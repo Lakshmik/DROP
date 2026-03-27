@@ -81,7 +81,7 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>R1DegenerateMGF</i> implements the MGF of R1 Degenerate Distribution. The References are:
+ * <i>R1DegenerateMGF</i> implements the MGF of R<sup>1</sup> Degenerate Distribution. The References are:
  * 
  * <br><br>
  * 	<ul>
@@ -94,6 +94,8 @@ import org.drip.numerical.common.NumberUtil;
  *
  *  <ul>
  * 		<li><i>R1DegenerateMGF</i> Constructor</li>
+ * 		<li>Evaluate the Moment Generating Function at <code>t</code></li>
+ * 		<li>Retrieve the n<sup>th</sup> Non-central Moment</li>
  *  </ul>
  *
  *	<br>
@@ -128,11 +130,11 @@ public class R1DegenerateMGF
 	}
 
 	/**
-	 * Evaluate the Moment Generating Function at t
+	 * Evaluate the Moment Generating Function at <code>t</code>
 	 * 
-	 * @param t MGF "t"
+	 * @param t MGF <code>t</code>
 	 * 
-	 * @return Moment Generating Function evaluated at t
+	 * @return Moment Generating Function evaluated at <code>t</code>
 	 * 
 	 * @throws Exception Thrown if the Moment Generating Function cannot be evaluated
 	 */

@@ -8,17 +8,17 @@ Portfolio Core Module contains libraries that implement Portfolio Contruction an
 
 ## Component Libraries
 
- * [*Asset Allocation Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/AssetAllocationAnalyticsLibrary.md) => Optimal Portfolio Construction and Asset Allocation Functionality.
+ * [*Asset Allocation Analytics*](https://github.com/lakshmik/DROP/blob/master/AssetAllocationAnalyticsLibrary.md) => Optimal Portfolio Construction and Asset Allocation Functionality.
 
- * [*Asset Liability Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/AssetLiabilityAnalyticsLibrary.md) => Asset Liability Analytics Functionality.
+ * [*Asset Liability Analytics*](https://github.com/lakshmik/DROP/blob/master/AssetLiabilityAnalyticsLibrary.md) => Asset Liability Analytics Functionality.
 
- * [*Capital Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/CapitalAnalyticsLibrary.md) => Economic Risk Capital and Basel Operational Capital Analytics.
+ * [*Capital Analytics*](https://github.com/lakshmik/DROP/blob/master/CapitalAnalyticsLibrary.md) => Economic Risk Capital and Basel Operational Capital Analytics.
 
- * [*Exposure Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/ExposureAnalyticsLibrary.md) => Scenario Exposures at the specified Trade Group Granularity.
+ * [*Exposure Analytics*](https://github.com/lakshmik/DROP/blob/master/ExposureAnalyticsLibrary.md) => Scenario Exposures at the specified Trade Group Granularity.
 
- * [*Margin Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/MarginAnalyticsLibrary.md) => Initial and Variation Margin Analytics.
+ * [*Margin Analytics*](https://github.com/lakshmik/DROP/blob/master/MarginAnalyticsLibrary.md) => Initial and Variation Margin Analytics.
 
- * [*XVA Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/XVAAnalyticsLibrary.md) => Valuation Adjustments (Collateral VA/CVA/DVA/FBA/FCA/FVA/MVA/XVA).
+ * [*XVA Analytics*](https://github.com/lakshmik/DROP/blob/master/XVAAnalyticsLibrary.md) => Valuation Adjustments (Collateral VA/CVA/DVA/FBA/FCA/FVA/MVA/XVA).
 
 
 ## Asset Allocation Analytics Coverage

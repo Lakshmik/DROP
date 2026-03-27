@@ -197,7 +197,7 @@ public class ComposableUnitFloatingPeriod extends org.drip.analytics.cashflow.Co
 		iReferencePeriodStartDate = iReferencePeriodStartDate > iEpochDate ? iReferencePeriodStartDate :
 			iEpochDate;
 
-		return dcFunding.libor (
+		return iReferencePeriodStartDate == iReferencePeriodEndDate ? 0. : dcFunding.libor (
 			iReferencePeriodStartDate,
 			iReferencePeriodEndDate,
 			org.drip.analytics.daycount.Convention.YearFraction (

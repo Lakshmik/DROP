@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,7 +93,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>Table4DetailedBlowout</i> replicates the detailed Steps involved in the Black-Litterman Model Process
- * as illustrated in Table #4 the Following Paper:
+ * 	as illustrated in Table #4 the Following Paper:
  *  
  * <br><br>
  *  <ul>
@@ -182,30 +190,23 @@ public class Table4DetailedBlowout
 		int sovereignCount = sovereignArray.length;
 		double[][] sigmaMatrix = new double[sovereignCount][sovereignCount];
 
-		for (int sovereignIndexI = 0; sovereignIndexI < sovereignCount; ++sovereignIndexI)
-		{
-			for (int sovereignIndexJ = 0; sovereignIndexJ < sovereignCount; ++sovereignIndexJ)
-			{
+		for (int sovereignIndexI = 0; sovereignIndexI < sovereignCount; ++sovereignIndexI) {
+			for (int sovereignIndexJ = 0; sovereignIndexJ < sovereignCount; ++sovereignIndexJ) {
 				sigmaMatrix[sovereignIndexI][sovereignIndexJ] = inputVolatilityArray[sovereignIndexI] *
 					inputVolatilityArray[sovereignIndexJ] *
 					inputCorrelationMatrix[sovereignIndexI][sovereignIndexJ];
 			}
 		}
 
-		double[] piArray = R1MatrixUtil.Product (
-			sigmaMatrix,
-			inputWArray
-		);
+		double[] piArray = R1MatrixUtil.Product (sigmaMatrix, inputWArray);
 
-		for (int sovereignIndex = 0; sovereignIndex < sovereignCount; ++sovereignIndex)
-		{
+		for (int sovereignIndex = 0; sovereignIndex < sovereignCount; ++sovereignIndex) {
 			piArray[sovereignIndex] *= inputDELTA;
 		}
 
 		System.out.println();
 
-		for (int sovereignIndex = 0; sovereignIndex < sovereignCount; ++sovereignIndex)
-		{
+		for (int sovereignIndex = 0; sovereignIndex < sovereignCount; ++sovereignIndex) {
 			System.out.println (
 				"\t{PI}[" + sovereignArray[sovereignIndex] + "] =>" +
 				FormatUtil.FormatDouble (piArray[sovereignIndex], 1, 1, 100.) + "%"
@@ -219,8 +220,7 @@ public class Table4DetailedBlowout
 			piArray
 		);
 
-		for (int pDotPIIndex = 0; pDotPIIndex < pDotPIArray.length; ++pDotPIIndex)
-		{
+		for (int pDotPIIndex = 0; pDotPIIndex < pDotPIArray.length; ++pDotPIIndex) {
 			System.out.println (
 				"\t{P.PI}[" + pDotPIIndex + "] =>" +
 				FormatUtil.FormatDouble (pDotPIArray[pDotPIIndex], 1, 6, 1.)
@@ -231,8 +231,7 @@ public class Table4DetailedBlowout
 
 		double[] qMinus_PdotPI_Array = new double[inputQArray.length];
 
-		for (int qIndex = 0; qIndex < inputQArray.length; ++qIndex)
-		{
+		for (int qIndex = 0; qIndex < inputQArray.length; ++qIndex) {
 			qMinus_PdotPI_Array[qIndex] = inputQArray[qIndex] - pDotPIArray[qIndex];
 		}
 
@@ -248,14 +247,9 @@ public class Table4DetailedBlowout
 
 		System.out.println();
 
-		double[][] pTransposeMatrix = R1MatrixUtil.Transpose (
-			inputPMatrix
-		);
+		double[][] pTransposeMatrix = R1MatrixUtil.Transpose (inputPMatrix);
 
-		double[][] sigmaDot_PTranspose_Matrix = R1MatrixUtil.Product (
-			sigmaMatrix,
-			pTransposeMatrix
-		);
+		double[][] sigmaDot_PTranspose_Matrix = R1MatrixUtil.Product (sigmaMatrix, pTransposeMatrix);
 
 		for (int sigmaDot_PTranspose_MatrixRowIndex = 0;
 			sigmaDot_PTranspose_MatrixRowIndex < sigmaDot_PTranspose_Matrix.length;
@@ -266,8 +260,13 @@ public class Table4DetailedBlowout
 				++sigmaDot_PTranspose_MatrixColumnIndex)
 			{
 				System.out.println (
-					"\t{SIGMA.PTRANSPOSE}[" + sigmaDot_PTranspose_MatrixRowIndex + "][" + sigmaDot_PTranspose_MatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (sigmaDot_PTranspose_Matrix[sigmaDot_PTranspose_MatrixRowIndex][sigmaDot_PTranspose_MatrixColumnIndex], 1, 6, 1.)
+					"\t{SIGMA.PTRANSPOSE}[" + sigmaDot_PTranspose_MatrixRowIndex + "][" +
+						sigmaDot_PTranspose_MatrixColumnIndex + "] =>" + FormatUtil.FormatDouble (
+							sigmaDot_PTranspose_Matrix[sigmaDot_PTranspose_MatrixRowIndex][sigmaDot_PTranspose_MatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
@@ -288,8 +287,13 @@ public class Table4DetailedBlowout
 				++pDotSIGMAdot_PTranspose_MatrixColumnIndex)
 			{
 				System.out.println (
-					"\t{P.SIGMA.PTRANSPOSE}[" + pDotSIGMAdot_PTranspose_MatrixRowIndex + "][" + pDotSIGMAdot_PTranspose_MatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (pDotSIGMAdot_PTranspose_Matrix[pDotSIGMAdot_PTranspose_MatrixRowIndex][pDotSIGMAdot_PTranspose_MatrixColumnIndex], 1, 6, 1.)
+					"\t{P.SIGMA.PTRANSPOSE}[" + pDotSIGMAdot_PTranspose_MatrixRowIndex + "][" +
+						pDotSIGMAdot_PTranspose_MatrixColumnIndex + "] =>" + FormatUtil.FormatDouble (
+							pDotSIGMAdot_PTranspose_Matrix[pDotSIGMAdot_PTranspose_MatrixRowIndex][pDotSIGMAdot_PTranspose_MatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
@@ -313,20 +317,22 @@ public class Table4DetailedBlowout
 					inputOmegaMatrix[pDotSIGMAdot_PTranspose_PlusOMEGAMatrixRowIndex][pDotSIGMAdot_PTranspose_PlusOMEGAMatrixColumnIndex];
 
 				System.out.println (
-					"\t{P.SIGMA.PTRANSPOSE+OMEGA}[" + pDotSIGMAdot_PTranspose_PlusOMEGAMatrixRowIndex + "][" + pDotSIGMAdot_PTranspose_PlusOMEGAMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (
-						pDotSIGMAdot_PTranspose_PlusOMEGAMatrix[pDotSIGMAdot_PTranspose_PlusOMEGAMatrixRowIndex][pDotSIGMAdot_PTranspose_PlusOMEGAMatrixColumnIndex],
-						1, 6, 1.
-					)
+					"\t{P.SIGMA.PTRANSPOSE+OMEGA}[" + pDotSIGMAdot_PTranspose_PlusOMEGAMatrixRowIndex + "]["
+						+ pDotSIGMAdot_PTranspose_PlusOMEGAMatrixColumnIndex + "] =>" +
+							FormatUtil.FormatDouble (
+								pDotSIGMAdot_PTranspose_PlusOMEGAMatrix[pDotSIGMAdot_PTranspose_PlusOMEGAMatrixRowIndex][pDotSIGMAdot_PTranspose_PlusOMEGAMatrixColumnIndex],
+								1,
+								6,
+								1.
+							)
 				);
 			}
 		}
 
 		System.out.println();
 
-		double[][] $PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrix = R1MatrixUtil.InvertUsingGaussianElimination (
-			pDotSIGMAdot_PTranspose_PlusOMEGAMatrix
-		);
+		double[][] $PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrix =
+			R1MatrixUtil.InvertUsingGaussianElimination (pDotSIGMAdot_PTranspose_PlusOMEGAMatrix);
 
 		for (int $PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixRowIndex = 0;
 			$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixRowIndex <
@@ -339,18 +345,23 @@ public class Table4DetailedBlowout
 				++$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixColumnIndex)
 			{
 				System.out.println (
-					"\t{P.SIGMA.PTRANSPOSE+OMEGA}^(-1)[" + $PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixRowIndex + "][" + $PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble ($PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrix[$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixRowIndex][$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixColumnIndex], 1, 6, 1.)
+					"\t{P.SIGMA.PTRANSPOSE+OMEGA}^(-1)[" +
+						$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixRowIndex + "][" +
+						$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixColumnIndex + "] =>" +
+						FormatUtil.FormatDouble (
+							$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrix[$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixRowIndex][$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
 
 		System.out.println();
 
-		double[] __$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__Array = R1MatrixUtil.Product (
-			$PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrix,
-			qMinus_PdotPI_Array
-		);
+		double[] __$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__Array =
+			R1MatrixUtil.Product ($PDotSIGMAdot_PTranspose_PlusOMEGA$InverseMatrix, qMinus_PdotPI_Array);
 
 		for (int __$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex = 0;
 			__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex <
@@ -358,8 +369,14 @@ public class Table4DetailedBlowout
 			++__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex)
 		{
 			System.out.println (
-				"\t{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{Q-P.PI}[" + __$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex + "] =>" +
-				FormatUtil.FormatDouble (__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__Array[__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex], 1, 6, 1.)
+				"\t{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{Q-P.PI}[" +
+					__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex + "] =>" +
+					FormatUtil.FormatDouble (
+						__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__Array[__$PDotSIGMADot_PTranspose_plusOMEGA$Inverse__Dot_QMinus__PDotPI__ArrayIndex],
+						1,
+						6,
+						1.
+					)
 			);
 		}
 
@@ -377,8 +394,14 @@ public class Table4DetailedBlowout
 			++sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__ArrayIndex)
 		{
 			System.out.println (
-				"\t{SIGMA.PTRANSPOSE}{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{Q-P.PI}[" + sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__ArrayIndex + "] =>" +
-				FormatUtil.FormatDouble (sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__Array[sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__ArrayIndex], 1, 6, 1.)
+				"\t{SIGMA.PTRANSPOSE}{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{Q-P.PI}[" +
+					sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__ArrayIndex +
+					"] =>" + FormatUtil.FormatDouble (
+						sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__Array[sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__ArrayIndex],
+						1,
+						6,
+						1.
+					)
 			);
 		}
 
@@ -386,23 +409,19 @@ public class Table4DetailedBlowout
 
 		double[] piHatArray = new double[piArray.length];
 
-		for (int piHatArrayIndex = 0; piHatArrayIndex < piHatArray.length; ++piHatArrayIndex)
-		{
+		for (int piHatArrayIndex = 0; piHatArrayIndex < piHatArray.length; ++piHatArrayIndex) {
 			piHatArray[piHatArrayIndex] = piArray[piHatArrayIndex] +
 				sigmaDot$PTranspose$__$PDotSIGMADot_PTranspose_PlusOmega$Inverse__Dot_QMinus__PDotPI__Array[piHatArrayIndex];
 
 			System.out.println (
-				"\tPIHAT=PI+{SIGMA.PTRANSPOSE}{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{Q-P.PI}[" + piHatArrayIndex + "] =>" +
-				FormatUtil.FormatDouble (piHatArray[piHatArrayIndex], 1, 1, 100.) + "%"
+				"\tPIHAT=PI+{SIGMA.PTRANSPOSE}{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{Q-P.PI}[" + piHatArrayIndex +
+					"] =>" + FormatUtil.FormatDouble (piHatArray[piHatArrayIndex], 1, 1, 100.) + "%"
 			);
 		}
 
 		System.out.println();
 
-		double[][] pDotSigmaMatrix = R1MatrixUtil.Product (
-			inputPMatrix,
-			sigmaMatrix
-		);
+		double[][] pDotSigmaMatrix = R1MatrixUtil.Product (inputPMatrix, sigmaMatrix);
 
 		for (int pDotSigmaMatrixRowIndex = 0;
 			pDotSigmaMatrixRowIndex < pDotSigmaMatrix.length;
@@ -414,7 +433,12 @@ public class Table4DetailedBlowout
 			{
 				System.out.println (
 					"\tP.SIGMA[" + pDotSigmaMatrixRowIndex + "][" + pDotSigmaMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (pDotSigmaMatrix[pDotSigmaMatrixRowIndex][pDotSigmaMatrixColumnIndex], 1, 6, 1.)
+					FormatUtil.FormatDouble (
+						pDotSigmaMatrix[pDotSigmaMatrixRowIndex][pDotSigmaMatrixColumnIndex],
+						1,
+						6,
+						1.
+					)
 				);
 			}
 		}
@@ -437,8 +461,15 @@ public class Table4DetailedBlowout
 				++__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex)
 			{
 				System.out.println (
-					"\t{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA}[" + __$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex + "][" + __$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrix[__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex][__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex], 1, 6, 1.)
+					"\t{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA}[" +
+						__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex + "][" +
+						__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex + "] =>"
+						+ FormatUtil.FormatDouble (
+							__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrix[__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex][__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
@@ -462,11 +493,16 @@ public class Table4DetailedBlowout
 				++sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixColumnIndex)
 			{
 				System.out.println (
-					"\t{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA}[" + sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixRowIndex + "][" + sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (
-						sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrix[sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixRowIndex][sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixColumnIndex],
-						1, 6, 1.
-					)
+					"\t{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA}[" +
+						sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixRowIndex +
+							"][" +
+							sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixColumnIndex
+							+ "] =>" + FormatUtil.FormatDouble (
+								sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrix[sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixRowIndex][sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrixColumnIndex],
+								1,
+								6,
+								1.
+							)
 				);
 			}
 		}
@@ -492,16 +528,23 @@ public class Table4DetailedBlowout
 					sigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmegaPDotSigmaMatrix[sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex][sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex];
 
 				System.out.println (
-					"\tSIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA}[" + sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex + "][" + sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrix[sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex][sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex], 1, 6, 1.)
+					"\tSIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA}[" +
+						sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex + "][" + sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex
+						+ "] =>" + FormatUtil.FormatDouble (
+							sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrix[sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixRowIndex][sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
 
 		System.out.println();
 
-		double[][] tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix =
-			new double[sovereignCount][sovereignCount];
+		double[][]
+			tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix
+			= new double[sovereignCount][sovereignCount];
 
 		for (int tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex = 0;
 			tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex <
@@ -513,20 +556,28 @@ public class Table4DetailedBlowout
 					tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[0].length;
 				++tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex)
 			{
-				tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex] =
-					inputTAU * sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrix[tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex];
+				tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex]
+					= inputTAU *
+						sigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigmaMatrix[tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex];
 
 				System.out.println (
-					"\tTAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})[" + tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex + "][" + tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex], 1, 6, 1.)
+					"\tTAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})[" +
+						tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex + "][" + tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex
+						+ "] =>" + FormatUtil.FormatDouble (
+							tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
 
 		System.out.println();
 
-		double[][] sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix =
-			new double[sovereignCount][sovereignCount];
+		double[][]
+			sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix
+			= new double[sovereignCount][sovereignCount];
 
 		for (int sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex = 0;
 				sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex <
@@ -543,8 +594,14 @@ public class Table4DetailedBlowout
 					tauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex];
 
 				System.out.println (
-					"\tSIGMA+TAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})[" + sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex + "][" + sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex], 1, 6, 1.)
+					"\tSIGMA+TAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})[" +
+						sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex + "][" + sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex
+						+ "] =>" + FormatUtil.FormatDouble (
+							sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$Matrix[sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixRowIndex][sigmaPlusTauDot$$SigmaMinusSigmaDot_PTranspose_Dot__$PDotSigmaDot_PTranspose_PlusOmega$Inverse__DotPDotSigma$$MatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
@@ -564,18 +621,21 @@ public class Table4DetailedBlowout
 				++sigmaPInverseMatrixColumnIndex)
 			{
 				System.out.println (
-					"\t[SIGMA+TAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})]^(-1)[" + sigmaPInverseMatrixRowIndex + "][" + sigmaPInverseMatrixColumnIndex + "] =>" +
-					FormatUtil.FormatDouble (sigmaPInverseMatrix[sigmaPInverseMatrixRowIndex][sigmaPInverseMatrixColumnIndex], 1, 6, 1.)
+					"\t[SIGMA+TAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})]^(-1)["
+						+ sigmaPInverseMatrixRowIndex + "][" + sigmaPInverseMatrixColumnIndex + "] =>" +
+						FormatUtil.FormatDouble (
+							sigmaPInverseMatrix[sigmaPInverseMatrixRowIndex][sigmaPInverseMatrixColumnIndex],
+							1,
+							6,
+							1.
+						)
 				);
 			}
 		}
 
 		System.out.println();
 
-		double[] sigmaPInverseDotPiHatArray = R1MatrixUtil.Product (
-			sigmaPInverseMatrix,
-			piHatArray
-		);
+		double[] sigmaPInverseDotPiHatArray = R1MatrixUtil.Product (sigmaPInverseMatrix, piHatArray);
 
 		for (int sigmaPInverseDotPiHatArrayIndex = 0;
 			sigmaPInverseDotPiHatArrayIndex < sigmaPInverseDotPiHatArray.length;
@@ -584,8 +644,13 @@ public class Table4DetailedBlowout
 			sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex] /= inputDELTA;
 
 			System.out.println (
-				"\t[SIGMA+TAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})]^(-1).PIHAT[" + sigmaPInverseDotPiHatArrayIndex + "] =>" +
-				FormatUtil.FormatDouble (sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex], 1, 1, 100.) + "%"
+				"\t[SIGMA+TAU.(SIGMA-{SIGMA.PTRANSPOSE}.{P.SIGMA.PTRANSPOSE+OMEGA}^(-1).{P.SIGMA})]^(-1).PIHAT["
+					+ sigmaPInverseDotPiHatArrayIndex + "] =>" + FormatUtil.FormatDouble (
+						sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex],
+						1,
+						1,
+						100.
+					) + "%"
 			);
 		}
 
@@ -597,8 +662,7 @@ public class Table4DetailedBlowout
 
 		System.out.println ("\t|----------------||");
 
-		for (int piArrayIndex = 0; piArrayIndex < piArray.length; ++piArrayIndex)
-		{
+		for (int piArrayIndex = 0; piArrayIndex < piArray.length; ++piArrayIndex) {
 			System.out.println (
 				"\t| [" + sovereignArray[piArrayIndex] + "] =>" +
 				FormatUtil.FormatDouble (piArray[piArrayIndex], 2, 1, 100.) + "% ||"
@@ -613,8 +677,7 @@ public class Table4DetailedBlowout
 
 		System.out.println ("\t|----------------||");
 
-		for (int piArrayIndex = 0; piArrayIndex < piHatArray.length; ++piArrayIndex)
-		{
+		for (int piArrayIndex = 0; piArrayIndex < piHatArray.length; ++piArrayIndex) {
 			System.out.println (
 				"\t| [" + sovereignArray[piArrayIndex] + "] =>" +
 				FormatUtil.FormatDouble (piHatArray[piArrayIndex], 2, 1, 100.) + "% ||"
@@ -633,11 +696,11 @@ public class Table4DetailedBlowout
 
 		System.out.println ("\t|-----------------||");
 
-		for (int inputWArrayIndex = 0; inputWArrayIndex < inputWArray.length; ++inputWArrayIndex)
-		{
+		for (int inputWArrayIndex = 0; inputWArrayIndex < inputWArray.length; ++inputWArrayIndex) {
 			System.out.println (
 				"\t| [" + sovereignArray[inputWArrayIndex] + "] => " +
-				FormatUtil.FormatDouble (inputWArray[inputWArrayIndex] / (1. + inputTAU), 2, 1, 100.) + "% ||"
+					FormatUtil.FormatDouble (inputWArray[inputWArrayIndex] / (1. + inputTAU), 2, 1, 100.) +
+					"% ||"
 			);
 		}
 
@@ -657,7 +720,12 @@ public class Table4DetailedBlowout
 		{
 			System.out.println (
 				"\t| [" + sovereignArray[sigmaPInverseDotPiHatArrayIndex] + "] => " +
-				FormatUtil.FormatDouble (sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex], 2, 1, 100.) + "% ||"
+				FormatUtil.FormatDouble (
+					sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex],
+					2,
+					1,
+					100.
+				) + "% ||"
 			);
 		}
 
@@ -677,7 +745,8 @@ public class Table4DetailedBlowout
 		{
 			System.out.println (
 				"\t| [" + sovereignArray[sigmaPInverseDotPiHatArrayIndex] + "] => " +
-				FormatUtil.FormatDouble (sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex] - (inputWArray[sigmaPInverseDotPiHatArrayIndex] / (1. + inputTAU)), 2, 1, 100.) + "%  ||"
+				FormatUtil.FormatDouble (sigmaPInverseDotPiHatArray[sigmaPInverseDotPiHatArrayIndex] -
+					(inputWArray[sigmaPInverseDotPiHatArrayIndex] / (1. + inputTAU)), 2, 1, 100.) + "%  ||"
 			);
 		}
 

@@ -1,11 +1,26 @@
 
 package org.drip.historical.attribution;
 
+import java.util.Set;
+
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,53 +96,82 @@ package org.drip.historical.attribution;
 
 /**
  * <i>PositionChangeComponents</i> contains the Decomposition of the Components of the Interval Change for a
- * given Position.
+ * 	given Position. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></li>
+ * 		<li><i>PositionChangeComponents</i> Constructor</li>
+ * 		<li>Return the Position Change Type</li>
+ * 		<li>Retrieve the Set of Manifest Measures</li>
+ * 		<li>Retrieve the First Position Market Snapshot Instance</li>
+ * 		<li>Retrieve the Second Position Market Snapshot Instance</li>
+ * 		<li>Retrieve the First Date</li>
+ * 		<li>Retrieve the Second Date</li>
+ * 		<li>Retrieve the Gross Interval Clean Change</li>
+ * 		<li>Retrieve the Gross Interval Change</li>
+ * 		<li>Retrieve the Specific Manifest Measure Market Realization Position Change</li>
+ * 		<li>Retrieve the Full Manifest Measure Realization Position Change</li>
+ * 		<li>Retrieve the Specific Manifest Measure Market Sensitivity Position Change</li>
+ * 		<li>Retrieve the Full Manifest Measure Market Sensitivity Position Change</li>
+ * 		<li>Retrieve the Specific Manifest Measure Market Roll-down Position Change</li>
+ * 		<li>Retrieve the Full Manifest Measure Roll-down Position Change</li>
+ * 		<li>Retrieve the Accrual Interval Change</li>
+ * 		<li>Retrieve the Explained Interval Change</li>
+ * 		<li>Retrieve the Unexplained Interval Change</li>
+ * 		<li>Retrieve the Map of Difference Metrics</li>
+ * 		<li>Retrieve the Row of Header Fields</li>
+ * 		<li>Retrieve the Row of Content Fields</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PositionChangeComponents {
-	private boolean _bChangeTypeReturn = false;
-	private double _dblAccrualChange = java.lang.Double.NaN;
-	private org.drip.historical.attribution.PositionMarketSnap _pmsFirst = null;
-	private org.drip.historical.attribution.PositionMarketSnap _pmsSecond = null;
-	private org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> _mapDifferenceMetric = null;
+public class PositionChangeComponents
+{
+	private boolean _changeTypeReturn = false;
+	private double _accrualChange = Double.NaN;
+	private PositionMarketSnap _t1PositionMarketSnap = null;
+	private PositionMarketSnap _t2PositionMarketSnap = null;
+	private CaseInsensitiveHashMap<Double> _differenceMetricMap = null;
 
 	/**
-	 * PositionChangeComponents Constructor
+	 * <i>PositionChangeComponents</i> Constructor
 	 * 
-	 * @param bChangeTypeReturn TRUE - Change Type is Return (Relative)
-	 * @param pmsFirst The First Position Market Snapshot Instance
-	 * @param pmsSecond The Second Position Market Snapshot Instance
-	 * @param dblAccrualChange The Accrual Change Component of Interval Return/Change
-	 * @param mapDifferenceMetric The Map of Difference Metrics
+	 * @param changeTypeReturn TRUE - Change Type is Return (Relative)
+	 * @param t1PositionMarketSnap The T1 Position Market Snapshot Instance
+	 * @param t2PositionMarketSnap The T2 Position Market Snapshot Instance
+	 * @param accrualChange The Accrual Change Component of Interval Return/Change
+	 * @param differenceMetricMap The Map of Difference Metrics
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public PositionChangeComponents (
-		final boolean bChangeTypeReturn,
-		final org.drip.historical.attribution.PositionMarketSnap pmsFirst,
-		final org.drip.historical.attribution.PositionMarketSnap pmsSecond,
-		final double dblAccrualChange,
-		final org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapDifferenceMetric)
-		throws java.lang.Exception
+		final boolean changeTypeReturn,
+		final PositionMarketSnap t1PositionMarketSnap,
+		final PositionMarketSnap t2PositionMarketSnap,
+		final double accrualChange,
+		final CaseInsensitiveHashMap<Double> differenceMetricMap)
+		throws Exception
 	{
-		_bChangeTypeReturn = bChangeTypeReturn;
-		_mapDifferenceMetric = mapDifferenceMetric;
+		_changeTypeReturn = changeTypeReturn;
+		_differenceMetricMap = differenceMetricMap;
 
-		if (null == (_pmsFirst = pmsFirst) || null == (_pmsSecond = pmsSecond) ||
-			_pmsFirst.snapDate().julian() >= _pmsSecond.snapDate().julian() ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblAccrualChange = dblAccrualChange))
-			throw new java.lang.Exception ("PositionChangeComponents Constructor => Invalid Inputs!");
+		if (null == (_t1PositionMarketSnap = t1PositionMarketSnap) ||
+			null == (_t2PositionMarketSnap = t2PositionMarketSnap) ||
+			_t1PositionMarketSnap.snapDate().julian() >= _t2PositionMarketSnap.snapDate().julian() ||
+			!NumberUtil.IsValid (_accrualChange = accrualChange))
+		{
+			throw new Exception ("PositionChangeComponents Constructor => Invalid Inputs!");
+		}
 	}
 
 	/**
@@ -138,7 +182,7 @@ public class PositionChangeComponents {
 
 	public boolean changeTypeReturn()
 	{
-		return _bChangeTypeReturn;
+		return _changeTypeReturn;
 	}
 
 	/**
@@ -147,9 +191,9 @@ public class PositionChangeComponents {
 	 * @return The Set of Manifest Measures
 	 */
 
-	public java.util.Set<java.lang.String> manifestMeasures()
+	public Set<String> manifestMeasureSet()
 	{
-		return _pmsFirst.manifestMeasures();
+		return _t1PositionMarketSnap.manifestMeasures();
 	}
 
 	/**
@@ -158,9 +202,9 @@ public class PositionChangeComponents {
 	 * @return The First Position Market Snapshot Instance
 	 */
 
-	public org.drip.historical.attribution.PositionMarketSnap pmsFirst()
+	public PositionMarketSnap t1PositionMarketSnap()
 	{
-		return _pmsFirst;
+		return _t1PositionMarketSnap;
 	}
 
 	/**
@@ -169,9 +213,9 @@ public class PositionChangeComponents {
 	 * @return The Second Position Market Snapshot Instance
 	 */
 
-	public org.drip.historical.attribution.PositionMarketSnap pmsSecond()
+	public PositionMarketSnap t2PositionMarketSnap()
 	{
-		return _pmsSecond;
+		return _t2PositionMarketSnap;
 	}
 
 	/**
@@ -180,9 +224,9 @@ public class PositionChangeComponents {
 	 * @return The First Date
 	 */
 
-	public org.drip.analytics.date.JulianDate firstDate()
+	public JulianDate t1()
 	{
-		return _pmsFirst.snapDate();
+		return _t1PositionMarketSnap.snapDate();
 	}
 
 	/**
@@ -191,9 +235,9 @@ public class PositionChangeComponents {
 	 * @return The Second Date
 	 */
 
-	public org.drip.analytics.date.JulianDate secondDate()
+	public JulianDate t2()
 	{
-		return _pmsSecond.snapDate();
+		return _t2PositionMarketSnap.snapDate();
 	}
 
 	/**
@@ -204,7 +248,7 @@ public class PositionChangeComponents {
 
 	public double grossCleanChange()
 	{
-		return _pmsSecond.marketValue() - _pmsFirst.marketValue();
+		return _t2PositionMarketSnap.marketValue() - _t1PositionMarketSnap.marketValue();
 	}
 
 	/**
@@ -215,35 +259,38 @@ public class PositionChangeComponents {
 
 	public double grossChange()
 	{
-		return grossCleanChange() + _dblAccrualChange;
+		return grossCleanChange() + _accrualChange;
 	}
 
 	/**
 	 * Retrieve the Specific Manifest Measure Market Realization Position Change
 	 * 
-	 * @param strManifestMeasure The Manifest Measure
+	 * @param manifestMeasure The Manifest Measure
 	 * 
 	 * @return The Specific Manifest Measure Market Realization Position Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double specificMarketRealizationChange (
-		final java.lang.String strManifestMeasure)
-		throws java.lang.Exception
+		final String manifestMeasure)
+		throws Exception
 	{
-		org.drip.historical.attribution.PositionManifestMeasureSnap pmmsFirst = _pmsFirst.manifestMeasureSnap
-			(strManifestMeasure);
+		PositionManifestMeasureSnap t1PositionManifestMeasureSnap =
+			_t1PositionMarketSnap.manifestMeasureSnap (manifestMeasure);
 
-		org.drip.historical.attribution.PositionManifestMeasureSnap pmmsSecond = _pmsSecond.manifestMeasureSnap
-			(strManifestMeasure);
+		PositionManifestMeasureSnap t2PositionManifestMeasureSnap =
+			_t2PositionMarketSnap.manifestMeasureSnap (manifestMeasure);
 
-		if (null == pmmsFirst || null == pmmsSecond)
-			throw new java.lang.Exception
-				("PositionChangeComponents::specificMarketRealizationChange => Invalid Inputs");
+		if (null == t1PositionManifestMeasureSnap || null == t2PositionManifestMeasureSnap) {
+			throw new Exception (
+				"PositionChangeComponents::specificMarketRealizationChange => Invalid Inputs"
+			);
+		}
 
-		return 0.5 * (pmmsFirst.sensitivity() + pmmsSecond.sensitivity()) * (pmmsSecond.realization() -
-			pmmsFirst.realization());
+		return 0.5 *
+			(t1PositionManifestMeasureSnap.sensitivity() + t2PositionManifestMeasureSnap.sensitivity()) *
+			(t2PositionManifestMeasureSnap.realization() - t1PositionManifestMeasureSnap.realization());
 	}
 
 	/**
@@ -251,52 +298,58 @@ public class PositionChangeComponents {
 	 * 
 	 * @return The Full Manifest Measure Realization Position Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double marketRealizationChange()
-		throws java.lang.Exception
+		throws Exception
 	{
-		java.util.Set<java.lang.String> setstrManiFestMeasure = _pmsFirst.manifestMeasures();
+		Set<String> manifestMeasureSet = _t1PositionMarketSnap.manifestMeasures();
 
-		if (null == setstrManiFestMeasure || 0 == setstrManiFestMeasure.size())
-			throw new java.lang.Exception
-				("PositionChangeComponents::marketRealizationChange => No Manifest Measures");
+		if (null == manifestMeasureSet || 0 == manifestMeasureSet.size()) {
+			throw new Exception (
+				"PositionChangeComponents::marketRealizationChange => No Manifest Measures"
+			);
+		}
 
-		double dblMarketRealizationChange = 0.;
+		double marketRealizationChange = 0.;
 
-		for (java.lang.String strManifestMeasure : setstrManiFestMeasure)
-			dblMarketRealizationChange += specificMarketRealizationChange (strManifestMeasure);
+		for (String manifestMeasure : manifestMeasureSet) {
+			marketRealizationChange += specificMarketRealizationChange (manifestMeasure);
+		}
 
-		return dblMarketRealizationChange;
+		return marketRealizationChange;
 	}
 
 	/**
 	 * Retrieve the Specific Manifest Measure Market Sensitivity Position Change
 	 * 
-	 * @param strManifestMeasure The Manifest Measure
+	 * @param manifestMeasure The Manifest Measure
 	 * 
 	 * @return The Specific Manifest Measure Market Sensitivity Position Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double specificMarketSensitivityChange (
-		final java.lang.String strManifestMeasure)
-		throws java.lang.Exception
+		final String manifestMeasure)
+		throws Exception
 	{
-		org.drip.historical.attribution.PositionManifestMeasureSnap pmmsFirst = _pmsFirst.manifestMeasureSnap
-			(strManifestMeasure);
+		PositionManifestMeasureSnap t1PositionManifestMeasureSnap =
+			_t1PositionMarketSnap.manifestMeasureSnap (manifestMeasure);
 
-		org.drip.historical.attribution.PositionManifestMeasureSnap pmmsSecond =
-			_pmsSecond.manifestMeasureSnap (strManifestMeasure);
+		PositionManifestMeasureSnap t2PositionManifestMeasureSnap =
+			_t2PositionMarketSnap.manifestMeasureSnap (manifestMeasure);
 
-		if (null == pmmsFirst || null == pmmsSecond)
-			throw new java.lang.Exception
-				("PositionChangeComponents::specificMarketSensitivityChange => Invalid Inputs");
+		if (null == t1PositionManifestMeasureSnap || null == t2PositionManifestMeasureSnap) {
+			throw new Exception (
+				"PositionChangeComponents::specificMarketSensitivityChange => Invalid Inputs"
+			);
+		}
 
-		return 0.5 * (pmmsFirst.realization() + pmmsSecond.realization()) * (pmmsSecond.sensitivity() -
-			pmmsFirst.sensitivity());
+		return 0.5 *
+			(t1PositionManifestMeasureSnap.realization() + t2PositionManifestMeasureSnap.realization()) *
+			(t2PositionManifestMeasureSnap.sensitivity() - t1PositionManifestMeasureSnap.sensitivity());
 	}
 
 	/**
@@ -304,48 +357,52 @@ public class PositionChangeComponents {
 	 * 
 	 * @return The Full Manifest Measure Market Sensitivity Position Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double marketSensitivityChange()
-		throws java.lang.Exception
+		throws Exception
 	{
-		java.util.Set<java.lang.String> setstrManiFestMeasure = _pmsFirst.manifestMeasures();
+		Set<String> manifestMeasureSet = _t1PositionMarketSnap.manifestMeasures();
 
-		if (null == setstrManiFestMeasure || 0 == setstrManiFestMeasure.size())
-			throw new java.lang.Exception
-				("PositionChangeComponents::marketSensitivityChange => No Manifest Measures");
+		if (null == manifestMeasureSet || 0 == manifestMeasureSet.size()) {
+			throw new Exception (
+				"PositionChangeComponents::marketSensitivityChange => No Manifest Measures"
+			);
+		}
 
-		double dblMarketSensitivityChange = 0.;
+		double marketSensitivityChange = 0.;
 
-		for (java.lang.String strManifestMeasure : setstrManiFestMeasure)
-			dblMarketSensitivityChange += specificMarketSensitivityChange (strManifestMeasure);
+		for (String manifestMeasure : manifestMeasureSet) {
+			marketSensitivityChange += specificMarketSensitivityChange (manifestMeasure);
+		}
 
-		return dblMarketSensitivityChange;
+		return marketSensitivityChange;
 	}
 
 	/**
 	 * Retrieve the Specific Manifest Measure Market Roll-down Position Change
 	 * 
-	 * @param strManifestMeasure The Manifest Measure
+	 * @param manifestMeasure The Manifest Measure
 	 * 
 	 * @return The Specific Manifest Measure Market Roll-down Position Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double specificMarketRollDownChange (
-		final java.lang.String strManifestMeasure)
-		throws java.lang.Exception
+		final String manifestMeasure)
+		throws Exception
 	{
-		org.drip.historical.attribution.PositionManifestMeasureSnap pmmsFirst = _pmsFirst.manifestMeasureSnap
-			(strManifestMeasure);
+		PositionManifestMeasureSnap t1PositionManifestMeasureSnap =
+			_t1PositionMarketSnap.manifestMeasureSnap (manifestMeasure);
 
-		if (null == pmmsFirst)
-			throw new java.lang.Exception
-				("PositionChangeComponents::specificMarketRollDownChange => Invalid Inputs");
+		if (null == t1PositionManifestMeasureSnap) {
+			throw new Exception ("PositionChangeComponents::specificMarketRollDownChange => Invalid Inputs");
+		}
 
-		return pmmsFirst.sensitivity() * (pmmsFirst.rollDown() - pmmsFirst.realization());
+		return t1PositionManifestMeasureSnap.sensitivity() *
+			(t1PositionManifestMeasureSnap.rollDown() - t1PositionManifestMeasureSnap.realization());
 	}
 
 	/**
@@ -353,24 +410,25 @@ public class PositionChangeComponents {
 	 * 
 	 * @return The Full Manifest Measure Roll-down Position Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double marketRollDownChange()
-		throws java.lang.Exception
+		throws Exception
 	{
-		java.util.Set<java.lang.String> setstrManiFestMeasure = _pmsFirst.manifestMeasures();
+		Set<String> manifestMeasureSet = _t1PositionMarketSnap.manifestMeasures();
 
-		if (null == setstrManiFestMeasure || 0 == setstrManiFestMeasure.size())
-			throw new java.lang.Exception
-				("PositionChangeComponents::marketRollDownChange => No Manifest Measures");
+		if (null == manifestMeasureSet || 0 == manifestMeasureSet.size()) {
+			throw new Exception ("PositionChangeComponents::marketRollDownChange => No Manifest Measures");
+		}
 
-		double dblMarketRollDownChange = 0.;
+		double marketRollDownChange = 0.;
 
-		for (java.lang.String strManifestMeasure : setstrManiFestMeasure)
-			dblMarketRollDownChange += specificMarketRollDownChange (strManifestMeasure);
+		for (String manifestMeasure : manifestMeasureSet) {
+			marketRollDownChange += specificMarketRollDownChange (manifestMeasure);
+		}
 
-		return dblMarketRollDownChange;
+		return marketRollDownChange;
 	}
 
 	/**
@@ -381,7 +439,7 @@ public class PositionChangeComponents {
 
 	public double accrualChange()
 	{
-		return _dblAccrualChange;
+		return _accrualChange;
 	}
 
 	/**
@@ -389,11 +447,11 @@ public class PositionChangeComponents {
 	 * 
 	 * @return The Explained Interval Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double explainedChange()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return marketRealizationChange() + marketRollDownChange();
 	}
@@ -403,11 +461,11 @@ public class PositionChangeComponents {
 	 * 
 	 * @return The Unexplained Interval Change
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double unexplainedChange()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return grossChange() - explainedChange();
 	}
@@ -418,9 +476,9 @@ public class PositionChangeComponents {
 	 * @return The Map of Difference Metrics
 	 */
 
-	public org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> differenceMetric()
+	public CaseInsensitiveHashMap<Double> differenceMetric()
 	{
-		return _mapDifferenceMetric;
+		return _differenceMetricMap;
 	}
 
 	/**
@@ -429,18 +487,21 @@ public class PositionChangeComponents {
 	 * @return The Row of Header Fields
 	 */
 
-	public java.lang.String header()
+	public String header()
 	{
-		java.lang.String strHeader = "FirstDate,SecondDate,TotalPnL,TotalCleanPnL,MarketShiftPnL," +
-			"RollDownPnL,AccrualPnL,ExplainedPnL,UnexplainedPnL," + _pmsFirst.header ("first") +
-				_pmsSecond.header ("second");
+		String header = "FirstDate,SecondDate,TotalPnL,TotalCleanPnL,MarketShiftPnL," +
+			"RollDownPnL,AccrualPnL,ExplainedPnL,UnexplainedPnL," + _t1PositionMarketSnap.header ("first") +
+			_t2PositionMarketSnap.header ("second");
 
-		if (null == _mapDifferenceMetric) return strHeader;
+		if (null == _differenceMetricMap) {
+			return header;
+		}
 
-		for (java.lang.String strKey : _mapDifferenceMetric.keySet())
-			strHeader = strHeader + strKey + "change,";
+		for (String key : _differenceMetricMap.keySet()) {
+			header = header + key + "change,";
+		}
 
-		return strHeader;
+		return header;
 	}
 
 	/**
@@ -449,45 +510,40 @@ public class PositionChangeComponents {
 	 * @return The Row of Content Fields
 	 */
 
-	public java.lang.String content()
+	public String content()
 	{
-		java.lang.String strContent = firstDate().toString() + "," + secondDate().toString() + ",";
+		String content = t1().toString() + "," + t2().toString() + ",";
 
-		strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (grossChange(), 1, 8, 1.) +
-			",";
+		content = content + FormatUtil.FormatDouble (grossChange(), 1, 8, 1.) + ",";
 
-		strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (grossCleanChange(), 1, 8,
-			1.) + ",";
+		content = content + FormatUtil.FormatDouble (grossCleanChange(), 1, 8, 1.) + ",";
 
 		try {
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble
-				(marketRealizationChange(), 1, 8, 1.) + ",";
+			content = content + FormatUtil.FormatDouble (marketRealizationChange(), 1, 8, 1.) + ",";
 
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (marketRollDownChange(),
-				1, 8, 1.) + ",";
+			content = content + FormatUtil.FormatDouble (marketRollDownChange(), 1, 8, 1.) + ",";
 
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (_dblAccrualChange, 1, 8,
-				1.) + ",";
+			content = content + FormatUtil.FormatDouble (_accrualChange, 1, 8, 1.) + ",";
 
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (explainedChange(), 1, 8,
-				1.) + ",";
+			content = content + FormatUtil.FormatDouble (explainedChange(), 1, 8, 1.) + ",";
 
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (unexplainedChange(), 1,
-				8, 1.) + ",";
-		} catch (java.lang.Exception e) {
+			content = content + FormatUtil.FormatDouble (unexplainedChange(), 1, 8, 1.) + ",";
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		strContent = strContent + _pmsFirst.content() + _pmsSecond.content();
+		content = content + _t1PositionMarketSnap.content() + _t2PositionMarketSnap.content();
 
-		if (null == _mapDifferenceMetric) return strContent;
+		if (null == _differenceMetricMap) {
+			return content;
+		}
 
-		for (java.lang.String strKey : _mapDifferenceMetric.keySet())
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (_mapDifferenceMetric.get
-				(strKey), 1, 8, 1.) + ",";
+		for (String key : _differenceMetricMap.keySet()) {
+			content = content + FormatUtil.FormatDouble (_differenceMetricMap.get (key), 1, 8, 1.) + ",";
+		}
 
-		return strContent;
+		return content;
 	}
 }

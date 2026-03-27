@@ -3,7 +3,6 @@ package org.drip.sample.treasuryfuturespnl;
 
 import java.util.List;
 
-import org.drip.analytics.date.JulianDate;
 import org.drip.feed.loader.*;
 import org.drip.historical.attribution.*;
 import org.drip.service.common.FormatUtil;
@@ -15,6 +14,14 @@ import org.drip.service.product.TreasuryFuturesAPI;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,85 +99,73 @@ import org.drip.service.product.TreasuryFuturesAPI;
  * <i>OAT1Attribution</i> demonstrates the Invocation of the Historical PnL Horizon PnL Attribution analysis
  * 	for the OAT1 Series.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/treasuryfuturespnl/README.md">G20 Treasury Futures PnL Attribution</a></li>
- *  </ul>
- * <br><br>
+ * <br>
+ * <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/treasuryfuturespnl/README.md">G20 Treasury Futures PnL Attribution</a></td></tr>
+ * </table>
+ * <br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class OAT1Attribution {
+public class OAT1Attribution
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strPrintLocation =
+		String printLocation =
 			"C:\\DROP\\Daemons\\Transforms\\TreasuryFuturesCloses\\OAT1ClosesReconstitutor.csv";
 
-		CSVGrid csvGrid = CSVParser.StringGrid (
-			strPrintLocation,
-			true
+		CSVGrid csvGrid = CSVParser.StringGrid (printLocation, true);
+
+		List<PositionChangeComponents> positionChangeComponentsList =
+			TreasuryFuturesAPI.HorizonChangeAttribution (
+				"FRTR",
+				csvGrid.dateArrayAtColumn (4),
+				csvGrid.dateArrayAtColumn (5),
+				csvGrid.doubleArrayAtColumn (3),
+				csvGrid.dateArrayAtColumn (6),
+				csvGrid.dateArrayAtColumn (0),
+				csvGrid.doubleArrayAtColumn (2),
+				csvGrid.doubleArrayAtColumn (1)
+			);
+
+		System.out.println (
+			"FirstDate, SecondDate, ExpiryDate, CTD Bond, Expiry Clean Price, Conversion Factor, 1D Gross PnL, 1D Market PnL, 1D Roll-down PnL, 1D Accrual PnL, 1D Explained PnL, 1D Unexplianed PnL"
 		);
 
-		JulianDate[] adtSpot = csvGrid.dateArrayAtColumn (0);
-
-		double[] adblConversionFactor = csvGrid.doubleArrayAtColumn (1);
-
-		double[] adblCleanPrice = csvGrid.doubleArrayAtColumn (2);
-
-		double[] adblCoupon = csvGrid.doubleArrayAtColumn (3);
-
-		JulianDate[] adtEffective = csvGrid.dateArrayAtColumn (4);
-
-		JulianDate[] adtMaturity = csvGrid.dateArrayAtColumn (5);
-
-		JulianDate[] adtExpiry = csvGrid.dateArrayAtColumn (6);
-
-		List<PositionChangeComponents> lsPCC = TreasuryFuturesAPI.HorizonChangeAttribution (
-			"FRTR",
-			adtEffective,
-			adtMaturity,
-			adblCoupon,
-			adtExpiry,
-			adtSpot,
-			adblCleanPrice,
-			adblConversionFactor
-		);
-
-		System.out.println ("FirstDate, SecondDate, ExpiryDate, CTD Bond, Expiry Clean Price, Conversion Factor, 1D Gross PnL, 1D Market PnL, 1D Roll-down PnL, 1D Accrual PnL, 1D Explained PnL, 1D Unexplianed PnL");
-
-		for (PositionChangeComponents pcc : lsPCC) {
-			TreasuryFuturesMarketSnap tfpms = (TreasuryFuturesMarketSnap) pcc.pmsSecond();
+		for (PositionChangeComponents positionChangeComponents : positionChangeComponentsList) {
+			TreasuryFuturesMarketSnap treasuryFuturesMarketSnap =
+				(TreasuryFuturesMarketSnap) positionChangeComponents.t2PositionMarketSnap();
 
 			System.out.println (
-				pcc.firstDate() + ", " +
-				pcc.secondDate() + ", " +
-				tfpms.expiryDate() + ", " +
-				tfpms.ctdName() + ", " +
-				FormatUtil.FormatDouble (tfpms.expiryCleanPrice(), 1, 5, 1.) + ", " +
-				FormatUtil.FormatDouble (tfpms.conversionFactor(), 1, 5, 1.) + ", " +
-				FormatUtil.FormatDouble (pcc.grossChange(), 2, 2, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.marketRealizationChange(), 2, 2, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.marketRollDownChange(), 2, 2, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.accrualChange(), 2, 2, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.explainedChange(), 2, 2, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.unexplainedChange(), 2, 2, 10000.)
+				positionChangeComponents.t1() + ", " +
+				positionChangeComponents.t2() + ", " +
+				treasuryFuturesMarketSnap.expiryDate() + ", " +
+				treasuryFuturesMarketSnap.ctdName() + ", " +
+				FormatUtil.FormatDouble (treasuryFuturesMarketSnap.expiryCleanPrice(), 1, 5, 1.) + ", " +
+				FormatUtil.FormatDouble (treasuryFuturesMarketSnap.conversionFactor(), 1, 5, 1.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.grossChange(), 2, 2, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.marketRealizationChange(), 2, 2, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.marketRollDownChange(), 2, 2, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.accrualChange(), 2, 2, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.explainedChange(), 2, 2, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.unexplainedChange(), 2, 2, 10000.)
 			);
 		}
 

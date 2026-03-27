@@ -1,11 +1,27 @@
 
 package org.drip.historical.attribution;
 
+import java.util.Map;
+import java.util.Set;
+
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,53 +97,74 @@ package org.drip.historical.attribution;
 
 /**
  * <i>PositionMarketSnap</i> contains the Metrics Snapshot associated with the relevant Manifest Measures for
- * a given Position.
+ * 	a given Position. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></li>
+ * 		<li><i>PositionMarketSnap</i> Constructor</li>
+ * 		<li>Retrieve the Date of the Snap</li>
+ * 		<li>Retrieve the Position Market Value</li>
+ * 		<li>Add an Instance of the Position Manifest Measure Snap from the Specified Inputs</li>
+ * 		<li>Retrieve the Snapshot associated with the specified Manifest Measure</li>
+ * 		<li>Retrieve the Set of Manifest Measures</li>
+ * 		<li>Set the Custom Date Entry corresponding to the Specified Key</li>
+ * 		<li>Retrieve the Custom Date Entry corresponding to the Specified Key</li>
+ * 		<li>Set the Custom C<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Retrieve the Custom C<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Set the Custom R<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Retrieve the Custom R<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Set the Market Measure Name</li>
+ * 		<li>Retrieve the Market Measure Name</li>
+ * 		<li>Set the Market Measure Value</li>
+ * 		<li>Retrieve the Market Measure Value</li>
+ * 		<li>Set the Cumulative Coupon Amount</li>
+ * 		<li>Retrieve the Cumulative Coupon Amount</li>
+ * 		<li>Retrieve the Row of Header Fields</li>
+ * 		<li>Retrieve the Row of Content Fields</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PositionMarketSnap {
-	private double _dblMarketValue = java.lang.Double.NaN;
-	private org.drip.analytics.date.JulianDate _dtSnap = null;
+public class PositionMarketSnap
+{
+	private JulianDate _snapDate = null;
+	private double _marketValue = Double.NaN;
 
-	private java.util.Map<java.lang.String, org.drip.historical.attribution.PositionManifestMeasureSnap>
-		_mapPMMS = new
-			org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.historical.attribution.PositionManifestMeasureSnap>();
+	private Map<String, String> _customC1Map = new CaseInsensitiveHashMap<String>();
 
-	private java.util.Map<java.lang.String, java.lang.String> _mapCustomC1 = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.String>();
+	private Map<String, Double> _customR1Map = new CaseInsensitiveHashMap<Double>();
 
-	private java.util.Map<java.lang.String, java.lang.Double> _mapCustomR1 = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>();
+	private Map<String, JulianDate> _customDateMap = new CaseInsensitiveHashMap<JulianDate>();
 
-	private java.util.Map<java.lang.String, org.drip.analytics.date.JulianDate> _mapCustomDate = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.analytics.date.JulianDate>();
+	private Map<String, PositionManifestMeasureSnap> _positionManifestMeasureSnapMap =
+		new CaseInsensitiveHashMap<PositionManifestMeasureSnap>();
 
 	/**
-	 * PositionMarketSnap Constructor
+	 * <i>PositionMarketSnap</i> Constructor
 	 * 
-	 * @param dtSnap The Snapshot Date
-	 * @param dblMarketValue The Snapshot Market Value
+	 * @param snapDate The Snapshot Date
+	 * @param marketValue The Snapshot Market Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public PositionMarketSnap (
-		final org.drip.analytics.date.JulianDate dtSnap,
-		final double dblMarketValue)
-		throws java.lang.Exception
+		final JulianDate snapDate,
+		final double marketValue)
+		throws Exception
 	{
-		if (null == (_dtSnap = dtSnap) || !org.drip.numerical.common.NumberUtil.IsValid (_dblMarketValue =
-			dblMarketValue))
-			throw new java.lang.Exception ("PositionMarketSnap Constructor: Invalid Inputs");
+		if (null == (_snapDate = snapDate) || !NumberUtil.IsValid (_marketValue = marketValue)) {
+			throw new Exception ("PositionMarketSnap Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -136,9 +173,9 @@ public class PositionMarketSnap {
 	 * @return Date of the Snap
 	 */
 
-	public org.drip.analytics.date.JulianDate snapDate()
+	public JulianDate snapDate()
 	{
-		return _dtSnap;
+		return _snapDate;
 	}
 
 	/**
@@ -149,34 +186,42 @@ public class PositionMarketSnap {
 
 	public double marketValue()
 	{
-		return _dblMarketValue;
+		return _marketValue;
 	}
 
 	/**
 	 * Add an Instance of the Position Manifest Measure Snap from the Specified Inputs
 	 * 
-	 * @param strManifestMeasure The Manifest Measure
-	 * @param dblManifestMeasureRealization The Manifest Measure Realization
-	 * @param dblManifestMeasureSensitivity The Manifest Measure Sensitivity
-	 * @param dblManifestMeasureRollDown The Manifest Measure Roll Down
+	 * @param manifestMeasure The Manifest Measure
+	 * @param manifestMeasureRealization The Manifest Measure Realization
+	 * @param manifestMeasureSensitivity The Manifest Measure Sensitivity
+	 * @param manifestMeasureRollDown The Manifest Measure Roll Down
 	 * 
 	 * @return TRUE - The Manifest Measure Snap Metrics successfully added
 	 */
 
 	public boolean addManifestMeasureSnap (
-		final java.lang.String strManifestMeasure,
-		final double dblManifestMeasureRealization,
-		final double dblManifestMeasureSensitivity,
-		final double dblManifestMeasureRollDown)
+		final String manifestMeasure,
+		final double manifestMeasureRealization,
+		final double manifestMeasureSensitivity,
+		final double manifestMeasureRollDown)
 	{
-		if (null == strManifestMeasure || strManifestMeasure.isEmpty()) return false;
+		if (null == manifestMeasure || manifestMeasure.isEmpty()) {
+			return false;
+		}
 
 		try {
-			_mapPMMS.put (strManifestMeasure, new org.drip.historical.attribution.PositionManifestMeasureSnap
-				(dblManifestMeasureRealization, dblManifestMeasureSensitivity, dblManifestMeasureRollDown));
+			_positionManifestMeasureSnapMap.put (
+				manifestMeasure,
+				new PositionManifestMeasureSnap (
+					manifestMeasureRealization,
+					manifestMeasureSensitivity,
+					manifestMeasureRollDown
+				)
+			);
 
 			return true;
-		} catch (java.lang.Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -186,16 +231,16 @@ public class PositionMarketSnap {
 	/**
 	 * Retrieve the Snapshot associated with the specified Manifest Measure
 	 * 
-	 * @param strManifestMeasure The Manifest Measure
+	 * @param manifestMeasure The Manifest Measure
 	 * 
 	 * @return The Snapshot associated with the specified Manifest Measure
 	 */
 
-	public org.drip.historical.attribution.PositionManifestMeasureSnap manifestMeasureSnap (
-		final java.lang.String strManifestMeasure)
+	public PositionManifestMeasureSnap manifestMeasureSnap (
+		final String manifestMeasure)
 	{
-		return null == strManifestMeasure || !_mapPMMS.containsKey (strManifestMeasure) ? null : _mapPMMS.get
-			(strManifestMeasure);
+		return null == manifestMeasure || !_positionManifestMeasureSnapMap.containsKey (manifestMeasure) ?
+			null : _positionManifestMeasureSnapMap.get (manifestMeasure);
 	}
 
 	/**
@@ -204,27 +249,29 @@ public class PositionMarketSnap {
 	 * @return The Set of Manifest Measures
 	 */
 
-	public java.util.Set<java.lang.String> manifestMeasures()
+	public Set<String> manifestMeasures()
 	{
-		return _mapPMMS.keySet();
+		return _positionManifestMeasureSnapMap.keySet();
 	}
 
 	/**
 	 * Set the Custom Date Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
-	 * @param dtCustom The Custom Date Entry
+	 * @param key The Key
+	 * @param customDate The Custom Date Entry
 	 * 
 	 * @return TRUE - Custom Date successfully set
 	 */
 
 	public boolean setDate (
-		final java.lang.String strKey,
-		final org.drip.analytics.date.JulianDate dtCustom)
+		final String key,
+		final JulianDate customDate)
 	{
-		if (null == strKey || strKey.isEmpty() || null == dtCustom) return false;
+		if (null == key || key.isEmpty() || null == customDate) {
+			return false;
+		}
 
-		_mapCustomDate.put (strKey, dtCustom);
+		_customDateMap.put (key, customDate);
 
 		return true;
 	}
@@ -232,123 +279,126 @@ public class PositionMarketSnap {
 	/**
 	 * Retrieve the Custom Date Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
+	 * @param key The Key
 	 * 
 	 * @return The Custom Date Entry
 	 */
 
-	public org.drip.analytics.date.JulianDate date (
-		final java.lang.String strKey)
+	public JulianDate date (
+		final String key)
 	{
-		return null == strKey || !_mapCustomDate.containsKey (strKey) ? null : _mapCustomDate.get (strKey);
+		return null == key || !_customDateMap.containsKey (key) ? null : _customDateMap.get (key);
 	}
 
 	/**
-	 * Set the Custom C^1 Entry corresponding to the Specified Key
+	 * Set the Custom C<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
-	 * @param strC1 The Custom C^1 Entry
+	 * @param key The Key
+	 * @param c1 The Custom C<sup>1</sup> Entry
 	 * 
-	 * @return TRUE - Custom C^1 Entry successfully set
+	 * @return TRUE - Custom C<sup>1</sup> Entry successfully set
 	 */
 
 	public boolean setC1 (
-		final java.lang.String strKey,
-		final java.lang.String strC1)
+		final String key,
+		final String c1)
 	{
-		if (null == strKey || strKey.isEmpty() || null == strC1 || strC1.isEmpty()) return false;
-
-		_mapCustomC1.put (strKey, strC1);
-
-		return true;
-	}
-
-	/**
-	 * Retrieve the Custom C^1 Entry corresponding to the Specified Key
-	 * 
-	 * @param strKey The Key
-	 * 
-	 * @return The Custom C^1 Entry
-	 */
-
-	public java.lang.String c1 (
-		final java.lang.String strKey)
-	{
-		return null == strKey || !_mapCustomC1.containsKey (strKey) ? null : _mapCustomC1.get (strKey);
-	}
-
-	/**
-	 * Set the Custom R^1 Entry corresponding to the Specified Key
-	 * 
-	 * @param strKey The Key
-	 * @param dblR1 The Custom R^1 Entry
-	 * @param bIgnoreNaN TRUE - Ignore NaN Entry
-	 * 
-	 * @return TRUE - Custom Number successfully set
-	 */
-
-	public boolean setR1 (
-		final java.lang.String strKey,
-		final double dblR1,
-		final boolean bIgnoreNaN)
-	{
-		if (null == strKey || strKey.isEmpty() || (!bIgnoreNaN && !org.drip.numerical.common.NumberUtil.IsValid
-			(dblR1)))
+		if (null == key || key.isEmpty() || null == c1 || c1.isEmpty()) {
 			return false;
+		}
 
-		_mapCustomR1.put (strKey, dblR1);
+		_customC1Map.put (key, c1);
 
 		return true;
 	}
 
 	/**
-	 * Set the Custom R^1 Entry corresponding to the Specified Key
+	 * Retrieve the Custom C<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
-	 * @param dblR1 The Custom R^1 Entry
+	 * @param key The Key
+	 * 
+	 * @return The Custom C<sup>1</sup> Entry
+	 */
+
+	public String c1 (
+		final String key)
+	{
+		return null == key || !_customC1Map.containsKey (key) ? null : _customC1Map.get (key);
+	}
+
+	/**
+	 * Set the Custom R<sup>1</sup> Entry corresponding to the Specified Key
+	 * 
+	 * @param key The Key
+	 * @param r1 The Custom R<sup>1</sup> Entry
+	 * @param ignoreNaN TRUE - Ignore NaN Entry
 	 * 
 	 * @return TRUE - Custom Number successfully set
 	 */
 
 	public boolean setR1 (
-		final java.lang.String strKey,
-		final double dblR1)
+		final String key,
+		final double r1,
+		final boolean ignoreNaN)
 	{
-		return setR1 (strKey, dblR1, true);
+		if (null == key || key.isEmpty() || (!ignoreNaN && !NumberUtil.IsValid (r1))) {
+			return false;
+		}
+
+		_customR1Map.put (key, r1);
+
+		return true;
 	}
 
 	/**
-	 * Retrieve the Custom R^1 Entry corresponding to the Specified Key
+	 * Set the Custom R<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
+	 * @param key The Key
+	 * @param r1 The Custom R<sup>1</sup> Entry
 	 * 
-	 * @return The Custom R^1 Entry
+	 * @return TRUE - Custom Number successfully set
+	 */
+
+	public boolean setR1 (
+		final String key,
+		final double r1)
+	{
+		return setR1 (key, r1, true);
+	}
+
+	/**
+	 * Retrieve the Custom R<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @param key The Key
+	 * 
+	 * @return The Custom R<sup>1</sup> Entry
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double r1 (
-		final java.lang.String strKey)
-		throws java.lang.Exception
+		final String key)
+		throws Exception
 	{
-		if (null == strKey || !_mapCustomR1.containsKey (strKey))
-			throw new java.lang.Exception ("PositionMarketSnap::r1 => Invalid Inputs");
+		if (null == key || !_customR1Map.containsKey (key)) {
+			throw new Exception ("PositionMarketSnap::r1 => Invalid Inputs");
+		}
 
-		return _mapCustomR1.get (strKey);
+		return _customR1Map.get (key);
 	}
 
 	/**
 	 * Set the Market Measure Name
 	 * 
-	 * @param strMarketMeasureName The Market Measure Name
+	 * @param marketMeasureName The Market Measure Name
 	 * 
 	 * @return The Market Measure Name successfully set
 	 */
 
 	public boolean setMarketMeasureName (
-		final java.lang.String strMarketMeasureName)
+		final String marketMeasureName)
 	{
-		return setC1 ("MarketMeasureName", strMarketMeasureName);
+		return setC1 ("MarketMeasureName", marketMeasureName);
 	}
 
 	/**
@@ -357,7 +407,7 @@ public class PositionMarketSnap {
 	 * @return The Market Measure Name
 	 */
 
-	public java.lang.String marketMeasureName()
+	public String marketMeasureName()
 	{
 		return c1 ("MarketMeasureName");
 	}
@@ -365,15 +415,15 @@ public class PositionMarketSnap {
 	/**
 	 * Set the Market Measure Value
 	 * 
-	 * @param dblMarketMeasureValue The Market Measure Value
+	 * @param marketMeasureValue The Market Measure Value
 	 * 
 	 * @return The Market Measure Value successfully set
 	 */
 
 	public boolean setMarketMeasureValue (
-		final double dblMarketMeasureValue)
+		final double marketMeasureValue)
 	{
-		return setR1 ("MarketMeasureValue", dblMarketMeasureValue);
+		return setR1 ("MarketMeasureValue", marketMeasureValue);
 	}
 
 	/**
@@ -381,11 +431,11 @@ public class PositionMarketSnap {
 	 * 
 	 * @return The Market Measure Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double marketMeasureValue()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("MarketMeasureValue");
 	}
@@ -393,15 +443,15 @@ public class PositionMarketSnap {
 	/**
 	 * Set the Cumulative Coupon Amount
 	 * 
-	 * @param dblCumulativeCouponAmount The Cumulative Coupon Amount
+	 * @param cumulativeCouponAmount The Cumulative Coupon Amount
 	 * 
 	 * @return TRUE - The Cumulative Coupon Amount successfully set
 	 */
 
 	public boolean setCumulativeCouponAmount (
-		final double dblCumulativeCouponAmount)
+		final double cumulativeCouponAmount)
 	{
-		return setR1 ("CumulativeCouponAmount", dblCumulativeCouponAmount);
+		return setR1 ("CumulativeCouponAmount", cumulativeCouponAmount);
 	}
 
 	/**
@@ -409,11 +459,11 @@ public class PositionMarketSnap {
 	 * 
 	 * @return The Cumulative Coupon Amount
 	 * 
-	 * @throws java.lang.Exception Thrown if the Cumulative Coupon Amount cannot be obtained
+	 * @throws Exception Thrown if the Cumulative Coupon Amount cannot be obtained
 	 */
 
 	public double cumulativeCouponAmount()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("CumulativeCouponAmount");
 	}
@@ -421,26 +471,29 @@ public class PositionMarketSnap {
 	/**
 	 * Retrieve the Row of Header Fields
 	 * 
-	 * @param strPrefix The Prefix that precedes each Header Field
+	 * @param prefix The Prefix that precedes each Header Field
 	 * 
 	 * @return The Row of Header Fields
 	 */
 
-	public java.lang.String header (
-		final java.lang.String strPrefix)
+	public String header (
+		final String prefix)
 	{
-		java.lang.String strHeader = "";
+		String header = "";
 
-		for (java.lang.String strR1Key : _mapCustomR1.keySet())
-			strHeader = strHeader + strPrefix + strR1Key + ",";
+		for (String r1Key : _customR1Map.keySet()) {
+			header = header + prefix + r1Key + ",";
+		}
 
-		for (java.lang.String strC1Key : _mapCustomC1.keySet())
-			strHeader = strHeader + strPrefix + strC1Key + ",";
+		for (String c1Key : _customC1Map.keySet()) {
+			header = header + prefix + c1Key + ",";
+		}
 
-		for (java.lang.String strDateKey : _mapCustomDate.keySet())
-			strHeader = strHeader + strPrefix + strDateKey + ",";
+		for (String dateKey : _customDateMap.keySet()) {
+			header = header + prefix + dateKey + ",";
+		}
 
-		return strHeader;
+		return header;
 	}
 
 	/**
@@ -449,20 +502,22 @@ public class PositionMarketSnap {
 	 * @return The Row of Content Fields
 	 */
 
-	public java.lang.String content()
+	public String content()
 	{
-		java.lang.String strContent = "";
+		String content = "";
 
-		for (java.lang.String strR1Key : _mapCustomR1.keySet())
-			strContent = strContent + org.drip.service.common.FormatUtil.FormatDouble (_mapCustomR1.get
-				(strR1Key), 1, 8, 1.) + ",";
+		for (String r1Key : _customR1Map.keySet()) {
+			content = content + FormatUtil.FormatDouble (_customR1Map.get (r1Key), 1, 8, 1.) + ",";
+		}
 
-		for (java.lang.String strC1Key : _mapCustomC1.keySet())
-			strContent = strContent + _mapCustomC1.get (strC1Key) + ",";
+		for (String c1Key : _customC1Map.keySet()) {
+			content = content + _customC1Map.get (c1Key) + ",";
+		}
 
-		for (java.lang.String strDateKey : _mapCustomDate.keySet())
-			strContent = strContent + _mapCustomDate.get (strDateKey).toString() + ",";
+		for (String dateKey : _customDateMap.keySet()) {
+			content = content + _customDateMap.get (dateKey).toString() + ",";
+		}
 
-		return strContent;
+		return content;
 	}
 }

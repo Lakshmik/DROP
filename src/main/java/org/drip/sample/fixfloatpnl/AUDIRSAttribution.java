@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,39 +92,40 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>AUDIRSAttribution</i> generates the Historical PnL Attribution for AUD IRS.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fixfloatpnl/README.md">Fix Float PnL Attribution Decomposition</a></li>
- *  </ul>
- * <br><br>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fixfloatpnl/README.md">Fix Float PnL Attribution Decomposition</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class AUDIRSAttribution {
+public class AUDIRSAttribution
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "AUD";
-		String strClosesLocation = "C:\\DROP\\Daemons\\Transforms\\FundingStateMarks\\" + strCurrency + "ShapePreservingReconstitutor.csv";
-
-		String[] astrFundingDepositTenor = new String[] {
+		String currency = "AUD";
+		String closesLocation = "C:\\DROP\\Daemons\\Transforms\\FundingStateMarks\\" + currency +
+			"ShapePreservingReconstitutor.csv";
+		String[] fundingDepositTenorArray = new String[] {
 			"1M",
 			"2M",
 			"3M",
@@ -124,8 +133,7 @@ public class AUDIRSAttribution {
 			"5M",
 			"6M"
 		};
-
-		int[] aiFundingDepositColumn = new int[] {
+		int[] fundingDepositColumnArray = new int[] {
 			1,
 			2,
 			3,
@@ -133,8 +141,7 @@ public class AUDIRSAttribution {
 			5,
 			6
 		};
-
-		String[] astrFundingFixFloatTenor = new String[] {
+		String[] fundingFixFloatTenorArray = new String[] {
 			"1Y",
 			"2Y",
 			"3Y",
@@ -154,8 +161,7 @@ public class AUDIRSAttribution {
 			"40Y",
 			"50Y"
 		};
-
-		int[] aiFundingFixFloatColumn = new int[] {
+		int[] fundingFixFloatColumnArray = new int[] {
 			 7,
 			 8,
 			 9,
@@ -175,8 +181,7 @@ public class AUDIRSAttribution {
 			23,
 			24
 		};
-
-		String[] astrMaturityTenor = new String[] {
+		String[] maturityTenorArray = new String[] {
 			"1Y",
 			"2Y",
 			"3Y",
@@ -193,28 +198,26 @@ public class AUDIRSAttribution {
 			"20Y",
 			"25Y"
 		};
-
-		int[] aiHorizonGap = new int[] {
+		int[] horizonGapArray = new int[] {
 			1,
 			// 22,
 			// 67
 		};
-
-		String[] astrRollDownHorizonMap = new String[] {
+		String[] rollDownHorizonArray = new String[] {
 			"1M",
 			"3M"
 		};
 
 		FixFloatPnLAttributor.TenorHorizonExplainComponents (
-			strCurrency,
-			astrMaturityTenor,
-			aiHorizonGap,
-			strClosesLocation,
-			astrFundingDepositTenor,
-			aiFundingDepositColumn,
-			astrFundingFixFloatTenor,
-			aiFundingFixFloatColumn,
-			astrRollDownHorizonMap
+			currency,
+			maturityTenorArray,
+			horizonGapArray,
+			closesLocation,
+			fundingDepositTenorArray,
+			fundingDepositColumnArray,
+			fundingFixFloatTenorArray,
+			fundingFixFloatColumnArray,
+			rollDownHorizonArray
 		);
 
 		EnvManager.TerminateEnv();

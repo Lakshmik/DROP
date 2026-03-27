@@ -1,11 +1,22 @@
 
 package org.drip.historical.engine;
 
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,39 +92,49 @@ package org.drip.historical.engine;
 
 /**
  * <i>MarketMeasureRollDown</i> holds the Map of the Market Measure Roll Down Values for the Native as well
- * as the Additional Horizon Tenors.
+ * 	as the Additional Horizon Tenors. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></li>
+ * 		<li><i>MarketMeasureRollDown</i> Constructor</li>
+ * 		<li>Retrieve the Innate Roll Down Market Measure</li>
+ * 		<li>Add the Custom Horizon Market Measure Roll Down Metric Value</li>
+ * 		<li>Retrieve the Horizon Market Metric</li>
+ * 		<li>Retrieve the Roll Down Horizon Metric Map</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class MarketMeasureRollDown {
-	private double _dblInnate = java.lang.Double.NaN;
+public class MarketMeasureRollDown
+{
+	private double _innate = Double.NaN;
 
-	private org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> _mapHorizonMetric = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>();
+	private CaseInsensitiveHashMap<Double> _horizonMetricMap = new CaseInsensitiveHashMap<Double>();
 
 	/**
-	 * MarketMeasureRollDown Constructor
+	 * <i>MarketMeasureRollDown</i> Constructor
 	 * 
-	 * @param dblInnate The Native Roll Down Market Metric
+	 * @param innate The Native Roll Down Market Metric
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public MarketMeasureRollDown (
-		final double dblInnate)
-		throws java.lang.Exception
+		final double innate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblInnate = dblInnate))
-			throw new java.lang.Exception ("MarketMeasureRollDown Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_innate = innate)) {
+			throw new Exception ("MarketMeasureRollDown Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -124,27 +145,27 @@ public class MarketMeasureRollDown {
 
 	public double innate()
 	{
-		return _dblInnate;
+		return _innate;
 	}
 
 	/**
 	 * Add the Custom Horizon Market Measure Roll Down Metric Value
 	 * 
-	 * @param strHorizon The Custom Horizon
-	 * @param dblHorizonRollDown The Custom Horizon Market Measure Roll Down Metric Value
+	 * @param horizon The Custom Horizon
+	 * @param horizonRollDown The Custom Horizon Market Measure Roll Down Metric Value
 	 * 
 	 * @return TRUE - The Custom Horizon Market Measure Roll Down Metric Value successfully set
 	 */
 
 	public boolean add (
-		final java.lang.String strHorizon,
-		final double dblHorizonRollDown)
+		final String horizon,
+		final double horizonRollDown)
 	{
-		if (null == strHorizon || strHorizon.isEmpty() || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblHorizonRollDown))
+		if (null == horizon || horizon.isEmpty() || !NumberUtil.IsValid (horizonRollDown)) {
 			return false;
+		}
 
-		_mapHorizonMetric.put (strHorizon, dblHorizonRollDown);
+		_horizonMetricMap.put (horizon, horizonRollDown);
 
 		return true;
 	}
@@ -152,21 +173,22 @@ public class MarketMeasureRollDown {
 	/**
 	 * Retrieve the Horizon Market Metric
 	 * 
-	 * @param strHorizon The Horizon
+	 * @param horizon The Horizon
 	 * 
 	 * @return The Roll Down Market Metric corresponding to the Horizon
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double horizon (
-		final java.lang.String strHorizon)
-		throws java.lang.Exception
+		final String horizon)
+		throws Exception
 	{
-		if (null == strHorizon || strHorizon.isEmpty() || !_mapHorizonMetric.containsKey (strHorizon))
-			throw new java.lang.Exception ("MarketMeasureRollDown::horizon => Invalid Inputs");
+		if (null == horizon || horizon.isEmpty() || !_horizonMetricMap.containsKey (horizon)) {
+			throw new Exception ("MarketMeasureRollDown::horizon => Invalid Inputs");
+		}
 
-		return _mapHorizonMetric.get (strHorizon);
+		return _horizonMetricMap.get (horizon);
 	}
 
 	/**
@@ -175,8 +197,8 @@ public class MarketMeasureRollDown {
 	 * @return The Roll Down Horizon Metric Map
 	 */
 
-	public org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> horizon()
+	public CaseInsensitiveHashMap<Double> horizonMetricMap()
 	{
-		return _mapHorizonMetric;
+		return _horizonMetricMap;
 	}
 }

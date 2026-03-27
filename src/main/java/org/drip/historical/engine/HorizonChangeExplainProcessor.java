@@ -1,11 +1,29 @@
 
 package org.drip.historical.engine;
 
+import java.util.Map;
+
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.historical.attribution.PositionMarketSnap;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.param.market.CurveSurfaceQuoteContainer;
+import org.drip.param.valuation.ValuationParams;
+import org.drip.product.definition.Component;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,53 +99,72 @@ package org.drip.historical.engine;
 
 /**
  * <i>HorizonChangeExplainProcessor</i> holds the Stubs associated with the Computation of the Horizon
- * Position Change Components for the given Product.
+ * 	Position Change Components for the given Product. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></li>
+ * 		<li>Retrieve the Component</li>
+ * 		<li>Retrieve the Component Settle Lag</li>
+ * 		<li>Retrieve the Component Market Measure Name</li>
+ * 		<li>Retrieve the Component Market Measure Value</li>
+ * 		<li>Retrieve the First Date of the Horizon Change</li>
+ * 		<li>Retrieve the First Date's Market Parameters</li>
+ * 		<li>Retrieve the Second Date of the Horizon Change</li>
+ * 		<li>Retrieve the Second Date's Market Parameters</li>
+ * 		<li>Retrieve the Map of the Roll Down Market Parameters</li>
+ * 		<li>Generate the Map of the Roll Down Market Quote Metrics</li>
+ * 		<li>Generate the Roll Up Version of the Quote Metric</li>
+ * 		<li>Generate and Snap Relevant Fields from the T1 Market Valuation Parameters</li>
+ * 		<li>Update the Fixings (if any) to the Second Market Parameters</li>
+ * 		<li>Generate and Snap Relevant Fields from the T2 Market Valuation Parameters</li>
+ * 		<li>Generate the Horizon Differential Metrics Map</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class HorizonChangeExplainProcessor {
-	private int _iSettleLag = -1;
-	private java.lang.String _strMarketMeasureName = "";
-	private org.drip.product.definition.Component _comp = null;
-	private org.drip.analytics.date.JulianDate _dtFirst = null;
-	private org.drip.analytics.date.JulianDate _dtSecond = null;
-	private double _dblMarketMeasureValue = java.lang.Double.NaN;
-	private org.drip.param.market.CurveSurfaceQuoteContainer _csqcFirst = null;
-	private org.drip.param.market.CurveSurfaceQuoteContainer _csqcSecond = null;
-	private
-		org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.param.market.CurveSurfaceQuoteContainer>
-			_mapCSQCRollDown = null;
+public abstract class HorizonChangeExplainProcessor
+{
+	private int _settleLag = -1;
+	private JulianDate _t1 = null;
+	private JulianDate _t2 = null;
+	private String _marketMeasure = "";
+	private Component _component = null;
+	private double _marketMeasureValue = Double.NaN;
+	private CurveSurfaceQuoteContainer _t1CurveSurfaceQuoteContainer = null;
+	private CurveSurfaceQuoteContainer _t2CurveSurfaceQuoteContainer = null;
+	private CaseInsensitiveHashMap<CurveSurfaceQuoteContainer> _curveSurfaceQuoteContainerRollDownMap = null;
 
 	protected HorizonChangeExplainProcessor (
-		final org.drip.product.definition.Component comp,
-		final int iSettleLag,
-		final java.lang.String strMarketMeasureName,
-		final double dblMarketMeasureValue,
-		final org.drip.analytics.date.JulianDate dtFirst,
-		final org.drip.analytics.date.JulianDate dtSecond,
-		final org.drip.param.market.CurveSurfaceQuoteContainer csqcFirst,
-		final org.drip.param.market.CurveSurfaceQuoteContainer csqcSecond,
-		final
-			org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.param.market.CurveSurfaceQuoteContainer>
-			mapCSQCRollDown)
-		throws java.lang.Exception
+		final Component component,
+		final int settleLag,
+		final String marketMeasure,
+		final double marketMeasureValue,
+		final JulianDate t1,
+		final JulianDate t2,
+		final CurveSurfaceQuoteContainer t1CurveSurfaceQuoteContainer,
+		final CurveSurfaceQuoteContainer t2CurveSurfaceQuoteContainer,
+		final CaseInsensitiveHashMap<CurveSurfaceQuoteContainer> curveSurfaceQuoteContainerRollDownMap)
+		throws Exception
 	{
-		if (null == (_comp = comp) || 0 > (_iSettleLag = iSettleLag) || null == (_strMarketMeasureName =
-			strMarketMeasureName) || _strMarketMeasureName.isEmpty() ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblMarketMeasureValue = dblMarketMeasureValue) ||
-					null == (_dtFirst = dtFirst) || null == (_dtSecond = dtSecond) || _dtSecond.julian() <=
-						_dtFirst.julian() || null == (_csqcFirst = csqcFirst) || null == (_csqcSecond =
-							csqcSecond) || null == (_mapCSQCRollDown = mapCSQCRollDown))
-			throw new java.lang.Exception ("HorizonChangeExplainProcessor Constructor => Invalid Inputs");
+		if (null == (_component = component) || 0 > (_settleLag = settleLag) ||
+			null == (_marketMeasure = marketMeasure) || _marketMeasure.isEmpty() ||
+			!NumberUtil.IsValid (_marketMeasureValue = marketMeasureValue) ||
+			null == (_t1 = t1) || null == (_t2 = t2) || _t2.julian() <= _t1.julian() ||
+			null == (_t1CurveSurfaceQuoteContainer = t1CurveSurfaceQuoteContainer) ||
+			null == (_t2CurveSurfaceQuoteContainer = t2CurveSurfaceQuoteContainer) ||
+			null == (_curveSurfaceQuoteContainerRollDownMap = curveSurfaceQuoteContainerRollDownMap))
+		{
+			throw new Exception ("HorizonChangeExplainProcessor Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -136,9 +173,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return The Component
 	 */
 
-	public org.drip.product.definition.Component component()
+	public Component component()
 	{
-		return _comp;
+		return _component;
 	}
 
 	/**
@@ -149,7 +186,7 @@ public abstract class HorizonChangeExplainProcessor {
 
 	public int settleLag()
 	{
-		return _iSettleLag;
+		return _settleLag;
 	}
 
 	/**
@@ -158,9 +195,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return The Component Market Measure Name
 	 */
 
-	public java.lang.String marketMeasureName()
+	public String marketMeasureName()
 	{
-		return _strMarketMeasureName;
+		return _marketMeasure;
 	}
 
 	/**
@@ -171,7 +208,7 @@ public abstract class HorizonChangeExplainProcessor {
 
 	public double marketMeasureValue()
 	{
-		return _dblMarketMeasureValue;
+		return _marketMeasureValue;
 	}
 
 	/**
@@ -180,9 +217,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return The First Date of the Horizon Change
 	 */
 
-	public org.drip.analytics.date.JulianDate firstDate()
+	public JulianDate t1()
 	{
-		return _dtFirst;
+		return _t1;
 	}
 
 	/**
@@ -191,9 +228,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return The First Date's Market Parameters
 	 */
 
-	public org.drip.param.market.CurveSurfaceQuoteContainer firstMarketParameters()
+	public CurveSurfaceQuoteContainer t1MarketParameters()
 	{
-		return _csqcFirst;
+		return _t1CurveSurfaceQuoteContainer;
 	}
 
 	/**
@@ -202,9 +239,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return The Second Date of the Horizon Change
 	 */
 
-	public org.drip.analytics.date.JulianDate secondDate()
+	public JulianDate t2()
 	{
-		return _dtSecond;
+		return _t2;
 	}
 
 	/**
@@ -213,9 +250,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return The Second Date's Market Parameters
 	 */
 
-	public org.drip.param.market.CurveSurfaceQuoteContainer secondMarketParameters()
+	public CurveSurfaceQuoteContainer secondMarketParameters()
 	{
-		return _csqcSecond;
+		return _t2CurveSurfaceQuoteContainer;
 	}
 
 	/**
@@ -224,11 +261,9 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return Map of the Roll Down Market Parameters
 	 */
 
-	public
-		org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.param.market.CurveSurfaceQuoteContainer>
-			rollDownMarketParameters()
+	public CaseInsensitiveHashMap<CurveSurfaceQuoteContainer> curveSurfaceQuoteContainerRollDownMap()
 	{
-		return _mapCSQCRollDown;
+		return _curveSurfaceQuoteContainerRollDownMap;
 	}
 
 	/**
@@ -237,36 +272,41 @@ public abstract class HorizonChangeExplainProcessor {
 	 * @return Map of the Roll Down Market Quote Metrics
 	 */
 
-	public org.drip.historical.engine.MarketMeasureRollDown rollDownMeasureMap()
+	public MarketMeasureRollDown rollDownMeasureMap()
 	{
-		org.drip.param.valuation.ValuationParams valParamsRollDown =
-			org.drip.param.valuation.ValuationParams.Spot (_dtSecond.addBusDays (_iSettleLag,
-				_comp.payCurrency()).julian());
+		ValuationParams rollDownValuationParams = ValuationParams.Spot (
+			_t2.addBusDays (_settleLag, _component.payCurrency()).julian()
+		);
 
-		java.util.Set<java.lang.String> setstrRollDownTenor = _mapCSQCRollDown.keySet(); 
+		MarketMeasureRollDown marketMeasureRollDown = null;
 
-		org.drip.historical.engine.MarketMeasureRollDown mmrd = null;
+		for (String rollDownTenor : _curveSurfaceQuoteContainerRollDownMap.keySet()) {
+			Map<String, Double> componentMeasureMap = _component.value (
+				rollDownValuationParams,
+				null,
+				_curveSurfaceQuoteContainerRollDownMap.get (rollDownTenor),
+				null
+			);
 
-		for (java.lang.String strRollDownTenor : setstrRollDownTenor) {
-			java.util.Map<java.lang.String, java.lang.Double> mapCompMeasures = _comp.value
-				(valParamsRollDown, null, _mapCSQCRollDown.get (strRollDownTenor), null);
+			if (null == componentMeasureMap || !componentMeasureMap.containsKey (_marketMeasure)) {
+				return null;
+			}
 
-			if (null == mapCompMeasures || !mapCompMeasures.containsKey (_strMarketMeasureName)) return null;
-
-			if ("Native".equalsIgnoreCase (strRollDownTenor)) {
+			if ("Native".equalsIgnoreCase (rollDownTenor)) {
 				try {
-					mmrd = new org.drip.historical.engine.MarketMeasureRollDown (mapCompMeasures.get
-						(_strMarketMeasureName));
-				} catch (java.lang.Exception e) {
+					marketMeasureRollDown =
+						new MarketMeasureRollDown (componentMeasureMap.get (_marketMeasure));
+				} catch (Exception e) {
 					e.printStackTrace();
 
 					return null;
 				}
-			} else
-				mmrd.add (strRollDownTenor, mapCompMeasures.get (_strMarketMeasureName));
+			} else {
+				marketMeasureRollDown.add (rollDownTenor, componentMeasureMap.get (_marketMeasure));
+			}
 		}
 
-		return mmrd;
+		return marketMeasureRollDown;
 	}
 
 	/**
@@ -274,29 +314,33 @@ public abstract class HorizonChangeExplainProcessor {
 	 * 
 	 * @return The Roll Up Version of the Quote Metric
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double metricRollUp()
-		throws java.lang.Exception
+		throws Exception
 	{
-		java.util.Map<java.lang.String, java.lang.Double> mapCompMeasures = _comp.value
-			(org.drip.param.valuation.ValuationParams.Spot (_dtSecond.addBusDays (_iSettleLag,
-				_comp.payCurrency()).julian()), null, _csqcFirst, null);
+		Map<String, Double> componentMeasureMap = _component.value (
+			ValuationParams.Spot (_t2.addBusDays (_settleLag, _component.payCurrency()).julian()),
+			null,
+			_t1CurveSurfaceQuoteContainer,
+			null
+		);
 
-		if (null == mapCompMeasures || !mapCompMeasures.containsKey (_strMarketMeasureName))
-			throw new java.lang.Exception ("HorizonChangeExplainProcessor::metricRollUp => Invalid Inputs");
+		if (null == componentMeasureMap || !componentMeasureMap.containsKey (_marketMeasure)) {
+			throw new Exception ("HorizonChangeExplainProcessor::metricRollUp => Invalid Inputs");
+		}
 
-		return mapCompMeasures.get (_strMarketMeasureName);
+		return componentMeasureMap.get (_marketMeasure);
 	}
 
 	/**
-	 * Generate and Snap Relevant Fields from the First Market Valuation Parameters
+	 * Generate and Snap Relevant Fields from the T1 Market Valuation Parameters
 	 * 
-	 * @return The First Market Parameters Valuation Snapshot
+	 * @return The T1 Market Parameters Valuation Snapshot
 	 */
 
-	public abstract org.drip.historical.attribution.PositionMarketSnap snapFirstMarketValue();
+	public abstract PositionMarketSnap t1PositionMarketSnap();
 
 	/**
 	 * Update the Fixings (if any) to the Second Market Parameters
@@ -307,24 +351,24 @@ public abstract class HorizonChangeExplainProcessor {
 	public abstract boolean updateFixings();
 
 	/**
-	 * Generate and Snap Relevant Fields from the Second Market Valuation Parameters
+	 * Generate and Snap Relevant Fields from the T2 Market Valuation Parameters
 	 * 
-	 * @return The Second Market Parameters Valuation Snapshot
+	 * @return The T2 Market Parameters Valuation Snapshot
 	 */
 
-	public abstract org.drip.historical.attribution.PositionMarketSnap snapSecondMarketValue();
+	public abstract PositionMarketSnap t2PositionMarketSnap();
 
 	/**
 	 * Generate the Horizon Differential Metrics Map
 	 * 
-	 * @param pmsFirst The First Position Market Snap
-	 * @param pmsSecond The Second Position Market Snap
+	 * @param t1PositionMarketSnap The First Position Market Snap
+	 * @param t2PositionMarketSnap The Second Position Market Snap
 	 * 
 	 * @return The Horizon Differential Metrics Map
 	 */
 
-	public abstract org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>
-		crossHorizonDifferentialMetrics (
-			final org.drip.historical.attribution.PositionMarketSnap pmsFirst,
-			final org.drip.historical.attribution.PositionMarketSnap pmsSecond);
+	public abstract CaseInsensitiveHashMap<Double> crossHorizonDifferentialMetrics (
+		final PositionMarketSnap t1PositionMarketSnap,
+		final PositionMarketSnap t2PositionMarketSnap
+	);
 }

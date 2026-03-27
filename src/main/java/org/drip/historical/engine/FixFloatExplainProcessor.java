@@ -1,11 +1,34 @@
 
 package org.drip.historical.engine;
 
+import java.util.Map;
+
+import org.drip.analytics.cashflow.ComposableUnitFloatingPeriod;
+import org.drip.analytics.cashflow.ComposableUnitPeriod;
+import org.drip.analytics.cashflow.CompositePeriod;
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.daycount.Convention;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.historical.attribution.PositionMarketSnap;
+import org.drip.param.market.CurveSurfaceQuoteContainer;
+import org.drip.param.valuation.ValuationParams;
+import org.drip.product.rates.FixFloatComponent;
+import org.drip.product.rates.Stream;
+import org.drip.state.identifier.ForwardLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,356 +104,487 @@ package org.drip.historical.engine;
 
 /**
  * <i>FixFloatExplainProcessor</i> contains the Functionality associated with the Horizon Analysis of the Fix
- * Float Swap.
+ * 	Float Swap. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></li>
+ * 		<li><i>FixFloatExplainProcessor</i> Constructor</li>
+ * 		<li>Generate and Snap Relevant Fields from the T1 Market Valuation Parameters</li>
+ * 		<li>Update the Fixings (if any) to the Second Market Parameters</li>
+ * 		<li>Generate and Snap Relevant Fields from the T2 Market Valuation Parameters</li>
+ * 		<li>Generate the Horizon Differential Metrics Map</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixFloatExplainProcessor extends org.drip.historical.engine.HorizonChangeExplainProcessor {
+public class FixFloatExplainProcessor
+	extends HorizonChangeExplainProcessor
+{
 
 	/**
-	 * FixFloatExplainProcessor Constructor
+	 * <i>FixFloatExplainProcessor</i> Constructor
 	 * 
-	 * @param ffc The Fix Float Component
-	 * @param iSettleLag The Component's Settle Lag
-	 * @param strMarketMeasureName The Market Measure Name
-	 * @param dblMarketMeasureValue The Market Measure Value
-	 * @param dtFirst First Date
-	 * @param dtSecond Second Date
-	 * @param csqcFirst First Market Parameters
-	 * @param csqcSecond Second Market Parameters
-	 * @param mapCSQCRollDown Map of the Roll Down Market Parameters
+	 * @param fixFloatComponent The Fix Float Component
+	 * @param settleLag The Component's Settle Lag
+	 * @param marketMeasure The Market Measure Name
+	 * @param marketMeasureValue The Market Measure Value
+	 * @param t1 First Date
+	 * @param t2 Second Date
+	 * @param t1CurveSurfaceQuoteContainer First Market Parameters
+	 * @param t2CurveSurfaceQuoteContainer Second Market Parameters
+	 * @param curveSurfaceQuoteContainerRollDownMap Map of the Roll Down Market Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public FixFloatExplainProcessor (
-		final org.drip.product.rates.FixFloatComponent ffc,
-		final int iSettleLag,
-		final java.lang.String strMarketMeasureName,
-		final double dblMarketMeasureValue,
-		final org.drip.analytics.date.JulianDate dtFirst,
-		final org.drip.analytics.date.JulianDate dtSecond,
-		final org.drip.param.market.CurveSurfaceQuoteContainer csqcFirst,
-		final org.drip.param.market.CurveSurfaceQuoteContainer csqcSecond,
-		final
-			org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.param.market.CurveSurfaceQuoteContainer>
-			mapCSQCRollDown)
-		throws java.lang.Exception
+		final FixFloatComponent fixFloatComponent,
+		final int settleLag,
+		final String marketMeasure,
+		final double marketMeasureValue,
+		final JulianDate t1,
+		final JulianDate t2,
+		final CurveSurfaceQuoteContainer t1CurveSurfaceQuoteContainer,
+		final CurveSurfaceQuoteContainer t2CurveSurfaceQuoteContainer,
+		final CaseInsensitiveHashMap<CurveSurfaceQuoteContainer> curveSurfaceQuoteContainerRollDownMap)
+		throws Exception
 	{
-		super (ffc, iSettleLag, strMarketMeasureName, dblMarketMeasureValue, dtFirst, dtSecond, csqcFirst,
-			csqcSecond, mapCSQCRollDown);
+		super (
+			fixFloatComponent,
+			settleLag,
+			marketMeasure,
+			marketMeasureValue,
+			t1,
+			t2,
+			t1CurveSurfaceQuoteContainer,
+			t2CurveSurfaceQuoteContainer,
+			curveSurfaceQuoteContainerRollDownMap
+		);
 	}
 
-	@Override public org.drip.historical.attribution.PositionMarketSnap snapFirstMarketValue()
+	/**
+	 * Generate and Snap Relevant Fields from the T1 Market Valuation Parameters
+	 * 
+	 * @return The T1 Market Parameters Valuation Snapshot
+	 */
+
+	@Override public PositionMarketSnap t1PositionMarketSnap()
 	{
-		org.drip.analytics.date.JulianDate dtFirst = firstDate();
+		FixFloatComponent fixFloatComponent = (FixFloatComponent) component();
 
-		org.drip.product.rates.FixFloatComponent ffc = (org.drip.product.rates.FixFloatComponent)
-			component();
+		String payCurrency = fixFloatComponent.payCurrency();
 
-		java.lang.String strPayCurrency = ffc.payCurrency();
+		JulianDate t1 = t1();
 
-		java.util.Map<java.lang.String, java.lang.Double> mapFixFloat = ffc.value
-			(org.drip.param.valuation.ValuationParams.Spot (dtFirst.addBusDays (settleLag(),
-				strPayCurrency).julian()), null, firstMarketParameters(), null);
+		Map<String, Double> fixFloatMeasureMap = fixFloatComponent.value (
+			ValuationParams.Spot (t1.addBusDays (settleLag(), payCurrency).julian()),
+			null,
+			t1MarketParameters(),
+			null
+		);
 
-		if (null == mapFixFloat || !mapFixFloat.containsKey ("Accrued") || !mapFixFloat.containsKey
-			("CleanFixedDV01") || !mapFixFloat.containsKey ("CleanFloatingDV01") || !mapFixFloat.containsKey
-				("CleanPV") || !mapFixFloat.containsKey ("CumulativeCouponAmount") ||
-					!mapFixFloat.containsKey ("CumulativeCouponDCF") || !mapFixFloat.containsKey
-						("DerivedCleanPV") || !mapFixFloat.containsKey ("DerivedCumulativeCouponAmount") ||
-							!mapFixFloat.containsKey ("DerivedCumulativeCouponDCF") ||
-								!mapFixFloat.containsKey ("ReferenceCleanPV") || !mapFixFloat.containsKey
-									("ReferenceCumulativeCouponAmount") || !mapFixFloat.containsKey
-										("ReferenceCumulativeCouponDCF") || !mapFixFloat.containsKey
-											("SwapRate"))
+		if (null == fixFloatMeasureMap ||
+			!fixFloatMeasureMap.containsKey ("Accrued") ||
+			!fixFloatMeasureMap.containsKey ("CleanFixedDV01") ||
+			!fixFloatMeasureMap.containsKey ("CleanFloatingDV01") ||
+			!fixFloatMeasureMap.containsKey ("CleanPV") ||
+			!fixFloatMeasureMap.containsKey ("CumulativeCouponAmount") ||
+			!fixFloatMeasureMap.containsKey ("CumulativeCouponDCF") ||
+			!fixFloatMeasureMap.containsKey ("DerivedCleanPV") ||
+			!fixFloatMeasureMap.containsKey ("DerivedCumulativeCouponAmount") ||
+			!fixFloatMeasureMap.containsKey ("DerivedCumulativeCouponDCF") ||
+			!fixFloatMeasureMap.containsKey ("ReferenceCleanPV") ||
+			!fixFloatMeasureMap.containsKey ("ReferenceCumulativeCouponAmount") ||
+			!fixFloatMeasureMap.containsKey ("ReferenceCumulativeCouponDCF") ||
+			!fixFloatMeasureMap.containsKey ("SwapRate"))
+		{
 			return null;
+		}
 
-		double dblCleanPV = mapFixFloat.get ("CleanPV");
+		double swapRate = fixFloatMeasureMap.get ("SwapRate");
 
-		double dblSwapRate = mapFixFloat.get ("SwapRate");
+		MarketMeasureRollDown marketMeasureRollDown = rollDownMeasureMap();
 
-		double dblSwapRateSensitivity = 10000. * mapFixFloat.get ("CleanFixedDV01");
+		ForwardLabel forwardLabel = fixFloatComponent.derivedStream().forwardLabel();
 
-		org.drip.state.identifier.ForwardLabel forwardLabel = ffc.derivedStream().forwardLabel();
+		double swapRateSensitivity = 10000. * fixFloatMeasureMap.get ("CleanFixedDV01");
 
-		org.drip.historical.engine.MarketMeasureRollDown mmrd = rollDownMeasureMap();
+		if (null == marketMeasureRollDown) {
+			return null;
+		}
 
-		if (null == mmrd) return null;
+		CaseInsensitiveHashMap<Double> horizonMetricMap = marketMeasureRollDown.horizonMetricMap();
 
-		double dblRollDownInnate = mmrd.innate();
-
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapHorizonMetric =
-			mmrd.horizon();
+		double rollDownInnate = marketMeasureRollDown.innate();
 
 		try {
-			org.drip.historical.attribution.PositionMarketSnap pms = new
-				org.drip.historical.attribution.PositionMarketSnap (dtFirst, dblCleanPV);
+			PositionMarketSnap positionMarketSnap =
+				new PositionMarketSnap (t1, fixFloatMeasureMap.get ("CleanPV"));
 
-			if (!pms.setR1 ("Accrued", mapFixFloat.get ("Accrued"))) return null;
-
-			if (!pms.setR1 ("CleanFixedDV01", dblSwapRateSensitivity)) return null;
-
-			if (!pms.setR1 ("CleanFloatingDV01", 10000. * mapFixFloat.get ("CleanFloatingDV01")))
+			if (!positionMarketSnap.setR1 ("Accrued", fixFloatMeasureMap.get ("Accrued")) ||
+				!positionMarketSnap.setR1 ("CleanFixedDV01", swapRateSensitivity) ||
+				!positionMarketSnap.setR1 (
+					"CleanFloatingDV01",
+					10000. * fixFloatMeasureMap.get ("CleanFloatingDV01")
+				) ||
+				!positionMarketSnap.setC1 ("CouponCurrency", forwardLabel.currency()) ||
+				!positionMarketSnap.setR1 (
+					"CumulativeCouponAmount",
+					fixFloatMeasureMap.get ("CumulativeCouponAmount")
+				) ||
+				!positionMarketSnap.setR1 (
+					"CumulativeCouponDCF",
+					fixFloatMeasureMap.get ("CumulativeCouponDCF")
+				) ||
+				!positionMarketSnap.setR1 ("DerivedCleanPV", fixFloatMeasureMap.get ("DerivedCleanPV")) ||
+				!positionMarketSnap.setDate ("EffectiveDate", fixFloatComponent.effectiveDate()) ||
+				!positionMarketSnap.setC1 (
+					"FixedAccrualDayCount",
+					fixFloatComponent.referenceStream().accrualDC()
+				) ||
+				!positionMarketSnap.setR1 ("FixedCoupon", swapRate) ||
+				!positionMarketSnap.setR1 (
+					"FixedCumulativeCouponAmount",
+					fixFloatMeasureMap.get ("ReferenceCumulativeCouponAmount")
+				) ||
+				!positionMarketSnap.setR1 (
+					"FixedCumulativeCouponDCF",
+					fixFloatMeasureMap.get ("ReferenceCumulativeCouponDCF")
+				) ||
+				!positionMarketSnap.setC1 ("FloatAccrualDayCount", forwardLabel.floaterIndex().dayCount()) ||
+				!positionMarketSnap.setR1 (
+					"FloatCumulativeCouponAmount",
+					fixFloatMeasureMap.get ("DerivedCumulativeCouponAmount")
+				) ||
+				!positionMarketSnap.setR1 (
+					"FloatCumulativeCouponDCF",
+					fixFloatMeasureMap.get ("DerivedCumulativeCouponDCF")
+				) ||
+				!positionMarketSnap.setC1 ("FloaterLabel", forwardLabel.fullyQualifiedName()) ||
+				!positionMarketSnap.setDate ("MaturityDate", fixFloatComponent.maturityDate()) ||
+				!positionMarketSnap.setC1 ("MaturityTenor", fixFloatComponent.tenor()) ||
+				!positionMarketSnap.setC1 ("PayCurrency", payCurrency) ||
+				!positionMarketSnap.setR1 (
+					"ReferenceCleanPV",
+					fixFloatMeasureMap.get ("ReferenceCleanPV")
+				) ||
+				!positionMarketSnap.setR1 ("SwapRate", swapRate) ||
+				!positionMarketSnap.setR1 ("SwapRateRollDown", rollDownInnate)
+			)
+			{
 				return null;
-
-			if (!pms.setC1 ("CouponCurrency", forwardLabel.currency())) return null;
-
-			if (!pms.setR1 ("CumulativeCouponAmount", mapFixFloat.get ("CumulativeCouponAmount")))
-				return null;
-
-			if (!pms.setR1 ("CumulativeCouponDCF", mapFixFloat.get ("CumulativeCouponDCF"))) return null;
-
-			if (!pms.setR1 ("DerivedCleanPV", mapFixFloat.get ("DerivedCleanPV"))) return null;
-
-			if (!pms.setDate ("EffectiveDate", ffc.effectiveDate())) return null;
-
-			if (!pms.setC1 ("FixedAccrualDayCount", ffc.referenceStream().accrualDC())) return null;
-
-			if (!pms.setR1 ("FixedCoupon", dblSwapRate)) return null;
-
-			if (!pms.setR1 ("FixedCumulativeCouponAmount", mapFixFloat.get
-				("ReferenceCumulativeCouponAmount")))
-				return null;
-
-			if (!pms.setR1 ("FixedCumulativeCouponDCF", mapFixFloat.get ("ReferenceCumulativeCouponDCF")))
-				return null;
-
-			if (!pms.setC1 ("FloatAccrualDayCount", forwardLabel.floaterIndex().dayCount())) return null;
-
-			if (!pms.setR1 ("FloatCumulativeCouponAmount", mapFixFloat.get
-				("DerivedCumulativeCouponAmount")))
-				return null;
-
-			if (!pms.setR1 ("FloatCumulativeCouponDCF", mapFixFloat.get ("DerivedCumulativeCouponDCF")))
-				return null;
-
-			if (!pms.setC1 ("FloaterLabel", forwardLabel.fullyQualifiedName())) return null;
-
-			if (!pms.setDate ("MaturityDate", ffc.maturityDate())) return null;
-
-			if (!pms.setC1 ("MaturityTenor", ffc.tenor())) return null;
-
-			if (!pms.setC1 ("PayCurrency", strPayCurrency)) return null;
-
-			if (!pms.setR1 ("ReferenceCleanPV", mapFixFloat.get ("ReferenceCleanPV"))) return null;
-
-			if (!pms.setR1 ("SwapRate", dblSwapRate)) return null;
-
-			if (!pms.setR1 ("SwapRateRollDown", dblRollDownInnate)) return null;
-
-			for (java.lang.String strRollDownTenor : mapHorizonMetric.keySet()) {
-				if (!pms.setR1 ("SwapRateRollDown" + strRollDownTenor, mapHorizonMetric.get
-					(strRollDownTenor)))
-					return null;
 			}
 
-			if (!pms.addManifestMeasureSnap ("SwapRate", dblSwapRate, -1. * dblSwapRateSensitivity,
-				dblRollDownInnate))
-				return null;
+			for (String rollDownTenor : horizonMetricMap.keySet()) {
+				if (!positionMarketSnap.setR1 (
+					"SwapRateRollDown" + rollDownTenor,
+					horizonMetricMap.get (rollDownTenor)
+				))
+				{
+					return null;
+				}
+			}
 
-			return pms;
-		} catch (java.lang.Exception e) {
+			if (!positionMarketSnap.addManifestMeasureSnap (
+				"SwapRate",
+				swapRate, -1. * swapRateSensitivity,
+				rollDownInnate
+			))
+			{
+				return null;
+			}
+
+			return positionMarketSnap;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
+	/**
+	 * Update the Fixings (if any) to the Second Market Parameters
+	 * 
+	 * @return TRUE - The Fixings were successfully updated to the Second Market Parameters
+	 */
+
 	@Override public boolean updateFixings()
 	{
-		org.drip.product.rates.FixFloatComponent ffc = (org.drip.product.rates.FixFloatComponent)
-			component();
+		FixFloatComponent fixFloatComponent = (FixFloatComponent) component();
 
-		org.drip.product.rates.Stream floatingStream = ffc.derivedStream();
+		Stream floatingStream = fixFloatComponent.derivedStream();
 
-		int iDate = secondDate().julian();
+		int t2Date = t2().julian();
 
-		if (iDate > ffc.maturityDate().julian()) return false;
-
-		int iEffectiveDate = ffc.effectiveDate().julian();
-
-		if (iDate <= iEffectiveDate) iDate = iEffectiveDate;
-
-		org.drip.analytics.cashflow.CompositePeriod cpFixing = floatingStream.containingPeriod (iDate);
-
-		if (null == cpFixing) return false;
-
-		org.drip.analytics.cashflow.ComposableUnitPeriod cupEnclosing = cpFixing.enclosingCUP (iDate);
-
-		if (null == cupEnclosing || !(cupEnclosing instanceof
-			org.drip.analytics.cashflow.ComposableUnitFloatingPeriod))
+		if (t2Date > fixFloatComponent.maturityDate().julian()) {
 			return false;
+		}
 
-		org.drip.param.market.CurveSurfaceQuoteContainer csqcFirst = firstMarketParameters();
+		int effectiveDate = fixFloatComponent.effectiveDate().julian();
 
-		org.drip.state.identifier.ForwardLabel forwardLabel = floatingStream.forwardLabel();
+		if (t2Date <= effectiveDate) {
+			t2Date = effectiveDate;
+		}
 
-		int iFixingDate = ((org.drip.analytics.cashflow.ComposableUnitFloatingPeriod)
-			cupEnclosing).referenceIndexPeriod().fixingDate();
+		CompositePeriod fixingCompositePeriod = floatingStream.containingPeriod (t2Date);
+
+		if (null == fixingCompositePeriod) {
+			return false;
+		}
+
+		ComposableUnitPeriod enclosingComposableUnitPeriod = fixingCompositePeriod.enclosingCUP (t2Date);
+
+		if (null == enclosingComposableUnitPeriod ||
+			!(enclosingComposableUnitPeriod instanceof ComposableUnitFloatingPeriod))
+		{
+			return false;
+		}
+
+		CurveSurfaceQuoteContainer t1CurveSurfaceQuoteContainer = t1MarketParameters();
+
+		ForwardLabel forwardLabel = floatingStream.forwardLabel();
+
+		int fixingDate = (
+			(ComposableUnitFloatingPeriod) enclosingComposableUnitPeriod
+		).referenceIndexPeriod().fixingDate();
 
 		try {
-			double dblResetFixingRate = cupEnclosing.baseRate (csqcFirst);
+			double resetFixingRate = enclosingComposableUnitPeriod.baseRate (t1CurveSurfaceQuoteContainer);
 
-			return csqcFirst.setFixing (iFixingDate, forwardLabel, dblResetFixingRate) &&
-				secondMarketParameters().setFixing (iFixingDate, forwardLabel, dblResetFixingRate);
-		} catch (java.lang.Exception e) {
+			return t1CurveSurfaceQuoteContainer.setFixing (fixingDate, forwardLabel, resetFixingRate) &&
+				secondMarketParameters().setFixing (fixingDate, forwardLabel, resetFixingRate);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return false;
 	}
 
-	@Override public org.drip.historical.attribution.PositionMarketSnap snapSecondMarketValue()
+	/**
+	 * Generate and Snap Relevant Fields from the T2 Market Valuation Parameters
+	 * 
+	 * @return The T2 Market Parameters Valuation Snapshot
+	 */
+
+	@Override public PositionMarketSnap t2PositionMarketSnap()
 	{
-		org.drip.analytics.date.JulianDate dtSecond = secondDate();
+		JulianDate t2 = t2();
 
-		org.drip.product.rates.FixFloatComponent ffc = (org.drip.product.rates.FixFloatComponent)
-			component();
+		FixFloatComponent fixFloatComponent = (FixFloatComponent) component();
 
-		java.util.Map<java.lang.String, java.lang.Double> mapFixFloat = ffc.value
-			(org.drip.param.valuation.ValuationParams.Spot (dtSecond.addBusDays (settleLag(),
-				ffc.payCurrency()).julian()), null, secondMarketParameters(), null);
+		Map<String, Double> fixFloatMeasureMap = fixFloatComponent.value (
+			ValuationParams.Spot (t2.addBusDays (settleLag(), fixFloatComponent.payCurrency()).julian()),
+			null,
+			secondMarketParameters(),
+			null
+		);
 
-		if (null == mapFixFloat || !mapFixFloat.containsKey ("CleanFixedDV01") || !mapFixFloat.containsKey
-			("CleanPV") || !mapFixFloat.containsKey ("CumulativeCouponAmount") || !mapFixFloat.containsKey
-				("CumulativeCouponDCF") || !mapFixFloat.containsKey ("DerivedCumulativeCouponAmount") ||
-					!mapFixFloat.containsKey ("DerivedCumulativeCouponDCF") || !mapFixFloat.containsKey
-						("ReferenceCumulativeCouponAmount") || !mapFixFloat.containsKey
-							("ReferenceCumulativeCouponDCF") || !mapFixFloat.containsKey ("ResetDate") ||
-								!mapFixFloat.containsKey ("ResetRate") || !mapFixFloat.containsKey
-									("SwapRate"))
+		if (null == fixFloatMeasureMap ||
+			!fixFloatMeasureMap.containsKey ("CleanFixedDV01") ||
+			!fixFloatMeasureMap.containsKey ("CleanPV") ||
+			!fixFloatMeasureMap.containsKey ("CumulativeCouponAmount") ||
+			!fixFloatMeasureMap.containsKey ("CumulativeCouponDCF") ||
+			!fixFloatMeasureMap.containsKey ("DerivedCumulativeCouponAmount") ||
+			!fixFloatMeasureMap.containsKey ("DerivedCumulativeCouponDCF") ||
+			!fixFloatMeasureMap.containsKey ("ReferenceCumulativeCouponAmount") ||
+			!fixFloatMeasureMap.containsKey ("ReferenceCumulativeCouponDCF") ||
+			!fixFloatMeasureMap.containsKey ("ResetDate") ||
+			!fixFloatMeasureMap.containsKey ("ResetRate") ||
+			!fixFloatMeasureMap.containsKey ("SwapRate"))
+		{
 			return null;
+		}
 
-		double dblSwapRate = mapFixFloat.get ("SwapRate");
+		double swapRate = fixFloatMeasureMap.get ("SwapRate");
 
 		try {
-			org.drip.historical.attribution.PositionMarketSnap pms = new
-				org.drip.historical.attribution.PositionMarketSnap (dtSecond, mapFixFloat.get ("CleanPV"));
+			PositionMarketSnap positionMarketSnap =
+				new PositionMarketSnap (t2, fixFloatMeasureMap.get ("CleanPV"));
 
-			if (!pms.setR1 ("CumulativeCouponAmount", mapFixFloat.get ("CumulativeCouponAmount")))
+			if (!positionMarketSnap.setR1 (
+					"CumulativeCouponAmount",
+					fixFloatMeasureMap.get ("CumulativeCouponAmount")
+				) || !positionMarketSnap.setR1 (
+					"CumulativeCouponDCF",
+					fixFloatMeasureMap.get ("CumulativeCouponDCF")
+				) || !positionMarketSnap.setR1 (
+					"FixedCumulativeCouponAmount",
+					fixFloatMeasureMap.get ("ReferenceCumulativeCouponAmount")
+				) || !positionMarketSnap.setR1 (
+					"FixedCumulativeCouponDCF",
+					fixFloatMeasureMap.get ("ReferenceCumulativeCouponDCF")
+				) || !positionMarketSnap.setR1 (
+					"FloatCumulativeCouponAmount",
+					fixFloatMeasureMap.get ("DerivedCumulativeCouponAmount")
+				) || !positionMarketSnap.setR1 (
+					"FloatCumulativeCouponAmount",
+					fixFloatMeasureMap.get ("DerivedCumulativeCouponAmount")
+				) || !positionMarketSnap.setR1 (
+					"FloatCumulativeCouponDCF",
+					fixFloatMeasureMap.get ("DerivedCumulativeCouponDCF")
+				) || !positionMarketSnap.setDate (
+					"ResetDate",
+					new JulianDate ((int) (double) fixFloatMeasureMap.get ("ResetDate"))
+				) || !positionMarketSnap.setR1 (
+					"ResetRate",
+					fixFloatMeasureMap.get ("ResetRate")
+				) || !positionMarketSnap.setR1 (
+					"SwapRate",
+					swapRate
+				) || !positionMarketSnap.addManifestMeasureSnap (
+					"SwapRate",
+					swapRate,
+					-10000. * fixFloatMeasureMap.get ("CleanFixedDV01"),
+					0.
+				)
+			)
+			{
 				return null;
+			}
 
-			if (!pms.setR1 ("CumulativeCouponDCF", mapFixFloat.get ("CumulativeCouponDCF"))) return null;
-
-			if (!pms.setR1 ("FixedCumulativeCouponAmount", mapFixFloat.get
-				("ReferenceCumulativeCouponAmount")))
-				return null;
-
-			if (!pms.setR1 ("FixedCumulativeCouponDCF", mapFixFloat.get ("ReferenceCumulativeCouponDCF")))
-				return null;
-
-			if (!pms.setR1 ("FloatCumulativeCouponAmount", mapFixFloat.get
-				("DerivedCumulativeCouponAmount")))
-				return null;
-
-			if (!pms.setR1 ("FloatCumulativeCouponDCF", mapFixFloat.get ("DerivedCumulativeCouponDCF")))
-				return null;
-
-			if (!pms.setDate ("ResetDate", new org.drip.analytics.date.JulianDate ((int) (double)
-				mapFixFloat.get ("ResetDate"))))
-				return null;
-
-			if (!pms.setR1 ("ResetRate", mapFixFloat.get ("ResetRate"))) return null;
-
-			if (!pms.setR1 ("SwapRate", dblSwapRate)) return null;
-
-			if (!pms.addManifestMeasureSnap ("SwapRate", dblSwapRate, -10000. * mapFixFloat.get
-				("CleanFixedDV01"), 0.))
-				return null;
-
-			return pms;
-		} catch (java.lang.Exception e) {
+			return positionMarketSnap;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>
-		crossHorizonDifferentialMetrics (
-			final org.drip.historical.attribution.PositionMarketSnap pmsFirst,
-			final org.drip.historical.attribution.PositionMarketSnap pmsSecond)
+	/**
+	 * Generate the Horizon Differential Metrics Map
+	 * 
+	 * @param t1PositionMarketSnap The First Position Market Snap
+	 * @param t2PositionMarketSnap The Second Position Market Snap
+	 * 
+	 * @return The Horizon Differential Metrics Map
+	 */
+
+	@Override public CaseInsensitiveHashMap<Double> crossHorizonDifferentialMetrics (
+		final PositionMarketSnap t1PositionMarketSnap,
+		final PositionMarketSnap t2PositionMarketSnap)
 	{
-		if (null == pmsFirst || null == pmsSecond) return null;
+		if (null == t1PositionMarketSnap || null == t2PositionMarketSnap) {
+			return null;
+		}
 
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapDifferentialMetric = new
-			org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>();
+		CaseInsensitiveHashMap<Double> differentialMetricMap = new CaseInsensitiveHashMap<Double>();
 
-		org.drip.analytics.date.JulianDate dtEffective = pmsFirst.date ("EffectiveDate");
+		String floatAccrualDayCount = t1PositionMarketSnap.c1 ("FloatAccrualDayCount");
 
-		java.lang.String strFixedAccrualDayCount = pmsFirst.c1 ("FixedAccrualDayCount");
+		String fixedAccrualDayCount = t1PositionMarketSnap.c1 ("FixedAccrualDayCount");
 
-		java.lang.String strFloatAccrualDayCount = pmsFirst.c1 ("FloatAccrualDayCount");
+		JulianDate effectiveDate = t1PositionMarketSnap.date ("EffectiveDate");
 
-		java.lang.String strCalendar = pmsFirst.c1 ("PayCurrency");
+		int effectiveDatePlus3M = effectiveDate.addTenor ("3M").julian();
 
-		int iDate1M = dtEffective.addTenor ("1M").julian();
+		int effectiveDatePlus1M = effectiveDate.addTenor ("1M").julian();
 
-		int iDate3M = dtEffective.addTenor ("3M").julian();
+		String calendar = t1PositionMarketSnap.c1 ("PayCurrency");
 
-		int iEffectiveDate = dtEffective.julian();
+		int effectiveDateJulian = effectiveDate.julian();
 
 		try {
-			double dblFixedCumulativeCouponAmount = pmsSecond.r1 ("FixedCumulativeCouponAmount") -
-				pmsFirst.r1 ("FixedCumulativeCouponAmount");
+			double fixedCumulativeCouponAmount = t2PositionMarketSnap.r1 ("FixedCumulativeCouponAmount") -
+				t1PositionMarketSnap.r1 ("FixedCumulativeCouponAmount");
 
-			double dblFixedCumulativeCouponDCF = pmsSecond.r1 ("FixedCumulativeCouponDCF") - pmsFirst.r1
-				("FixedCumulativeCouponDCF");
+			double fixedCumulativeCouponDCF = t2PositionMarketSnap.r1 ("FixedCumulativeCouponDCF") -
+				t1PositionMarketSnap.r1 ("FixedCumulativeCouponDCF");
 
-			double dblFloatCumulativeCouponAmount = pmsSecond.r1 ("FloatCumulativeCouponAmount") -
-				pmsFirst.r1 ("FloatCumulativeCouponAmount");
+			double floatCumulativeCouponAmount = t2PositionMarketSnap.r1 ("FloatCumulativeCouponAmount") -
+				t1PositionMarketSnap.r1 ("FloatCumulativeCouponAmount");
 
-			double dblFloatCumulativeCouponDCF = pmsSecond.r1 ("FloatCumulativeCouponDCF") - pmsFirst.r1
-				("FloatCumulativeCouponDCF");
+			double floatCumulativeCouponDCF = t2PositionMarketSnap.r1 ("FloatCumulativeCouponDCF") -
+				t1PositionMarketSnap.r1 ("FloatCumulativeCouponDCF");
 
-			mapDifferentialMetric.put ("CumulativeCouponAmount", pmsSecond.r1 ("CumulativeCouponAmount") -
-				pmsFirst.r1 ("CumulativeCouponAmount"));
+			differentialMetricMap.put (
+				"CumulativeCouponAmount",
+				t2PositionMarketSnap.r1 ("CumulativeCouponAmount") -
+					t1PositionMarketSnap.r1 ("CumulativeCouponAmount")
+			);
 
-			mapDifferentialMetric.put ("CumulativeCouponDCF", pmsSecond.r1 ("CumulativeCouponDCF") -
-				pmsFirst.r1 ("CumulativeCouponDCF"));
+			differentialMetricMap.put (
+				"CumulativeCouponDCF",
+				t2PositionMarketSnap.r1 ("CumulativeCouponDCF") -
+					t1PositionMarketSnap.r1 ("CumulativeCouponDCF")
+			);
 
-			mapDifferentialMetric.put ("EffectiveFixedCouponRate", dblFixedCumulativeCouponAmount /
-				dblFixedCumulativeCouponDCF);
+			differentialMetricMap.put (
+				"EffectiveFixedCouponRate",
+				fixedCumulativeCouponAmount / fixedCumulativeCouponDCF
+			);
 
-			mapDifferentialMetric.put ("EffectiveFloatCouponRate", dblFloatCumulativeCouponAmount /
-				dblFloatCumulativeCouponDCF);
+			differentialMetricMap.put (
+				"EffectiveFloatCouponRate",
+				floatCumulativeCouponAmount / floatCumulativeCouponDCF
+			);
 
-			mapDifferentialMetric.put ("FixedAccrualDCF1M",
-				org.drip.analytics.daycount.Convention.YearFraction (iEffectiveDate, iDate1M,
-					strFixedAccrualDayCount, false, null, strCalendar));
+			differentialMetricMap.put (
+				"FixedAccrualDCF1M",
+				Convention.YearFraction (
+					effectiveDateJulian,
+					effectiveDatePlus1M,
+					fixedAccrualDayCount,
+					false,
+					null,
+					calendar
+				)
+			);
 
-			mapDifferentialMetric.put ("FixedAccrualDCF3M",
-				org.drip.analytics.daycount.Convention.YearFraction (iEffectiveDate, iDate3M,
-					strFixedAccrualDayCount, false, null, strCalendar));
+			differentialMetricMap.put (
+				"FixedAccrualDCF3M",
+				Convention.YearFraction (
+					effectiveDateJulian,
+					effectiveDatePlus3M,
+					fixedAccrualDayCount,
+					false,
+					null,
+					calendar
+				)
+			);
 
-			mapDifferentialMetric.put ("FixedCumulativeCouponAmount", dblFixedCumulativeCouponAmount);
+			differentialMetricMap.put ("FixedCumulativeCouponAmount", fixedCumulativeCouponAmount);
 
-			mapDifferentialMetric.put ("FixedCumulativeCouponDCF", dblFixedCumulativeCouponDCF);
+			differentialMetricMap.put ("FixedCumulativeCouponDCF", fixedCumulativeCouponDCF);
 
-			mapDifferentialMetric.put ("FloatAccrualDCF1M",
-				org.drip.analytics.daycount.Convention.YearFraction (iEffectiveDate, iDate1M,
-					strFloatAccrualDayCount, false, null, strCalendar));
+			differentialMetricMap.put (
+				"FloatAccrualDCF1M",
+				Convention.YearFraction (
+					effectiveDateJulian,
+					effectiveDatePlus1M,
+					floatAccrualDayCount,
+					false,
+					null,
+					calendar
+				)
+			);
 
-			mapDifferentialMetric.put ("FloatAccrualDCF3M",
-				org.drip.analytics.daycount.Convention.YearFraction (iEffectiveDate, iDate3M,
-					strFloatAccrualDayCount, false, null, strCalendar));
+			differentialMetricMap.put (
+				"FloatAccrualDCF3M",
+				Convention.YearFraction (
+					effectiveDateJulian,
+					effectiveDatePlus3M,
+					floatAccrualDayCount,
+					false,
+					null,
+					calendar
+				)
+			);
 
-			mapDifferentialMetric.put ("FloatCumulativeCouponAmount", dblFloatCumulativeCouponAmount);
+			differentialMetricMap.put ("FloatCumulativeCouponAmount", floatCumulativeCouponAmount);
 
-			mapDifferentialMetric.put ("FloatCumulativeCouponDCF", dblFloatCumulativeCouponDCF);
+			differentialMetricMap.put ("FloatCumulativeCouponDCF", floatCumulativeCouponDCF);
 
-			return mapDifferentialMetric;
-		} catch (java.lang.Exception e) {
+			return differentialMetricMap;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

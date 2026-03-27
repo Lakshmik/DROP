@@ -16,6 +16,14 @@ import org.drip.service.template.LatentMarketStateBuilder;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,42 +99,44 @@ import org.drip.service.template.LatentMarketStateBuilder;
 
 /**
  * <i>CADSmooth1YForward</i> Generates the Historical CAD Smoothened Funding Curve Native 1Y Compounded
- * Forward Rate.
+ * 	Forward Rate.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fundinghistorical/README.md">Smooth Shape Preserving Funding Historical</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fundinghistorical/README.md">Smooth Shape Preserving Funding Historical</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CADSmooth1YForward {
+public class CADSmooth1YForward
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "CAD";
-		String strClosesLocation = "C:\\DROP\\Daemons\\Transforms\\FundingStateMarks\\" + strCurrency + "ShapePreservingReconstitutor.csv";
-		String[] astrForTenor = new String[] {
+		String currency = "CAD";
+		String closesLocation = "C:\\DROP\\Daemons\\Transforms\\FundingStateMarks\\" + currency +
+			"ShapePreservingReconstitutor.csv";
+		String[] forTenorArray = new String[] {
 			"1Y"
 		};
-		String[] astrInTenor = new String[] {
+		String[] inTenorArray = new String[] {
 			"1Y",
 			"2Y",
 			"3Y",
@@ -143,7 +153,7 @@ public class CADSmooth1YForward {
 			"20Y",
 			"25Y",
 		};
-		String[] astrFixFloatMaturityTenor = new String[] {
+		String[] fixFloatMaturityTenorArray = new String[] {
 			"1Y",
 			"2Y",
 			"3Y",
@@ -164,110 +174,110 @@ public class CADSmooth1YForward {
 			"50Y"
 		};
 
-		CSVGrid csvGrid = CSVParser.StringGrid (
-			strClosesLocation,
-			true
-		);
+		CSVGrid csvGrid = CSVParser.StringGrid (closesLocation, true);
 
-		JulianDate[] adtClose = csvGrid.dateArrayAtColumn (0);
+		JulianDate[] closeDateArray = csvGrid.dateArrayAtColumn (0);
 
-		double[] adblFixFloatQuote1Y = csvGrid.doubleArrayAtColumn (1);
+		double[] fixFloat1YQuoteArray = csvGrid.doubleArrayAtColumn (1);
 
-		double[] adblFixFloatQuote2Y = csvGrid.doubleArrayAtColumn (2);
+		double[] fixFloat2YQuoteArray = csvGrid.doubleArrayAtColumn (2);
 
-		double[] adblFixFloatQuote3Y = csvGrid.doubleArrayAtColumn (3);
+		double[] fixFloat3YQuoteArray = csvGrid.doubleArrayAtColumn (3);
 
-		double[] adblFixFloatQuote4Y = csvGrid.doubleArrayAtColumn (4);
+		double[] fixFloat4YQuoteArray = csvGrid.doubleArrayAtColumn (4);
 
-		double[] adblFixFloatQuote5Y = csvGrid.doubleArrayAtColumn (5);
+		double[] fixFloat5YQuoteArray = csvGrid.doubleArrayAtColumn (5);
 
-		double[] adblFixFloatQuote6Y = csvGrid.doubleArrayAtColumn (6);
+		double[] fixFloat6YQuoteArray = csvGrid.doubleArrayAtColumn (6);
 
-		double[] adblFixFloatQuote7Y = csvGrid.doubleArrayAtColumn (7);
+		double[] fixFloat7YQuoteArray = csvGrid.doubleArrayAtColumn (7);
 
-		double[] adblFixFloatQuote8Y = csvGrid.doubleArrayAtColumn (8);
+		double[] fixFloat8YQuoteArray = csvGrid.doubleArrayAtColumn (8);
 
-		double[] adblFixFloatQuote9Y = csvGrid.doubleArrayAtColumn (9);
+		double[] fixFloat9YQuoteArray = csvGrid.doubleArrayAtColumn (9);
 
-		double[] adblFixFloatQuote10Y = csvGrid.doubleArrayAtColumn (10);
+		double[] fixFloat10YQuoteArray = csvGrid.doubleArrayAtColumn (10);
 
-		double[] adblFixFloatQuote11Y = csvGrid.doubleArrayAtColumn (11);
+		double[] fixFloat11YQuoteArray = csvGrid.doubleArrayAtColumn (11);
 
-		double[] adblFixFloatQuote12Y = csvGrid.doubleArrayAtColumn (12);
+		double[] fixFloat12YQuoteArray = csvGrid.doubleArrayAtColumn (12);
 
-		double[] adblFixFloatQuote15Y = csvGrid.doubleArrayAtColumn (13);
+		double[] fixFloat15YQuoteArray = csvGrid.doubleArrayAtColumn (13);
 
-		double[] adblFixFloatQuote20Y = csvGrid.doubleArrayAtColumn (14);
+		double[] fixFloat20YQuoteArray = csvGrid.doubleArrayAtColumn (14);
 
-		double[] adblFixFloatQuote25Y = csvGrid.doubleArrayAtColumn (15);
+		double[] fixFloat25YQuoteArray = csvGrid.doubleArrayAtColumn (15);
 
-		double[] adblFixFloatQuote30Y = csvGrid.doubleArrayAtColumn (16);
+		double[] fixFloat30YQuoteArray = csvGrid.doubleArrayAtColumn (16);
 
-		double[] adblFixFloatQuote40Y = csvGrid.doubleArrayAtColumn (17);
+		double[] fixFloat40YQuoteArray = csvGrid.doubleArrayAtColumn (17);
 
-		double[] adblFixFloatQuote50Y = csvGrid.doubleArrayAtColumn (18);
+		double[] fixFloat50YQuoteArray = csvGrid.doubleArrayAtColumn (18);
 
-		int iNumClose = adtClose.length;
-		JulianDate[] adtSpot = new JulianDate[iNumClose];
-		double[][] aadblFixFloatQuote = new double[iNumClose][18];
+		int closeDateCount = closeDateArray.length;
+		JulianDate[] spotDateArray = new JulianDate[closeDateCount];
+		double[][] fixFloatQuoteGrid = new double[closeDateCount][18];
 
-		for (int i = 0; i < iNumClose; ++i) {
-			adtSpot[i] = adtClose[i];
-			aadblFixFloatQuote[i][0] = adblFixFloatQuote1Y[i];
-			aadblFixFloatQuote[i][1] = adblFixFloatQuote2Y[i];
-			aadblFixFloatQuote[i][2] = adblFixFloatQuote3Y[i];
-			aadblFixFloatQuote[i][3] = adblFixFloatQuote4Y[i];
-			aadblFixFloatQuote[i][4] = adblFixFloatQuote5Y[i];
-			aadblFixFloatQuote[i][5] = adblFixFloatQuote6Y[i];
-			aadblFixFloatQuote[i][6] = adblFixFloatQuote7Y[i];
-			aadblFixFloatQuote[i][7] = adblFixFloatQuote8Y[i];
-			aadblFixFloatQuote[i][8] = adblFixFloatQuote9Y[i];
-			aadblFixFloatQuote[i][9] = adblFixFloatQuote10Y[i];
-			aadblFixFloatQuote[i][10] = adblFixFloatQuote11Y[i];
-			aadblFixFloatQuote[i][11] = adblFixFloatQuote12Y[i];
-			aadblFixFloatQuote[i][12] = adblFixFloatQuote15Y[i];
-			aadblFixFloatQuote[i][13] = adblFixFloatQuote20Y[i];
-			aadblFixFloatQuote[i][14] = adblFixFloatQuote25Y[i];
-			aadblFixFloatQuote[i][15] = adblFixFloatQuote30Y[i];
-			aadblFixFloatQuote[i][16] = adblFixFloatQuote40Y[i];
-			aadblFixFloatQuote[i][17] = adblFixFloatQuote50Y[i];
+		for (int closeDateIndex = 0; closeDateIndex < closeDateCount; ++closeDateIndex) {
+			spotDateArray[closeDateIndex] = closeDateArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][0] = fixFloat1YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][1] = fixFloat2YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][2] = fixFloat3YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][3] = fixFloat4YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][4] = fixFloat5YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][5] = fixFloat6YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][6] = fixFloat7YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][7] = fixFloat8YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][8] = fixFloat9YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][9] = fixFloat10YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][10] = fixFloat11YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][11] = fixFloat12YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][12] = fixFloat15YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][13] = fixFloat20YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][14] = fixFloat25YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][15] = fixFloat30YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][16] = fixFloat40YQuoteArray[closeDateIndex];
+			fixFloatQuoteGrid[closeDateIndex][17] = fixFloat50YQuoteArray[closeDateIndex];
 		}
 
-		String strDump = "Date";
+		String dump = "Date";
 
-		for (String strInTenor : astrInTenor) {
-			for (String strForTenor : astrForTenor)
-				strDump += "," + strInTenor + strForTenor;
+		for (String inTenor : inTenorArray) {
+			for (String forTenor : forTenorArray) {
+				dump += "," + inTenor + forTenor;
+			}
 		}
 
-		System.out.println (strDump);
+		System.out.println (dump);
 
-		Map<JulianDate, FundingCurveMetrics> mapFCM = FundingCurveAPI.HorizonMetrics (
-			adtSpot,
-			astrFixFloatMaturityTenor,
-			aadblFixFloatQuote,
-			astrInTenor,
-			astrForTenor,
-			strCurrency,
+		Map<JulianDate, FundingCurveMetrics> fundingCurveMetricsMap = FundingCurveAPI.HorizonMetrics (
+			spotDateArray,
+			fixFloatMaturityTenorArray,
+			fixFloatQuoteGrid,
+			inTenorArray,
+			forTenorArray,
+			currency,
 			LatentMarketStateBuilder.SMOOTH
 		);
 
-		for (int i = 0; i < iNumClose; ++i) {
-			FundingCurveMetrics fcm = mapFCM.get (adtSpot[i]);
+		for (int closeDateIndex = 0; closeDateIndex < closeDateCount; ++closeDateIndex) {
+			FundingCurveMetrics fundingCurveMetrics =
+				fundingCurveMetricsMap.get (spotDateArray[closeDateIndex]);
 
-			strDump = adtSpot[i].toString();
+			dump = spotDateArray[closeDateIndex].toString();
 
-			for (String strInTenor : astrInTenor) {
-				for (String strForTenor : astrForTenor)
-					strDump += "," + FormatUtil.FormatDouble (
-						fcm.nativeForwardRate (
-							strInTenor,
-							strForTenor
-						), 1, 5, 100.
+			for (String inTenor : inTenorArray) {
+				for (String forTenor : forTenorArray) {
+					dump += "," + FormatUtil.FormatDouble (
+						fundingCurveMetrics.nativeForwardRate (inTenor, forTenor),
+						1,
+						5,
+						100.
 					);
+				}
 			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 
 		EnvManager.TerminateEnv();

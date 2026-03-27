@@ -17,6 +17,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -130,9 +138,7 @@ public class UserConfidenceProjectionCalibration
 	{
 		System.out.println ("\t|-----------------------------||");
 
-		System.out.println (
-			"\t|            VIEW #" + viewIndex + "          ||"
-		);
+		System.out.println ("\t|            VIEW #" + viewIndex + "          ||");
 
 		System.out.println ("\t|-----------------------------||");
 
@@ -160,21 +166,19 @@ public class UserConfidenceProjectionCalibration
 			true
 		);
 
-		for (int tiltDepartureIndex = 1;
-			tiltDepartureIndex <= 15;
-			++tiltDepartureIndex)
-		{
+		for (int tiltDepartureIndex = 1; tiltDepartureIndex <= 15; ++tiltDepartureIndex) {
 			System.out.println ("\t| " +
 				FormatUtil.FormatDouble (0.01 * tiltDepartureIndex, 2, 2, 100.) + "% | " +
 				FormatUtil.FormatDouble (
-					tiltDepartureFunction.evaluate (
-						0.01 * tiltDepartureIndex
-					), 2, 2, 100.
-				) + "% | " +
-				FormatUtil.FormatDouble (
-					tiltDepartureFunctionDerivative.evaluate (
-						0.01 * tiltDepartureIndex
-					), 2, 2, 100.
+					tiltDepartureFunction.evaluate (0.01 * tiltDepartureIndex),
+					2,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					tiltDepartureFunctionDerivative.evaluate (0.01 * tiltDepartureIndex),
+					2,
+					2,
+					100.
 				) + "% ||"
 			);
 		}
@@ -185,13 +189,13 @@ public class UserConfidenceProjectionCalibration
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
@@ -257,28 +261,16 @@ public class UserConfidenceProjectionCalibration
 		BlackLittermanCombinationEngine blackLittermanCombinationEngine =
 			new BlackLittermanCombinationEngine (
 				ForwardReverseHoldingsAllocation.Reverse (
-					Portfolio.Standard (
-						assetIDArray,
-						assetEquilibriumWeightArray
-					),
+					Portfolio.Standard (assetIDArray, assetEquilibriumWeightArray),
 					assetExcessReturnsCovarianceMatrix,
 					riskAversion
 				),
-				new PriorControlSpecification (
-					true,
-					riskFreeRate,
-					tau
-				),
+				new PriorControlSpecification (true, riskFreeRate, tau),
 				new ProjectionSpecification (
 					R1MultivariateNormal.Standard (
 						rectangularManifold,
 						LabelledRd.FromArray (
-							new String[]
-							{
-								"PROJECTION #1",
-								"PROJECTION #2",
-								"PROJECTION #3"
-							}
+							new String[] {"PROJECTION #1", "PROJECTION #2", "PROJECTION #3"}
 						),
 						projectionExpectedExcessReturnsArray,
 						ViewLoading.ProjectionCovariance (

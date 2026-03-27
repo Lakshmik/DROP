@@ -18,6 +18,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,7 +101,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>Table6Reconciler</i> reconciles the First Set of Outputs (Table #6) of the Black-Litterman Model
- * Process as illustrated in the Following Paper:
+ * 	Process as illustrated in the Following Paper:
  *  
  * <br><br>
  *  <ul>
@@ -231,27 +239,15 @@ public class Table6Reconciler
 
 		R1MultivariateNormal viewDistribution = R1MultivariateNormal.Standard (
 			rectangularManifold,
-			LabelledRd.FromArray (
-				new String[]
-				{
-					"PROJECTION #1",
-					"PROJECTION #2"
-				}
-			),
+			LabelledRd.FromArray (new String[] {"PROJECTION #1", "PROJECTION #2"}),
 			projectionExpectedExcessReturnsArray,
 			projectionExcessReturnsCovarianceMatrix
 		);
 
 		double[][] assetExcessReturnsCovarianceMatrix = new double[assetIDArray.length][assetIDArray.length];
 
-		for (int assetIDI = 0;
-			assetIDI < assetIDArray.length;
-			++assetIDI)
-		{
-			for (int assetIDJ = 0;
-				assetIDJ < assetIDArray.length;
-				++assetIDJ)
-			{
+		for (int assetIDI = 0; assetIDI < assetIDArray.length; ++assetIDI) {
+			for (int assetIDJ = 0; assetIDJ < assetIDArray.length; ++assetIDJ) {
 				assetExcessReturnsCovarianceMatrix[assetIDI][assetIDJ] =
 					assetExcessReturnsCorrelationMatrix[assetIDI][assetIDJ] *
 					assetExcessReturnsVolatilityArray[assetIDI] *
@@ -262,22 +258,12 @@ public class Table6Reconciler
 		BlackLittermanCombinationEngine blackLittermanCombinationEngine =
 			new BlackLittermanCombinationEngine (
 				ForwardReverseHoldingsAllocation.Reverse (
-					Portfolio.Standard (
-						assetIDArray,
-						assetEquilibriumWeightArray
-					),
+					Portfolio.Standard (assetIDArray, assetEquilibriumWeightArray),
 					assetExcessReturnsCovarianceMatrix,
 					riskAversion
 				),
-				new PriorControlSpecification (
-					false,
-					riskFreeRate,
-					tau
-				),
-				new ProjectionSpecification (
-					viewDistribution,
-					assetSpaceViewProjectionMatrix
-				)
+				new PriorControlSpecification (false, riskFreeRate, tau),
+				new ProjectionSpecification (viewDistribution, assetSpaceViewProjectionMatrix)
 			);
 
 		R1MultivariateConvolutionMetrics jointPosteriorMetrics =
@@ -285,7 +271,8 @@ public class Table6Reconciler
 				rectangularManifold
 			).jointPosteriorMetrics();
 
-		R1MultivariateNormal jointDistribution = (R1MultivariateNormal) jointPosteriorMetrics.jointDistribution();
+		R1MultivariateNormal jointDistribution =
+			(R1MultivariateNormal) jointPosteriorMetrics.jointDistribution();
 
 		R1MultivariateNormal posteriorDistribution =
 			(R1MultivariateNormal) jointPosteriorMetrics.posteriorDistribution();
@@ -313,9 +300,7 @@ public class Table6Reconciler
 		).optimalPortfolio().assetComponentArray();
 
 		ProjectionExposure projectionExposure =
-			blackLittermanCombinationEngine.projectionExposureAttribution (
-				rectangularManifold
-			);
+			blackLittermanCombinationEngine.projectionExposureAttribution (rectangularManifold);
 
 		double[] interViewComponentArray = projectionExposure.interViewComponentArray();
 
@@ -344,10 +329,7 @@ public class Table6Reconciler
 
 		System.out.println ("\t|------------------------||");
 
-		for (int assetID = 0;
-			assetID < assetSpaceJointReturnsReconcilerArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetSpaceJointReturnsReconcilerArray.length; ++assetID) {
 			System.out.println (
 				"\t| [" + assetIDArray[assetID] + "] =>" +
 				FormatUtil.FormatDouble (assetEquilibriumWeightArray[assetID], 2, 1, 100.) + "% |" +
@@ -357,230 +339,258 @@ public class Table6Reconciler
 
 		System.out.println ("\t|------------------------||");
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                           PRIOR CROSS ASSET CORRELATION MATRIX                                 ||");
+		System.out.println (
+			"\t|                           PRIOR CROSS ASSET CORRELATION MATRIX                                 ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		String header = "\t|     |";
 
-		for (int assetID = 0;
-			assetID < assetIDArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetIDArray.length; ++assetID) {
 			header += "    " + assetIDArray[assetID] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIDI = 0;
-			assetIDI < assetIDArray.length;
-			++assetIDI)
-		{
+		for (int assetIDI = 0; assetIDI < assetIDArray.length; ++assetIDI) {
 			String dump = "\t| " + assetIDArray[assetIDI] + " ";
 
-			for (int assetIDJ = 0;
-				assetIDJ < assetIDArray.length;
-				++assetIDJ)
-			{
+			for (int assetIDJ = 0; assetIDJ < assetIDArray.length; ++assetIDJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					assetExcessReturnsCorrelationMatrix[assetIDI][assetIDJ], 1, 8, 1.
+					assetExcessReturnsCorrelationMatrix[assetIDI][assetIDJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                           PRIOR CROSS ASSET COVARIANCE MATRIX                                  ||");
+		System.out.println (
+			"\t|                           PRIOR CROSS ASSET COVARIANCE MATRIX                                  ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		header = "\t|     |";
 
-		for (int assetID = 0;
-			assetID < assetIDArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetIDArray.length; ++assetID) {
 			header += "    " + assetIDArray[assetID] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIDI = 0;
-			assetIDI < assetIDArray.length;
-			++assetIDI)
-		{
+		for (int assetIDI = 0; assetIDI < assetIDArray.length; ++assetIDI) {
 			String dump = "\t| " + assetIDArray[assetIDI] + " ";
 
-			for (int assetIDJ = 0;
-				assetIDJ < assetIDArray.length;
-				++assetIDJ)
-			{
+			for (int assetIDJ = 0; assetIDJ < assetIDArray.length; ++assetIDJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					assetExcessReturnsCovarianceMatrix[assetIDI][assetIDJ], 1, 8, 1.
+					assetExcessReturnsCovarianceMatrix[assetIDI][assetIDJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                          VIEW SCOPING ASSET PROJECTION LOADING                                 ||");
+		System.out.println (
+			"\t|                          VIEW SCOPING ASSET PROJECTION LOADING                                 ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		header = "\t|     |";
 
-		for (int assetID = 0;
-			assetID < assetIDArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetIDArray.length; ++assetID) {
 			header += "    " + assetIDArray[assetID] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int viewIndex = 0;
-			viewIndex < assetSpaceViewProjectionMatrix.length;
-			++viewIndex)
-		{
+		for (int viewIndex = 0; viewIndex < assetSpaceViewProjectionMatrix.length; ++viewIndex) {
 			String dump = "\t|  #" + viewIndex + " ";
 
-			for (int assetID = 0;
-				assetID < assetIDArray.length;
-				++assetID)
-			{
+			for (int assetID = 0; assetID < assetIDArray.length; ++assetID) {
 				dump += "|" + FormatUtil.FormatDouble (
-					assetSpaceViewProjectionMatrix[viewIndex][assetID], 1, 8, 1.
+					assetSpaceViewProjectionMatrix[viewIndex][assetID],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int viewIndexI = 0;
-			viewIndexI < assetSpaceViewProjectionMatrix.length;
-			++viewIndexI)
-		{
+		for (int viewIndexI = 0; viewIndexI < assetSpaceViewProjectionMatrix.length; ++viewIndexI) {
 			String dump = "\t|  #" + viewIndexI + " ";
 
-			for (int viewIndexJ = 0;
-				viewIndexJ < assetSpaceViewProjectionMatrix.length;
-				++viewIndexJ)
-			{
+			for (int viewIndexJ = 0; viewIndexJ < assetSpaceViewProjectionMatrix.length; ++viewIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					projectionExcessReturnsCovarianceMatrix[viewIndexI][viewIndexJ], 1, 8, 1.
+					projectionExcessReturnsCovarianceMatrix[viewIndexI][viewIndexJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (
 				dump + "|" + FormatUtil.FormatDouble (
-					projectionExpectedExcessReturnsArray[viewIndexI], 1, 2, 100.
+					projectionExpectedExcessReturnsArray[viewIndexI],
+					1,
+					2,
+					100.
 				) + "%"
 			);
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                           JOINT CROSS ASSET COVARIANCE MATRIX                                  ||");
+		System.out.println (
+			"\t|                           JOINT CROSS ASSET COVARIANCE MATRIX                                  ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		header = "\t|     |";
 
-		for (int assetID = 0;
-			assetID < assetIDArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetIDArray.length; ++assetID) {
 			header += "    " + assetIDArray[assetID] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIDI = 0;
-			assetIDI < assetIDArray.length;
-			++assetIDI)
-		{
+		for (int assetIDI = 0; assetIDI < assetIDArray.length; ++assetIDI) {
 			String dump = "\t| " + assetIDArray[assetIDI] + " ";
 
-			for (int assetIDJ = 0;
-				assetIDJ < assetIDArray.length;
-				++assetIDJ)
-			{
+			for (int assetIDJ = 0; assetIDJ < assetIDArray.length; ++assetIDJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					assetSpaceJointCovarianceMatrix[assetIDI][assetIDJ], 1, 8, 1.
+					assetSpaceJointCovarianceMatrix[assetIDI][assetIDJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                         POSTERIOR CROSS ASSET COVARIANCE MATRIX                                ||");
+		System.out.println (
+			"\t|                         POSTERIOR CROSS ASSET COVARIANCE MATRIX                                ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		header = "\t|     |";
 
-		for (int assetID = 0;
-			assetID < assetIDArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetIDArray.length; ++assetID) {
 			header += "    " + assetIDArray[assetID] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIDI = 0;
-			assetIDI < assetIDArray.length;
-			++assetIDI)
-		{
+		for (int assetIDI = 0; assetIDI < assetIDArray.length; ++assetIDI) {
 			String dump = "\t| " + assetIDArray[assetIDI] + " ";
 
-			for (int assetIDJ = 0;
-				assetIDJ < assetIDArray.length;
-				++assetIDJ)
-			{
+			for (int assetIDJ = 0; assetIDJ < assetIDArray.length; ++assetIDJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					assetSpacePosteriorCovarianceMatrix[assetIDI][assetIDJ], 1, 8, 1.
+					assetSpacePosteriorCovarianceMatrix[assetIDI][assetIDJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||\n");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||\n"
+		);
 
 		System.out.println ("\t|------------------------||");
 
@@ -592,10 +602,7 @@ public class Table6Reconciler
 
 		System.out.println ("\t|------------------------||");
 
-		for (int assetID = 0;
-			assetID < assetSpaceJointReturnsReconcilerArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetSpaceJointReturnsReconcilerArray.length; ++assetID) {
 			System.out.println (
 				"\t| [" + assetIDArray[assetID] + "] =>" +
 				FormatUtil.FormatDouble (assetSpaceJointReturnsArray[assetID], 2, 1, 100.) + "% |" +
@@ -615,14 +622,12 @@ public class Table6Reconciler
 
 		System.out.println ("\t|------------------------||");
 
-		for (int assetID = 0;
-			assetID < assetComponentArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetComponentArray.length; ++assetID) {
 			System.out.println (
 				"\t| [" + assetIDArray[assetID] + "] =>" +
 				FormatUtil.FormatDouble (assetComponentArray[assetID].amount(), 2, 1, 100.) + "% |" +
-				FormatUtil.FormatDouble (posteriorOptimalWeightsReconcilerArray[assetID], 2, 1, 100.) + "% ||"
+				FormatUtil.FormatDouble (posteriorOptimalWeightsReconcilerArray[assetID], 2, 1, 100.) +
+					"% ||"
 			);
 		}
 
@@ -638,14 +643,21 @@ public class Table6Reconciler
 
 		System.out.println ("\t|------------------------||");
 
-		for (int assetID = 0;
-			assetID < assetComponentArray.length;
-			++assetID)
-		{
+		for (int assetID = 0; assetID < assetComponentArray.length; ++assetID) {
 			System.out.println (
 				"\t| [" + assetIDArray[assetID] + "] =>" +
-				FormatUtil.FormatDouble (assetComponentArray[assetID].amount() - (assetEquilibriumWeightArray[assetID]) / (1. + tau), 2, 1, 100.) + "% |" +
-				FormatUtil.FormatDouble (posteriorOptimalDeviationReconcilerArray[assetID], 2, 1, 100.) + "% ||"
+				FormatUtil.FormatDouble (
+					assetComponentArray[assetID].amount() -
+						(assetEquilibriumWeightArray[assetID]) / (1. + tau),
+					2,
+					1,
+					100.
+				) + "% |" + FormatUtil.FormatDouble (
+					posteriorOptimalDeviationReconcilerArray[assetID],
+					2,
+					1,
+					100.
+				) + "% ||"
 			);
 		}
 
@@ -661,8 +673,7 @@ public class Table6Reconciler
 
 		System.out.println ("\t|-----------------------------------------------------------------||");
 
-		for (int viewIndex = 0; viewIndex < interViewComponentArray.length; ++viewIndex)
-		{
+		for (int viewIndex = 0; viewIndex < interViewComponentArray.length; ++viewIndex) {
 			System.out.println (
 				"\t| VIEW  #" + (viewIndex + 1) + " => " +
 				FormatUtil.FormatDouble (interViewComponentArray[viewIndex], 1, 3, 1.) + " | " +

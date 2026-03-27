@@ -16,6 +16,14 @@ import org.drip.service.template.LatentMarketStateBuilder;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,19 +101,20 @@ import org.drip.service.template.LatentMarketStateBuilder;
  * <i>USDSmooth1MForward</i> Generates the Historical USD Smoothened Overnight Curve Native 1M Compounded
  * 	Forward Rate.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/overnighthistorical/README.md">G7 Smooth OIS 1M Forward</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/overnighthistorical/README.md">G7 Smooth OIS 1M Forward</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class USDSmooth1MForward {
+public class USDSmooth1MForward
+{
 
 	/**
 	 * Entry Point
@@ -121,12 +130,13 @@ public class USDSmooth1MForward {
 	{
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
-		String strClosesLocation = "C:\\DROP\\Daemons\\Transforms\\OvernightOISMarks\\" + strCurrency + "OISSmoothReconstitutor.csv";
-		String[] astrForTenor = new String[] {
+		String currency = "USD";
+		String closesLocation = "C:\\DROP\\Daemons\\Transforms\\OvernightOISMarks\\" + currency +
+			"OISSmoothReconstitutor.csv";
+		String[] forTenorArray = new String[] {
 			"1M"
 		};
-		String[] astrInTenor = new String[] {
+		String[] inTenorArray = new String[] {
 			"1W",
 			"2W",
 			"3W",
@@ -144,7 +154,7 @@ public class USDSmooth1MForward {
 			"4Y",
 			"5Y"
 		};
-		String[] astrOISMaturityTenor = new String[] {
+		String[] oisMaturityTenorArray = new String[] {
 			"1W",
 			"2W",
 			"3W",
@@ -163,104 +173,104 @@ public class USDSmooth1MForward {
 			"5Y"
 		};
 
-		CSVGrid csvGrid = CSVParser.StringGrid (
-			strClosesLocation,
-			true
-		);
+		CSVGrid csvGrid = CSVParser.StringGrid (closesLocation, true);
 
-		JulianDate[] adtClose = csvGrid.dateArrayAtColumn (0);
+		JulianDate[] closeDateArray = csvGrid.dateArrayAtColumn (0);
 
-		double[] adblOISQuote1W = csvGrid.doubleArrayAtColumn (1);
+		double[] oisQuoteArray1W = csvGrid.doubleArrayAtColumn (1);
 
-		double[] adblOISQuote2W = csvGrid.doubleArrayAtColumn (2);
+		double[] oisQuoteArray2W = csvGrid.doubleArrayAtColumn (2);
 
-		double[] adblOISQuote3W = csvGrid.doubleArrayAtColumn (3);
+		double[] oisQuoteArray3W = csvGrid.doubleArrayAtColumn (3);
 
-		double[] adblOISQuote1M = csvGrid.doubleArrayAtColumn (4);
+		double[] oisQuoteArray1M = csvGrid.doubleArrayAtColumn (4);
 
-		double[] adblOISQuote2M = csvGrid.doubleArrayAtColumn (5);
+		double[] oisQuoteArray2M = csvGrid.doubleArrayAtColumn (5);
 
-		double[] adblOISQuote3M = csvGrid.doubleArrayAtColumn (6);
+		double[] oisQuoteArray3M = csvGrid.doubleArrayAtColumn (6);
 
-		double[] adblOISQuote4M = csvGrid.doubleArrayAtColumn (7);
+		double[] oisQuoteArray4M = csvGrid.doubleArrayAtColumn (7);
 
-		double[] adblOISQuote5M = csvGrid.doubleArrayAtColumn (8);
+		double[] oisQuoteArray5M = csvGrid.doubleArrayAtColumn (8);
 
-		double[] adblOISQuote6M = csvGrid.doubleArrayAtColumn (9);
+		double[] oisQuoteArray6M = csvGrid.doubleArrayAtColumn (9);
 
-		double[] adblOISQuote9M = csvGrid.doubleArrayAtColumn (10);
+		double[] oisQuoteArray9M = csvGrid.doubleArrayAtColumn (10);
 
-		double[] adblOISQuote1Y = csvGrid.doubleArrayAtColumn (11);
+		double[] oisQuoteArray1Y = csvGrid.doubleArrayAtColumn (11);
 
-		double[] adblOISQuote18M = csvGrid.doubleArrayAtColumn (12);
+		double[] oisQuoteArray18M = csvGrid.doubleArrayAtColumn (12);
 
-		double[] adblOISQuote2Y = csvGrid.doubleArrayAtColumn (13);
+		double[] oisQuoteArray2Y = csvGrid.doubleArrayAtColumn (13);
 
-		double[] adblOISQuote3Y = csvGrid.doubleArrayAtColumn (14);
+		double[] oisQuoteArray3Y = csvGrid.doubleArrayAtColumn (14);
 
-		double[] adblOISQuote4Y = csvGrid.doubleArrayAtColumn (15);
+		double[] oisQuoteArray4Y = csvGrid.doubleArrayAtColumn (15);
 
-		double[] adblOISQuote5Y = csvGrid.doubleArrayAtColumn (16);
+		double[] oisQuoteArray5Y = csvGrid.doubleArrayAtColumn (16);
 
-		int iNumClose = adtClose.length;
-		JulianDate[] adtSpot = new JulianDate[iNumClose];
-		double[][] aadblOISQuote = new double[iNumClose][16];
+		int closeDateCount = closeDateArray.length;
+		JulianDate[] spotDateAray = new JulianDate[closeDateCount];
+		double[][] oisQuoteGrid = new double[closeDateCount][16];
 
-		for (int i = 0; i < iNumClose; ++i) {
-			adtSpot[i] = adtClose[i];
-			aadblOISQuote[i][0] = adblOISQuote1W[i];
-			aadblOISQuote[i][1] = adblOISQuote2W[i];
-			aadblOISQuote[i][2] = adblOISQuote3W[i];
-			aadblOISQuote[i][3] = adblOISQuote1M[i];
-			aadblOISQuote[i][4] = adblOISQuote2M[i];
-			aadblOISQuote[i][5] = adblOISQuote3M[i];
-			aadblOISQuote[i][6] = adblOISQuote4M[i];
-			aadblOISQuote[i][7] = adblOISQuote5M[i];
-			aadblOISQuote[i][8] = adblOISQuote6M[i];
-			aadblOISQuote[i][9] = adblOISQuote9M[i];
-			aadblOISQuote[i][10] = adblOISQuote1Y[i];
-			aadblOISQuote[i][11] = adblOISQuote18M[i];
-			aadblOISQuote[i][12] = adblOISQuote2Y[i];
-			aadblOISQuote[i][13] = adblOISQuote3Y[i];
-			aadblOISQuote[i][14] = adblOISQuote4Y[i];
-			aadblOISQuote[i][15] = adblOISQuote5Y[i];
+		for (int closeDateIndex = 0; closeDateIndex < closeDateCount; ++closeDateIndex) {
+			spotDateAray[closeDateIndex] = closeDateArray[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][0] = oisQuoteArray1W[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][1] = oisQuoteArray2W[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][2] = oisQuoteArray3W[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][3] = oisQuoteArray1M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][4] = oisQuoteArray2M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][5] = oisQuoteArray3M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][6] = oisQuoteArray4M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][7] = oisQuoteArray5M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][8] = oisQuoteArray6M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][9] = oisQuoteArray9M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][10] = oisQuoteArray1Y[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][11] = oisQuoteArray18M[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][12] = oisQuoteArray2Y[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][13] = oisQuoteArray3Y[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][14] = oisQuoteArray4Y[closeDateIndex];
+			oisQuoteGrid[closeDateIndex][15] = oisQuoteArray5Y[closeDateIndex];
 		}
 
-		String strDump = "Date";
+		String dump = "Date";
 
-		for (String strInTenor : astrInTenor) {
-			for (String strForTenor : astrForTenor)
-				strDump += "," + strInTenor + strForTenor;
+		for (String inTenor : inTenorArray) {
+			for (String forTenor : forTenorArray) {
+				dump += "," + inTenor + forTenor;
+			}
 		}
 
-		System.out.println (strDump);
+		System.out.println (dump);
 
-		Map<JulianDate, FundingCurveMetrics> mapFCM = OvernightCurveAPI.HorizonMetrics (
-			adtSpot,
-			astrOISMaturityTenor,
-			aadblOISQuote,
-			astrInTenor,
-			astrForTenor,
-			strCurrency,
+		Map<JulianDate, FundingCurveMetrics> fundingCurveMetricsMap = OvernightCurveAPI.HorizonMetrics (
+			spotDateAray,
+			oisMaturityTenorArray,
+			oisQuoteGrid,
+			inTenorArray,
+			forTenorArray,
+			currency,
 			LatentMarketStateBuilder.SMOOTH
 		);
 
-		for (int i = 0; i < iNumClose; ++i) {
-			FundingCurveMetrics fcm = mapFCM.get (adtSpot[i]);
+		for (int closeDateIndex = 0; closeDateIndex < closeDateCount; ++closeDateIndex) {
+			FundingCurveMetrics fundingCurveMetrics =
+				fundingCurveMetricsMap.get (spotDateAray[closeDateIndex]);
 
-			strDump = adtSpot[i].toString();
+			dump = spotDateAray[closeDateIndex].toString();
 
-			for (String strInTenor : astrInTenor) {
-				for (String strForTenor : astrForTenor)
-					strDump += "," + FormatUtil.FormatDouble (
-						fcm.nativeForwardRate (
-							strInTenor,
-							strForTenor
-						), 1, 5, 100.
+			for (String inTenor : inTenorArray) {
+				for (String forTenor : forTenorArray) {
+					dump += "," + FormatUtil.FormatDouble (
+						fundingCurveMetrics.nativeForwardRate (inTenor, forTenor),
+						1,
+						5,
+						100.
 					);
+				}
 			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 
 		EnvManager.TerminateEnv();

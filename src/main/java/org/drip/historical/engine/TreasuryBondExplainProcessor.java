@@ -1,11 +1,31 @@
 
 package org.drip.historical.engine;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.daycount.ActActDCParams;
+import org.drip.analytics.daycount.Convention;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.historical.attribution.PositionMarketSnap;
+import org.drip.param.market.CurveSurfaceQuoteContainer;
+import org.drip.param.valuation.ValuationParams;
+import org.drip.product.definition.Component;
+import org.drip.product.govvie.TreasuryComponent;
+import org.drip.state.govvie.GovvieCurve;
+import org.drip.state.identifier.GovvieLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,284 +101,381 @@ package org.drip.historical.engine;
 
 /**
  * <i>TreasuryBondExplainProcessor</i> contains the Functionality associated with the Horizon Analysis of the
- * Treasury Bond.
+ * 	Treasury Bond. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></li>
+ * 		<li><i>TreasuryBondExplainProcessor</i> Constructor</li>
+ * 		<li>Generate the Map of the Roll Down Market Quote Metrics</li>
+ * 		<li>Generate and Snap Relevant Fields from the T1 Market Valuation Parameters</li>
+ * 		<li>Update the Fixings (if any) to the Second Market Parameters</li>
+ * 		<li>Generate and Snap Relevant Fields from the T2 Market Valuation Parameters</li>
+ * 		<li>Generate the Horizon Differential Metrics Map</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class TreasuryBondExplainProcessor extends org.drip.historical.engine.HorizonChangeExplainProcessor {
+public class TreasuryBondExplainProcessor
+	extends HorizonChangeExplainProcessor
+{
 
 	/**
-	 * TreasuryBondExplainProcessor Constructor
+	 * <i>TreasuryBondExplainProcessor</i> Constructor
 	 * 
-	 * @param tsyComponent The Treasury Component
-	 * @param strMarketMeasureName The Market Measure Name
-	 * @param dblMarketMeasureValue The Market Measure Value
-	 * @param dtFirst First Date
-	 * @param dtSecond Second Date
-	 * @param csqcFirst First Market Parameters
-	 * @param csqcSecond Second Market Parameters
-	 * @param mapCSQCRollDown Map of the Roll Down Market Parameters
+	 * @param treasuryComponent The Treasury Component
+	 * @param marketMeasure The Market Measure Name
+	 * @param marketMeasureValue The Market Measure Value
+	 * @param t1 First Date
+	 * @param t2 Second Date
+	 * @param t1CurveSurfaceQuoteContainer First Market Parameters
+	 * @param t2CurveSurfaceQuoteContainer Second Market Parameters
+	 * @param curveSurfaceQuoteContainerRollDownMap Map of the Roll Down Market Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public TreasuryBondExplainProcessor (
-		final org.drip.product.govvie.TreasuryComponent tsyComponent,
-		final java.lang.String strMarketMeasureName,
-		final double dblMarketMeasureValue,
-		final org.drip.analytics.date.JulianDate dtFirst,
-		final org.drip.analytics.date.JulianDate dtSecond,
-		final org.drip.param.market.CurveSurfaceQuoteContainer csqcFirst,
-		final org.drip.param.market.CurveSurfaceQuoteContainer csqcSecond,
-		final
-			org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.param.market.CurveSurfaceQuoteContainer>
-			mapCSQCRollDown)
-		throws java.lang.Exception
+		final TreasuryComponent treasuryComponent,
+		final String marketMeasure,
+		final double marketMeasureValue,
+		final JulianDate t1,
+		final JulianDate t2,
+		final CurveSurfaceQuoteContainer t1CurveSurfaceQuoteContainer,
+		final CurveSurfaceQuoteContainer t2CurveSurfaceQuoteContainer,
+		final CaseInsensitiveHashMap<CurveSurfaceQuoteContainer> curveSurfaceQuoteContainerRollDownMap)
+		throws Exception
 	{
-		super (tsyComponent, 0, strMarketMeasureName, dblMarketMeasureValue, dtFirst, dtSecond, csqcFirst,
-			csqcSecond, mapCSQCRollDown);
+		super (
+			treasuryComponent,
+			0,
+			marketMeasure,
+			marketMeasureValue,
+			t1,
+			t2,
+			t1CurveSurfaceQuoteContainer,
+			t2CurveSurfaceQuoteContainer,
+			curveSurfaceQuoteContainerRollDownMap
+		);
 	}
 
-	@Override public org.drip.historical.engine.MarketMeasureRollDown rollDownMeasureMap()
+	/**
+	 * Generate the Map of the Roll Down Market Quote Metrics
+	 * 
+	 * @return Map of the Roll Down Market Quote Metrics
+	 */
+
+	@Override public MarketMeasureRollDown rollDownMeasureMap()
 	{
-		org.drip.product.definition.Component comp = component();
+		Component component = component();
 
-		int iMaturityDate = comp.maturityDate().julian();
+		MarketMeasureRollDown marketMeasureRollDown = null;
 
-		org.drip.historical.engine.MarketMeasureRollDown mmrd = null;
+		int maturityDate = component.maturityDate().julian();
 
-		org.drip.state.identifier.GovvieLabel govvieLabel = comp.govvieLabel();
+		GovvieLabel govvieLabel = component.govvieLabel();
 
-		org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.param.market.CurveSurfaceQuoteContainer>
-			mapCSQCRollDown = rollDownMarketParameters();
+		CaseInsensitiveHashMap<CurveSurfaceQuoteContainer> curveSurfaceQuoteContainerRollDownMap =
+			curveSurfaceQuoteContainerRollDownMap();
 
-		for (java.lang.String strRollDownTenor : mapCSQCRollDown.keySet()) {
-			org.drip.state.govvie.GovvieCurve gc = mapCSQCRollDown.get (strRollDownTenor).govvieState
-				(govvieLabel);
-
+		for (String rollDownTenor : curveSurfaceQuoteContainerRollDownMap.keySet()) {
 			try {
-				double dblMarketMeasureRollDown = gc.yld (iMaturityDate);
+				double marketMeasureRollDownValue = curveSurfaceQuoteContainerRollDownMap.get (
+					rollDownTenor
+				).govvieState (
+					govvieLabel
+				).yld (
+					maturityDate
+				);
 
-				if ("Native".equalsIgnoreCase (strRollDownTenor))
-					mmrd = new org.drip.historical.engine.MarketMeasureRollDown (dblMarketMeasureRollDown);
-				else
-					mmrd.add (strRollDownTenor, dblMarketMeasureRollDown);
-			} catch (java.lang.Exception e) {
+				if ("Native".equalsIgnoreCase (rollDownTenor)) {
+					marketMeasureRollDown = new MarketMeasureRollDown (marketMeasureRollDownValue);
+				} else {
+					marketMeasureRollDown.add (rollDownTenor, marketMeasureRollDownValue);
+				}
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		return mmrd;
+		return marketMeasureRollDown;
 	}
 
-	@Override public org.drip.historical.attribution.PositionMarketSnap snapFirstMarketValue()
+	/**
+	 * Generate and Snap Relevant Fields from the T1 Market Valuation Parameters
+	 * 
+	 * @return The T1 Market Parameters Valuation Snapshot
+	 */
+
+	@Override public PositionMarketSnap t1PositionMarketSnap()
 	{
-		org.drip.analytics.date.JulianDate dtValuation = firstDate();
+		TreasuryComponent treasuryComponent = (TreasuryComponent) component();
 
-		org.drip.product.govvie.TreasuryComponent tsyComponent = (org.drip.product.govvie.TreasuryComponent)
-			component();
+		JulianDate effectiveDate = treasuryComponent.effectiveDate();
 
-		org.drip.param.market.CurveSurfaceQuoteContainer csqc = firstMarketParameters();
+		JulianDate maturityDate = treasuryComponent.maturityDate();
 
-		org.drip.state.identifier.GovvieLabel govvieLabel = tsyComponent.govvieLabel();
+		GovvieLabel govvieLabel = treasuryComponent.govvieLabel();
 
-		org.drip.analytics.date.JulianDate dtEffective = tsyComponent.effectiveDate();
+		JulianDate t1 = t1();
 
-		org.drip.analytics.date.JulianDate dtMaturity = tsyComponent.maturityDate();
+		int valuationDate = t1.julian();
 
-		org.drip.state.govvie.GovvieCurve gc = csqc.govvieState (govvieLabel);
+		String currency = treasuryComponent.currency();
 
-		double dblFixedCoupon = tsyComponent.couponSetting().couponRate();
+		String accrualDC = treasuryComponent.accrualDC();
 
-		java.lang.String strCurrency = tsyComponent.currency();
+		MarketMeasureRollDown marketMeasureRollDown = rollDownMeasureMap();
 
-		int iValuationDate = dtValuation.julian();
+		if (null == marketMeasureRollDown) {
+			return null;
+		}
 
-		org.drip.param.valuation.ValuationParams valParams = org.drip.param.valuation.ValuationParams.Spot
-			(iValuationDate);
+		double rollDownInnate = marketMeasureRollDown.innate();
 
-		org.drip.historical.engine.MarketMeasureRollDown mmrd = rollDownMeasureMap();
+		double fixedCoupon = treasuryComponent.couponSetting().couponRate();
 
-		if (null == mmrd) return null;
+		CurveSurfaceQuoteContainer t1MarketParameters = t1MarketParameters();
 
-		double dblRollDownInnate = mmrd.innate();
+		GovvieCurve govvieCurve = t1MarketParameters.govvieState (govvieLabel);
 
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapHorizonMetric =
-			mmrd.horizon();
+		ValuationParams valuationParams = ValuationParams.Spot (valuationDate);
 
-		java.lang.String strAccrualDC = tsyComponent.accrualDC();
+		CaseInsensitiveHashMap<Double> horizonMetricMap = marketMeasureRollDown.horizonMetricMap();
 
 		try {
-			double dblYield = gc.yld (dtMaturity.julian());
+			double yield = govvieCurve.yld (maturityDate.julian());
 
-			double dblAccrued = tsyComponent.accrued (iValuationDate, csqc);
+			double accrued = treasuryComponent.accrued (valuationDate, t1MarketParameters);
 
-			double dblCleanPrice = tsyComponent.priceFromYield (valParams, csqc, null, dblYield);
+			double cleanPrice = treasuryComponent.priceFromYield (
+				valuationParams,
+				t1MarketParameters,
+				null,
+				yield
+			);
 
-			double dblYieldSensitivity = 10000. * tsyComponent.modifiedDurationFromYield (valParams, csqc,
-				null, dblYield);
+			double yieldSensitivity = 10000. * treasuryComponent.modifiedDurationFromYield (
+				valuationParams,
+				t1MarketParameters,
+				null,
+				yield
+			);
 
-			double dblCumulativeCouponDCF = org.drip.analytics.daycount.Convention.YearFraction
-				(dtEffective.julian(), iValuationDate, strAccrualDC, false,
-					org.drip.analytics.daycount.ActActDCParams.FromFrequency (gc.freq()), strCurrency);
+			double cumulativeCouponDCF = Convention.YearFraction (
+				effectiveDate.julian(),
+				valuationDate,
+				accrualDC,
+				false,
+				ActActDCParams.FromFrequency (govvieCurve.freq()),
+				currency
+			);
 
-			org.drip.historical.attribution.PositionMarketSnap pms = new
-				org.drip.historical.attribution.PositionMarketSnap (dtValuation, dblCleanPrice);
+			PositionMarketSnap positionMarketSnap = new PositionMarketSnap (t1, cleanPrice);
 
-			if (!pms.setR1 ("Accrued", dblAccrued)) return null;
-
-			if (!pms.setC1 ("AccruedDC", strAccrualDC)) return null;
-
-			if (!pms.setR1 ("CleanPrice", dblCleanPrice)) return null;
-
-			if (!pms.setR1 ("CumulativeCouponAmount", dblCumulativeCouponDCF * dblFixedCoupon)) return null;
-
-			if (!pms.setR1 ("CumulativeCouponDCF", dblCumulativeCouponDCF)) return null;
-
-			if (!pms.setC1 ("Currency", strCurrency)) return null;
-
-			if (!pms.setR1 ("DirtyPrice", dblCleanPrice + dblAccrued)) return null;
-
-			if (!pms.setDate ("EffectiveDate", dtEffective)) return null;
-
-			if (!pms.setC1 ("FixedAccrualDayCount", strAccrualDC)) return null;
-
-			if (!pms.setR1 ("FixedCoupon", dblFixedCoupon)) return null;
-
-			if (!pms.setDate ("MaturityDate", dtMaturity)) return null;
-
-			if (!pms.setC1 ("MaturityTenor", tsyComponent.tenor())) return null;
-
-			if (!pms.setR1 ("ModifiedDuration", dblYieldSensitivity)) return null;
-
-			if (!pms.setR1 ("Yield", dblYield)) return null;
-
-			if (!pms.setR1 ("YieldRollDown", dblRollDownInnate)) return null;
-
-			for (java.lang.String strRollDownTenor : mapHorizonMetric.keySet()) {
-				if (!pms.setR1 ("YieldRollDown" + strRollDownTenor, mapHorizonMetric.get (strRollDownTenor)))
-					return null;
+			if (!positionMarketSnap.setR1 ("Accrued", accrued) ||
+				!positionMarketSnap.setC1 ("AccruedDC", accrualDC) ||
+				!positionMarketSnap.setR1 ("CleanPrice", cleanPrice) ||
+				!positionMarketSnap.setR1 ("CumulativeCouponAmount", cumulativeCouponDCF * fixedCoupon) ||
+				!positionMarketSnap.setR1 ("CumulativeCouponDCF", cumulativeCouponDCF) ||
+				!positionMarketSnap.setC1 ("Currency", currency) ||
+				!positionMarketSnap.setR1 ("DirtyPrice", cleanPrice + accrued) ||
+				!positionMarketSnap.setDate ("EffectiveDate", effectiveDate) ||
+				!positionMarketSnap.setC1 ("FixedAccrualDayCount", accrualDC) ||
+				!positionMarketSnap.setR1 ("FixedCoupon", fixedCoupon) ||
+				!positionMarketSnap.setDate ("MaturityDate", maturityDate) ||
+				!positionMarketSnap.setC1 ("MaturityTenor", treasuryComponent.tenor()) ||
+				!positionMarketSnap.setR1 ("ModifiedDuration", yieldSensitivity) ||
+				!positionMarketSnap.setR1 ("Yield", yield) ||
+				!positionMarketSnap.setR1 ("YieldRollDown", rollDownInnate))
+			{
+				return null;
 			}
 
-			if (!pms.addManifestMeasureSnap ("Yield", dblYield, -1. * dblYieldSensitivity,
-				dblRollDownInnate))
-				return null;
+			for (String rollDownTenor : horizonMetricMap.keySet()) {
+				if (!positionMarketSnap.setR1 (
+					"YieldRollDown" + rollDownTenor,
+					horizonMetricMap.get (rollDownTenor)
+				))
+				{
+					return null;
+				}
+			}
 
-			return pms;
-		} catch (java.lang.Exception e) {
+			if (!positionMarketSnap.addManifestMeasureSnap (
+				"Yield",
+				yield,
+				-1. * yieldSensitivity,
+				rollDownInnate
+			))
+			{
+				return null;
+			}
+
+			return positionMarketSnap;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
+
+	/**
+	 * Update the Fixings (if any) to the Second Market Parameters
+	 * 
+	 * @return TRUE - The Fixings were successfully updated to the Second Market Parameters
+	 */
 
 	@Override public boolean updateFixings()
 	{
 		return true;
 	}
 
-	@Override public org.drip.historical.attribution.PositionMarketSnap snapSecondMarketValue()
+	/**
+	 * Generate and Snap Relevant Fields from the T2 Market Valuation Parameters
+	 * 
+	 * @return The T2 Market Parameters Valuation Snapshot
+	 */
+
+	@Override public PositionMarketSnap t2PositionMarketSnap()
 	{
-		org.drip.product.govvie.TreasuryComponent tsyComponent = (org.drip.product.govvie.TreasuryComponent)
-			component();
+		JulianDate t2 = t2();
 
-		org.drip.analytics.date.JulianDate dtValuation = secondDate();
+		int valuationDate = t2.julian();
 
-		int iValuationDate = dtValuation.julian();
+		TreasuryComponent treasuryComponent = (TreasuryComponent) component();
 
-		org.drip.param.market.CurveSurfaceQuoteContainer csqc = secondMarketParameters();
+		ValuationParams valuationParams = ValuationParams.Spot (valuationDate);
 
-		org.drip.param.valuation.ValuationParams valParams = org.drip.param.valuation.ValuationParams.Spot
-			(iValuationDate);
+		CurveSurfaceQuoteContainer secondMarketParameters = secondMarketParameters();
+
+		GovvieCurve govvieCurve = secondMarketParameters.govvieState (treasuryComponent.govvieLabel());
 
 		try {
-			org.drip.state.govvie.GovvieCurve gc = csqc.govvieState (tsyComponent.govvieLabel());
+			double yield = govvieCurve.yld (treasuryComponent.maturityDate().julian());
 
-			double dblYield = gc.yld (tsyComponent.maturityDate().julian());
+			double cumulativeCouponDCF = Convention.YearFraction (
+				treasuryComponent.effectiveDate().julian(),
+				valuationDate,
+				treasuryComponent.accrualDC(),
+				false,
+				ActActDCParams.FromFrequency (govvieCurve.freq()),
+				treasuryComponent.currency()
+			);
 
-			double dblCumulativeCouponDCF = org.drip.analytics.daycount.Convention.YearFraction
-				(tsyComponent.effectiveDate().julian(), iValuationDate, tsyComponent.accrualDC(), false,
-					org.drip.analytics.daycount.ActActDCParams.FromFrequency (gc.freq()),
-						tsyComponent.currency());
+			PositionMarketSnap positionMarketSnap = new PositionMarketSnap (
+				t2,
+				treasuryComponent.priceFromYield (valuationParams, secondMarketParameters, null, yield)
+			);
 
-			org.drip.historical.attribution.PositionMarketSnap pms = new
-				org.drip.historical.attribution.PositionMarketSnap (dtValuation, tsyComponent.priceFromYield
-					(valParams, csqc, null, dblYield));
-
-			if (!pms.setR1 ("CumulativeCouponAmount", dblCumulativeCouponDCF *
-				tsyComponent.couponSetting().couponRate()))
+			if (!positionMarketSnap.setR1 (
+					"CumulativeCouponAmount",
+					cumulativeCouponDCF * treasuryComponent.couponSetting().couponRate()
+				) ||
+				!positionMarketSnap.setR1 ("CumulativeCouponDCF", cumulativeCouponDCF) ||
+				!positionMarketSnap.setR1 ("Yield", yield) ||
+				!positionMarketSnap.addManifestMeasureSnap (
+					"Yield",
+					yield, -10000. * treasuryComponent.modifiedDurationFromYield (
+						valuationParams,
+						secondMarketParameters,
+						null,
+						yield
+					),
+					0.
+				)
+			)
+			{
 				return null;
+			}
 
-			if (!pms.setR1 ("CumulativeCouponDCF", dblCumulativeCouponDCF)) return null;
-
-			if (!pms.setR1 ("Yield", dblYield)) return null;
-
-			if (!pms.addManifestMeasureSnap ("Yield", dblYield, -10000. *
-				tsyComponent.modifiedDurationFromYield (valParams, csqc, null, dblYield), 0.))
-				return null;
-
-			return pms;
-		} catch (java.lang.Exception e) {
+			return positionMarketSnap;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>
-		crossHorizonDifferentialMetrics (
-			final org.drip.historical.attribution.PositionMarketSnap pmsFirst,
-			final org.drip.historical.attribution.PositionMarketSnap pmsSecond)
+	/**
+	 * Generate the Horizon Differential Metrics Map
+	 * 
+	 * @param t1PositionMarketSnap The First Position Market Snap
+	 * @param t2PositionMarketSnap The Second Position Market Snap
+	 * 
+	 * @return The Horizon Differential Metrics Map
+	 */
+
+	@Override public CaseInsensitiveHashMap<Double> crossHorizonDifferentialMetrics (
+		final PositionMarketSnap t1PositionMarketSnap,
+		final PositionMarketSnap t2PositionMarketSnap)
 	{
-		if (null == pmsFirst || null == pmsSecond) return null;
+		if (null == t1PositionMarketSnap || null == t2PositionMarketSnap) {
+			return null;
+		}
 
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapDifferentialMetric = new
-			org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>();
+		ActActDCParams actActDCParams =
+			ActActDCParams.FromFrequency (((TreasuryComponent) component()).freq());
 
-		org.drip.analytics.date.JulianDate dtEffective = pmsFirst.date ("EffectiveDate");
+		CaseInsensitiveHashMap<Double> differentialMetricMap = new CaseInsensitiveHashMap<Double>();
 
-		java.lang.String strAccrualDC = pmsFirst.c1 ("AccruedDC");
+		JulianDate effectiveDate = t1PositionMarketSnap.date ("EffectiveDate");
 
-		java.lang.String strCalendar = pmsFirst.c1 ("Currency");
+		String accrualDC = t1PositionMarketSnap.c1 ("AccruedDC");
 
-		int iDate1M = dtEffective.addTenor ("1M").julian();
+		String calendar = t1PositionMarketSnap.c1 ("Currency");
 
-		int iDate3M = dtEffective.addTenor ("3M").julian();
-
-		int iEffectiveDate = dtEffective.julian();
-
-		org.drip.analytics.daycount.ActActDCParams aap =
-			org.drip.analytics.daycount.ActActDCParams.FromFrequency
-				(((org.drip.product.govvie.TreasuryComponent) component()).freq());
+		int effectiveDateJulian = effectiveDate.julian();
 
 		try {
-			mapDifferentialMetric.put ("CumulativeCouponAmount", pmsSecond.r1 ("CumulativeCouponAmount") -
-				pmsFirst.r1 ("CumulativeCouponAmount"));
+			differentialMetricMap.put (
+				"CumulativeCouponAmount",
+				t2PositionMarketSnap.r1 ("CumulativeCouponAmount") -
+					t1PositionMarketSnap.r1 ("CumulativeCouponAmount")
+			);
 
-			mapDifferentialMetric.put ("CumulativeCouponDCF", pmsSecond.r1 ("CumulativeCouponDCF") -
-				pmsFirst.r1 ("CumulativeCouponDCF"));
+			differentialMetricMap.put (
+				"CumulativeCouponDCF",
+				t2PositionMarketSnap.r1 ("CumulativeCouponDCF") -
+					t1PositionMarketSnap.r1 ("CumulativeCouponDCF")
+			);
 
-			mapDifferentialMetric.put ("CumulativeCouponDCF1M",
-				org.drip.analytics.daycount.Convention.YearFraction (iEffectiveDate, iDate1M, strAccrualDC,
-					false, aap, strCalendar));
+			differentialMetricMap.put (
+				"CumulativeCouponDCF1M",
+				Convention.YearFraction (
+					effectiveDateJulian,
+					effectiveDate.addTenor ("1M").julian(),
+					accrualDC,
+					false,
+					actActDCParams,
+					calendar
+				)
+			);
 
-			mapDifferentialMetric.put ("CumulativeCouponDCF3M",
-				org.drip.analytics.daycount.Convention.YearFraction (iEffectiveDate, iDate3M, strAccrualDC,
-					false, aap, strCalendar));
+			differentialMetricMap.put (
+				"CumulativeCouponDCF3M",
+				Convention.YearFraction (
+					effectiveDateJulian,
+					effectiveDate.addTenor ("3M").julian(),
+					accrualDC,
+					false,
+					actActDCParams,
+					calendar
+				)
+			);
 
-			return mapDifferentialMetric;
-		} catch (java.lang.Exception e) {
+			return differentialMetricMap;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

@@ -417,7 +417,7 @@ public class LatentStateSequenceBuilder implements SegmentSequenceBuilder
 		}
 
 		LatentStateResponseModel[] latentStateResponseModelArray =
-			((CurveStretch) multiSegmentSequence).segments();
+			(_curveStretch = (CurveStretch) multiSegmentSequence).segments();
 
 		return null != latentStateResponseModelArray &&
 			latentStateResponseModelArray.length == _latentStateStretchSpecification.segmentSpec().length;
@@ -520,13 +520,13 @@ public class LatentStateSequenceBuilder implements SegmentSequenceBuilder
 				return false;
 			}
 
-			if (!latentStateResponseModelArray[startingSegmentIndex].calibrate (
-				0 == startingSegmentIndex ? null : latentStateResponseModelArray[startingSegmentIndex - 1],
+			if (!latentStateResponseModelArray[segmentIndex].calibrate (
+				0 == segmentIndex ? null : latentStateResponseModelArray[segmentIndex - 1],
 				_responseValueSensitivityConstraintMap.get (segmentRight).base(),
 				null == _stretchBestFitResponse ? null : _stretchBestFitResponse.sizeToSegment (
-					latentStateResponseModelArray[startingSegmentIndex]
+					latentStateResponseModelArray[segmentIndex]
 				)) || !_curveStretch.markSegmentBuilt (
-					startingSegmentIndex,
+					segmentIndex,
 					predictorResponseWeightConstraint.mergeLabelSet()
 				)
 			) {

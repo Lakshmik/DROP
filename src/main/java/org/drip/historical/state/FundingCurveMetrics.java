@@ -1,11 +1,23 @@
 
 package org.drip.historical.state;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,41 +92,50 @@ package org.drip.historical.state;
  */
 
 /**
- * <i>FundingCurveMetrics</i> holds the computed Metrics associated the Funding Curve State.
+ * <i>FundingCurveMetrics</i> holds the computed Metrics associated the Funding Curve State. It provides the
+ * 	following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/state/README.md">Historical Implied Curve Node Metrics</a></li>
+ * 		<li><i>FundingCurveMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Closing Date</li>
+ * 		<li>Add the Native Forward Rate for the specified In/For Start/Forward Tenors</li>
+ * 		<li>Retrieve the Native Forward Rate given the In/For Tenors</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/state/README.md">Historical Implied Curve Node Metrics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FundingCurveMetrics {
-	private org.drip.analytics.date.JulianDate _dtClose = null;
+public class FundingCurveMetrics
+{
+	private JulianDate _closeDate = null;
 
-	private
-		org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>>
-			_mapInForNativeLIBOR = new
-				org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>>();
+	private CaseInsensitiveHashMap<CaseInsensitiveHashMap<Double>> _inForNativeLIBORMap =
+		new CaseInsensitiveHashMap<CaseInsensitiveHashMap<Double>>();
 
 	/**
-	 * FundingCurveMetrics Constructor
+	 * <i>FundingCurveMetrics</i> Constructor
 	 * 
-	 * @param dtClose The Closing Date
+	 * @param closeDate The Closing Date
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public FundingCurveMetrics (
-		final org.drip.analytics.date.JulianDate dtClose)
-		throws java.lang.Exception
+		final JulianDate closeDate)
+		throws Exception
 	{
-		if (null == (_dtClose = dtClose))
-			throw new java.lang.Exception ("FundingCurveMetrics Constructor => Invalid Inputs");
+		if (null == (_closeDate = closeDate)) {
+			throw new Exception ("FundingCurveMetrics Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -123,39 +144,42 @@ public class FundingCurveMetrics {
 	 * @return The Closing Date
 	 */
 
-	public org.drip.analytics.date.JulianDate close()
+	public JulianDate close()
 	{
-		return _dtClose;
+		return _closeDate;
 	}
 
 	/**
 	 * Add the Native Forward Rate for the specified In/For Start/Forward Tenors
 	 * 
-	 * @param strInTenor "In" Start Tenor
-	 * @param strForTenor "For" Forward Tenor
-	 * @param dblForwardRate Forward Rate
+	 * @param inTenor "In" Start Tenor
+	 * @param forTenor "For" Forward Tenor
+	 * @param forwardRate Forward Rate
 	 * 
 	 * @return TRUE - The Native Forward Rate successfully added
 	 */
 
 	public boolean addNativeForwardRate (
-		final java.lang.String strInTenor,
-		final java.lang.String strForTenor,
-		final double dblForwardRate)
+		final String inTenor,
+		final String forTenor,
+		final double forwardRate)
 	{
-		if (null == strInTenor || strInTenor.isEmpty() || null == strForTenor || strForTenor.isEmpty() ||
-			!org.drip.numerical.common.NumberUtil.IsValid (dblForwardRate))
+		if (null == inTenor || inTenor.isEmpty() ||
+			null == forTenor || forTenor.isEmpty() ||
+			!NumberUtil.IsValid (forwardRate))
+		{
 			return false;
+		}
 
-		if (!_mapInForNativeLIBOR.containsKey (strInTenor)) {
-			org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapForwardRate = new
-				org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>();
+		if (!_inForNativeLIBORMap.containsKey (inTenor)) {
+			CaseInsensitiveHashMap<Double> forwardRateMap = new CaseInsensitiveHashMap<Double>();
 
-			mapForwardRate.put (strForTenor, dblForwardRate);
+			forwardRateMap.put (forTenor, forwardRate);
 
-			_mapInForNativeLIBOR.put (strInTenor, mapForwardRate);
-		} else
-			_mapInForNativeLIBOR.get (strInTenor).put (strForTenor, dblForwardRate);
+			_inForNativeLIBORMap.put (inTenor, forwardRateMap);
+		} else {
+			_inForNativeLIBORMap.get (inTenor).put (forTenor, forwardRate);
+		}
 
 		return true;
 	}
@@ -163,29 +187,32 @@ public class FundingCurveMetrics {
 	/**
 	 * Retrieve the Native Forward Rate given the In/For Tenors
 	 * 
-	 * @param strInTenor "In" Start Tenor
-	 * @param strForTenor "For" Forward Tenor
+	 * @param inTenor "In" Start Tenor
+	 * @param forTenor "For" Forward Tenor
 	 * 
 	 * @return The Native Forward Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double nativeForwardRate (
-		final java.lang.String strInTenor,
-		final java.lang.String strForTenor)
-		throws java.lang.Exception
+		final String inTenor,
+		final String forTenor)
+		throws Exception
 	{
-		if (null == strInTenor || strInTenor.isEmpty() || null == strForTenor || strForTenor.isEmpty() ||
-			!_mapInForNativeLIBOR.containsKey (strInTenor))
-			throw new java.lang.Exception ("FundingCurveMetrics::forwardRate => Invalid Inputs");
+		if (null == inTenor || inTenor.isEmpty() ||
+			null == forTenor || forTenor.isEmpty() ||
+			!_inForNativeLIBORMap.containsKey (inTenor))
+		{
+			throw new Exception ("FundingCurveMetrics::nativeForwardRate => Invalid Inputs");
+		}
 
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double> mapForwardRate =
-			_mapInForNativeLIBOR.get (strInTenor);
+		CaseInsensitiveHashMap<Double> forwardRateMap = _inForNativeLIBORMap.get (inTenor);
 
-		if (null == mapForwardRate || !mapForwardRate.containsKey (strForTenor))
-			throw new java.lang.Exception ("FundingCurveMetrics::forwardRate => Invalid Inputs");
+		if (null == forwardRateMap || !forwardRateMap.containsKey (forTenor)) {
+			throw new Exception ("FundingCurveMetrics::nativeForwardRate => Invalid Inputs");
+		}
 
-		return mapForwardRate.get (strForTenor);
+		return forwardRateMap.get (forTenor);
 	}
 }

@@ -15,6 +15,14 @@ import org.drip.service.product.TreasuryFuturesAPI;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,122 +100,37 @@ import org.drip.service.product.TreasuryFuturesAPI;
  * <i>WN1KeyRateDuration</i> demonstrates the Computation of the Key Rate Duration for the WN1 Treasury
  * 	Futures.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/treasuryfuturesrisk/README.md">Treasury Futures Key Rate Duration</a></li>
- *  </ul>
- * <br><br>
+ * <br>
+ * <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/treasuryfuturesrisk/README.md">Treasury Futures Key Rate Duration</a></td></tr>
+ * </table>
+ * <br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class WN1KeyRateDuration {
+public class WN1KeyRateDuration
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strTreasuryCode = "WN1";
-		String strTreasuryMarkLocation = "C:\\DROP\\Daemons\\Transforms\\TreasuryYieldMarks\\USTBenchmarksReconstituted.csv";
-		String strPrintLocation = "C:\\DROP\\Daemons\\Transforms\\TreasuryFuturesCloses\\" +
-			strTreasuryCode + "ClosesReconstitutor.csv";
-
-		CSVGrid csvGridTreasuryMark = CSVParser.StringGrid (
-			strTreasuryMarkLocation,
-			true
-		);
-
-		JulianDate[] adtTreasuryMark = csvGridTreasuryMark.dateArrayAtColumn (0);
-
-		double[] adblYieldUST02Y = csvGridTreasuryMark.doubleArrayAtColumn (1);
-
-		double[] adblYieldUST03Y = csvGridTreasuryMark.doubleArrayAtColumn (2);
-
-		double[] adblYieldUST04Y = csvGridTreasuryMark.doubleArrayAtColumn (3);
-
-		double[] adblYieldUST05Y = csvGridTreasuryMark.doubleArrayAtColumn (4);
-
-		double[] adblYieldUST07Y = csvGridTreasuryMark.doubleArrayAtColumn (5);
-
-		double[] adblYieldUST10Y = csvGridTreasuryMark.doubleArrayAtColumn (6);
-
-		double[] adblYieldUST20Y = csvGridTreasuryMark.doubleArrayAtColumn (7);
-
-		double[] adblYieldUST30Y = csvGridTreasuryMark.doubleArrayAtColumn (8);
-
-		Map<JulianDate, Double> mapTreasuryMark02Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark03Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark04Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark05Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark07Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark10Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark20Y = new TreeMap<JulianDate, Double>();
-
-		Map<JulianDate, Double> mapTreasuryMark30Y = new TreeMap<JulianDate, Double>();
-
-		for (int i = 0; i < adtTreasuryMark.length; ++i) {
-			mapTreasuryMark02Y.put (adtTreasuryMark[i], adblYieldUST02Y[i]);
-
-			mapTreasuryMark03Y.put (adtTreasuryMark[i], adblYieldUST03Y[i]);
-
-			mapTreasuryMark04Y.put (adtTreasuryMark[i], adblYieldUST04Y[i]);
-
-			mapTreasuryMark05Y.put (adtTreasuryMark[i], adblYieldUST05Y[i]);
-
-			mapTreasuryMark07Y.put (adtTreasuryMark[i], adblYieldUST07Y[i]);
-
-			mapTreasuryMark10Y.put (adtTreasuryMark[i], adblYieldUST10Y[i]);
-
-			mapTreasuryMark20Y.put (adtTreasuryMark[i], adblYieldUST20Y[i]);
-
-			mapTreasuryMark30Y.put (adtTreasuryMark[i], adblYieldUST30Y[i]);
-		}
-
-		CSVGrid csvGrid = CSVParser.StringGrid (
-			strPrintLocation,
-			true
-		);
-
-		JulianDate[] adtSpot = csvGrid.dateArrayAtColumn (0);
-
-		double[] adblCleanPrice = csvGrid.doubleArrayAtColumn (2);
-
-		double[] adblCoupon = csvGrid.doubleArrayAtColumn (3);
-
-		JulianDate[] adtEffective = csvGrid.dateArrayAtColumn (4);
-
-		JulianDate[] adtMaturity = csvGrid.dateArrayAtColumn (5);
-
-		JulianDate[] adtExpiry = csvGrid.dateArrayAtColumn (6);
-
-		int iNumCompute = adtSpot.length;
-		JulianDate[] adtEffectiveCompute = new JulianDate[iNumCompute];
-		JulianDate[] adtMaturityCompute = new JulianDate[iNumCompute];
-		double[] adblCouponCompute = new double[iNumCompute];
-		JulianDate[] adtExpiryCompute = new JulianDate[iNumCompute];
-		JulianDate[] adtSpotCompute = new JulianDate[iNumCompute];
-		double[] adblCleanPriceCompute = new double[iNumCompute];
-		double[][] aadblUSTComputeYield = new double[iNumCompute][8];
-		String[] astrBenchmarkTenor = new String[] {
+		String treasuryCode = "WN1";
+		String[] benchmarkTenorArray = new String[] {
 			"2Y",
 			"3Y",
 			"4Y",
@@ -217,55 +140,170 @@ public class WN1KeyRateDuration {
 			"20Y",
 			"30Y"
 		};
+		String treasuryMarkLocation =
+			"C:\\DROP\\Daemons\\Transforms\\TreasuryYieldMarks\\USTBenchmarksReconstituted.csv";
+		String printLocation = "C:\\DROP\\Daemons\\Transforms\\TreasuryFuturesCloses\\" + treasuryCode +
+			"ClosesReconstitutor.csv";
 
-		for (int i = 0; i < iNumCompute; ++i) {
-			adtEffectiveCompute[i] = adtEffective[i];
-			adtMaturityCompute[i] = adtMaturity[i];
-			adblCouponCompute[i] = adblCoupon[i];
-			adtExpiryCompute[i] = adtExpiry[i];
-			adtSpotCompute[i] = adtSpot[i];
-			adblCleanPriceCompute[i] = adblCleanPrice[i];
-			aadblUSTComputeYield[i][0] = adblYieldUST02Y[i];
-			aadblUSTComputeYield[i][1] = adblYieldUST03Y[i];
-			aadblUSTComputeYield[i][2] = adblYieldUST04Y[i];
-			aadblUSTComputeYield[i][3] = adblYieldUST05Y[i];
-			aadblUSTComputeYield[i][4] = adblYieldUST07Y[i];
-			aadblUSTComputeYield[i][5] = adblYieldUST10Y[i];
-			aadblUSTComputeYield[i][6] = adblYieldUST20Y[i];
-			aadblUSTComputeYield[i][7] = adblYieldUST30Y[i];
+		CSVGrid treasuryMarkCSVGrid = CSVParser.StringGrid (treasuryMarkLocation, true);
+
+		JulianDate[] treasuryMarkDateArray = treasuryMarkCSVGrid.dateArrayAtColumn (0);
+
+		double[] ust02YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (1);
+
+		double[] ust03YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (2);
+
+		double[] ust04YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (3);
+
+		double[] ust05YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (4);
+
+		double[] ust07YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (5);
+
+		double[] ust10YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (6);
+
+		double[] ust20YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (7);
+
+		double[] ust30YYieldArray = treasuryMarkCSVGrid.doubleArrayAtColumn (8);
+
+		Map<JulianDate, Double> treasuryMarkMap02Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap03Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap04Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap05Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap07Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap10Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap20Y = new TreeMap<JulianDate, Double>();
+
+		Map<JulianDate, Double> treasuryMarkMap30Y = new TreeMap<JulianDate, Double>();
+
+		for (int treasuryMarkIndex = 0;
+			treasuryMarkIndex < treasuryMarkDateArray.length;
+			++treasuryMarkIndex)
+		{
+			treasuryMarkMap02Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex], 
+				ust02YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap03Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust03YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap04Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust04YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap05Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust05YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap07Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust07YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap10Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust10YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap20Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust20YYieldArray[treasuryMarkIndex]
+			);
+
+			treasuryMarkMap30Y.put (
+				treasuryMarkDateArray[treasuryMarkIndex],
+				ust30YYieldArray[treasuryMarkIndex]
+			);
 		}
 
-		List<TenorDurationNodeMetrics> lsTDNM = TreasuryFuturesAPI.HorizonKeyRateDuration (
-			"UST",
-			adtEffectiveCompute,
-			adtMaturityCompute,
-			adblCouponCompute,
-			adtExpiryCompute,
-			adtSpotCompute,
-			adblCleanPriceCompute,
-			astrBenchmarkTenor,
-			aadblUSTComputeYield
+		CSVGrid csvGrid = CSVParser.StringGrid (printLocation, true);
+
+		JulianDate[] spotDateArray = csvGrid.dateArrayAtColumn (0);
+
+		double[] cleanPriceArray = csvGrid.doubleArrayAtColumn (2);
+
+		double[] couponArray = csvGrid.doubleArrayAtColumn (3);
+
+		JulianDate[] effectiveDateArray = csvGrid.dateArrayAtColumn (4);
+
+		JulianDate[] maturityDateArray = csvGrid.dateArrayAtColumn (5);
+
+		JulianDate[] expiryDateArray = csvGrid.dateArrayAtColumn (6);
+
+		int spotDateCount = spotDateArray.length;
+		JulianDate[] effectiveComputeDateArray = new JulianDate[spotDateCount];
+		JulianDate[] maturityComputeDateArray = new JulianDate[spotDateCount];
+		double[] couponComputeArray = new double[spotDateCount];
+		JulianDate[] expiryComputeDateArray = new JulianDate[spotDateCount];
+		JulianDate[] spotComputeDateArray = new JulianDate[spotDateCount];
+		double[] cleanPriceComputeArray = new double[spotDateCount];
+		double[][] ustComputeYieldGrid = new double[spotDateCount][8];
+
+		for (int spotDateIndex = 0; spotDateIndex < spotDateCount; ++spotDateIndex) {
+			effectiveComputeDateArray[spotDateIndex] = effectiveDateArray[spotDateIndex];
+			maturityComputeDateArray[spotDateIndex] = maturityDateArray[spotDateIndex];
+			couponComputeArray[spotDateIndex] = couponArray[spotDateIndex];
+			expiryComputeDateArray[spotDateIndex] = expiryDateArray[spotDateIndex];
+			spotComputeDateArray[spotDateIndex] = spotDateArray[spotDateIndex];
+			cleanPriceComputeArray[spotDateIndex] = cleanPriceArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][0] = ust02YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][1] = ust03YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][2] = ust04YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][3] = ust05YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][4] = ust07YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][5] = ust10YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][6] = ust20YYieldArray[spotDateIndex];
+			ustComputeYieldGrid[spotDateIndex][7] = ust30YYieldArray[spotDateIndex];
+		}
+
+		List<TenorDurationNodeMetrics> tenorDurationNodeMetricsList =
+			TreasuryFuturesAPI.HorizonKeyRateDuration (
+				"UST",
+				effectiveComputeDateArray,
+				maturityComputeDateArray,
+				couponComputeArray,
+				expiryComputeDateArray,
+				spotComputeDateArray,
+				cleanPriceComputeArray,
+				benchmarkTenorArray,
+				ustComputeYieldGrid
+			);
+
+		System.out.println (
+			"SpotDate,ExpiryDate,CTDName,SpotCTDCleanPrice,ExpiryCTDCleanPrice,SpotGSpread,ExpiryGSpread,SpotYield,ExpiryYield,Parallel,2Y,3Y,4Y,5Y,7Y,10Y,20Y,30Y"
 		);
 
-		System.out.println ("SpotDate,ExpiryDate,CTDName,SpotCTDCleanPrice,ExpiryCTDCleanPrice,SpotGSpread,ExpiryGSpread,SpotYield,ExpiryYield,Parallel,2Y,3Y,4Y,5Y,7Y,10Y,20Y,30Y");
+		for (TenorDurationNodeMetrics tenorDurationNodeMetrics : tenorDurationNodeMetricsList) {
+			String tenorDurationNodeMetricsDump =
+				tenorDurationNodeMetrics.snapDate() + "," +
+				tenorDurationNodeMetrics.date ("ExpiryDate") + "," +
+				tenorDurationNodeMetrics.c1 ("CTDName") + "," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("SpotCTDCleanPrice"), 1, 5, 100.) +
+					"," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("ExpiryCTDCleanPrice"), 1, 5, 100.) +
+					"," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("SpotGSpread"), 1, 1, 10000.) + "," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("ExpiryGSpread"), 1, 1, 10000.) + "," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("SpotYield"), 1, 4, 100.) + "," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("ExpiryYield"), 1, 4, 100.) + "," +
+				FormatUtil.FormatDouble (tenorDurationNodeMetrics.r1 ("ParallelKRD"), 1, 4, 1.);
 
-		for (TenorDurationNodeMetrics tdnm : lsTDNM) {
-			String strTDNM =
-				tdnm.dateSnap() + "," +
-				tdnm.date ("ExpiryDate") + "," +
-				tdnm.c1 ("CTDName") + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("SpotCTDCleanPrice"), 1, 5, 100.) + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("ExpiryCTDCleanPrice"), 1, 5, 100.) + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("SpotGSpread"), 1, 1, 10000.) + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("ExpiryGSpread"), 1, 1, 10000.) + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("SpotYield"), 1, 4, 100.) + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("ExpiryYield"), 1, 4, 100.) + "," +
-				FormatUtil.FormatDouble (tdnm.r1 ("ParallelKRD"), 1, 4, 1.);
+			for (Map.Entry<String, Double> krdEntry : tenorDurationNodeMetrics.krdMap().entrySet()) {
+				tenorDurationNodeMetricsDump +=
+					"," + FormatUtil.FormatDouble (krdEntry.getValue(), 1, 4, 1.);
+			}
 
-			for (Map.Entry<String, Double> meTDNM : tdnm.krdMap().entrySet())
-				strTDNM += "," + FormatUtil.FormatDouble (meTDNM.getValue(), 1, 4, 1.);
-
-			System.out.println (strTDNM);
+			System.out.println (tenorDurationNodeMetricsDump);
 		}
 
 		EnvManager.TerminateEnv();

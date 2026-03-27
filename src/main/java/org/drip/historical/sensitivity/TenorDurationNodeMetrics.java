@@ -1,11 +1,26 @@
 
 package org.drip.historical.sensitivity;
 
+import java.util.Map;
+
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.analytics.support.CaseInsensitiveTreeMap;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,48 +95,61 @@ package org.drip.historical.sensitivity;
  */
 
 /**
- * <i>TenorDurationNodeMetrics</i> holds the KRD Duration Nodes and associated Metrics.
+ * <i>TenorDurationNodeMetrics</i> holds the KRD Duration Nodes and associated Metrics. It provides the
+ * 	following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/sensitivity/README.md">Product Horizon Change Tenor Sensitivity</a></li>
+ * 		<li><i>TenorDurationNodeMetrics</i> Constructor</li>
+ * 		<li>Retrieve the KRD Date Snap</li>
+ * 		<li>Insert a KRD Node</li>
+ * 		<li>Retrieve the KRD Map</li>
+ * 		<li>Set the Custom Date Entry corresponding to the Specified Key</li>
+ * 		<li>Retrieve the Custom Date Entry corresponding to the Specified Key</li>
+ * 		<li>Set the Custom C<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Retrieve the Custom C<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Set the Custom R<sup>1</sup> Entry corresponding to the Specified Key</li>
+ * 		<li>Retrieve the Custom R<sup>1</sup> Entry corresponding to the Specified Key</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/sensitivity/README.md">Product Horizon Change Tenor Sensitivity</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class TenorDurationNodeMetrics {
-	private org.drip.analytics.date.JulianDate _dtSnap = null;
+public class TenorDurationNodeMetrics
+{
+	private JulianDate _snapDate = null;
 
-	private java.util.Map<java.lang.String, java.lang.String> _mapCustomC1 = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.String>();
+	private Map<String, String> _customC1Map = new CaseInsensitiveHashMap<String>();
 
-	private java.util.Map<java.lang.String, java.lang.Double> _mapCustomR1 = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<java.lang.Double>();
+	private Map<String, Double> _customR1Map = new CaseInsensitiveHashMap<Double>();
 
-	private org.drip.analytics.support.CaseInsensitiveTreeMap<java.lang.Double> _mapKRD = new
-		org.drip.analytics.support.CaseInsensitiveTreeMap<java.lang.Double>();
+	private CaseInsensitiveTreeMap<Double> _krdMap = new CaseInsensitiveTreeMap<Double>();
 
-	private java.util.Map<java.lang.String, org.drip.analytics.date.JulianDate> _mapCustomDate = new
-		org.drip.analytics.support.CaseInsensitiveHashMap<org.drip.analytics.date.JulianDate>();
+	private Map<String, JulianDate> _customDateMap = new CaseInsensitiveHashMap<JulianDate>();
 
 	/**
-	 * TenorDurationNodeMetrics Constructor
+	 * <i>TenorDurationNodeMetrics</i> Constructor
 	 * 
-	 * @param dtSnap The Date Snap
+	 * @param snapDate The Date Snap
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public TenorDurationNodeMetrics (
-		final org.drip.analytics.date.JulianDate dtSnap)
-		throws java.lang.Exception
+		final JulianDate snapDate)
+		throws Exception
 	{
-		if (null == (_dtSnap = dtSnap))
-			throw new java.lang.Exception ("TenorDurationNodeMetrics ctr: Invalid Inputs");
+		if (null == (_snapDate = snapDate)) {
+			throw new Exception ("TenorDurationNodeMetrics Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -130,29 +158,29 @@ public class TenorDurationNodeMetrics {
 	 * @return The KRD Date Snap
 	 */
 
-	public org.drip.analytics.date.JulianDate dateSnap()
+	public JulianDate snapDate()
 	{
-		return _dtSnap;
+		return _snapDate;
 	}
 
 	/**
 	 * Insert a KRD Node
 	 * 
-	 * @param strKRDNode KRD Node Key
-	 * @param dblKRDValue KRD Node Value
+	 * @param krdKey KRD Node Key
+	 * @param krdValue KRD Node Value
 	 * 
 	 * @return TRUE - The KRD Entry successfully inserted
 	 */
 
 	public boolean addKRDNode (
-		final java.lang.String strKRDNode,
-		final double dblKRDValue)
+		final String krdKey,
+		final double krdValue)
 	{
-		if (null == strKRDNode || strKRDNode.isEmpty() || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblKRDValue))
+		if (null == krdKey || krdKey.isEmpty() || !NumberUtil.IsValid (krdValue)) {
 			return false;
+		}
 
-		_mapKRD.put (strKRDNode, dblKRDValue);
+		_krdMap.put (krdKey, krdValue);
 
 		return true;
 	}
@@ -163,27 +191,29 @@ public class TenorDurationNodeMetrics {
 	 * @return The KRD Map
 	 */
 
-	public org.drip.analytics.support.CaseInsensitiveTreeMap<java.lang.Double> krdMap()
+	public CaseInsensitiveTreeMap<Double> krdMap()
 	{
-		return _mapKRD;
+		return _krdMap;
 	}
 
 	/**
 	 * Set the Custom Date Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
-	 * @param dtCustom The Custom Date Entry
+	 * @param key The Key
+	 * @param customDate The Custom Date Entry
 	 * 
 	 * @return TRUE - Custom Date successfully set
 	 */
 
 	public boolean setDate (
-		final java.lang.String strKey,
-		final org.drip.analytics.date.JulianDate dtCustom)
+		final String key,
+		final JulianDate customDate)
 	{
-		if (null == strKey || strKey.isEmpty() || null == dtCustom) return false;
+		if (null == key || key.isEmpty() || null == customDate) {
+			return false;
+		}
 
-		_mapCustomDate.put (strKey, dtCustom);
+		_customDateMap.put (key, customDate);
 
 		return true;
 	}
@@ -191,89 +221,93 @@ public class TenorDurationNodeMetrics {
 	/**
 	 * Retrieve the Custom Date Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
+	 * @param key The Key
 	 * 
 	 * @return The Custom Date Entry
 	 */
 
-	public org.drip.analytics.date.JulianDate date (
-		final java.lang.String strKey)
+	public JulianDate date (
+		final String key)
 	{
-		return null == strKey || !_mapCustomDate.containsKey (strKey) ? null : _mapCustomDate.get (strKey);
+		return null == key || !_customDateMap.containsKey (key) ? null : _customDateMap.get (key);
 	}
 
 	/**
-	 * Set the Custom C^1 Entry corresponding to the Specified Key
+	 * Set the Custom C<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
-	 * @param strC1 The Custom C^1 Entry
+	 * @param key The Key
+	 * @param c1 The Custom C<sup>1</sup> Entry
 	 * 
-	 * @return TRUE - Custom C^1 Entry successfully set
+	 * @return TRUE - Custom C<sup>1</sup> Entry successfully set
 	 */
 
 	public boolean setC1 (
-		final java.lang.String strKey,
-		final java.lang.String strC1)
+		final String key,
+		final String c1)
 	{
-		if (null == strKey || strKey.isEmpty() || null == strC1 || strC1.isEmpty()) return false;
+		if (null == key || key.isEmpty() || null == c1 || c1.isEmpty()) {
+			return false;
+		}
 
-		_mapCustomC1.put (strKey, strC1);
+		_customC1Map.put (key, c1);
 
 		return true;
 	}
 
 	/**
-	 * Retrieve the Custom C^1 Entry corresponding to the Specified Key
+	 * Retrieve the Custom C<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
+	 * @param key The Key
 	 * 
-	 * @return The Custom C^1 Entry
+	 * @return The Custom C<sup>1</sup> Entry
 	 */
 
-	public java.lang.String c1 (
-		final java.lang.String strKey)
+	public String c1 (
+		final String key)
 	{
-		return null == strKey || !_mapCustomC1.containsKey (strKey) ? null : _mapCustomC1.get (strKey);
+		return null == key || !_customC1Map.containsKey (key) ? null : _customC1Map.get (key);
 	}
 
 	/**
-	 * Set the Custom R^1 Entry corresponding to the Specified Key
+	 * Set the Custom R<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
-	 * @param dblR1 The Custom R^1 Entry
+	 * @param key The Key
+	 * @param r1 The Custom R<sup>1</sup> Entry
 	 * 
 	 * @return TRUE - Custom Number successfully set
 	 */
 
 	public boolean setR1 (
-		final java.lang.String strKey,
-		final double dblR1)
+		final String key,
+		final double r1)
 	{
-		if (null == strKey || strKey.isEmpty() || !org.drip.numerical.common.NumberUtil.IsValid (dblR1))
+		if (null == key || key.isEmpty() || !NumberUtil.IsValid (r1)) {
 			return false;
+		}
 
-		_mapCustomR1.put (strKey, dblR1);
+		_customR1Map.put (key, r1);
 
 		return true;
 	}
 
 	/**
-	 * Retrieve the Custom R^1 Entry corresponding to the Specified Key
+	 * Retrieve the Custom R<sup>1</sup> Entry corresponding to the Specified Key
 	 * 
-	 * @param strKey The Key
+	 * @param key The Key
 	 * 
-	 * @return The Custom R^1 Entry
+	 * @return The Custom R<sup>1</sup> Entry
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double r1 (
-		final java.lang.String strKey)
-		throws java.lang.Exception
+		final String key)
+		throws Exception
 	{
-		if (null == strKey || !_mapCustomR1.containsKey (strKey))
-			throw new java.lang.Exception ("PositionMarketSnap::r1 => Invalid Inputs");
+		if (null == key || !_customR1Map.containsKey (key)) {
+			throw new Exception ("TenorDurationNodeMetrics::r1 => Invalid Inputs");
+		}
 
-		return _mapCustomR1.get (strKey);
+		return _customR1Map.get (key);
 	}
 }

@@ -205,7 +205,7 @@ public class LatentStateResponseModel
 				responseScalingShapeControl
 			);
 
-			if (!NumberUtil.IsValid (leftPredictorOrdinate) || NumberUtil.IsValid (rightPredictorOrdinate) ||
+			if (!NumberUtil.IsValid (leftPredictorOrdinate) || !NumberUtil.IsValid (rightPredictorOrdinate) ||
 				leftPredictorOrdinate == rightPredictorOrdinate)
 			{
 				return null;

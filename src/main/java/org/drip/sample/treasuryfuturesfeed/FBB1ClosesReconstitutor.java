@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,52 +93,53 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>FBB1ClosesReconstitutor</i> Cleanses, Transforms, and Re-constitutes the Formated FBB1 Closes Feed.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/treasuryfuturesfeed/README.md">G20 Treasury Futures Feed Reconstitutor</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/treasuryfuturesfeed/README.md">G20 Treasury Futures Feed Reconstitutor</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FBB1ClosesReconstitutor {
+public class FBB1ClosesReconstitutor
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		int iSpotDateIndex = 0;
-		int iConversionFactorIndex = 1;
-		int iCleanPriceIndex = 14;
-		int iCTDCouponIndex = 7;
-		int iEffectiveDateIndex = 11;
-		int iMaturityDateIndex = 12;
-		int iExpiryProxyIndex = 13;
-		String strFeedLocation = "C:\\DROP\\Daemons\\Feeds\\TreasuryFutures\\FBB1_ClosesFormatted.csv";
+		int spotDateIndex = 0;
+		int conversionFactorIndex = 1;
+		int cleanPriceIndex = 14;
+		int ctdCouponIndex = 7;
+		int effectiveDateIndex = 11;
+		int maturityDateIndex = 12;
+		int expiryProxyIndex = 13;
+		String feedLocation = "C:\\DROP\\Daemons\\Feeds\\TreasuryFutures\\FBB1_ClosesFormatted.csv";
 
 		TreasuryFuturesClosesReconstitutor.RegularizeCloses (
-			strFeedLocation,
-			iSpotDateIndex,
-			iConversionFactorIndex,
-			iCleanPriceIndex,
-			iCTDCouponIndex,
-			iEffectiveDateIndex,
-			iMaturityDateIndex,
-			iExpiryProxyIndex
+			feedLocation,
+			spotDateIndex,
+			conversionFactorIndex,
+			cleanPriceIndex,
+			ctdCouponIndex,
+			effectiveDateIndex,
+			maturityDateIndex,
+			expiryProxyIndex
 		);
 
 		EnvManager.TerminateEnv();

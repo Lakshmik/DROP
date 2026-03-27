@@ -11,7 +11,7 @@ Computation Support Library contains Cluster Support, Historical/Live Feed Proce
 
  |        Document         | Link |
  |-------------------------|------|
- | User Guide              | [*Latest*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/ComputationSupport/ComputationSupport_v6.96.pdf) [*Previous*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/ComputationSupport) |
+ | User Guide              | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/ComputationSupport/ComputationSupport_v6.96.pdf) [*Previous*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/ComputationSupport) |
  | API                     | [*Javadoc*](https://lakshmidrip.github.io/DROP/Javadoc/index.html)|
 
 

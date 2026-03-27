@@ -264,7 +264,8 @@ public class ScenarioGovvieCurveBuilder
 			LatentStateSpecification[] latentStateSpecificationArray = new LatentStateSpecification[] {
 				new LatentStateSpecification (
 					LatentStateStatic.LATENT_STATE_GOVVIE,
-					LatentStateStatic.GOVVIE_QM_YIELD, govvieLabel
+					LatentStateStatic.GOVVIE_QM_YIELD,
+					govvieLabel
 				)
 			};
 
@@ -403,7 +404,7 @@ public class ScenarioGovvieCurveBuilder
 				null,
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (0, 2),
+				SegmentInelasticDesignControl.Create (2, 2),
 				calibratableComponentArray,
 				manifestMeasure,
 				quoteArray

@@ -1,11 +1,21 @@
 
 package org.drip.historical.attribution;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,44 +91,55 @@ package org.drip.historical.attribution;
 
 /**
  * <i>PositionManifestMeasureSnap</i> contains the Metrics Snapshot associated with a Specified Manifest
- * Measure for a given Position.
+ * 	Measure for a given Position. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></li>
+ * 		<li><i>PositionManifestMeasureSnap</i> Constructor</li>
+ * 		<li>Retrieve the Realized Manifest Measure Value</li>
+ * 		<li>Retrieve the Manifest Measure Sensitivity</li>
+ * 		<li>Retrieve the Manifest Measure Roll Down</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PositionManifestMeasureSnap {
-	private double _dblRollDown = java.lang.Double.NaN;
-	private double _dblRealization = java.lang.Double.NaN;
-	private double _dblSensitivity = java.lang.Double.NaN;
+public class PositionManifestMeasureSnap
+{
+	private double _rollDown = Double.NaN;
+	private double _realization = Double.NaN;
+	private double _sensitivity = Double.NaN;
 
 	/**
-	 * PositionManifestMeasureSnap Constructor
+	 * <i>PositionManifestMeasureSnap</i> Constructor
 	 * 
-	 * @param dblRealization Manifest Measure Instance Realization
-	 * @param dblSensitivity First-Order Sensitivity of the Position to the Manifest Measure
-	 * @param dblRollDown Manifest Measure Roll Down
+	 * @param realization Manifest Measure Instance Realization
+	 * @param sensitivity First-Order Sensitivity of the Position to the Manifest Measure
+	 * @param rollDown Manifest Measure Roll Down
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public PositionManifestMeasureSnap (
-		final double dblRealization,
-		final double dblSensitivity,
-		final double dblRollDown)
-		throws java.lang.Exception
+		final double realization,
+		final double sensitivity,
+		final double rollDown)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblRealization = dblRealization) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblSensitivity = dblSensitivity) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblRollDown = dblRollDown))
-			throw new java.lang.Exception ("PositionManifestMeasureSnap ctr: Invalid Inputs");
+		if (!NumberUtil.IsValid (_realization = realization) ||
+			!NumberUtil.IsValid (_sensitivity = sensitivity) ||
+			!NumberUtil.IsValid (_rollDown = rollDown))
+		{
+			throw new Exception ("PositionManifestMeasureSnap Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -129,7 +150,7 @@ public class PositionManifestMeasureSnap {
 
 	public double realization()
 	{
-		return _dblRealization;
+		return _realization;
 	}
 
 	/**
@@ -140,7 +161,7 @@ public class PositionManifestMeasureSnap {
 
 	public double sensitivity()
 	{
-		return _dblSensitivity;
+		return _sensitivity;
 	}
 
 	/**
@@ -151,6 +172,6 @@ public class PositionManifestMeasureSnap {
 
 	public double rollDown()
 	{
-		return _dblRollDown;
+		return _rollDown;
 	}
 }

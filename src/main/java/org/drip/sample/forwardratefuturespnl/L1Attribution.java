@@ -3,7 +3,6 @@ package org.drip.sample.forwardratefuturespnl;
 
 import java.util.List;
 
-import org.drip.analytics.date.JulianDate;
 import org.drip.feed.loader.*;
 import org.drip.historical.attribution.*;
 import org.drip.service.common.FormatUtil;
@@ -15,6 +14,14 @@ import org.drip.service.product.FundingFuturesAPI;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,73 +99,109 @@ import org.drip.service.product.FundingFuturesAPI;
  * <i>L1Attribution</i> demonstrates the Invocation of the Historical PnL Horizon PnL Attribution analysis
  * for the L1 Series.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forwardratefuturespnl/README.md">Forward Rate Futures PnL Attribution</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forwardratefuturespnl/README.md">Forward Rate Futures PnL Attribution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class L1Attribution {
+public class L1Attribution
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "GBP";
-		String strPrintLocation = "C:\\DROP\\Daemons\\Transforms\\FundingFuturesCloses\\L1ClosesReconstitutor.csv";
+		String currency = "GBP";
+		String printLocation =
+			"C:\\DROP\\Daemons\\Transforms\\FundingFuturesCloses\\L1ClosesReconstitutor.csv";
 
-		CSVGrid csvGrid = CSVParser.StringGrid (
-			strPrintLocation,
-			true
-		);
+		CSVGrid csvGrid = CSVParser.StringGrid (printLocation, true);
 
-		JulianDate[] adtSpot = csvGrid.dateArrayAtColumn (0);
-
-		double[] adblForwardRate = csvGrid.doubleArrayAtColumn (2);
-
-		JulianDate[] adtExpiry = csvGrid.dateArrayAtColumn (3);
-
-		List<PositionChangeComponents> lsPCC = FundingFuturesAPI.HorizonChangeAttribution (
-			adtSpot,
-			adtExpiry,
-			adblForwardRate,
-			strCurrency
-		);
-
-		System.out.println ("FirstDate, SecondDate, Previous DV01, Previous Forward Rate, Spot DV01, Spot Forward Rate, 1D Gross PnL, 1D Market PnL, 1D Roll-down PnL, 1D Accrual PnL, 1D Explained PnL, 1D Unexplianed PnL, Floater Label");
-
-		for (PositionChangeComponents pcc : lsPCC)
-			System.out.println (
-				pcc.firstDate() + ", " +
-				pcc.secondDate() + ", " +
-				FormatUtil.FormatDouble (pcc.pmsFirst().r1 ("DV01"), 1, 8, 1.) + ", " +
-				FormatUtil.FormatDouble (pcc.pmsFirst().r1 ("ForwardRate"), 1, 8, 100.) + ", " +
-				FormatUtil.FormatDouble (pcc.pmsSecond().r1 ("DV01"), 1, 8, 1.) + ", " +
-				FormatUtil.FormatDouble (pcc.pmsSecond().r1 ("ForwardRate"), 1, 8, 100.) + ", " +
-				FormatUtil.FormatDouble (pcc.grossChange(), 1, 8, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.marketRealizationChange(), 1, 8, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.marketRollDownChange(), 1, 8, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.accrualChange(), 1, 8, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.explainedChange(), 1, 8, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.unexplainedChange(), 1, 8, 10000.) + ", " +
-				pcc.pmsFirst().c1 ("FloaterLabel")
+		List<PositionChangeComponents> positionChangeComponentsList =
+			FundingFuturesAPI.HorizonChangeAttribution (
+				csvGrid.dateArrayAtColumn (0),
+				csvGrid.dateArrayAtColumn (3),
+				csvGrid.doubleArrayAtColumn (2),
+				currency
 			);
+
+		System.out.println (
+			"FirstDate, SecondDate, Previous DV01, Previous Forward Rate, Spot DV01, Spot Forward Rate, 1D Gross PnL, 1D Market PnL, 1D Roll-down PnL, 1D Accrual PnL, 1D Explained PnL, 1D Unexplianed PnL, Floater Label"
+		);
+
+		for (PositionChangeComponents positionChangeComponents : positionChangeComponentsList) {
+			System.out.println (
+				positionChangeComponents.t1() + ", " + positionChangeComponents.t2() + ", " +
+				FormatUtil.FormatDouble (
+					positionChangeComponents.t1PositionMarketSnap().r1 ("DV01"),
+					1,
+					8,
+					1.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.t1PositionMarketSnap().r1 ("ForwardRate"),
+					1,
+					8,
+					100.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.t2PositionMarketSnap().r1 ("DV01"),
+					1,
+					8,
+					1.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.t2PositionMarketSnap().r1 ("ForwardRate"),
+					1,
+					8,
+					100.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.grossChange(),
+					1,
+					8,
+					10000.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.marketRealizationChange(),
+					1,
+					8,
+					10000.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.marketRollDownChange(),
+					1,
+					8,
+					10000.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.accrualChange(),
+					1,
+					8,
+					10000.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.explainedChange(),
+					1,
+					8,
+					10000.
+				) + ", " + FormatUtil.FormatDouble (
+					positionChangeComponents.unexplainedChange(),
+					1,
+					8,
+					10000.
+				) + ", " + positionChangeComponents.t1PositionMarketSnap().c1 ("FloaterLabel")
+			);
+		}
 
 		EnvManager.TerminateEnv();
 	}

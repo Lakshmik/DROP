@@ -1,11 +1,24 @@
 
 package org.drip.historical.state;
 
+import java.util.TreeMap;
+
+import org.drip.analytics.date.JulianDate;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,42 +93,53 @@ package org.drip.historical.state;
  */
 
 /**
- * <i>CreditCurveMetrics</i> holds the computed Metrics associated the Credit Curve State.
+ * <i>CreditCurveMetrics</i> holds the computed Metrics associated the Credit Curve State. It provides the
+ * 	following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/state/README.md">Historical Implied Curve Node Metrics</a></li>
+ * 		<li><i>CreditCurveMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Closing Date</li>
+ * 		<li>Add the Survival Probability corresponding to the specified Date</li>
+ * 		<li>Add the Recovery Rate corresponding to the specified Date</li>
+ * 		<li>Retrieve the Survival Probability corresponding to the specified Date</li>
+ * 		<li>Retrieve the Recovery Rate corresponding to the specified Date</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/state/README.md">Historical Implied Curve Node Metrics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class CreditCurveMetrics {
-	private org.drip.analytics.date.JulianDate _dtClose = null;
+public class CreditCurveMetrics
+{
+	private JulianDate _closeDate = null;
 
-	private java.util.TreeMap<org.drip.analytics.date.JulianDate, java.lang.Double> _mapSurvivalProbability =
-		new java.util.TreeMap<org.drip.analytics.date.JulianDate, java.lang.Double>();
+	private TreeMap<JulianDate, Double> _recoveryRateMap = new TreeMap<JulianDate, Double>();
 
-	private java.util.TreeMap<org.drip.analytics.date.JulianDate, java.lang.Double> _mapRecoveryRate = new
-		java.util.TreeMap<org.drip.analytics.date.JulianDate, java.lang.Double>();
+	private TreeMap<JulianDate, Double> _survivalProbabilityMap = new TreeMap<JulianDate, Double>();
 
 	/**
-	 * CreditCurveMetrics Constructor
+	 * <i>CreditCurveMetrics</i> Constructor
 	 * 
-	 * @param dtClose The Closing Date
+	 * @param closeDate The Closing Date
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public CreditCurveMetrics (
-		final org.drip.analytics.date.JulianDate dtClose)
-		throws java.lang.Exception
+		final JulianDate closeDate)
+		throws Exception
 	{
-		if (null == (_dtClose = dtClose))
-			throw new java.lang.Exception ("CreditCurveMetrics Constructor => Invalid Inputs");
+		if (null == (_closeDate = closeDate)) {
+			throw new Exception ("CreditCurveMetrics Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -124,27 +148,29 @@ public class CreditCurveMetrics {
 	 * @return The Closing Date
 	 */
 
-	public org.drip.analytics.date.JulianDate close()
+	public JulianDate close()
 	{
-		return _dtClose;
+		return _closeDate;
 	}
 
 	/**
 	 * Add the Survival Probability corresponding to the specified Date
 	 * 
-	 * @param dt The Date
-	 * @param dblSurvivalProbability The Survival Probability
+	 * @param date The Date
+	 * @param survivalProbability The Survival Probability
 	 * 
 	 * @return TRUE - The Dated Survival Probability successfully added
 	 */
 
 	public boolean addSurvivalProbability (
-		final org.drip.analytics.date.JulianDate dt,
-		final double dblSurvivalProbability)
+		final JulianDate date,
+		final double survivalProbability)
 	{
-		if (null == dt || !org.drip.numerical.common.NumberUtil.IsValid (dblSurvivalProbability)) return false;
+		if (null == date || !NumberUtil.IsValid (survivalProbability)) {
+			return false;
+		}
 
-		_mapSurvivalProbability.put (dt, dblSurvivalProbability);
+		_survivalProbabilityMap.put (date, survivalProbability);
 
 		return true;
 	}
@@ -152,19 +178,21 @@ public class CreditCurveMetrics {
 	/**
 	 * Add the Recovery Rate corresponding to the specified Date
 	 * 
-	 * @param dt The Date
-	 * @param dblRecoveryRate The Recovery Rate
+	 * @param date The Date
+	 * @param recoveryRate The Recovery Rate
 	 * 
 	 * @return TRUE - The Dated Recovery Rate successfully added
 	 */
 
 	public boolean addRecoveryRate (
-		final org.drip.analytics.date.JulianDate dt,
-		final double dblRecoveryRate)
+		final JulianDate date,
+		final double recoveryRate)
 	{
-		if (null == dt || !org.drip.numerical.common.NumberUtil.IsValid (dblRecoveryRate)) return false;
+		if (null == date || !NumberUtil.IsValid (recoveryRate)) {
+			return false;
+		}
 
-		_mapRecoveryRate.put (dt, dblRecoveryRate);
+		_recoveryRateMap.put (date, recoveryRate);
 
 		return true;
 	}
@@ -172,40 +200,42 @@ public class CreditCurveMetrics {
 	/**
 	 * Retrieve the Survival Probability corresponding to the specified Date
 	 * 
-	 * @param dt The Specified Date
+	 * @param date The Specified Date
 	 * 
 	 * @return The corresponding Survival Probability
 	 * 
-	 * @throws java.lang.Exception Thrown if the Survival Probability cannot be retrieved
+	 * @throws Exception Thrown if the Survival Probability cannot be retrieved
 	 */
 
 	public double survivalProbability (
-		final org.drip.analytics.date.JulianDate dt)
-		throws java.lang.Exception
+		final JulianDate date)
+		throws Exception
 	{
-		if (null == dt || !_mapSurvivalProbability.containsKey (dt))
-			throw new java.lang.Exception ("CreditCurveMetrics::survivalProbability => Invalid Inputs");
+		if (null == date || !_survivalProbabilityMap.containsKey (date)) {
+			throw new Exception ("CreditCurveMetrics::survivalProbability => Invalid Inputs");
+		}
 
-		return _mapSurvivalProbability.get (dt);
+		return _survivalProbabilityMap.get (date);
 	}
 
 	/**
 	 * Retrieve the Recovery Rate corresponding to the specified Date
 	 * 
-	 * @param dt The Specified Date
+	 * @param date The Specified Date
 	 * 
 	 * @return The corresponding Recovery Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Recovery Rate cannot be retrieved
+	 * @throws Exception Thrown if the Recovery Rate cannot be retrieved
 	 */
 
 	public double recoveryRate (
-		final org.drip.analytics.date.JulianDate dt)
-		throws java.lang.Exception
+		final JulianDate date)
+		throws Exception
 	{
-		if (null == dt || !_mapRecoveryRate.containsKey (dt))
-			throw new java.lang.Exception ("CreditCurveMetrics::recoveryRate => Invalid Inputs");
+		if (null == date || !_recoveryRateMap.containsKey (date)) {
+			throw new Exception ("CreditCurveMetrics::recoveryRate => Invalid Inputs");
+		}
 
-		return _mapRecoveryRate.get (dt);
+		return _recoveryRateMap.get (date);
 	}
 }

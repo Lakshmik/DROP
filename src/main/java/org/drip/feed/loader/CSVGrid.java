@@ -328,7 +328,9 @@ public class CSVGrid {
 		double[] adbl = new double[_lsastr.size()];
 
 		for (java.lang.String[] astr : _lsastr) {
-			if (null == astr || astr.length <= iColumn) return null;
+			if (null == astr || astr.length <= iColumn) {
+				return null;
+			}
 
 			adbl[iRow++] = dblScaler * ToDouble (astr[iColumn]);
 		}

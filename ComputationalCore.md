@@ -8,19 +8,19 @@ Computational Core Module contains libraries the implement Algorithm/Computation
 
 ## Component Libraries
 
- * [*Function Analysis*](https://github.com/lakshmiDRIP/DROP/blob/master/FunctionAnalysisLibrary.md) => Special Function and their Analysis.
+ * [*Function Analysis*](https://github.com/lakshmik/DROP/blob/master/FunctionAnalysisLibrary.md) => Special Function and their Analysis.
 
- * [*Graph Algorithms*](https://github.com/lakshmiDRIP/DROP/blob/master/GraphAlgorithmLibrary.md) => Graph Representation and Path Traversal.
+ * [*Graph Algorithms*](https://github.com/lakshmik/DROP/blob/master/GraphAlgorithmLibrary.md) => Graph Representation and Path Traversal.
 
- * [*Model Validation*](https://github.com/lakshmiDRIP/DROP/blob/master/ModelValidationAnalyticsLibrary.md) => Functionality for Statistical Hypotheses Validation and Testing.
+ * [*Model Validation*](https://github.com/lakshmik/DROP/blob/master/ModelValidationAnalyticsLibrary.md) => Functionality for Statistical Hypotheses Validation and Testing.
 
- * [*Numerical Analysis*](https://github.com/lakshmiDRIP/DROP/blob/master/NumericalAnalysisLibrary.md) => Functionality for Numerical Methods - including R<sup>x</sup> Solvers, Linear Algebra, and Statistical Measure Distributions.
+ * [*Numerical Analysis*](https://github.com/lakshmik/DROP/blob/master/NumericalAnalysisLibrary.md) => Functionality for Numerical Methods - including R<sup>x</sup> Solvers, Linear Algebra, and Statistical Measure Distributions.
 
- * [*Numerical Optimizer*](https://github.com/lakshmiDRIP/DROP/blob/master/NumericalOptimizerLibrary.md) => Functionality for Numerical Optimization - including Constrained and Mixed Integer Non-Linear Optimizers.
+ * [*Numerical Optimizer*](https://github.com/lakshmik/DROP/blob/master/NumericalOptimizerLibrary.md) => Functionality for Numerical Optimization - including Constrained and Mixed Integer Non-Linear Optimizers.
 
- * [*Spline Builder*](https://github.com/lakshmiDRIP/DROP/blob/master/SplineBuilderLibrary.md) => Functionality for constructing Spline Based Curves and Surfaces.
+ * [*Spline Builder*](https://github.com/lakshmik/DROP/blob/master/SplineBuilderLibrary.md) => Functionality for constructing Spline Based Curves and Surfaces.
 
- * [*Statistical Learning*](https://github.com/lakshmiDRIP/DROP/blob/master/StatisticalLearningLibrary.md) => Statistical Learning Analyzers and Machine Learning Schemes.
+ * [*Statistical Learning*](https://github.com/lakshmik/DROP/blob/master/StatisticalLearningLibrary.md) => Statistical Learning Analyzers and Machine Learning Schemes.
 
 
 ## Function Analysis Coverage

@@ -8,11 +8,11 @@ Product Core Module contains libraries the implement Fixed Income Analytics, Loa
 
 ## Component Libraries
 
- * [*Fixed Income Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/FixedIncomeAnalyticsLibrary.md) => Valuation and Risk Functionality of the Principal Asset Classes, i.e., Equity, Rates, Credit, FX, Commodity, and their Hybrids.
+ * [*Fixed Income Analytics*](https://github.com/lakshmik/DROP/blob/master/FixedIncomeAnalyticsLibrary.md) => Valuation and Risk Functionality of the Principal Asset Classes, i.e., Equity, Rates, Credit, FX, Commodity, and their Hybrids.
 
- * [*Loan Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/LoanAnalyticsLibrary.md) => Valuation and Risk Functionality for Asset Backed and Mortgage Backed Securities.
+ * [*Loan Analytics*](https://github.com/lakshmik/DROP/blob/master/LoanAnalyticsLibrary.md) => Valuation and Risk Functionality for Asset Backed and Mortgage Backed Securities.
 
- * [*Transaction Cost Analytics*](https://github.com/lakshmiDRIP/DROP/blob/master/TransactionCostAnalyticsLibrary.md) => Functionality to estimate single Trade/Portfolio Execution Cost, and corresponding Optimal Trajectories.
+ * [*Transaction Cost Analytics*](https://github.com/lakshmik/DROP/blob/master/TransactionCostAnalyticsLibrary.md) => Functionality to estimate single Trade/Portfolio Execution Cost, and corresponding Optimal Trajectories.
 
 
 ## Fixed Income Analytics Coverage

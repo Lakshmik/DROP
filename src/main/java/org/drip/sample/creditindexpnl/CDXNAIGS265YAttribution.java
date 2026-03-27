@@ -15,6 +15,14 @@ import org.drip.service.product.CreditIndexAPI;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,40 +98,42 @@ import org.drip.service.product.CreditIndexAPI;
 
 /**
  * <i>CDXNAIGS265YAttribution</i> contains the Functionality associated with the Attribution of the CDX NA IG
- * 5Y S26 Index.
+ * 	5Y S26 Index.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/creditindexpnl/README.md">CDX NA IG PnL Attribution</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/creditindexpnl/README.md">CDX NA IG PnL Attribution</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CDXNAIGS265YAttribution {
+public class CDXNAIGS265YAttribution
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		int iSeries = 26;
-		int iHorizonGap = 1;
-		String strClosesLocation = "C:\\DROP\\Daemons\\Transforms\\CreditCDXMarks\\CDXNAIGS" + iSeries + "5YReconstitutor.csv";
-		String[] astrFundingFixingMaturityTenor = new String[] {
+		int series = 26;
+		int horizonGap = 1;
+		String closesLocation = "C:\\DROP\\Daemons\\Transforms\\CreditCDXMarks\\CDXNAIGS" + series +
+			"5YReconstitutor.csv";
+		String[] fundingFixingMaturityTenorArray = new String[] {
 			"1Y",
 			"2Y",
 			"3Y",
@@ -144,114 +154,120 @@ public class CDXNAIGS265YAttribution {
 			"50Y"
 		};
 
-		CSVGrid csvGrid = CSVParser.StringGrid (
-			strClosesLocation,
-			true
-		);
+		CSVGrid csvGrid = CSVParser.StringGrid (closesLocation, true);
 
-		JulianDate[] adtClose = csvGrid.dateArrayAtColumn (0);
+		JulianDate[] closeDateArray = csvGrid.dateArrayAtColumn (0);
 
-		double[] adblFundingFixingQuote1Y = csvGrid.doubleArrayAtColumn (1);
+		double[] fundingFixingQuote1Y = csvGrid.doubleArrayAtColumn (1);
 
-		double[] adblFundingFixingQuote2Y = csvGrid.doubleArrayAtColumn (2);
+		double[] fundingFixingQuote2Y = csvGrid.doubleArrayAtColumn (2);
 
-		double[] adblFundingFixingQuote3Y = csvGrid.doubleArrayAtColumn (3);
+		double[] fundingFixingQuote3Y = csvGrid.doubleArrayAtColumn (3);
 
-		double[] adblFundingFixingQuote4Y = csvGrid.doubleArrayAtColumn (4);
+		double[] fundingFixingQuote4Y = csvGrid.doubleArrayAtColumn (4);
 
-		double[] adblFundingFixingQuote5Y = csvGrid.doubleArrayAtColumn (5);
+		double[] fundingFixingQuote5Y = csvGrid.doubleArrayAtColumn (5);
 
-		double[] adblFundingFixingQuote6Y = csvGrid.doubleArrayAtColumn (6);
+		double[] fundingFixingQuote6Y = csvGrid.doubleArrayAtColumn (6);
 
-		double[] adblFundingFixingQuote7Y = csvGrid.doubleArrayAtColumn (7);
+		double[] fundingFixingQuote7Y = csvGrid.doubleArrayAtColumn (7);
 
-		double[] adblFundingFixingQuote8Y = csvGrid.doubleArrayAtColumn (8);
+		double[] fundingFixingQuote8Y = csvGrid.doubleArrayAtColumn (8);
 
-		double[] adblFundingFixingQuote9Y = csvGrid.doubleArrayAtColumn (9);
+		double[] fundingFixingQuote9Y = csvGrid.doubleArrayAtColumn (9);
 
-		double[] adblFundingFixingQuote10Y = csvGrid.doubleArrayAtColumn (10);
+		double[] fundingFixingQuote10Y = csvGrid.doubleArrayAtColumn (10);
 
-		double[] adblFundingFixingQuote11Y = csvGrid.doubleArrayAtColumn (11);
+		double[] fundingFixingQuote11Y = csvGrid.doubleArrayAtColumn (11);
 
-		double[] adblFundingFixingQuote12Y = csvGrid.doubleArrayAtColumn (12);
+		double[] fundingFixingQuote12Y = csvGrid.doubleArrayAtColumn (12);
 
-		double[] adblFundingFixingQuote15Y = csvGrid.doubleArrayAtColumn (13);
+		double[] fundingFixingQuote15Y = csvGrid.doubleArrayAtColumn (13);
 
-		double[] adblFundingFixingQuote20Y = csvGrid.doubleArrayAtColumn (14);
+		double[] fundingFixingQuote20Y = csvGrid.doubleArrayAtColumn (14);
 
-		double[] adblFundingFixingQuote25Y = csvGrid.doubleArrayAtColumn (15);
+		double[] fundingFixingQuote25Y = csvGrid.doubleArrayAtColumn (15);
 
-		double[] adblFundingFixingQuote30Y = csvGrid.doubleArrayAtColumn (16);
+		double[] fundingFixingQuote30Y = csvGrid.doubleArrayAtColumn (16);
 
-		double[] adblFundingFixingQuote40Y = csvGrid.doubleArrayAtColumn (17);
+		double[] fundingFixingQuote40Y = csvGrid.doubleArrayAtColumn (17);
 
-		double[] adblFundingFixingQuote50Y = csvGrid.doubleArrayAtColumn (18);
+		double[] fundingFixingQuote50Y = csvGrid.doubleArrayAtColumn (18);
 
-		String[] astrFullCreditIndexName = csvGrid.stringArrayAtColumn (19);
+		String[] fullCreditIndexNameArray = csvGrid.stringArrayAtColumn (19);
 
-		double[] adblCreditIndexQuotedSpread = csvGrid.doubleArrayAtColumn (20);
+		double[] creditIndexQuotedSpreadArray = csvGrid.doubleArrayAtColumn (20);
 
-		int iNumClose = adtClose.length;
-		JulianDate[] adtSpot = new JulianDate[iNumClose];
-		double[][] aadblFundingFixingQuote = new double[iNumClose][18];
+		int closeDateCount = closeDateArray.length;
+		JulianDate[] spotDateArray = new JulianDate[closeDateCount];
+		double[][] fundingFixingQuoteGrid = new double[closeDateCount][18];
 
-		for (int i = 0; i < iNumClose; ++i) {
-			adtSpot[i] = adtClose[i];
-			aadblFundingFixingQuote[i][0] = adblFundingFixingQuote1Y[i];
-			aadblFundingFixingQuote[i][1] = adblFundingFixingQuote2Y[i];
-			aadblFundingFixingQuote[i][2] = adblFundingFixingQuote3Y[i];
-			aadblFundingFixingQuote[i][3] = adblFundingFixingQuote4Y[i];
-			aadblFundingFixingQuote[i][4] = adblFundingFixingQuote5Y[i];
-			aadblFundingFixingQuote[i][5] = adblFundingFixingQuote6Y[i];
-			aadblFundingFixingQuote[i][6] = adblFundingFixingQuote7Y[i];
-			aadblFundingFixingQuote[i][7] = adblFundingFixingQuote8Y[i];
-			aadblFundingFixingQuote[i][8] = adblFundingFixingQuote9Y[i];
-			aadblFundingFixingQuote[i][9] = adblFundingFixingQuote10Y[i];
-			aadblFundingFixingQuote[i][10] = adblFundingFixingQuote11Y[i];
-			aadblFundingFixingQuote[i][11] = adblFundingFixingQuote12Y[i];
-			aadblFundingFixingQuote[i][12] = adblFundingFixingQuote15Y[i];
-			aadblFundingFixingQuote[i][13] = adblFundingFixingQuote20Y[i];
-			aadblFundingFixingQuote[i][14] = adblFundingFixingQuote25Y[i];
-			aadblFundingFixingQuote[i][15] = adblFundingFixingQuote30Y[i];
-			aadblFundingFixingQuote[i][16] = adblFundingFixingQuote40Y[i];
-			aadblFundingFixingQuote[i][17] = adblFundingFixingQuote50Y[i];
-			adblCreditIndexQuotedSpread[i] *= 10000.;
+		for (int closeDateIndex = 0; closeDateIndex < closeDateCount; ++closeDateIndex) {
+			spotDateArray[closeDateIndex] = closeDateArray[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][0] = fundingFixingQuote1Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][1] = fundingFixingQuote2Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][2] = fundingFixingQuote3Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][3] = fundingFixingQuote4Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][4] = fundingFixingQuote5Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][5] = fundingFixingQuote6Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][6] = fundingFixingQuote7Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][7] = fundingFixingQuote8Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][8] = fundingFixingQuote9Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][9] = fundingFixingQuote10Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][10] = fundingFixingQuote11Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][11] = fundingFixingQuote12Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][12] = fundingFixingQuote15Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][13] = fundingFixingQuote20Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][14] = fundingFixingQuote25Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][15] = fundingFixingQuote30Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][16] = fundingFixingQuote40Y[closeDateIndex];
+			fundingFixingQuoteGrid[closeDateIndex][17] = fundingFixingQuote50Y[closeDateIndex];
+			creditIndexQuotedSpreadArray[closeDateIndex] *= 10000.;
 		}
 
-		List<PositionChangeComponents> lsPCC = CreditIndexAPI.HorizonChangeAttribution (
-			adtSpot,
-			1,
-			astrFundingFixingMaturityTenor,
-			aadblFundingFixingQuote,
-			astrFullCreditIndexName,
-			adblCreditIndexQuotedSpread
+		List<PositionChangeComponents> positionChangeComponentsList =
+			CreditIndexAPI.HorizonChangeAttribution (
+				spotDateArray,
+				1,
+				fundingFixingMaturityTenorArray,
+				fundingFixingQuoteGrid,
+				fullCreditIndexNameArray,
+				creditIndexQuotedSpreadArray
+			);
+
+		System.out.println (
+			"FirstDate,SecondDate,CreditLabel,Horizon,TotalPnL,MarketShiftPnL,RollDownPnL,AccrualPnL,ExplainedPnL,UnexplainedPnL,FixedCoupon,FirstFairPremium,SecondFairPremium,RollDownFairPremium,CleanFixedDV01"
 		);
 
-		System.out.println ("FirstDate,SecondDate,CreditLabel,Horizon,TotalPnL,MarketShiftPnL,RollDownPnL,AccrualPnL,ExplainedPnL,UnexplainedPnL,FixedCoupon,FirstFairPremium,SecondFairPremium,RollDownFairPremium,CleanFixedDV01");
+		for (PositionChangeComponents positionChangeComponents : positionChangeComponentsList) {
+			if (null == positionChangeComponents) {
+				continue;
+			}
 
-		for (PositionChangeComponents pcc : lsPCC) {
-			if (null == pcc) continue;
+			CDSMarketSnap t1PositionMarketSnap =
+				(CDSMarketSnap) positionChangeComponents.t1PositionMarketSnap();
 
-			CDSMarketSnap cdsmsFirst = (CDSMarketSnap) pcc.pmsFirst();
-
-			CDSMarketSnap cdsmsSecond = (CDSMarketSnap) pcc.pmsSecond();
+			CDSMarketSnap t2PositionMarketSnap =
+				(CDSMarketSnap) positionChangeComponents.t2PositionMarketSnap();
 
 			System.out.println (
-				pcc.firstDate() + ", " +
-				pcc.secondDate() + ", " +
-				cdsmsFirst.creditLabel() + ", " +
-				iHorizonGap + "," +
-				FormatUtil.FormatDouble (pcc.grossChange(), 2, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.marketRealizationChange(), 2, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.marketRollDownChange(), 1, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.accrualChange(), 1, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.explainedChange(), 2, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (pcc.unexplainedChange(), 1, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (cdsmsFirst.fixedCoupon(), 1, 2, 10000.) + ", " +
-				FormatUtil.FormatDouble (cdsmsFirst.currentFairPremium(), 1, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (cdsmsSecond.currentFairPremium(), 1, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (cdsmsFirst.rollDownFairPremium(), 1, 4, 10000.) + ", " +
-				FormatUtil.FormatDouble (cdsmsFirst.cleanDV01(), 1, 4, 1.)
+				positionChangeComponents.t1() + ", " +
+				positionChangeComponents.t2() + ", " +
+				t1PositionMarketSnap.creditLabel() + ", " +
+				horizonGap + "," +
+				FormatUtil.FormatDouble (positionChangeComponents.grossChange(), 2, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.marketRealizationChange(), 2, 4, 10000.) +
+					", " +
+				FormatUtil.FormatDouble (positionChangeComponents.marketRollDownChange(), 1, 4, 10000.) +
+					", " +
+				FormatUtil.FormatDouble (positionChangeComponents.accrualChange(), 1, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.explainedChange(), 2, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (positionChangeComponents.unexplainedChange(), 1, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (t1PositionMarketSnap.fixedCoupon(), 1, 2, 10000.) + ", " +
+				FormatUtil.FormatDouble (t1PositionMarketSnap.currentFairPremium(), 1, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (t2PositionMarketSnap.currentFairPremium(), 1, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (t1PositionMarketSnap.rollDownFairPremium(), 1, 4, 10000.) + ", " +
+				FormatUtil.FormatDouble (t1PositionMarketSnap.cleanDV01(), 1, 4, 1.)
 			);
 		}
 

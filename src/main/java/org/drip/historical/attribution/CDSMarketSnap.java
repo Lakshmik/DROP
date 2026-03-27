@@ -1,11 +1,21 @@
 
 package org.drip.historical.attribution;
 
+import org.drip.analytics.date.JulianDate;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,70 +90,108 @@ package org.drip.historical.attribution;
  */
 
 /**
- * <i>CDSMarketSnap</i> contains the Metrics Snapshot associated with the relevant Manifest Measures for the given
- * Credit Default Swap Position.
+ * <i>CDSMarketSnap</i> contains the Metrics Snapshot associated with the relevant Manifest Measures for the
+ * 	given Credit Default Swap Position. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></li>
+ * 		<li><i>CDSMarketSnap</i> Constructor</li>
+ * 		<li>Set the Fair Premium and Position Sensitivity</li>
+ * 		<li>Set the Effective Date</li>
+ * 		<li>Retrieve the Effective Date</li>
+ * 		<li>Set the Maturity Date</li>
+ * 		<li>Retrieve the Maturity Date</li>
+ * 		<li>Set the Initial Fair Premium</li>
+ * 		<li>Retrieve the Initial Fair Premium</li>
+ * 		<li>Set the Current Fair Premium</li>
+ * 		<li>Retrieve the Current Fair Premium</li>
+ * 		<li>Set the Fixed Coupon</li>
+ * 		<li>Retrieve the Fixed Coupon</li>
+ * 		<li>Set the Clean DV01</li>
+ * 		<li>Retrieve the Clean DV01</li>
+ * 		<li>Set the Roll Down Fair Premium</li>
+ * 		<li>Retrieve the Roll Down Fair Premium</li>
+ * 		<li>Set the Accrued</li>
+ * 		<li>Retrieve the Accrued</li>
+ * 		<li>Set the Cumulative Coupon Amount</li>
+ * 		<li>Retrieve the Cumulative Coupon Amount</li>
+ * 		<li>Set the Credit Label</li>
+ * 		<li>Retrieve the Credit Label</li>
+ * 		<li>Set the Recovery Rate</li>
+ * 		<li>Retrieve the Recovery Rate</li>
+ * 		<li>Set the Coupon PV</li>
+ * 		<li>Retrieve the Coupon PV</li>
+ * 		<li>Set the Loss PV</li>
+ * 		<li>Retrieve the Loss PV</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/attribution/README.md">Position Market Change Components Attribution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarketSnap {
+public class CDSMarketSnap
+	extends PositionMarketSnap
+{
 
 	/**
-	 * CDSMarketSnap Constructor
+	 * <i>CDSMarketSnap</i> Constructor
 	 * 
-	 * @param dtSnap The Snapshot Date
-	 * @param dblMarketValue The Snapshot Market Value
+	 * @param snapDate The Snapshot Date
+	 * @param marketValue The Snapshot Market Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public CDSMarketSnap (
-		final org.drip.analytics.date.JulianDate dtSnap,
-		final double dblMarketValue)
-		throws java.lang.Exception
+		final JulianDate snapDate,
+		final double marketValue)
+		throws Exception
 	{
-		super (dtSnap, dblMarketValue);
+		super (snapDate, marketValue);
 	}
 
 	/**
 	 * Set the Fair Premium and Position Sensitivity
 	 * 
-	 * @param dblFairPremium The Fair Premium
-	 * @param dblFairPremiumSensitivity The Position Fair Premium Sensitivity
-	 * @param dblFairPremiumRollDown The Position Fair Premium Roll Down
+	 * @param fairPremium The Fair Premium
+	 * @param fairPremiumSensitivity The Position Fair Premium Sensitivity
+	 * @param fairPremiumRollDown The Position Fair Premium Roll Down
 	 * 
 	 * @return TRUE - The Fair Premium and the Position Sensitivity successfully set
 	 */
 
 	public boolean setFairPremiumMarketFactor (
-		final double dblFairPremium,
-		final double dblFairPremiumSensitivity,
-		final double dblFairPremiumRollDown)
+		final double fairPremium,
+		final double fairPremiumSensitivity,
+		final double fairPremiumRollDown)
 	{
-		return addManifestMeasureSnap ("FairPremium", dblFairPremium, dblFairPremiumSensitivity,
-			dblFairPremiumRollDown);
+		return addManifestMeasureSnap (
+			"FairPremium",
+			fairPremium,
+			fairPremiumSensitivity,
+			fairPremiumRollDown
+		);
 	}
 
 	/**
 	 * Set the Effective Date
 	 * 
-	 * @param dtEffective The Effective Date
+	 * @param effectiveDate The Effective Date
 	 * 
 	 * @return TRUE - The Effective Date successfully set
 	 */
 
 	public boolean setEffectiveDate (
-		final org.drip.analytics.date.JulianDate dtEffective)
+		final JulianDate effectiveDate)
 	{
-		return setDate ("EffectiveDate", dtEffective);
+		return setDate ("EffectiveDate", effectiveDate);
 	}
 
 	/**
@@ -152,7 +200,7 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * @return The Effective Date
 	 */
 
-	public org.drip.analytics.date.JulianDate effectiveDate()
+	public JulianDate effectiveDate()
 	{
 		return date ("EffectiveDate");
 	}
@@ -160,15 +208,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Maturity Date
 	 * 
-	 * @param dtMaturity The Maturity Date
+	 * @param maturityDate The Maturity Date
 	 * 
 	 * @return TRUE - The Maturity Date successfully set
 	 */
 
 	public boolean setMaturityDate (
-		final org.drip.analytics.date.JulianDate dtMaturity)
+		final JulianDate maturityDate)
 	{
-		return setDate ("MaturityDate", dtMaturity);
+		return setDate ("MaturityDate", maturityDate);
 	}
 
 	/**
@@ -177,7 +225,7 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * @return The Maturity Date
 	 */
 
-	public org.drip.analytics.date.JulianDate maturityDate()
+	public JulianDate maturityDate()
 	{
 		return date ("MaturityDate");
 	}
@@ -185,15 +233,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Initial Fair Premium
 	 * 
-	 * @param dblInitialFairPremium The Initial Fair Premium
+	 * @param initialFairPremium The Initial Fair Premium
 	 * 
 	 * @return TRUE - The Initial Fair Premium Successfully set
 	 */
 
 	public boolean setInitialFairPremium (
-		final double dblInitialFairPremium)
+		final double initialFairPremium)
 	{
-		return setR1 ("InitialFairPremium", dblInitialFairPremium);
+		return setR1 ("InitialFairPremium", initialFairPremium);
 	}
 
 	/**
@@ -201,11 +249,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Initial Fair Premium
 	 * 
-	 * @throws java.lang.Exception Thrown if the Initial Fair Premium cannot be obtained
+	 * @throws Exception Thrown if the Initial Fair Premium cannot be obtained
 	 */
 
 	public double initialFairPremium()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("InitialFairPremium");
 	}
@@ -213,15 +261,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Current Fair Premium
 	 * 
-	 * @param dblCurrentFairPremium The Current Fair Premium
+	 * @param currentFairPremium The Current Fair Premium
 	 * 
 	 * @return TRUE - The Current Fair Premium Successfully Set
 	 */
 
 	public boolean setCurrentFairPremium (
-		final double dblCurrentFairPremium)
+		final double currentFairPremium)
 	{
-		return setR1 ("CurrentFairPremium", dblCurrentFairPremium);
+		return setR1 ("CurrentFairPremium", currentFairPremium);
 	}
 
 	/**
@@ -229,11 +277,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Current Fair Premium
 	 * 
-	 * @throws java.lang.Exception Thrown if the Current Fair Premium cannot be obtained
+	 * @throws Exception Thrown if the Current Fair Premium cannot be obtained
 	 */
 
 	public double currentFairPremium()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("CurrentFairPremium");
 	}
@@ -241,15 +289,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Fixed Coupon
 	 * 
-	 * @param dblFixedCoupon The Fixed Coupon
+	 * @param fixedCoupon The Fixed Coupon
 	 * 
 	 * @return TRUE - The Fixed Coupon Successfully Set
 	 */
 
 	public boolean setFixedCoupon (
-		final double dblFixedCoupon)
+		final double fixedCoupon)
 	{
-		return setR1 ("FixedCoupon", dblFixedCoupon);
+		return setR1 ("FixedCoupon", fixedCoupon);
 	}
 
 	/**
@@ -257,11 +305,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Fixed Coupon
 	 * 
-	 * @throws java.lang.Exception Thrown if the Fixed Coupon cannot be obtained
+	 * @throws Exception Thrown if the Fixed Coupon cannot be obtained
 	 */
 
 	public double fixedCoupon()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("FixedCoupon");
 	}
@@ -269,15 +317,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Clean DV01
 	 * 
-	 * @param dblCleanDV01 The Clean DV01
+	 * @param cleanDV01 The Clean DV01
 	 * 
 	 * @return TRUE - The Clean DV01 Successfully Set
 	 */
 
 	public boolean setCleanDV01 (
-		final double dblCleanDV01)
+		final double cleanDV01)
 	{
-		return setR1 ("CleanDV01", dblCleanDV01);
+		return setR1 ("CleanDV01", cleanDV01);
 	}
 
 	/**
@@ -285,11 +333,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Clean DV01
 	 * 
-	 * @throws java.lang.Exception Thrown if the Clean DV01 cannot be obtained
+	 * @throws Exception Thrown if the Clean DV01 cannot be obtained
 	 */
 
 	public double cleanDV01()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("CleanDV01");
 	}
@@ -297,15 +345,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Roll Down Fair Premium
 	 * 
-	 * @param dblRollDownFairPremium The Roll Down Fair Premium
+	 * @param rollDownFairPremium The Roll Down Fair Premium
 	 * 
 	 * @return TRUE - The Roll Down Fair Premium Successfully Set
 	 */
 
 	public boolean setRollDownFairPremium (
-		final double dblRollDownFairPremium)
+		final double rollDownFairPremium)
 	{
-		return setR1 ("RollDownFairPremium", dblRollDownFairPremium);
+		return setR1 ("RollDownFairPremium", rollDownFairPremium);
 	}
 
 	/**
@@ -313,11 +361,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Roll Down Fair Premium
 	 * 
-	 * @throws java.lang.Exception Thrown if the Roll Down Fair Premium cannot be obtained
+	 * @throws Exception Thrown if the Roll Down Fair Premium cannot be obtained
 	 */
 
 	public double rollDownFairPremium()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("RollDownFairPremium");
 	}
@@ -325,15 +373,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Accrued
 	 * 
-	 * @param dblAccrued The Accrued
+	 * @param accrued The Accrued
 	 * 
 	 * @return TRUE - The Accrued successfully set
 	 */
 
 	public boolean setAccrued (
-		final double dblAccrued)
+		final double accrued)
 	{
-		return setR1 ("Accrued", dblAccrued);
+		return setR1 ("Accrued", accrued);
 	}
 
 	/**
@@ -341,11 +389,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Accrued
 	 * 
-	 * @throws java.lang.Exception Thrown if the Accrued cannot be obtained
+	 * @throws Exception Thrown if the Accrued cannot be obtained
 	 */
 
 	public double accrued()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("Accrued");
 	}
@@ -353,15 +401,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Cumulative Coupon Amount
 	 * 
-	 * @param dblCumulativeCouponAmount The Cumulative Coupon Amount
+	 * @param cumulativeCouponAmount The Cumulative Coupon Amount
 	 * 
 	 * @return TRUE - The Cumulative Coupon Amount successfully set
 	 */
 
 	public boolean setCumulativeCouponAmount (
-		final double dblCumulativeCouponAmount)
+		final double cumulativeCouponAmount)
 	{
-		return setR1 ("CumulativeCouponAmount", dblCumulativeCouponAmount);
+		return setR1 ("CumulativeCouponAmount", cumulativeCouponAmount);
 	}
 
 	/**
@@ -369,11 +417,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Cumulative Coupon Amount
 	 * 
-	 * @throws java.lang.Exception Thrown if the Cumulative Coupon Amount cannot be obtained
+	 * @throws Exception Thrown if the Cumulative Coupon Amount cannot be obtained
 	 */
 
 	public double cumulativeCouponAmount()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("CumulativeCouponAmount");
 	}
@@ -381,15 +429,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Credit Label
 	 * 
-	 * @param strCreditLabel Credit Label
+	 * @param creditLabel Credit Label
 	 * 
 	 * @return TRUE - The Credit Label successfully set
 	 */
 
 	public boolean setCreditLabel (
-		final java.lang.String strCreditLabel)
+		final String creditLabel)
 	{
-		return setC1 ("CreditLabel", strCreditLabel);
+		return setC1 ("CreditLabel", creditLabel);
 	}
 
 	/**
@@ -398,7 +446,7 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * @return The Credit Label
 	 */
 
-	public java.lang.String creditLabel()
+	public String creditLabel()
 	{
 		return c1 ("CreditLabel");
 	}
@@ -406,15 +454,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Recovery Rate
 	 * 
-	 * @param dblRecoveryRate The Recovery Rate
+	 * @param recoveryRate The Recovery Rate
 	 * 
 	 * @return TRUE - The Recovery Rate successfully set
 	 */
 
 	public boolean setRecoveryRate (
-		final double dblRecoveryRate)
+		final double recoveryRate)
 	{
-		return setR1 ("RecoveryRate", dblRecoveryRate);
+		return setR1 ("RecoveryRate", recoveryRate);
 	}
 
 	/**
@@ -422,11 +470,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Recovery Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Recovery Rate cannot be obtained
+	 * @throws Exception Thrown if the Recovery Rate cannot be obtained
 	 */
 
 	public double recoveryRate()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("RecoveryRate");
 	}
@@ -450,11 +498,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Coupon PV
 	 * 
-	 * @throws java.lang.Exception Thrown if the Coupon PV cannot be obtained
+	 * @throws Exception Thrown if the Coupon PV cannot be obtained
 	 */
 
 	public double couponPV()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("CouponPV");
 	}
@@ -462,15 +510,15 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	/**
 	 * Set the Loss PV
 	 * 
-	 * @param dblLossPV The Loss PV
+	 * @param lossPV The Loss PV
 	 * 
 	 * @return TRUE - The Loss PV successfully set
 	 */
 
 	public boolean setLossPV (
-		final double dblLossPV)
+		final double lossPV)
 	{
-		return setR1 ("LossPV", dblLossPV);
+		return setR1 ("LossPV", lossPV);
 	}
 
 	/**
@@ -478,11 +526,11 @@ public class CDSMarketSnap extends org.drip.historical.attribution.PositionMarke
 	 * 
 	 * @return The Loss PV
 	 * 
-	 * @throws java.lang.Exception Thrown if the Loss PV cannot be obtained
+	 * @throws Exception Thrown if the Loss PV cannot be obtained
 	 */
 
 	public double lossPV()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return r1 ("LossPV");
 	}

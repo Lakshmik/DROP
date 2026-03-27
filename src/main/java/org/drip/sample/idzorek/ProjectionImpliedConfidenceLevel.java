@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -240,13 +248,7 @@ public class ProjectionImpliedConfidenceLevel
 
 		R1MultivariateNormal viewDistribution = R1MultivariateNormal.Standard (
 			rectangularManifold,
-			LabelledRd.FromArray (
-				new String[] {
-					"PROJECTION #1",
-					"PROJECTION #2",
-					"PROJECTION #3"
-				}
-			),
+			LabelledRd.FromArray (new String[] {"PROJECTION #1", "PROJECTION #2", "PROJECTION #3"}),
 			projectionExpectedExcessReturnsArray,
 			ViewLoading.ProjectionCovariance (
 				assetExcessReturnsCovarianceMatrix,
@@ -258,22 +260,12 @@ public class ProjectionImpliedConfidenceLevel
 		ProjectionImpliedConfidenceOutput projectionImpliedConfidenceOutput =
 			new BlackLittermanCombinationEngine (
 				ForwardReverseHoldingsAllocation.Reverse (
-					Portfolio.Standard (
-						assetIDArray,
-						assetEquilibriumWeightArray
-					),
+					Portfolio.Standard (assetIDArray, assetEquilibriumWeightArray),
 					assetExcessReturnsCovarianceMatrix,
 					riskAversion
 				),
-				new PriorControlSpecification (
-					true,
-					riskFreeRate,
-					tau
-				),
-				new ProjectionSpecification (
-					viewDistribution,
-					aAssetSpaceViewProjectionMatrix
-				)
+				new PriorControlSpecification (true, riskFreeRate, tau),
+				new ProjectionSpecification (viewDistribution, aAssetSpaceViewProjectionMatrix)
 			).impliedConfidenceRun (
 				rectangularManifold
 			);
@@ -309,10 +301,7 @@ public class ProjectionImpliedConfidenceLevel
 
 		System.out.println ("\t|----------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < fullConfidenceWeightArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < fullConfidenceWeightArray.length; ++assetIndex) {
 			System.out.println ("\t| " +
 				assetIDArray[assetIndex] + " => " +
 				FormatUtil.FormatDouble (fullConfidenceReturnsArray[assetIndex], 1, 2, 100.) + "% | " +
@@ -332,14 +321,13 @@ public class ProjectionImpliedConfidenceLevel
 
 		System.out.println ("\t|----------------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < fullConfidenceWeightArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < fullConfidenceWeightArray.length; ++assetIndex) {
 			System.out.println ("\t| " +
 				assetIDArray[assetIndex] + " => " +
-				FormatUtil.FormatDouble (fullConfidenceWeightReconcilerArray[assetIndex], 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (customConfidenceWeightReconcilerArray[assetIndex], 2, 2, 100.) + "% | " +
+				FormatUtil.FormatDouble (fullConfidenceWeightReconcilerArray[assetIndex], 2, 2, 100.) +
+					"% | " +
+				FormatUtil.FormatDouble (customConfidenceWeightReconcilerArray[assetIndex], 2, 2, 100.) +
+					"% | " +
 				FormatUtil.FormatDouble (assetEquilibriumWeightArray[assetIndex], 2, 2, 100.) + "% ||"
 			);
 		}
@@ -356,10 +344,7 @@ public class ProjectionImpliedConfidenceLevel
 
 		System.out.println ("\t|----------------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < fullConfidenceWeightArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < fullConfidenceWeightArray.length; ++assetIndex) {
 			System.out.println ("\t| " +
 				assetIDArray[assetIndex] + " => " +
 				FormatUtil.FormatDouble (fullConfidenceWeightArray[assetIndex], 2, 2, 100.) + "% | " +
@@ -380,15 +365,15 @@ public class ProjectionImpliedConfidenceLevel
 
 		System.out.println ("\t|----------------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < fullConfidenceWeightArray.length - 1;
-			++assetIndex)
-		{
-			System.out.println ("\t| " +
-				assetIDArray[assetIndex] + " => " +
-				FormatUtil.FormatDouble (fullWeightDeviationReconcilerArray[assetIndex], 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (customWeightDeviationReconcilerArray[assetIndex], 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (impliedConfidenceLevelReconcilerArray[assetIndex], 2, 2, 100.) + "% ||"
+		for (int assetIndex = 0; assetIndex < fullConfidenceWeightArray.length - 1; ++assetIndex) {
+			System.out.println (
+				"\t| " + assetIDArray[assetIndex] + " => " +
+				FormatUtil.FormatDouble (fullWeightDeviationReconcilerArray[assetIndex], 2, 2, 100.) +
+					"% | " +
+				FormatUtil.FormatDouble (customWeightDeviationReconcilerArray[assetIndex], 2, 2, 100.) +
+					"% | " +
+				FormatUtil.FormatDouble (impliedConfidenceLevelReconcilerArray[assetIndex], 2, 2, 100.) +
+					"% ||"
 			);
 		}
 
@@ -404,10 +389,7 @@ public class ProjectionImpliedConfidenceLevel
 
 		System.out.println ("\t|----------------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < fullConfidenceWeightArray.length - 1;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < fullConfidenceWeightArray.length - 1; ++assetIndex) {
 			System.out.println ("\t| " +
 				assetIDArray[assetIndex] + " => " +
 				FormatUtil.FormatDouble (fullWeightDeviationArray[assetIndex], 2, 2, 100.) + "% | " +

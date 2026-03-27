@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -141,15 +149,18 @@ public class ProjectionImpliedConfidenceTilt
 
 		System.out.println ("\t|------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < impliedTiltArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < impliedTiltArray.length; ++assetIndex) {
 			System.out.println (
-				"\t| " + assetIDArray[assetIndex] + " => " +
-				FormatUtil.FormatDouble (impliedTiltArray[assetIndex], 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (
-					impliedTiltArray[assetIndex] + unadjustedWeightArray[assetIndex], 2, 2, 100.
+				"\t| " + assetIDArray[assetIndex] + " => " + FormatUtil.FormatDouble (
+					impliedTiltArray[assetIndex],
+					2,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					impliedTiltArray[assetIndex] + unadjustedWeightArray[assetIndex],
+					2,
+					2,
+					100.
 				) + "% ||"
 			);
 		}
@@ -231,29 +242,15 @@ public class ProjectionImpliedConfidenceTilt
 
 		double[][] projectionTiltArray = new BlackLittermanCombinationEngine (
 			ForwardReverseHoldingsAllocation.Reverse (
-				Portfolio.Standard (
-					assetIDArray,
-					assetEquilibriumWeightArray
-				),
+				Portfolio.Standard (assetIDArray, assetEquilibriumWeightArray),
 				assetExcessReturnsCovarianceMatrix,
 				riskAversion
 			),
-			new PriorControlSpecification (
-				true,
-				riskFreeRate,
-				tau
-			),
+			new PriorControlSpecification (true, riskFreeRate, tau),
 			new ProjectionSpecification (
 				R1MultivariateNormal.Standard (
 					rectangularManifold,
-					LabelledRd.FromArray (
-						new String[]
-						{
-							"PROJECTION #1",
-							"PROJECTION #2",
-							"PROJECTION #3"
-						}
-					),
+					LabelledRd.FromArray (new String[] {"PROJECTION #1", "PROJECTION #2", "PROJECTION #3"}),
 					projectionExpectedExcessReturnsArray,
 					ViewLoading.ProjectionCovariance (
 						assetExcessReturnsCovarianceMatrix,

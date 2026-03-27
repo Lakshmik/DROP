@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -147,16 +155,18 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println ("\t|--------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < weightArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < weightArray.length; ++assetIndex) {
 			System.out.println (
-				"\t| [" + assetIDArray[assetIndex] + "] => " +
-				FormatUtil.FormatDouble (weightArray[assetIndex], preDecimalDigits, postDecimalDigits, 100.)
-					+ "% | " +
-				FormatUtil.FormatDouble (
-					weightReconcilerArray[assetIndex], preDecimalDigits, postDecimalDigits, 100.
+				"\t| [" + assetIDArray[assetIndex] + "] => " + FormatUtil.FormatDouble (
+					weightArray[assetIndex],
+					preDecimalDigits,
+					postDecimalDigits,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					weightReconcilerArray[assetIndex],
+					preDecimalDigits,
+					postDecimalDigits,
+					100.
 				) + "% ||"
 			);
 		}
@@ -165,13 +175,19 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println (
 			"\t| HIGH  : " + highestWeightAsset.id() + " => " + FormatUtil.FormatDouble (
-				highestWeightAsset.amount(), preDecimalDigits, postDecimalDigits, 100.
+				highestWeightAsset.amount(),
+				preDecimalDigits,
+				postDecimalDigits,
+				100.
 			) + "%     ||"
 		);
 
 		System.out.println (
 			"\t| LOW   : " + lowestWeightAsset.id() + " => " + FormatUtil.FormatDouble (
-				lowestWeightAsset.amount(), preDecimalDigits, postDecimalDigits, 100.
+				lowestWeightAsset.amount(),
+				preDecimalDigits,
+				postDecimalDigits,
+				100.
 			) + "%     ||"
 		);
 
@@ -179,7 +195,10 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println (
 			"\t| TOTAL :                                   " + FormatUtil.FormatDouble (
-				forwardReverseOptimizationPortfolio.notional(), preDecimalDigits, postDecimalDigits, 100.
+				forwardReverseOptimizationPortfolio.notional(),
+				preDecimalDigits,
+				postDecimalDigits,
+				100.
 			) + "%     ||"
 		);
 
@@ -189,13 +208,13 @@ public class PriorPosteriorMetricsComparison
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
@@ -305,43 +324,28 @@ public class PriorPosteriorMetricsComparison
 
 		R1MultivariateNormal viewDistribution = R1MultivariateNormal.Standard (
 			rectangularManifold,
-			LabelledRd.FromArray (
-				new String[]
-				{
-					"PROJECTION #1",
-					"PROJECTION #2",
-					"PROJECTION #3"
-				}
-			),
+			LabelledRd.FromArray (new String[] {"PROJECTION #1", "PROJECTION #2", "PROJECTION #3"}),
 			projectionExpectedExcessReturnsArray,
 			projectionExcessReturnsCovarianceMatrix
 		);
 
 		R1MultivariateConvolutionMetrics jointPosteriorMetrics = new BlackLittermanCombinationEngine (
 			ForwardReverseHoldingsAllocation.Reverse (
-				Portfolio.Standard (
-					assetIDArray,
-					assetEquilibriumWeightArray
-				),
+				Portfolio.Standard (assetIDArray, assetEquilibriumWeightArray),
 				assetExcessReturnsCovarianceMatrix,
 				riskAversion
 			),
-			new PriorControlSpecification (
-				true,
-				riskFreeRate,
-				tau
-			),
-			new ProjectionSpecification (
-				viewDistribution,
-				assetSpaceViewProjectionMatrix
-			)
+			new PriorControlSpecification (true, riskFreeRate, tau),
+			new ProjectionSpecification (viewDistribution, assetSpaceViewProjectionMatrix)
 		).customConfidenceRun (
 			rectangularManifold
 		).jointPosteriorMetrics();
 
-		R1MultivariateNormal priorDistribution = (R1MultivariateNormal) jointPosteriorMetrics.priorDistribution();
+		R1MultivariateNormal priorDistribution =
+			(R1MultivariateNormal) jointPosteriorMetrics.priorDistribution();
 
-		R1MultivariateNormal jointDistribution = (R1MultivariateNormal) jointPosteriorMetrics.jointDistribution();
+		R1MultivariateNormal jointDistribution =
+			(R1MultivariateNormal) jointPosteriorMetrics.jointDistribution();
 
 		R1MultivariateNormal posteriorDistribution =
 			(R1MultivariateNormal) jointPosteriorMetrics.posteriorDistribution();
@@ -380,100 +384,110 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println ("\t|---------------------------||");
 
-		System.out.println ("\n\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                               PRIOR CROSS ASSET COVARIANCE MATRIX                                                       ||");
+		System.out.println (
+			"\t|                                               PRIOR CROSS ASSET COVARIANCE MATRIX                                                       ||"
+		);
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetIDArray.length;
-			++assetIndexI)
-		{
+		for (int assetIndexI = 0; assetIndexI < assetIDArray.length; ++assetIndexI) {
 			String dump = "\t| " + assetIDArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetIDArray.length;
-				++assetIndexJ)
-			{
+			for (int assetIndexJ = 0; assetIndexJ < assetIDArray.length; ++assetIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					assetExcessReturnsCovarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.
+					assetExcessReturnsCovarianceMatrix[assetIndexI][assetIndexJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|---------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|---------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                         VIEW SCOPING ASSET PROJECTION LOADING                               ||");
+		System.out.println (
+			"\t|                         VIEW SCOPING ASSET PROJECTION LOADING                               ||"
+		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------||"
+		);
 
-		for (int viewIndex = 0;
-			viewIndex < assetSpaceViewProjectionMatrix.length;
-			++viewIndex)
-		{
+		for (int viewIndex = 0; viewIndex < assetSpaceViewProjectionMatrix.length; ++viewIndex) {
 			String dump = "\t|  #" + viewIndex + " ";
 
-			for (int assetIndex = 0;
-				assetIndex < assetIDArray.length;
-				++assetIndex)
-			{
+			for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 				dump += "| " + FormatUtil.FormatDouble (
-					assetSpaceViewProjectionMatrix[viewIndex][assetIndex], 1, 5, 1.
+					assetSpaceViewProjectionMatrix[viewIndex][assetIndex],
+					1,
+					5,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println ("\n\t|----------------------------------------------||");
 
-		for (int viewIndexI = 0;
-			viewIndexI < assetSpaceViewProjectionMatrix.length;
-			++viewIndexI)
-		{
+		for (int viewIndexI = 0; viewIndexI < assetSpaceViewProjectionMatrix.length; ++viewIndexI) {
 			String dump = "\t|  #" + viewIndexI + " ";
 
-			for (int viewIndexJ = 0;
-				viewIndexJ < assetSpaceViewProjectionMatrix.length;
-				++viewIndexJ)
-			{
+			for (int viewIndexJ = 0; viewIndexJ < assetSpaceViewProjectionMatrix.length; ++viewIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					projectionExcessReturnsCovarianceMatrix[viewIndexI][viewIndexJ], 1, 6, 1.
+					projectionExcessReturnsCovarianceMatrix[viewIndexI][viewIndexJ],
+					1,
+					6,
+					1.
 				) + " ";
 			}
 
 			System.out.println (
 				dump + "|" + FormatUtil.FormatDouble (
-					projectionExpectedExcessReturnsArray[viewIndexI], 1, 2, 100.
+					projectionExpectedExcessReturnsArray[viewIndexI],
+					1,
+					2,
+					100.
 				) + "% ||"
 			);
 		}
 
 		System.out.println ("\t|----------------------------------------------||");
 
-		System.out.println ("\n\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                               JOINT CROSS ASSET COVARIANCE MATRIX                                                       ||");
+		System.out.println (
+			"\t|                                               JOINT CROSS ASSET COVARIANCE MATRIX                                                       ||"
+		);
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetIDArray.length;
-			++assetIndexI)
-		{
+		for (int assetIndexI = 0; assetIndexI < assetIDArray.length; ++assetIndexI) {
 			String dump = "\t| " + assetIDArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetIDArray.length;
-				++assetIndexJ)
-			{
+			for (int assetIndexJ = 0; assetIndexJ < assetIDArray.length; ++assetIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
 					aadblAssetSpaceJointCovariance[assetIndexI][assetIndexJ], 1, 8, 1.
 				) + " ";
@@ -482,33 +496,40 @@ public class PriorPosteriorMetricsComparison
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\n\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                             POSTERIOR CROSS ASSET COVARIANCE MATRIX                                                     ||");
+		System.out.println (
+			"\t|                                             POSTERIOR CROSS ASSET COVARIANCE MATRIX                                                     ||"
+		);
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetIDArray.length;
-			++assetIndexI)
-		{
+		for (int assetIndexI = 0; assetIndexI < assetIDArray.length; ++assetIndexI) {
 			String dump = "\t| " + assetIDArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetIDArray.length;
-				++assetIndexJ)
-			{
+			for (int assetIndexJ = 0; assetIndexJ < assetIDArray.length; ++assetIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					aadblAssetSpacePosteriorCovariance[assetIndexI][assetIndexJ], 1, 8, 1.
+					aadblAssetSpacePosteriorCovariance[assetIndexI][assetIndexJ],
+					1,
+					8,
+					1.
 				) + " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------------------------------------------------||\n");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------------------------------------------------||\n"
+		);
 
 		System.out.println ("\t|----------------------------------------------------||");
 
@@ -520,14 +541,12 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println ("\t|----------------------------------------------------||");
 
-		for (int viewIndex = 0;
-			viewIndex < assetSpaceJointReturnsReconcilerArray.length;
-			++viewIndex)
-		{
+		for (int viewIndex = 0; viewIndex < assetSpaceJointReturnsReconcilerArray.length; ++viewIndex) {
 			System.out.println (
 				"\t| [" + assetIDArray[viewIndex] + "] =>" +
 				FormatUtil.FormatDouble (assetSpaceJointReturnsArray[viewIndex], 1, 2, 100.) + "% |" +
-				FormatUtil.FormatDouble (assetSpaceJointReturnsReconcilerArray[viewIndex], 1, 2, 100.) + "% ||"
+				FormatUtil.FormatDouble (assetSpaceJointReturnsReconcilerArray[viewIndex], 1, 2, 100.) +
+					"% ||"
 			);
 		}
 
@@ -543,18 +562,19 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println ("\t|----------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetSpacePriorReturnsArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetSpacePriorReturnsArray.length; ++assetIndex) {
 			System.out.println (
-				"\t| [" + assetIDArray[assetIndex] + "] =>" +
-				FormatUtil.FormatDouble (
+				"\t| [" + assetIDArray[assetIndex] + "] =>" + FormatUtil.FormatDouble (
 					assetSpaceJointReturnsArray[assetIndex] - assetSpacePriorReturnsArray[assetIndex],
-					1, 2, 100.
-				) + "% |" +
-				FormatUtil.FormatDouble (posteriorPriorDeviationReconcilerArray[assetIndex], 1, 2, 100.)
-					+ "% ||"
+					1,
+					2,
+					100.
+				) + "% |" + FormatUtil.FormatDouble (
+					posteriorPriorDeviationReconcilerArray[assetIndex],
+					1,
+					2,
+					100.
+				) + "% ||"
 			);
 		}
 
@@ -578,17 +598,19 @@ public class PriorPosteriorMetricsComparison
 
 		System.out.println ("\t|--------------------------------------------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetEquilibriumWeightArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetEquilibriumWeightArray.length; ++assetIndex) {
 			System.out.println (
-				"\t| [" + assetIDArray[assetIndex] + "] => " +
-				FormatUtil.FormatDouble (
-					posteriorWeightArray[assetIndex] - assetEquilibriumWeightArray[assetIndex], 2, 2, 100.
-				) + "% | " +
-				FormatUtil.FormatDouble (posteriorWeightDeviationReconcilerArray[assetIndex], 2, 2, 100.)
-					+ "% ||"
+				"\t| [" + assetIDArray[assetIndex] + "] => " + FormatUtil.FormatDouble (
+					posteriorWeightArray[assetIndex] - assetEquilibriumWeightArray[assetIndex],
+					2,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					posteriorWeightDeviationReconcilerArray[assetIndex],
+					2,
+					2,
+					100.
+				) + "% ||"
 			);
 		}
 

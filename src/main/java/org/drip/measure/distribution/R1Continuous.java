@@ -122,6 +122,7 @@ import org.drip.numerical.r1integration.QuadratureEstimator;
  * 		<li>Retrieve the Buffered Probability of Existence</li>
  * 		<li>Retrieve the n<sup>th</sup> Non-central Moment</li>
  * 		<li>Retrieve the n<sup>th</sup> Central Moment</li>
+ * 		<li>Retrieve the First Central Moment</li>
  * 		<li>Retrieve the Inter-quantile Range (IQR) of the Distribution</li>
  * 		<li>Retrieve the Tukey Criterion of the Distribution</li>
  * 		<li>Retrieve the Tukey Anomaly of the Distribution</li>
@@ -135,6 +136,7 @@ import org.drip.numerical.r1integration.QuadratureEstimator;
  * 		<li>Compute the cumulative under the distribution to the given value</li>
  * 		<li>Compute the Incremental under the Distribution between the 2 variates</li>
  * 		<li>Compute the inverse cumulative under the distribution corresponding to the given value</li>
+ * 		<li>Retrieve the Standardized form of the Continuous Distribution</li>
  * 		<li>Retrieve the Mean of the Distribution</li>
  * 		<li>Retrieve the Median of the Distribution</li>
  *  </ul>
@@ -296,6 +298,34 @@ public abstract class R1Continuous
 	}
 
 	/**
+	 * Retrieve the Standardized form of the Continuous Distribution
+	 * 
+	 * @return Standardized form of the Continuous Distribution
+	 */
+
+	public R1Continuous standarized()
+	{
+		return new R1Continuous()
+		{
+			@Override public double[] support()
+			{
+				return new double[] {
+					0.,
+					1.
+				};
+			}
+
+			@Override public double density (
+				double x)
+				throws Exception
+			{
+				return (x - mean()) / Math.sqrt (variance());
+			}
+	
+		};
+	}
+
+	/**
 	 * Retrieve the <i>QuadratureEstimator</i> Instance for the Support
 	 * 
 	 * @return <i>QuadratureEstimator</i> Instance for the Support
@@ -399,6 +429,17 @@ public abstract class R1Continuous
 				}
 			}
 		);
+	}
+
+	/**
+	 * Retrieve the First Central Moment
+	 * 
+	 * @return First Central Moment
+	 */
+
+	public double firstCentralMoment()
+	{
+		return 0.;
 	}
 
 	/**

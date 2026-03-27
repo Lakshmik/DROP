@@ -516,7 +516,9 @@ public class CompositePeriodBuilder {
 		while (iEdgeDate < iEndDate) {
 			lsOvernightEdgeDate.add (iEdgeDate);
 
-			if (null == (dtEdge = dtEdge.addBusDays (1, strCalendar))) return null;
+			// if (null == (dtEdge = dtEdge.addBusDays (1, strCalendar))) return null;
+
+			if (null == (dtEdge = dtEdge.addDays (1))) return null;
 
 			iEdgeDate = dtEdge.julian();
 		}

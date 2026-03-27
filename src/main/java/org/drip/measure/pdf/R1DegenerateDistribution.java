@@ -84,7 +84,7 @@ import org.drip.measure.distribution.R1Continuous;
  * <i>R1DegenerateDistribution</i> implements the Degenerate Probability Distribution Function. The
  * 	References are:
  * 
- * <br><br>
+ * <br>
  * 	<ul>
  * 		<li>
  * 			Wikipedia (2025): Degenerate Distribution https://en.wikipedia.org/wiki/Degenerate_distribution
@@ -125,7 +125,7 @@ import org.drip.measure.distribution.R1Continuous;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/README.md">R<sup>d</sup> Continuous/Discrete Probability Measures</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/r1pdf/README.md">Explicit R<sup>1</sup> and R<sup>d</sup> PDF's</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/pdf/README.md">Explicit R<sup>1</sup> and R<sup>d</sup> PDF's</a></td></tr>
  *  </table>
  *	<br>
  *
@@ -138,7 +138,7 @@ public class R1DegenerateDistribution
 	private double _a = Double.NaN;
 
 	/**
-	 * R1DegenerateDistribution Constructor
+	 * <i>R1DegenerateDistribution</i> Constructor
 	 * 
 	 * @param a "a"
 	 * 
@@ -402,7 +402,7 @@ public class R1DegenerateDistribution
 		final R1Continuous r1UnivariateOther)
 		throws Exception
 	{
-		throw new Exception ("R1DegenerateDistribution::fisherInformation => Not implemented");
+		throw new Exception ("R1DegenerateDistribution::kullbackLeiblerDivergence => Not implemented");
 	}
 
 	/**

@@ -304,18 +304,12 @@ public class CalibratableMultiSegmentSequence
 		} else if (0 != (MultiSegmentSequence.CALIBRATE & calibrationDetail)) {
 			FixedPointFinderOutput fixedPointFinderOutput = null;
 
-			if (null == fixedPointFinderOutput || !fixedPointFinderOutput.containsRoot()) {
-				try {
-					fixedPointFinderOutput = new FixedPointFinderZheng (
-						0.,
-						this,
-						true
-					).findRoot();
-				} catch (Exception e) {
-					e.printStackTrace();
+			try {
+				fixedPointFinderOutput = new FixedPointFinderZheng (0., this, true).findRoot();
+			} catch (Exception e) {
+				e.printStackTrace();
 
-					return false;
-				}
+				return false;
 			}
 
 			if (null == fixedPointFinderOutput || !NumberUtil.IsValid (fixedPointFinderOutput.getRoot()) ||

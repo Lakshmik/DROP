@@ -26,6 +26,14 @@ import org.drip.xva.vertex.BurgardKjaerBuilder;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -100,9 +108,9 @@ import org.drip.xva.vertex.BurgardKjaerBuilder;
 
 /**
  * <i>PerfectReplicationUncollateralizedFundingStochastic</i> examines the Basel BCBS 2012 OTC Accounting
- * Impact to a Portfolio of 10 Swaps resulting from the Addition of a New Swap - Comparison via both FVA/FDA
- * and FCA/FBA Schemes. Simulation is carried out under the following Criteria using one of the Generalized
- * Burgard Kjaer (2013) Scheme.
+ * 	Impact to a Portfolio of 10 Swaps resulting from the Addition of a New Swap - Comparison via both FVA/FDA
+ * 	and FCA/FBA Schemes. Simulation is carried out under the following Criteria using one of the Generalized
+ * 	Burgard Kjaer (2013) Scheme.
  *  
  * <br><br>
  *  <ul>
@@ -150,222 +158,217 @@ import org.drip.xva.vertex.BurgardKjaerBuilder;
  *  </ul>
  *  
  * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/burgard2013/README.md">Burgard Kjaer (2013) Valuation Adjustments</a></li>
- *  </ul>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/burgard2013/README.md">Burgard Kjaer (2013) Valuation Adjustments</a></td></tr>
+ *  </table>
  * <br><br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class PerfectReplicationUncollateralizedFundingStochastic {
+public class PerfectReplicationUncollateralizedFundingStochastic
+{
 
 	private static final double[] NumeraireValueRealization (
-		final DiffusionEvolver deNumeraireValue,
-		final double dblNumeraireValueInitial,
-		final double dblTime,
-		final double dblTimeWidth,
-		final double[] adblRandom,
-		final int iNumStep)
+		final DiffusionEvolver numeraireValueDiffusionEvolver,
+		final double initialNumeraireValue,
+		final double time,
+		final double timeWidth,
+		final double[] randomArray,
+		final int stepCount)
 		throws Exception
 	{
-		double[] adblNumeraireValue = new double[iNumStep + 1];
-		adblNumeraireValue[0] = dblNumeraireValueInitial;
-		double[] adblTimeWidth = new double[iNumStep];
+		double[] numeraireValueArray = new double[stepCount + 1];
+		double[] timeWidthArray = new double[stepCount];
+		numeraireValueArray[0] = initialNumeraireValue;
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblTimeWidth[i] = dblTimeWidth;
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			timeWidthArray[stepIndex] = timeWidth;
+		}
 
-
-		JumpDiffusionEdge[] aJDE = deNumeraireValue.incrementSequence (
-			new JumpDiffusionVertex (
-				dblTime,
-				dblNumeraireValueInitial,
-				0.,
-				false
-			),
-			JumpDiffusionEdgeUnit.Diffusion (
-				adblTimeWidth,
-				adblRandom
-			),
-			dblTimeWidth
+		JumpDiffusionEdge[] jumpDiffusionEdgeArray = numeraireValueDiffusionEvolver.incrementSequence (
+			new JumpDiffusionVertex (time, initialNumeraireValue, 0., false),
+			JumpDiffusionEdgeUnit.Diffusion (timeWidthArray, randomArray),
+			timeWidth
 		);
 
-		for (int j = 1; j <= iNumStep; ++j)
-			adblNumeraireValue[j] = aJDE[j - 1].finish();
+		for (int stepIndex = 1; stepIndex <= stepCount; ++stepIndex) {
+			numeraireValueArray[stepIndex] = jumpDiffusionEdgeArray[stepIndex - 1].finish();
+		}
 
-		return adblNumeraireValue;
+		return numeraireValueArray;
 	}
 
 	private static final double[] VertexNumeraireRealization (
-		final DiffusionEvolver deNumeraireValue,
-		final double dblNumeraireValueInitial,
-		final double dblTime,
-		final double dblTimeWidth,
-		final double[] adblRandom,
-		final int iNumStep)
+		final DiffusionEvolver numeraireValueDiffusionEvolver,
+		final double initialNumeraireValue,
+		final double time,
+		final double timeWidth,
+		final double[] randomArray,
+		final int stepCount)
 		throws Exception
 	{
-		double[] adblNumeraireValue = new double[iNumStep + 1];
-		double[] adblTimeWidth = new double[iNumStep];
+		double[] numeraireValueArray = new double[stepCount + 1];
+		double[] timeWidthArray = new double[stepCount];
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblTimeWidth[i] = dblTimeWidth;
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			timeWidthArray[stepIndex] = timeWidth;
+		}
 
-		JumpDiffusionVertex[] aJDV = deNumeraireValue.vertexSequenceReverse (
-			new JumpDiffusionVertex (
-				dblTime,
-				dblNumeraireValueInitial,
-				0.,
-				false
-			),
-			JumpDiffusionEdgeUnit.Diffusion (
-				adblTimeWidth,
-				adblRandom
-			),
-			adblTimeWidth
-		);
+		JumpDiffusionVertex[] jumpDiffusionVertexArray =
+			numeraireValueDiffusionEvolver.vertexSequenceReverse (
+				new JumpDiffusionVertex (time, initialNumeraireValue, 0., false),
+				JumpDiffusionEdgeUnit.Diffusion (timeWidthArray, randomArray),
+				timeWidthArray
+			);
 
-		for (int j = 0; j <= iNumStep; ++j)
-			adblNumeraireValue[j] = aJDV[j].value();
+		for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
+			numeraireValueArray[stepIndex] = jumpDiffusionVertexArray[stepIndex].value();
+		}
 
-		return adblNumeraireValue;
+		return numeraireValueArray;
 	}
 
 	private static final double[] ATMSwapRateOffsetRealization (
-		final DiffusionEvolver deATMSwapRateOffset,
-		final double dblATMSwapRateOffsetInitial,
-		final double[] adblRandom,
-		final double dblTime,
-		final double dblTimeWidth,
-		final int iNumStep)
+		final DiffusionEvolver atmSwapRateOffsetDiffusionEvolver,
+		final double initialATMSwapRateOffset,
+		final double[] randomArray,
+		final double time,
+		final double timeWidth,
+		final int stepCount)
 		throws Exception
 	{
-		double[] adblATMSwapRateOffset = new double[iNumStep + 1];
-		adblATMSwapRateOffset[0] = dblATMSwapRateOffsetInitial;
-		double[] adblTimeWidth = new double[iNumStep];
+		double[] atmSwapRateOffsetArray = new double[stepCount + 1];
+		atmSwapRateOffsetArray[0] = initialATMSwapRateOffset;
+		double[] timeWidthArray = new double[stepCount];
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblTimeWidth[i] = dblTimeWidth;
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			timeWidthArray[stepIndex] = timeWidth;
+		}
 
-
-		JumpDiffusionEdge[] aJDE = deATMSwapRateOffset.incrementSequence (
-			new JumpDiffusionVertex (
-				dblTime,
-				dblATMSwapRateOffsetInitial,
-				0.,
-				false
-			),
-			JumpDiffusionEdgeUnit.Diffusion (
-				adblTimeWidth,
-				adblRandom
-			),
-			dblTimeWidth
+		JumpDiffusionEdge[] jumpDiffusionEdgeArray = atmSwapRateOffsetDiffusionEvolver.incrementSequence (
+			new JumpDiffusionVertex (time, initialATMSwapRateOffset, 0., false),
+			JumpDiffusionEdgeUnit.Diffusion (timeWidthArray, randomArray),
+			timeWidth
 		);
 
-		for (int j = 1; j <= iNumStep; ++j)
-			adblATMSwapRateOffset[j] = aJDE[j - 1].finish();
+		for (int stepIndex = 1; stepIndex <= stepCount; ++stepIndex) {
+			atmSwapRateOffsetArray[stepIndex] = jumpDiffusionEdgeArray[stepIndex - 1].finish();
+		}
 
-		return adblATMSwapRateOffset;
+		return atmSwapRateOffsetArray;
 	}
 
 	private static final double[] SwapPortfolioValueRealization (
-		final DiffusionEvolver deATMSwapRate,
-		final double dblATMSwapRateStart,
-		final double[] adblRandom,
-		final int iNumStep,
-		final double dblTime,
-		final double dblTimeWidth,
-		final double dblTimeMaturity,
-		final double dblSwapNotional)
+		final DiffusionEvolver atmSwapRateDiffusionEvolver,
+		final double atmSwapRateStart,
+		final double[] randomArray,
+		final int stepCount,
+		final double time,
+		final double timeWidth,
+		final double timeMaturity,
+		final double swapNotional)
 		throws Exception
 	{
-		double[] adblSwapPortfolioValueRealization = new double[iNumStep + 1];
-		int iMaturityStep = (int) (dblTimeMaturity / dblTimeWidth);
+		double[] swapPortfolioValueRealizationArray = new double[stepCount + 1];
+		int maturityStepSize = (int) (timeMaturity / timeWidth);
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblSwapPortfolioValueRealization[i] = 0.;
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			swapPortfolioValueRealizationArray[stepIndex] = 0.;
+		}
 
-		double[] adblATMSwapRateOffsetRealization = ATMSwapRateOffsetRealization (
-			deATMSwapRate,
-			dblATMSwapRateStart,
-			adblRandom,
-			dblTime,
-			dblTimeWidth,
-			iNumStep
+		double[] atmSwapRateOffsetRealizationArray = ATMSwapRateOffsetRealization (
+			atmSwapRateDiffusionEvolver,
+			atmSwapRateStart,
+			randomArray,
+			time,
+			timeWidth,
+			stepCount
 		);
 
-		for (int j = 0; j <= iNumStep; ++j)
-			adblSwapPortfolioValueRealization[j] = j > iMaturityStep ? 0. :
-				dblSwapNotional * dblTimeWidth * (iMaturityStep - j) * adblATMSwapRateOffsetRealization[j];
+		for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
+			swapPortfolioValueRealizationArray[stepIndex] = stepIndex > maturityStepSize ? 0. :
+				swapNotional * timeWidth * (maturityStepSize - stepIndex) *
+				atmSwapRateOffsetRealizationArray[stepIndex];
+		}
 
-		return adblSwapPortfolioValueRealization;
+		return swapPortfolioValueRealizationArray;
 	}
 
 	private static final double[][] Path (
-		final double[][] aadblCorrelation,
-		final int iNumVertex)
+		final double[][] correlationMatrix,
+		final int vertexCount)
 		throws Exception
 	{
-		CorrelatedFactorsPathVertexRealization cpvd = new CorrelatedFactorsPathVertexRealization (
+		return new CorrelatedFactorsPathVertexRealization (
 			new RandomNumberGenerator(),
-			aadblCorrelation,
-			iNumVertex,
+			correlationMatrix,
+			vertexCount,
 			1,
 			false,
 			null
-		);
-
-		return cpvd.multiTrajectoryNodeRd()[0].flatform();
+		).multiTrajectoryNodeRd()[0].flatform();
 	}
 
 	private static final ExposureAdjustmentAggregator[] Mix (
-		final double dblTimeMaturity1,
-		final double dblATMSwapRateOffsetStart1,
-		final double dblSwapNotional1,
-		final double dblTimeMaturity2,
-		final double dblATMSwapRateOffsetStart2,
-		final double dblSwapNotional2)
+		final double timeMaturity1,
+		final double atmSwapRateOffsetStart1,
+		final double swapNotional1,
+		final double timeMaturity2,
+		final double atmSwapRateOffsetStart2,
+		final double swapNotional2)
 		throws Exception
 	{
-		int iNumStep = 10;
-		int iNumPath = 60000;
-		int iNumVertex = 10;
-		double dblTime = 5.;
-		double dblATMSwapRateOffsetDrift = 0.0;
-		double dblATMSwapRateOffsetVolatility = 0.25;
-		double dblOvernightNumeraireDrift = 0.004;
-		double dblOvernightNumeraireVolatility = 0.02;
-		double dblOvernightNumeraireInitial = 1.;
-		double dblCSADrift = 0.01;
-		double dblCSAVolatility = 0.05;
-		double dblCSAInitial = 1.;
-		double dblBankHazardRateDrift = 0.002;
-		double dblBankHazardRateVolatility = 0.20;
-		double dblBankHazardRateInitial = 0.015;
-		double dblBankSeniorRecoveryRateDrift = 0.002;
-		double dblBankSeniorRecoveryRateVolatility = 0.02;
-		double dblBankSeniorRecoveryRateInitial = 0.40;
-		double dblBankSubordinateRecoveryRateDrift = 0.001;
-		double dblBankSubordinateRecoveryRateVolatility = 0.01;
-		double dblBankSubordinateRecoveryRateInitial = 0.15;
-		double dblCounterPartyHazardRateDrift = 0.002;
-		double dblCounterPartyHazardRateVolatility = 0.30;
-		double dblCounterPartyHazardRateInitial = 0.030;
-		double dblCounterPartyRecoveryRateDrift = 0.002;
-		double dblCounterPartyRecoveryRateVolatility = 0.02;
-		double dblCounterPartyRecoveryRateInitial = 0.30;
-		double dblBankSeniorFundingSpreadDrift = 0.00002;
-		double dblBankSeniorFundingSpreadVolatility = 0.002;
-		double dblBankSubordinateFundingSpreadDrift = 0.00001;
-		double dblBankSubordinateFundingSpreadVolatility = 0.001;
-		double dblCounterPartyFundingSpreadDrift = 0.000022;
-		double dblCounterPartyFundingSpreadVolatility = 0.0022;
+		int stepCount = 10;
+		int vertexCount = 10;
+		int pathCount = 60000;
 
-		double[][] aadblCorrelation = new double[][] {
+		double time = 5.;
+
+		double atmSwapRateOffsetDrift = 0.;
+		double atmSwapRateOffsetVolatility = 0.25;
+
+		double overnightNumeraireInitial = 1.;
+		double overnightNumeraireDrift = 0.004;
+		double overnightNumeraireVolatility = 0.02;
+
+		double csaInitial = 1.;
+		double csaDrift = 0.01;
+		double csaVolatility = 0.05;
+
+		double bankHazardRateDrift = 0.002;
+		double bankHazardRateInitial = 0.015;
+		double bankHazardRateVolatility = 0.2;
+
+		double bankSeniorRecoveryRateDrift = 0.002;
+		double bankSeniorRecoveryRateInitial = 0.4;
+		double bankSeniorRecoveryRateVolatility = 0.02;
+
+		double bankSubordinateRecoveryRateDrift = 0.001;
+		double bankSubordinateRecoveryRateInitial = 0.15;
+		double bankSubordinateRecoveryRateVolatility = 0.01;
+
+		double counterPartyHazardRateDrift = 0.002;
+		double counterPartyHazardRateInitial = 0.03;
+		double counterPartyHazardRateVolatility = 0.3;
+
+		double counterPartyRecoveryRateDrift = 0.002;
+		double counterPartyRecoveryRateInitial = 0.3;
+		double counterPartyRecoveryRateVolatility = 0.02;
+
+		double bankSeniorFundingSpreadDrift = 0.00002;
+		double bankSeniorFundingSpreadVolatility = 0.002;
+
+		double bankSubordinateFundingSpreadDrift = 0.00001;
+		double bankSubordinateFundingSpreadVolatility = 0.001;
+
+		double counterPartyFundingSpreadDrift = 0.000022;
+		double counterPartyFundingSpreadVolatility = 0.0022;
+
+		double[][] correlationMatrix = new double[][] {
 			{1.00,  0.00,  0.03,  0.07,  0.04,  0.05,  0.00,  0.08,  0.00,  0.00,  0.00},  // PORTFOLIO
 			{0.00,  1.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00},  // OVERNIGHT
 			{0.03,  0.00,  1.00,  0.26,  0.33,  0.21,  0.00,  0.35,  0.13,  0.00,  0.00},  // CSA
@@ -379,251 +382,242 @@ public class PerfectReplicationUncollateralizedFundingStochastic {
 			{0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  1.00}   // COUNTER PARTY FUNDING SPREAD
 		};
 
-		JulianDate dtSpot = DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
-		double dblTimeWidth = dblTime / iNumStep;
-		JulianDate[] adtVertex = new JulianDate[iNumStep + 1];
-		double[][] aadblPortfolio1Value = new double[iNumPath][iNumStep + 1];
-		double[][] aadblPortfolio2Value = new double[iNumPath][iNumStep + 1];
-		double[][] aadblCollateralBalance = new double[iNumPath][iNumStep + 1];
-		MonoPathExposureAdjustment[] aCPGPGround = new MonoPathExposureAdjustment[iNumPath];
-		MonoPathExposureAdjustment[] aCPGPExtended = new MonoPathExposureAdjustment[iNumPath];
-		double dblBankSeniorFundingSpreadInitial = dblBankHazardRateInitial / (1. - dblBankSeniorRecoveryRateInitial);
-		double dblBankSubordinateFundingSpreadInitial = dblBankHazardRateInitial / (1. - dblBankSubordinateRecoveryRateInitial);
-		double dblCounterPartyFundingSpreadInitial = dblCounterPartyHazardRateInitial / (1. - dblCounterPartyRecoveryRateInitial);
+		double timeWidth = time / stepCount;
+		JulianDate[] vertexDateArray = new JulianDate[stepCount + 1];
+		double[][] portfolio1ValueGrid = new double[pathCount][stepCount + 1];
+		double[][] portfolio2ValueGrid = new double[pathCount][stepCount + 1];
+		MonoPathExposureAdjustment[] groundMonoPathExposureAdjustmentArray =
+			new MonoPathExposureAdjustment[pathCount];
+		MonoPathExposureAdjustment[] extendedMonoPathExposureAdjustmentArray =
+			new MonoPathExposureAdjustment[pathCount];
+		double bankSeniorFundingSpreadInitial = bankHazardRateInitial / (1. - bankSeniorRecoveryRateInitial);
+		double bankSubordinateFundingSpreadInitial =
+			bankHazardRateInitial / (1. - bankSubordinateRecoveryRateInitial);
+		double counterPartyFundingSpreadInitial =
+			counterPartyHazardRateInitial / (1. - counterPartyRecoveryRateInitial);
 
-		DiffusionEvolver deATMSwapRateOffset = new DiffusionEvolver (
+		DiffusionEvolver atmSwapRateOffsetDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLinear.Standard (atmSwapRateOffsetDrift, atmSwapRateOffsetVolatility)
+		);
+
+		DiffusionEvolver overnightNumeraireDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (overnightNumeraireDrift, overnightNumeraireVolatility)
+		);
+
+		DiffusionEvolver csaDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (csaDrift, csaVolatility)
+		);
+
+		DiffusionEvolver bankHazardRateDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (bankHazardRateDrift, bankHazardRateVolatility)
+		);
+
+		DiffusionEvolver bankSeniorRecoveryRateDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (
+				bankSeniorRecoveryRateDrift,
+				bankSeniorRecoveryRateVolatility
+			)
+		);
+
+		DiffusionEvolver bankSubordinateRecoveryRateDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (
+				bankSubordinateRecoveryRateDrift,
+				bankSubordinateRecoveryRateVolatility
+			)
+		);
+
+		DiffusionEvolver counterPartyHazardRateDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (
+				counterPartyHazardRateDrift,
+				counterPartyHazardRateVolatility
+			)
+		);
+
+		DiffusionEvolver counterPartyRecoveryRateDiffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorLogarithmic.Standard (
+				counterPartyRecoveryRateDrift,
+				counterPartyRecoveryRateVolatility
+			)
+		);
+
+		DiffusionEvolver bankSeniorFundingSpreadDiffusionEvolver = new DiffusionEvolver (
 			DiffusionEvaluatorLinear.Standard (
-				dblATMSwapRateOffsetDrift,
-				dblATMSwapRateOffsetVolatility
+				bankSeniorFundingSpreadDrift,
+				bankSeniorFundingSpreadVolatility
 			)
 		);
 
-		DiffusionEvolver deOvernightNumeraire = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblOvernightNumeraireDrift,
-				dblOvernightNumeraireVolatility
-			)
-		);
-
-		DiffusionEvolver deCSA = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblCSADrift,
-				dblCSAVolatility
-			)
-		);
-
-		DiffusionEvolver deBankHazardRate = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblBankHazardRateDrift,
-				dblBankHazardRateVolatility
-			)
-		);
-
-		DiffusionEvolver deBankSeniorRecoveryRate = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblBankSeniorRecoveryRateDrift,
-				dblBankSeniorRecoveryRateVolatility
-			)
-		);
-
-		DiffusionEvolver deBankSubordinateRecoveryRate = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblBankSubordinateRecoveryRateDrift,
-				dblBankSubordinateRecoveryRateVolatility
-			)
-		);
-
-		DiffusionEvolver deCounterPartyHazardRate = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblCounterPartyHazardRateDrift,
-				dblCounterPartyHazardRateVolatility
-			)
-		);
-
-		DiffusionEvolver deCounterPartyRecoveryRate = new DiffusionEvolver (
-			DiffusionEvaluatorLogarithmic.Standard (
-				dblCounterPartyRecoveryRateDrift,
-				dblCounterPartyRecoveryRateVolatility
-			)
-		);
-
-		DiffusionEvolver deBankSeniorFundingSpread = new DiffusionEvolver (
+		DiffusionEvolver bankSubordinateFundingSpreadDiffusionEvolver = new DiffusionEvolver (
 			DiffusionEvaluatorLinear.Standard (
-				dblBankSeniorFundingSpreadDrift,
-				dblBankSeniorFundingSpreadVolatility
+				bankSubordinateFundingSpreadDrift,
+				bankSubordinateFundingSpreadVolatility
 			)
 		);
 
-		DiffusionEvolver deBankSubordinateFundingSpread = new DiffusionEvolver (
+		DiffusionEvolver counterPartyFundingSpreadDiffusionEvolver = new DiffusionEvolver (
 			DiffusionEvaluatorLinear.Standard (
-				dblBankSubordinateFundingSpreadDrift,
-				dblBankSubordinateFundingSpreadVolatility
+				counterPartyFundingSpreadDrift,
+				counterPartyFundingSpreadVolatility
 			)
 		);
 
-		DiffusionEvolver deCounterPartyFundingSpread = new DiffusionEvolver (
-			DiffusionEvaluatorLinear.Standard (
-				dblCounterPartyFundingSpreadDrift,
-				dblCounterPartyFundingSpreadVolatility
-			)
-		);
+		for (int pathIndex = 0; pathIndex < pathCount; ++pathIndex) {
+			double[][] numeraireGrid = R1MatrixUtil.Transpose (Path (correlationMatrix, vertexCount));
 
-		for (int i = 0; i < iNumPath; ++i) {
-			double[][] aadblNumeraire = R1MatrixUtil.Transpose (
-				Path (
-					aadblCorrelation,
-					iNumVertex
-				)
+			portfolio1ValueGrid[pathIndex] = SwapPortfolioValueRealization (
+				atmSwapRateOffsetDiffusionEvolver,
+				atmSwapRateOffsetStart1,
+				numeraireGrid[0],
+				vertexCount,
+				time,
+				timeWidth,
+				timeMaturity1,
+				swapNotional1
 			);
 
-			aadblPortfolio1Value[i] = SwapPortfolioValueRealization (
-				deATMSwapRateOffset,
-				dblATMSwapRateOffsetStart1,
-				aadblNumeraire[0],
-				iNumVertex,
-				dblTime,
-				dblTimeWidth,
-				dblTimeMaturity1,
-				dblSwapNotional1
+			portfolio2ValueGrid[pathIndex] = SwapPortfolioValueRealization (
+				atmSwapRateOffsetDiffusionEvolver,
+				atmSwapRateOffsetStart2,
+				numeraireGrid[0],
+				vertexCount,
+				time,
+				timeWidth,
+				timeMaturity2,
+				swapNotional2
 			);
 
-			aadblPortfolio2Value[i] = SwapPortfolioValueRealization (
-				deATMSwapRateOffset,
-				dblATMSwapRateOffsetStart2,
-				aadblNumeraire[0],
-				iNumVertex,
-				dblTime,
-				dblTimeWidth,
-				dblTimeMaturity2,
-				dblSwapNotional2
+			double[] overnightNumeraireArray = VertexNumeraireRealization (
+				overnightNumeraireDiffusionEvolver,
+				overnightNumeraireInitial,
+				time,
+				timeWidth,
+				numeraireGrid[1],
+				stepCount
 			);
 
-			double[] adblOvernightNumeraire = VertexNumeraireRealization (
-				deOvernightNumeraire,
-				dblOvernightNumeraireInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[1],
-				iNumStep
+			double[] csaArray = VertexNumeraireRealization (
+				csaDiffusionEvolver,
+				csaInitial,
+				time,
+				timeWidth,
+				numeraireGrid[2],
+				stepCount
 			);
 
-			double[] adblCSA = VertexNumeraireRealization (
-				deCSA,
-				dblCSAInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[2],
-				iNumStep
+			double[] bankHazardRateArray = NumeraireValueRealization (
+				bankHazardRateDiffusionEvolver,
+				bankHazardRateInitial,
+				time,
+				timeWidth,
+				numeraireGrid[3],
+				stepCount
 			);
 
-			double[] adblBankHazardRate = NumeraireValueRealization (
-				deBankHazardRate,
-				dblBankHazardRateInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[3],
-				iNumStep
+			double[] counterPartyHazardRateArray = NumeraireValueRealization (
+				counterPartyHazardRateDiffusionEvolver,
+				counterPartyHazardRateInitial,
+				time,
+				timeWidth,
+				numeraireGrid[4],
+				stepCount
 			);
 
-			double[] adblCounterPartyHazardRate = NumeraireValueRealization (
-				deCounterPartyHazardRate,
-				dblCounterPartyHazardRateInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[4],
-				iNumStep
+			double[] bankSeniorRecoveryRateArray = NumeraireValueRealization (
+				bankSeniorRecoveryRateDiffusionEvolver,
+				bankSeniorRecoveryRateInitial,
+				time,
+				timeWidth,
+				numeraireGrid[5],
+				stepCount
 			);
 
-			double[] adblBankSeniorRecoveryRate = NumeraireValueRealization (
-				deBankSeniorRecoveryRate,
-				dblBankSeniorRecoveryRateInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[5],
-				iNumStep
+			double[] bankSubordinateRecoveryRateArray = NumeraireValueRealization (
+				bankSubordinateRecoveryRateDiffusionEvolver,
+				bankSubordinateRecoveryRateInitial,
+				time,
+				timeWidth,
+				numeraireGrid[6],
+				stepCount
 			);
 
-			double[] adblBankSubordinateRecoveryRate = NumeraireValueRealization (
-				deBankSubordinateRecoveryRate,
-				dblBankSubordinateRecoveryRateInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[6],
-				iNumStep
+			double[] counterPartyRecoveryRateArray = NumeraireValueRealization (
+				counterPartyRecoveryRateDiffusionEvolver,
+				counterPartyRecoveryRateInitial,
+				time,
+				timeWidth,
+				numeraireGrid[7],
+				stepCount
 			);
 
-			double[] adblCounterPartyRecoveryRate = NumeraireValueRealization (
-				deCounterPartyRecoveryRate,
-				dblCounterPartyRecoveryRateInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[7],
-				iNumStep
+			double[] bankSeniorFundingSpreadArray = NumeraireValueRealization (
+				bankSeniorFundingSpreadDiffusionEvolver,
+				bankSeniorFundingSpreadInitial,
+				time,
+				timeWidth,
+				numeraireGrid[8],
+				stepCount
 			);
 
-			double[] adblBankSeniorFundingSpread = NumeraireValueRealization (
-				deBankSeniorFundingSpread,
-				dblBankSeniorFundingSpreadInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[8],
-				iNumStep
+			double[] bankSubordinateFundingSpreadArray = NumeraireValueRealization (
+				bankSubordinateFundingSpreadDiffusionEvolver,
+				bankSubordinateFundingSpreadInitial,
+				time,
+				timeWidth,
+				numeraireGrid[9],
+				stepCount
 			);
 
-			double[] adblBankSubordinateFundingSpread = NumeraireValueRealization (
-				deBankSubordinateFundingSpread,
-				dblBankSubordinateFundingSpreadInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[9],
-				iNumStep
+			double[] counterPartyFundingSpreadArray = NumeraireValueRealization (
+				counterPartyFundingSpreadDiffusionEvolver,
+				counterPartyFundingSpreadInitial,
+				time,
+				timeWidth,
+				numeraireGrid[10],
+				stepCount
 			);
 
-			double[] adblCounterPartyFundingSpread = NumeraireValueRealization (
-				deCounterPartyFundingSpread,
-				dblCounterPartyFundingSpreadInitial,
-				dblTime,
-				dblTimeWidth,
-				aadblNumeraire[10],
-				iNumStep
-			);
+			MarketVertex[] marketVertexArray = new MarketVertex [stepCount + 1];
+			CollateralGroupVertex[] collateralGroupVertex1Array = new CollateralGroupVertex[stepCount + 1];
+			CollateralGroupVertex[] collateralGroupVertex2Array = new CollateralGroupVertex[stepCount + 1];
 
-			MarketVertex[] aMV = new MarketVertex [iNumStep + 1];
-			CollateralGroupVertex[] aCGV1 = new CollateralGroupVertex[iNumStep + 1];
-			CollateralGroupVertex[] aCGV2 = new CollateralGroupVertex[iNumStep + 1];
-
-			for (int j = 0; j <= iNumStep; ++j)
-			{
+			for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
 				LatentStateVertexContainer latentStateVertexContainer = new LatentStateVertexContainer();
 
-				latentStateVertexContainer.add (
-					OTCFixFloatLabel.Standard ("USD-3M-10Y"),
-					Double.NaN
-				);
+				latentStateVertexContainer.add (OTCFixFloatLabel.Standard ("USD-3M-10Y"), Double.NaN);
 
-				aMV[j] = MarketVertex.Nodal (
-					adtVertex[j] = dtSpot.addMonths (6 * j),
-					dblOvernightNumeraireDrift,
-					adblOvernightNumeraire[j],
-					dblCSADrift,
-					adblCSA[j],
+				marketVertexArray[stepIndex] = MarketVertex.Nodal (
+					vertexDateArray[stepIndex] = spotDate.addMonths (6 * stepIndex),
+					overnightNumeraireDrift,
+					overnightNumeraireArray[stepIndex],
+					csaDrift,
+					csaArray[stepIndex],
 					new MarketVertexEntity (
-						Math.exp (-0.5 * adblBankHazardRate[j] * j),
-						adblBankHazardRate[j],
-						adblBankSeniorRecoveryRate[j],
-						adblBankSeniorFundingSpread[j],
-						Math.exp (-0.5 * adblBankHazardRate[j] * (1. - adblBankSeniorRecoveryRate[j]) * iNumStep),
-						adblBankSubordinateRecoveryRate[j],
-						adblBankSubordinateFundingSpread[j],
-						Math.exp (-0.5 * adblBankHazardRate[j] * (1. - adblBankSubordinateRecoveryRate[j]) * iNumStep)
+						Math.exp (-0.5 * bankHazardRateArray[stepIndex] * stepIndex),
+						bankHazardRateArray[stepIndex],
+						bankSeniorRecoveryRateArray[stepIndex],
+						bankSeniorFundingSpreadArray[stepIndex],
+						Math.exp (
+							-0.5 * bankHazardRateArray[stepIndex] *
+								(1. - bankSeniorRecoveryRateArray[stepIndex]) * stepCount
+						),
+						bankSubordinateRecoveryRateArray[stepIndex],
+						bankSubordinateFundingSpreadArray[stepIndex],
+						Math.exp (
+							-0.5 * bankHazardRateArray[stepIndex] *
+								(1. - bankSubordinateRecoveryRateArray[stepIndex]) * stepCount
+						)
 					),
 					new MarketVertexEntity (
-						Math.exp (-0.5 * adblCounterPartyHazardRate[j] * j),
-						adblCounterPartyHazardRate[j],
-						adblCounterPartyRecoveryRate[j],
-						adblCounterPartyFundingSpread[j],
-						Math.exp (-0.5 * adblCounterPartyHazardRate[j] * (1. - adblCounterPartyRecoveryRate[j]) * iNumStep),
+						Math.exp (-0.5 * counterPartyHazardRateArray[stepIndex] * stepIndex),
+						counterPartyHazardRateArray[stepIndex],
+						counterPartyRecoveryRateArray[stepIndex],
+						counterPartyFundingSpreadArray[stepIndex],
+						Math.exp (
+							-0.5 * counterPartyHazardRateArray[stepIndex] *
+								(1. - counterPartyRecoveryRateArray[stepIndex]) * stepCount
+						),
 						Double.NaN,
 						Double.NaN,
 						Double.NaN
@@ -631,108 +625,85 @@ public class PerfectReplicationUncollateralizedFundingStochastic {
 					latentStateVertexContainer
 				);
 
-				aadblCollateralBalance[i][j] = 0.;
-
-				CloseOut cog = new CloseOutBilateral (
-					adblBankSeniorRecoveryRate[j],
-					adblCounterPartyRecoveryRate[j]
+				CloseOut closeOut = new CloseOutBilateral (
+					bankSubordinateRecoveryRateArray[stepIndex],
+					counterPartyRecoveryRateArray[stepIndex]
 				);
 
-				if (0 != j) {
-					aCGV1[j] = BurgardKjaerBuilder.HedgeErrorDualBond (
-						adtVertex[j],
-						aadblPortfolio1Value[i][j],
+				if (0 != stepIndex) {
+					collateralGroupVertex1Array[stepIndex] = BurgardKjaerBuilder.HedgeErrorDualBond (
+						vertexDateArray[stepIndex],
+						portfolio1ValueGrid[pathIndex][stepIndex],
 						0.,
 						0.,
 						0.,
-						new MarketEdge (
-							aMV[j - 1],
-							aMV[j]
-						),
-						cog
+						new MarketEdge (marketVertexArray[stepIndex - 1], marketVertexArray[stepIndex]),
+						closeOut
 					);
 
-					aCGV2[j] = BurgardKjaerBuilder.HedgeErrorDualBond (
-						adtVertex[j],
-						aadblPortfolio2Value[i][j],
+					collateralGroupVertex2Array[stepIndex] = BurgardKjaerBuilder.HedgeErrorDualBond (
+						vertexDateArray[stepIndex],
+						portfolio2ValueGrid[pathIndex][stepIndex],
 						0.,
 						0.,
 						0.,
-						new MarketEdge (
-							aMV[j - 1],
-							aMV[j]
-						),
-						cog
+						new MarketEdge (marketVertexArray[stepIndex - 1], marketVertexArray[stepIndex]),
+						closeOut
 					);
 				} else {
-					aCGV1[j] = BurgardKjaerBuilder.Initial (
-						adtVertex[j],
-						aadblPortfolio1Value[i][0],
-						aMV[j],
-						cog
+					collateralGroupVertex1Array[stepIndex] = BurgardKjaerBuilder.Initial (
+						vertexDateArray[stepIndex],
+						portfolio1ValueGrid[pathIndex][0],
+						marketVertexArray[stepIndex],
+						closeOut
 					);
 
-					aCGV2[j] = BurgardKjaerBuilder.Initial (
-						adtVertex[j],
-						aadblPortfolio2Value[i][0],
-						aMV[j],
-						cog
+					collateralGroupVertex2Array[stepIndex] = BurgardKjaerBuilder.Initial (
+						vertexDateArray[stepIndex],
+						portfolio2ValueGrid[pathIndex][0],
+						marketVertexArray[stepIndex],
+						closeOut
 					);
 				}
 			}
 
-			MarketPath np = MarketPath.FromMarketVertexArray (aMV);
+			MarketPath marketPath = MarketPath.FromMarketVertexArray (marketVertexArray);
 
-			CollateralGroupPath[] aCGP1 = new CollateralGroupPath[] {
-				new CollateralGroupPath (
-					aCGV1,
-					np
-				)
+			CollateralGroupPath[] collateralGroupPath1Array = new CollateralGroupPath[] {
+				new CollateralGroupPath (collateralGroupVertex1Array, marketPath)
 			};
 
-			CollateralGroupPath[] aCGP2 = new CollateralGroupPath[] {
-				new CollateralGroupPath (
-					aCGV2,
-					np
-				)
+			CollateralGroupPath[] collateralGroupPath2Array = new CollateralGroupPath[] {
+				new CollateralGroupPath (collateralGroupVertex2Array, marketPath)
 			};
 
-			aCPGPGround[i] = new MonoPathExposureAdjustment (
+			groundMonoPathExposureAdjustmentArray[pathIndex] = new MonoPathExposureAdjustment (
 				new AlbaneseAndersenFundingGroupPath[] {
 					new AlbaneseAndersenFundingGroupPath (
 						new AlbaneseAndersenNettingGroupPath[] {
-							new AlbaneseAndersenNettingGroupPath (
-								aCGP1,
-								np
-							)
+							new AlbaneseAndersenNettingGroupPath (collateralGroupPath1Array, marketPath)
 						},
-						np
+						marketPath
 					)
 				}
 			);
 
-			aCPGPExtended[i] = new MonoPathExposureAdjustment (
+			extendedMonoPathExposureAdjustmentArray[pathIndex] = new MonoPathExposureAdjustment (
 				new AlbaneseAndersenFundingGroupPath[] {
 					new AlbaneseAndersenFundingGroupPath (
 						new AlbaneseAndersenNettingGroupPath[] {
-							new AlbaneseAndersenNettingGroupPath (
-								aCGP1,
-								np
-							),
-							new AlbaneseAndersenNettingGroupPath (
-								aCGP2,
-								np
-							)
+							new AlbaneseAndersenNettingGroupPath (collateralGroupPath1Array, marketPath),
+							new AlbaneseAndersenNettingGroupPath (collateralGroupPath2Array, marketPath)
 						},
-						np
+						marketPath
 					)
 				}
 			);
 		}
 
 		return new ExposureAdjustmentAggregator[] {
-			new ExposureAdjustmentAggregator (aCPGPGround),
-			new ExposureAdjustmentAggregator (aCPGPExtended)
+			new ExposureAdjustmentAggregator (groundMonoPathExposureAdjustmentArray),
+			new ExposureAdjustmentAggregator (extendedMonoPathExposureAdjustmentArray)
 		};
 	}
 

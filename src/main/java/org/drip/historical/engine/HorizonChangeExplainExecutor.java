@@ -1,11 +1,22 @@
 
 package org.drip.historical.engine;
 
+import org.drip.historical.attribution.PositionChangeComponents;
+import org.drip.historical.attribution.PositionMarketSnap;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,55 +92,78 @@ package org.drip.historical.engine;
 
 /**
  * <i>HorizonChangeExplainExecutor</i> executes the Sequence of Calls for the Calculation of the Component's
- * Horizon Change Explain.
+ * 	Horizon Change Explain. It provides the following Functionality:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></li>
+ * 		<li>Generate the Attribution for the Component's Horizon Change Explain Processor</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/README.md">Historical State Processing Utilities</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/historical/engine/README.md">Product Horizon Change Explain Engine</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class HorizonChangeExplainExecutor {
+public class HorizonChangeExplainExecutor
+{
 
 	/**
 	 * Generate the Attribution for the Component's Horizon Change Explain Processor
 	 * 
-	 * @param hcep The Component's Horizon Change Explain Processor
+	 * @param horizonChangeExplainProcessor The Component's Horizon Change Explain Processor
 	 * 
 	 * @return The Position Change Components containing the Explains
 	 */
 
-	public static final org.drip.historical.attribution.PositionChangeComponents GenerateAttribution (
-		final org.drip.historical.engine.HorizonChangeExplainProcessor hcep)
+	public static final PositionChangeComponents GenerateAttribution (
+		final HorizonChangeExplainProcessor horizonChangeExplainProcessor)
 	{
-		if (null == hcep) return null;
-
-		double dblMarketMeasureValue = hcep.marketMeasureValue();
-
-		java.lang.String strMarketMeasureName = hcep.marketMeasureName();
-
-		org.drip.historical.attribution.PositionMarketSnap pmsFirst = hcep.snapFirstMarketValue();
-
-		if (null == pmsFirst || !pmsFirst.setMarketMeasureName (strMarketMeasureName) ||
-			!pmsFirst.setMarketMeasureValue (dblMarketMeasureValue) || !hcep.updateFixings())
+		if (null == horizonChangeExplainProcessor) {
 			return null;
+		}
 
-		org.drip.historical.attribution.PositionMarketSnap pmsSecond = hcep.snapSecondMarketValue();
+		String marketMeasure = horizonChangeExplainProcessor.marketMeasureName();
 
-		if (null == pmsSecond || !pmsSecond.setMarketMeasureName (strMarketMeasureName) ||
-			!pmsSecond.setMarketMeasureValue (dblMarketMeasureValue))
+		double marketMeasureValue = horizonChangeExplainProcessor.marketMeasureValue();
+
+		PositionMarketSnap t1PositionMarketSnap = horizonChangeExplainProcessor.t1PositionMarketSnap();
+
+		if (null == t1PositionMarketSnap ||
+			!t1PositionMarketSnap.setMarketMeasureName (marketMeasure) ||
+			!t1PositionMarketSnap.setMarketMeasureValue (marketMeasureValue) ||
+			!horizonChangeExplainProcessor.updateFixings())
+		{
 			return null;
+		}
+
+		PositionMarketSnap t2PositionMarketSnap = horizonChangeExplainProcessor.t2PositionMarketSnap();
+
+		if (null == t2PositionMarketSnap ||
+			!t2PositionMarketSnap.setMarketMeasureName (marketMeasure) ||
+			!t2PositionMarketSnap.setMarketMeasureValue (marketMeasureValue))
+		{
+			return null;
+		}
 
 		try {
-			return new org.drip.historical.attribution.PositionChangeComponents (false, pmsFirst, pmsSecond,
-				pmsSecond.cumulativeCouponAmount() - pmsFirst.cumulativeCouponAmount(),
-					hcep.crossHorizonDifferentialMetrics (pmsFirst, pmsSecond));
-		} catch (java.lang.Exception e) {
+			return new PositionChangeComponents (
+				false,
+				t1PositionMarketSnap,
+				t2PositionMarketSnap,
+				t2PositionMarketSnap.cumulativeCouponAmount() -
+					t1PositionMarketSnap.cumulativeCouponAmount(),
+				horizonChangeExplainProcessor.crossHorizonDifferentialMetrics (
+					t1PositionMarketSnap,
+					t2PositionMarketSnap
+				)
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
