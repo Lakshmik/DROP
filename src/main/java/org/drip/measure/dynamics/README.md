@@ -1,46 +1,46 @@
 # DROP Measure Dynamics Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure Dynamics contains Jump Diffusion Evolution Evaluator Variants.
 
 
 ## Class Components
 
- * [***DiffusionEvaluator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluator.java)
+ * [***DiffusionEvaluator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluator.java)
  <i>DiffusionEvaluator</i> implements the Drift/Volatility Evaluators for R<sup>1</sup> Random Diffusion
  Process.
 
- * [***DiffusionEvaluatorLinear***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorLinear.java)
+ * [***DiffusionEvaluatorLinear***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorLinear.java)
  <i>DiffusionEvaluatorLinear</i> implements the Linear Drift and Volatility Evaluators for R<sup>1</sup>
  Random Diffusion Process.
 
- * [***DiffusionEvaluatorLogarithmic***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorLogarithmic.java)
+ * [***DiffusionEvaluatorLogarithmic***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorLogarithmic.java)
  <i>DiffusionEvaluatorLogarithmic</i> evaluates the Drift/Volatility of the Diffusion Random Variable
  Evolution according to R<sup>1</sup> Logarithmic Process.
 
- * [***DiffusionEvaluatorMeanReversion***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorMeanReversion.java)
+ * [***DiffusionEvaluatorMeanReversion***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorMeanReversion.java)
  <i>DiffusionEvaluatorMeanReversion</i> evaluates the Drift/Volatility of the Diffusion Random Variable
  Evolution according to R<sup>1</sup> Mean Reversion Process.
 
- * [***DiffusionEvaluatorOrnsteinUhlenbeck***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorOrnsteinUhlenbeck.java)
+ * [***DiffusionEvaluatorOrnsteinUhlenbeck***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/DiffusionEvaluatorOrnsteinUhlenbeck.java)
  <i>DiffusionEvaluatorOrnsteinUhlenbeck</i> evaluates the Drift/Volatility of the Diffusion Random Variable
  Evolution according to R<sup>1</sup> Ornstein Uhlenbeck Process.
 
- * [***HazardJumpEvaluator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/HazardJumpEvaluator.java)
+ * [***HazardJumpEvaluator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/HazardJumpEvaluator.java)
  <i>HazardJumpEvaluator</i> implements the Hazard Jump Process Point Event Indication Evaluator that guides
  the Single Factor Jump-Termination Random Process Variable Evolution.
 
- * [***LocalEvaluator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/LocalEvaluator.java)
+ * [***LocalEvaluator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/LocalEvaluator.java)
  <i>LocalEvaluator</i> exposes the Random Evolution's Local/Deterministic Evaluators.
 
- * [***OrnsteinUhlenbeck***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/OrnsteinUhlenbeck.java)
+ * [***OrnsteinUhlenbeck***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/OrnsteinUhlenbeck.java)
  <i>OrnsteinUhlenbeck</i> Interface exposes the Reference Parameter Scales the guide the Random Variable Evolution according to Ornstein-Uhlenbeck Mean Reverting Process.
 
- * [***OrnsteinUhlenbeckPair***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/OrnsteinUhlenbeckPair.java)
+ * [***OrnsteinUhlenbeckPair***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/OrnsteinUhlenbeckPair.java)
  <i>OrnsteinUhlenbeckPair</i> guides the Random Variable Evolution according to 2D Ornstein-Uhlenbeck Mean Reverting Process.
 
- * [***SingleJumpEvaluator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics/SingleJumpEvaluator.java)
+ * [***SingleJumpEvaluator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/SingleJumpEvaluator.java)
  <i>SingleJumpEvaluator</i> implements the Single Point Jump Event Indication Evaluator that guides the One
  Factor Jump Random Process Variable Evolution.
 
@@ -60,12 +60,12 @@ DROP Measure Dynamics contains Jump Diffusion Evolution Evaluator Variants.
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

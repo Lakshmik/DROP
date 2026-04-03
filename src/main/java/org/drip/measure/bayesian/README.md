@@ -1,6 +1,6 @@
 # DROP Measure Bayesian Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure Bayesian contains the Functionality to generate the Prior, Conditional, Posterior Theil Bayesian
 	Distributions.
@@ -8,31 +8,31 @@ DROP Measure Bayesian contains the Functionality to generate the Prior, Conditio
 
 ## Class Components
 
- * [***ConjugateParameterPrior***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/ConjugateParameterPrior.java)
+ * [***ConjugateParameterPrior***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/ConjugateParameterPrior.java)
  <i>ConjugateParameterPrior</i> implements the Determinants of the Parameter of the Conjugate Prior.
 
- * [***R1MultivariateConvolutionEngine***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1MultivariateConvolutionEngine.java)
+ * [***R1MultivariateConvolutionEngine***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1MultivariateConvolutionEngine.java)
  <i>R1MultivariateConvolutionEngine</i> implements the Engine that generates the Joint/Posterior Distributions from the Prior and the Conditional Joint Multivariate R<sup>1</sup> Distributions.
 
- * [***R1MultivariateConvolutionMetrics***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1MultivariateConvolutionMetrics.java)
+ * [***R1MultivariateConvolutionMetrics***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1MultivariateConvolutionMetrics.java)
  <i>R1MultivariateConvolutionMetrics</i> holds the Inputs and the Results of a Bayesian Multivariate Convolution Execution.
 
- * [***R1MultivariateNormalConvolutionEngine***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1MultivariateNormalConvolutionEngine.java)
+ * [***R1MultivariateNormalConvolutionEngine***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1MultivariateNormalConvolutionEngine.java)
  <i>R1MultivariateNormalConvolutionEngine</i> implements the Engine that generates the Joint/Posterior Distribution from the Prior and the Conditional Joint R<sup>1</sup> Multivariate Normal Distributions.
 
- * [***R1UnivariateConvolutionEngine***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1UnivariateConvolutionEngine.java)
+ * [***R1UnivariateConvolutionEngine***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1UnivariateConvolutionEngine.java)
  <i>R1UnivariateConvolutionEngine</i> implements the Engine that generates the Joint and the Posterior Distributions from the Prior and the Conditional Multivariate R<sup>1</sup> Distributions.
 
- * [***R1UnivariateConvolutionMetrics***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1UnivariateConvolutionMetrics.java)
+ * [***R1UnivariateConvolutionMetrics***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/R1UnivariateConvolutionMetrics.java)
  <i>R1UnivariateConvolutionMetrics</i> holds the Inputs and the Results of a Bayesian R<sup>1</sup> Univariate Convolution Execution.
 
- * [***ScopingContainer***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/ScopingContainer.java)
+ * [***ScopingContainer***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/ScopingContainer.java)
  <i>ScopingContainer</i> holds the Scoping Variate Distribution, the Projection Variate Distributions, and the Projection Variate Loadings based off of the Scoping Variates.
 
- * [***TheilMixedEstimationModel***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/TheilMixedEstimationModel.java)
+ * [***TheilMixedEstimationModel***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/TheilMixedEstimationModel.java)
  <i>TheilMixedEstimationModel</i> implements the Theil's Mixed Model for the Estimation of the Distribution Parameters.
 
- * [***ViewLoading***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/ViewLoading.java)
+ * [***ViewLoading***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian/ViewLoading.java)
  <i>ViewLoading</i> contains the View Projection Distribution and its Loadings to the Scoping Distribution.
 
 
@@ -53,12 +53,12 @@ DROP Measure Bayesian contains the Functionality to generate the Prior, Conditio
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

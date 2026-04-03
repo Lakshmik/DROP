@@ -2,7 +2,7 @@
 # Statistical Learning Library
 
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 Statistical Learning Library implements the Statistical Learning Analyzers and Machine Learning Schemes.
 
@@ -11,22 +11,22 @@ Statistical Learning Library implements the Statistical Learning Analyzers and M
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/StatisticalLearning/StatisticalLearning_v3.93.pdf) [*Previous*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/StatisticalLearning) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/StatisticalLearning/StatisticalLearning_v3.93.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/StatisticalLearning) |
  | User Guide              |  |
- | API                     | [*Javadoc*](https://lakshmidrip.github.io/DROP/Javadoc/index.html)|
+ | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
 
 ## Component Projects
 
  * *Learning* => Agnostic Learning Bounds under Empirical Loss Minimization Schemes.
-	* { [**Home**](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/learning/README.md) | 
-	[**Project**](https://github.com/lakshmiDRIP/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Alearning) }
+	* { [**Home**](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/learning/README.md) | 
+	[**Project**](https://github.com/lakshmik/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Alearning) }
  * *Sequence* => Bounds Metrics for Random, Custom, and Functional Sequences.
-	* { [**Home**](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sequence/README.md) | 
-	[**Project**](https://github.com/lakshmiDRIP/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Asequence) }
+	* { [**Home**](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sequence/README.md) | 
+	[**Project**](https://github.com/lakshmik/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Asequence) }
  * *Spaces* => R<sup>1</sup> and R<sup>d</sup> Vector/Tensor Spaces (Validated and/or Normed), and Function Classes off of them.
-	* { [**Home**](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/spaces/README.md) | 
-	[**Project**](https://github.com/lakshmiDRIP/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Aspaces) }
+	* { [**Home**](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/spaces/README.md) | 
+	[**Project**](https://github.com/lakshmik/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Aspaces) }
 
 
 ## Coverage
@@ -451,12 +451,12 @@ Statistical Learning Library implements the Statistical Learning Analyzers and M
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://lakshmidrip.github.io/DROP/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://lakshmik.github.io/DROP/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

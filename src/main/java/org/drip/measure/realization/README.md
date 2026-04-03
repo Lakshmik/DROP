@@ -1,36 +1,36 @@
 # DROP Measure Realization Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure Realization implements the Stochastic Jump Diffusion Vertex Edge.
 
 
 ## Class Components
 
- * [***DiffusionEvolver***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/DiffusionEvolver.java)
+ * [***DiffusionEvolver***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/DiffusionEvolver.java)
  <i>DiffusionEvolver</i> implements the Functionality that guides the Single Factor R<sup>1</sup> Diffusion Random Process Variable Evolution.
 
- * [***JumpDiffusionEdge***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionEdge.java)
+ * [***JumpDiffusionEdge***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionEdge.java)
  <i>JumpDiffusionEdge</i> implements the Deterministic and the Stochastic Components of a R<sup>d</sup>
  Marginal Random Increment Edge as well the Original Marginal Random Variate.
 
- * [***JumpDiffusionEdgeUnit***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionEdgeUnit.java)
+ * [***JumpDiffusionEdgeUnit***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionEdgeUnit.java)
  <i>JumpDiffusionEdgeUnit</i> holds the Jump Diffusion R<sup>d</sup> Unit Edge Realizations.
 
- * [***JumpDiffusionEvolver***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionEvolver.java)
+ * [***JumpDiffusionEvolver***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionEvolver.java)
  <i>JumpDiffusionEvolver</i> implements the Functionality that guides the Single Factor R<sup>1</sup> Jump Diffusion Random Process Variable Evolution.
 
- * [***JumpDiffusionVertex***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionVertex.java)
+ * [***JumpDiffusionVertex***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/JumpDiffusionVertex.java)
  <i>JumpDiffusionVertex</i> holds the Snapshot Values of the Realized R<sup>d</sup> Variable - its Value,
  whether it has terminated, and the Cumulative Hazard Integral - and Time.
 
- * [***StochasticEdgeDiffusion***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/StochasticEdgeDiffusion.java)
+ * [***StochasticEdgeDiffusion***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/StochasticEdgeDiffusion.java)
  <i>StochasticEdgeDiffusion</i> holds the Edge of the Diffusion Stochastic Evaluator Outcome.
 
- * [***StochasticEdgeJump***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/StochasticEdgeJump.java)
+ * [***StochasticEdgeJump***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/StochasticEdgeJump.java)
  <i>StochasticEdgeJump</i> holds the Edge of the Jump Stochastic Evaluator Outcome.
 
- * [***VertexRdSequence***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization/VertexRdSequence.java)
+ * [***VertexRdSequence***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization/VertexRdSequence.java)
  <i>VertexRdSequence</i> holds the R<sup>d</sup> Realizations at the Individual Vertexes.
 
 
@@ -54,12 +54,12 @@ DROP Measure Realization implements the Stochastic Jump Diffusion Vertex Edge.
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

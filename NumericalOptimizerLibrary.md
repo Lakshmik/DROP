@@ -2,7 +2,7 @@
 # Numerical Optimizer Library
 
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 Numerical Optimizer Library contains the supporting Functionality for Numerical Optimization - including Constrained and Mixed Integer Non-Linear Optimizers.
 
@@ -11,16 +11,16 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer/NumericalOptimizer_v7.14.pdf) [*Previous*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/NumericalOptimizer) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer/NumericalOptimizer_v7.14.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer) |
  | User Guide              |  |
- | API                     | [*Javadoc*](https://lakshmidrip.github.io/DROP/Javadoc/index.html)|
+ | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
 
 ## Component Projects
 
  * *Optimization* => Necessary, Sufficient, and Regularity Checks for Gradient Descent in a Constrained Optimization Setup.
-	* { [**Home**](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/optimization/README.md) | 
-	[**Project**](https://github.com/lakshmiDRIP/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Aoptimization) }
+	* { [**Home**](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/optimization/README.md) | 
+	[**Project**](https://github.com/lakshmik/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Aoptimization) }
 
 
 ## Coverage
@@ -153,12 +153,12 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://lakshmidrip.github.io/DROP/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://lakshmik.github.io/DROP/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

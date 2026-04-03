@@ -2,7 +2,7 @@
 # Regression Analytics Library
 
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 Regression Analytics Library maintains various Variants of Regression Analytics, across different Penalizing Norms.
 
@@ -11,9 +11,9 @@ Regression Analytics Library maintains various Variants of Regression Analytics,
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics/RegressionAnalytics_v5.70.pdf) [*Previous*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/RegressionAnalytics) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics/RegressionAnalytics_v5.70.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics) |
  | User Guide              |  |
- | API                     | [*Javadoc*](https://lakshmidrip.github.io/DROP/Javadoc/index.html)|
+ | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
 
 ## Component Projects
@@ -83,12 +83,12 @@ Regression Analytics Library maintains various Variants of Regression Analytics,
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://lakshmidrip.github.io/DROP/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://lakshmik.github.io/DROP/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

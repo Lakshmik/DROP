@@ -31,13 +31,13 @@ import org.drip.measure.state.LabelledRdContinuousDistribution;
  *  	numerical analysis, numerical optimization, spline builder, model validation, statistical learning,
  *  	graph builder/navigator, and computational support.
  *  
- *  	https://lakshmidrip.github.io/DROP/
+ *  	https://.github.io/DROP/
  *  
  *  DROP is composed of three modules:
  *  
- *  - DROP Product Core - https://lakshmidrip.github.io/DROP-Product-Core/
- *  - DROP Portfolio Core - https://lakshmidrip.github.io/DROP-Portfolio-Core/
- *  - DROP Computational Core - https://lakshmidrip.github.io/DROP-Computational-Core/
+ *  - DROP Product Core - https://.github.io/DROP-Product-Core/
+ *  - DROP Portfolio Core - https://.github.io/DROP-Portfolio-Core/
+ *  - DROP Computational Core - https://.github.io/DROP-Computational-Core/
  * 
  * 	DROP Product Core implements libraries for the following:
  * 	- Fixed Income Analytics
@@ -65,15 +65,15 @@ import org.drip.measure.state.LabelledRdContinuousDistribution;
  * 
  * 	Documentation for DROP is Spread Over:
  * 
- * 	- Main                     => https://lakshmidrip.github.io/DROP/
- * 	- Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * 	- GitHub                   => https://github.com/lakshmiDRIP/DROP
- * 	- Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * 	- Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * 	- Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * 	- Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * 	- Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * 	- Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * 	- Main                     => https://.github.io/DROP/
+ * 	- Wiki                     => https://github.com//DROP/wiki
+ * 	- GitHub                   => https://github.com//DROP
+ * 	- Repo Layout Taxonomy     => https://github.com//DROP/blob/master/Taxonomy.md
+ * 	- Javadoc                  => https://.github.io/DROP/Javadoc/index.html
+ * 	- Technical Specifications => https://github.com//DROP/tree/master/Docs/Internal
+ * 	- Release Versions         => https://.github.io/DROP/version.html
+ * 	- Community Credits        => https://.github.io/DROP/credits.html
+ * 	- Issues Catalog           => https://github.com//DROP/issues
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *   	you may not use this file except in compliance with the License.
@@ -100,10 +100,10 @@ import org.drip.measure.state.LabelledRdContinuousDistribution;
  *
  *	<br>
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
- *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
- *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
- *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/README.md">R<sup>d</sup> Continuous/Discrete Probability Measures</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian/README.md">Prior, Conditional, Posterior Theil Bayesian</a></td></tr>
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com//DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com//DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com//DROP/tree/master/src/main/java/org/drip/measure/README.md">R<sup>d</sup> Continuous/Discrete Probability Measures</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com//DROP/tree/master/src/main/java/org/drip/measure/bayesian/README.md">Prior, Conditional, Posterior Theil Bayesian</a></td></tr>
  *  </table>
  *	<br>
  *

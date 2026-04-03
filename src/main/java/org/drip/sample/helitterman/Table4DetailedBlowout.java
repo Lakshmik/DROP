@@ -33,13 +33,13 @@ import org.drip.service.env.EnvManager;
  *  	numerical analysis, numerical optimization, spline builder, model validation, statistical learning,
  *  	graph builder/navigator, and computational support.
  *  
- *  	https://lakshmidrip.github.io/DROP/
+ *  	https://lakshmik.github.io/DROP/
  *  
  *  DROP is composed of three modules:
  *  
- *  - DROP Product Core - https://lakshmidrip.github.io/DROP-Product-Core/
- *  - DROP Portfolio Core - https://lakshmidrip.github.io/DROP-Portfolio-Core/
- *  - DROP Computational Core - https://lakshmidrip.github.io/DROP-Computational-Core/
+ *  - DROP Product Core - https://lakshmik.github.io/DROP-Product-Core/
+ *  - DROP Portfolio Core - https://lakshmik.github.io/DROP-Portfolio-Core/
+ *  - DROP Computational Core - https://lakshmik.github.io/DROP-Computational-Core/
  * 
  * 	DROP Product Core implements libraries for the following:
  * 	- Fixed Income Analytics
@@ -67,15 +67,15 @@ import org.drip.service.env.EnvManager;
  * 
  * 	Documentation for DROP is Spread Over:
  * 
- * 	- Main                     => https://lakshmidrip.github.io/DROP/
- * 	- Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * 	- GitHub                   => https://github.com/lakshmiDRIP/DROP
- * 	- Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * 	- Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * 	- Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * 	- Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * 	- Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * 	- Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * 	- Main                     => https://lakshmik.github.io/DROP/
+ * 	- Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * 	- GitHub                   => https://github.com/lakshmik/DROP
+ * 	- Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * 	- Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * 	- Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * 	- Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * 	- Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * 	- Issues Catalog           => https://github.com/lakshmik/DROP/issues
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *   	you may not use this file except in compliance with the License.
@@ -105,10 +105,10 @@ import org.drip.service.env.EnvManager;
  *  
  * <br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/helitterman/README.md">He Litterman (1999) Projection Loadings</a></li>
+ *		<li><b>Module </b> = <a href = "https://github.com/lakshmik/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
+ *		<li><b>Library</b> = <a href = "https://github.com/lakshmik/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
+ *		<li><b>Project</b> = <a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
+ *		<li><b>Package</b> = <a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/helitterman/README.md">He Litterman (1999) Projection Loadings</a></li>
  *  </ul>
  * <br><br>
  *

@@ -1,46 +1,46 @@
 # DROP Measure Distribution Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure Distribution implements the R<sup>1</sup> R<sup>d</sup> Continuous Random Measure.
 
 
 ## Class Components
 
- * [***I1ContinuousUniform***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/I1ContinuousUniform.java)
+ * [***I1ContinuousUniform***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/I1ContinuousUniform.java)
  <i>I1ContinuousUniform</i> implements the Univariate Bounded Uniform Integer Distribution, with the Integer being generated between a (n inclusive) lower and an upper Bound.
 
- * [***R1Continuous***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1Continuous.java)
+ * [***R1Continuous***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1Continuous.java)
  <i>R1Continuous</i> exposes the Base Abstract Class behind continuous R<sup>1</sup> Distributions. It exports the Methods for incremental, cumulative, and inverse cumulative distribution densities.
 
- * [***R1ContinuousPareto***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousPareto.java)
+ * [***R1ContinuousPareto***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousPareto.java)
  <i>R1ContinuousPareto</i> implements the R<sup>1</sup> Continuous Pareto Distribution.
 
- * [***R1ContinuousPowerLaw***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousPowerLaw.java)
+ * [***R1ContinuousPowerLaw***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousPowerLaw.java)
  <i>R1ContinuousPowerLaw</i> implements the R<sup>1</sup> Continuous Power Law Distribution.
 
- * [***R1ContinuousUniform***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousUniform.java)
+ * [***R1ContinuousUniform***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousUniform.java)
  <i>R1ContinuousUniform</i> implements the Univariate R<sup>1</sup> Uniform Distribution. It implements the Incremental, the Cumulative, and the Inverse Cumulative Distribution Densities.
 
- * [***R1ContinuousUniformPiecewiseDisplaced***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousUniformPiecewiseDisplaced.java)
+ * [***R1ContinuousUniformPiecewiseDisplaced***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousUniformPiecewiseDisplaced.java)
  <i>R1ContinuousUniformPiecewiseDisplaced</i> implements the Continuous Uniform Displaced Piecewise Linear R<sup>1</sup> Distributions. It exports the Methods corresponding to the R<sup>1</sup> Lebesgue Base Class.
 
- * [***R1ContinuousUniformPiecewiseLinear***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousUniformPiecewiseLinear.java)
+ * [***R1ContinuousUniformPiecewiseLinear***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1ContinuousUniformPiecewiseLinear.java)
  <i>R1ContinuousUniformPiecewiseLinear</i> implements the Piecewise Linear R<sup>1</sup> Distributions. It exports the Methods corresponding to the R<sup>1</sup> Lebesgue Base Class.
 
- * [***R1Discrete***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1Discrete.java)
+ * [***R1Discrete***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1Discrete.java)
  <i>R1Discrete</i> implements the Discrete Distribution over the Combinatorial R<sup>1</sup> Outcomes.
 
- * [***R1R1Continuous***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1R1Continuous.java)
+ * [***R1R1Continuous***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/R1R1Continuous.java)
  <i>R1R1Continuous</i> implements the Base Abstract Class behind Bivariate R<sup>1</sup> Distributions. It exports Methods for Incremental, Cumulative, and Inverse Cumulative Distribution Densities.
 
- * [***RdContinuous***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/RdContinuous.java)
+ * [***RdContinuous***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/RdContinuous.java)
  <i>RdContinuous</i> implements the Base Abstract Class behind R<sup>d</sup> Distributions. It exports Methods for incremental, cumulative, and inverse cumulative Distribution Densities.
 
- * [***RdContinuousUniform***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/RdContinuousUniform.java)
+ * [***RdContinuousUniform***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/RdContinuousUniform.java)
  <i>RdContinuousUniform</i> contains the R<sup>d</sup> Continuous Uniform Distribution inside a Fixed Support.
 
- * [***RdR1Continuous***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/distribution/RdR1Continuous.java)
+ * [***RdR1Continuous***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/distribution/RdR1Continuous.java)
  <i>RdR1Continuous</i> implements the Base Abstract Class behind R<sup>d</sup> X R<sup>1</sup> Distributions. It exports Methods for incremental, cumulative, and inverse cumulative Distribution Densities.
 
 
@@ -59,12 +59,12 @@ DROP Measure Distribution implements the R<sup>1</sup> R<sup>d</sup> Continuous 
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

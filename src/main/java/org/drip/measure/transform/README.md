@@ -1,19 +1,19 @@
 # DROP Measure Transform Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure Transform contains Functionality for Expressing one Measure Using Another.
 
 
 ## Class Components
 
- * [***FromExponential***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/transform/FromExponential.java)
+ * [***FromExponential***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/transform/FromExponential.java)
  <i>FromExponential</i> transforms R<sup>1</sup> Exponential Distribution to Derived Distributions.
 
- * [***R1GammaToExponential***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/transform/R1GammaToExponential.java)
+ * [***R1GammaToExponential***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/transform/R1GammaToExponential.java)
  <i>R1GammaToExponential</i> implements the R<sup>1</sup> Exponential Distribution in Terms of the R<sup>1</sup> Gamma Distribution.
 
- * [***R1GammaToMaxwellBoltzmannSquared***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/transform/R1GammaToMaxwellBoltzmannSquared.java)
+ * [***R1GammaToMaxwellBoltzmannSquared***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/transform/R1GammaToMaxwellBoltzmannSquared.java)
  <i>R1GammaToMaxwellBoltzmannSquared</i> implements the Maxwell-Boltzmann Squared Distribution using the R<sup>1</sup> Gamma Distribution.
 
 
@@ -40,12 +40,12 @@ DROP Measure Transform contains Functionality for Expressing one Measure Using A
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

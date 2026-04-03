@@ -1,52 +1,52 @@
 # DROP Measure
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure implements R<sup>d</sup> Continuous/Discrete Probability Measures.
 
 
 ## Component Packages
 
- * [***Bayesian***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bayesian)
+ * [***Bayesian***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bayesian)
  DROP Measure Bayesian implements Prior, Conditional, Posterior, and Theil Bayesian Distributions.
 
- * [***Bridge***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/bridge)
+ * [***Bridge***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/bridge)
  DROP Measure Bridge implements Broken Date Brownian Bridge Interpolator.
 
- * [***Chi Squared***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/chisquare)
+ * [***Chi Squared***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/chisquare)
  DROP Measure Chi-Square implements Chi-Square Distribution Implementation/Properties.
 
- * [***Continuous***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/continuous)
+ * [***Continuous***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/continuous)
  DROP Measure Continuous implements R<sup>1</sup> R<sup>d</sup> Continuous Random Measure.
 
- * [***CRNG***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/crng)
+ * [***CRNG***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/crng)
  DROP Measure Discrete implements Continuous Random Number Stream Generator.
 
- * [***Discrete***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/discrete)
+ * [***Discrete***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/discrete)
  DROP Measure Discrete implements Antithetic, Quadratically Re-sampled, De-biased Distribution.
 
- * [***Dynamics***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/dynamics)
+ * [***Dynamics***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics)
  DROP Measure Dynamics implements Jump Diffusion Evolution Evaluator Variants.
 
- * [***Gaussian***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gaussian)
+ * [***Gaussian***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gaussian)
  DROP Measure Gaussian implements R<sup>1</sup> R<sup>d</sup> Covariant Gaussian Quadrature.
 
- * [***Joint***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/joint)
+ * [***Joint***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/joint)
  DROP Measure Joint implements R<sup>d</sup> Vertex Edge Realization Evolution.
 
- * [***Lebesgue***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/lebesgue)
+ * [***Lebesgue***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/lebesgue)
  DROP Measure Lebesgue implements Uniform Piece-wise Lebesgue Measure.
 
- * [***Process***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/process)
+ * [***Process***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/process)
  DROP Measure Process implements Jump Diffusion Evolver Process Variants.
 
- * [***Realization***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/realization)
+ * [***Realization***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/realization)
  DROP Measure Realization implements Stochastic Jump Diffusion Vertex Edge.
 
- * [***Statistics***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/statistics)
+ * [***Statistics***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/statistics)
  DROP Measure Stochastic implements R<sup>1</sup> R<sup>d</sup> Thin and Thick Moments.
 
- * [***Stochastic***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/stochastic)
+ * [***Stochastic***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/stochastic)
  DROP Measure Stochastic implements R<sup>1</sup> R<sup>1</sup> To R<sup>1</sup> Process.
 
 
@@ -106,12 +106,12 @@ DROP Measure implements R<sup>d</sup> Continuous/Discrete Probability Measures.
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

@@ -1,49 +1,49 @@
 # DROP Measure Gamma Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure Gamma holds R<sup>1</sup> Gamma Distribution Implementation/Properties.
 
 
 ## Class Components
 
- * [***ConjugateScalePrior***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/ConjugateScalePrior.java)
+ * [***ConjugateScalePrior***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/ConjugateScalePrior.java)
  <i>ConjugateScalePrior</i> implements the Determinants of the Parameters of the Conjugate Prior for the Scale Parameter.
 
- * [***ConjugateShapePrior***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/ConjugateShapePrior.java)
+ * [***ConjugateShapePrior***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/ConjugateShapePrior.java)
  <i>ConjugateShapePrior</i> implements the Determinants of the Parameters of the Conjugate Prior for the Shape Parameter.
 
- * [***ConjugateShapeScalePrior***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/ConjugateShapeScalePrior.java)
+ * [***ConjugateShapeScalePrior***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/ConjugateShapeScalePrior.java)
  <i>ConjugateShapeScalePrior</i> implements the Determinants of the Parameters of the Conjugate Prior for the Shape and the Scale Parameters.
 
- * [***ErlangDistribution***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/ErlangDistribution.java)
+ * [***ErlangDistribution***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/ErlangDistribution.java)
  <i>ErlangDistribution</i> implements the Shape and Scale Parameterization of the R<sup>1</sup> Erlang Distribution.
 
- * [***ExponentialFamilyRepresentation***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/ExponentialFamilyRepresentation.java)
+ * [***ExponentialFamilyRepresentation***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/ExponentialFamilyRepresentation.java)
  <i>ExponentialFamilyRepresentation</i> represents the Natural Parameters and the Natural Statistics of the R<sup>1</sup> Exponential Family of Distributions.
 
- * [***R1ConsistentEstimator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ConsistentEstimator.java)
+ * [***R1ConsistentEstimator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ConsistentEstimator.java)
  <i>R1ConsistentEstimator</i> implements the Mixed Type Log-Moment Parameter Estimator for a Sequence of Observations.
 
- * [***R1InvariantScaleParameterEstimator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1InvariantScaleParameterEstimator.java)
+ * [***R1InvariantScaleParameterEstimator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1InvariantScaleParameterEstimator.java)
  <i>R1InvariantScaleParameterEstimator</i> implements the Scale Parameter Estimator using Scale-Invariant Prior for the Scale Parameter under a Sequence of Observations.
 
- * [***R1MaximumLikelihoodEstimator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1MaximumLikelihoodEstimator.java)
+ * [***R1MaximumLikelihoodEstimator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1MaximumLikelihoodEstimator.java)
  <i>R1MaximumLikelihoodEstimator</i> implements the Maximum Likelihood Based Parameter Estimator for aSequence of Observations.
 
- * [***R1ParameterEstimator***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ParameterEstimator.java)
+ * [***R1ParameterEstimator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ParameterEstimator.java)
  <i>R1ParameterEstimator</i> exposes the Parameter Estimator for a Sequence of Observations.
 
- * [***R1ShapeScaleComposite***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ShapeScaleComposite.java)
+ * [***R1ShapeScaleComposite***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ShapeScaleComposite.java)
  <i>R1ShapeScaleComposite</i> implements the Scale-Scale Composite Measures.
 
- * [***R1ShapeScaleDiscrete***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ShapeScaleDiscrete.java)
+ * [***R1ShapeScaleDiscrete***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ShapeScaleDiscrete.java)
  <i>R1ShapeScaleDiscrete</i> generates Discrete Variables that are Derivatives of the R<sup>1</sup> Gamma Distribution.
 
- * [***R1ShapeScaleDistribution***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ShapeScaleDistribution.java)
+ * [***R1ShapeScaleDistribution***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/R1ShapeScaleDistribution.java)
  <i>R1ShapeScaleDistribution</i> implements the Shape and Scale Parameterization of the R<sup>1</sup> Gamma Distribution.
 
- * [***ShapeScaleParameters***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/gamma/ShapeScaleParameters.java)
+ * [***ShapeScaleParameters***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/gamma/ShapeScaleParameters.java)
  <i>ShapeScaleParameters</i> holds the Shape and the Scale Parameters corresponding to a Gamma Distribution.
 
 
@@ -62,12 +62,12 @@ DROP Measure Gamma holds R<sup>1</sup> Gamma Distribution Implementation/Propert
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

@@ -2,7 +2,7 @@
 # Asset Allocation Analytics Library
 
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 Asset Allocation Analytics Library implements Optimal Portfolio Construction and Asset Allocation Functionality.
 
@@ -11,16 +11,16 @@ Asset Allocation Analytics Library implements Optimal Portfolio Construction and
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/AssetAllocationAnalytics/AssetAllocationAnalytics_v6.75.pdf) [*Previous*](https://github.com/lakshmiDRIP/DROP/blob/master/Docs/Internal/AssetAllocationAnalytics) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/AssetAllocationAnalytics/AssetAllocationAnalytics_v6.75.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/AssetAllocationAnalytics) |
  | User Guide              |  |
- | API                     | [*Javadoc*](https://lakshmidrip.github.io/DROP/Javadoc/index.html)|
+ | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
 
 ## Component Projects
 
  * *Portfolio Construction* => Optimal and Constrained Portfolio Construction Functionality.
-	* { [**Home**](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/portfolioconstruction/README.md) | 
-	[**Project**](https://github.com/lakshmiDRIP/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Aportfolioconstruction) }
+	* { [**Home**](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/portfolioconstruction/README.md) | 
+	[**Project**](https://github.com/lakshmik/DROP/issues?q=is%3Aopen+is%3Aissue+label%3Aportfolioconstruction) }
 
 
 ## Coverage
@@ -211,12 +211,12 @@ Asset Allocation Analytics Library implements Optimal Portfolio Construction and
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://lakshmidrip.github.io/DROP/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://lakshmik.github.io/DROP/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

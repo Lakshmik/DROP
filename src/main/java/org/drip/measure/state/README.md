@@ -1,25 +1,25 @@
 # DROP Measure State Package
 
-<p align="center"><img src="https://github.com/lakshmiDRIP/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
+<p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 
 DROP Measure State implements Labels for Latent State Identifiers.
 
 
 ## Class Components
 
- * [***LabelledRd***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRd.java)
+ * [***LabelledRd***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRd.java)
  <i>LabelledRd</i> is the Base Class that holds the Labeled Latent State Vertex Content.
 
- * [***LabelledRdContinuousDistribution***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdContinuousDistribution.java)
+ * [***LabelledRdContinuousDistribution***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdContinuousDistribution.java)
  <i>LabelledRdContinuousDistribution</i> contains the Generalized, Labelled R<sup>1</sup> Multivariate Distributions.
 
- * [***LabelledRdCorrelation***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdCorrelation.java)
+ * [***LabelledRdCorrelation***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdCorrelation.java)
  <i>LabelledRdCorrelation</i> holds the Correlations between any Stochastic Variates identified by their Labels.
 
- * [***LabelledRdCovariance***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdCovariance.java)
+ * [***LabelledRdCovariance***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdCovariance.java)
  <i>LabelledRdCovariance</i> holds the Covariance between any Stochastic Variates identified by their Labels, as well as their Means.
 
- * [***LabelledRdRealizationSequence***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdRealizationSequence.java)
+ * [***LabelledRdRealizationSequence***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/state/LabelledRdRealizationSequence.java)
  <i>LabelledRdRealizationSequence</i> holds the Labeled R<sup>d</sup> Multi-Factor Latent State Vertex Realizations.
 
 
@@ -44,12 +44,12 @@ DROP Measure State implements Labels for Latent State Identifiers.
 
 ## DROP Specifications
 
- * Main                     => https://lakshmidrip.github.io/DROP/
- * Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
- * GitHub                   => https://github.com/lakshmiDRIP/DROP
- * Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
- * Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
- * Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
- * Release Versions         => https://lakshmidrip.github.io/DROP/version.html
- * Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
- * Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * Main                     => https://lakshmik.github.io/DROP/
+ * Wiki                     => https://github.com/lakshmik/DROP/wiki
+ * GitHub                   => https://github.com/lakshmik/DROP
+ * Repo Layout Taxonomy     => https://github.com/lakshmik/DROP/blob/master/Taxonomy.md
+ * Javadoc                  => https://lakshmik.github.io/DROP/Javadoc/index.html
+ * Technical Specifications => https://github.com/lakshmik/DROP/tree/master/Docs/Internal
+ * Release Versions         => https://lakshmik.github.io/DROP/version.html
+ * Community Credits        => https://lakshmik.github.io/DROP/credits.html
+ * Issues Catalog           => https://github.com/lakshmik/DROP/issues

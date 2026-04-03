@@ -30,6 +30,14 @@ import org.drip.xva.vertex.BurgardKjaerBuilder;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,9 +112,9 @@ import org.drip.xva.vertex.BurgardKjaerBuilder;
 
 /**
  * <i>SemiReplicationCollateralizedFundingStochastic</i> examines the Basel BCBS 2012 OTC Accounting Impact
- * to a Portfolio of 10 Swaps resulting from the Addition of a New Swap - Comparison via both FVA/FDA and
- * FCA/FBA Schemes. Simulation is carried out under the following Criteria using one of the Generalized
- * Burgard Kjaer (2013) Scheme.
+ * 	to a Portfolio of 10 Swaps resulting from the Addition of a New Swap - Comparison via both FVA/FDA and
+ * 	FCA/FBA Schemes. Simulation is carried out under the following Criteria using one of the Generalized
+ * 	Burgard Kjaer (2013) Scheme.
  *  
  * <br><br>
  *  <ul>
@@ -154,53 +162,48 @@ import org.drip.xva.vertex.BurgardKjaerBuilder;
  *  </ul>
  *  
  * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/burgard2013/README.md">Burgard Kjaer (2013) Valuation Adjustments</a></li>
- *  </ul>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/burgard2013/README.md">Burgard Kjaer (2013) Valuation Adjustments</a></td></tr>
+ *  </table>
  * <br><br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class SemiReplicationCollateralizedFundingStochastic {
+public class SemiReplicationCollateralizedFundingStochastic
+{
 
 	private static final double[] NumeraireValueRealization (
-		final DiffusionEvolver deNumeraireValue,
-		final double dblNumeraireValueInitial,
-		final double dblTime,
-		final double dblTimeWidth,
-		final double[] adblRandom,
-		final int iNumStep)
+		final DiffusionEvolver numeraireValueDiffusionEvolver,
+		final double initialNumeraireValue,
+		final double time,
+		final double timeWidth,
+		final double[] randomArray,
+		final int stepCount)
 		throws Exception
 	{
-		double[] adblNumeraireValue = new double[iNumStep + 1];
-		adblNumeraireValue[0] = dblNumeraireValueInitial;
-		double[] adblTimeWidth = new double[iNumStep];
+		double[] numeraireValueArray = new double[stepCount + 1];
+		double[] timeWidthArray = new double[stepCount];
+		numeraireValueArray[0] = initialNumeraireValue;
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblTimeWidth[i] = dblTimeWidth;
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			timeWidthArray[stepIndex] = timeWidth;
+		}
 
-		JumpDiffusionEdge[] aJDE = deNumeraireValue.incrementSequence (
-			new JumpDiffusionVertex (
-				dblTime,
-				dblNumeraireValueInitial,
-				0.,
-				false
-			),
-			JumpDiffusionEdgeUnit.Diffusion (
-				adblTimeWidth,
-				adblRandom
-			),
-			dblTimeWidth
+		JumpDiffusionEdge[] jumpDiffusionEdgeArray = numeraireValueDiffusionEvolver.incrementSequence (
+			new JumpDiffusionVertex (time, initialNumeraireValue, 0., false),
+			JumpDiffusionEdgeUnit.Diffusion (timeWidthArray, randomArray),
+			timeWidth
 		);
 
-		for (int j = 1; j <= iNumStep; ++j)
-			adblNumeraireValue[j] = aJDE[j - 1].finish();
+		for (int stepIndex = 1; stepIndex <= stepCount; ++stepIndex) {
+			numeraireValueArray[stepIndex] = jumpDiffusionEdgeArray[stepIndex - 1].finish();
+		}
 
-		return adblNumeraireValue;
+		return numeraireValueArray;
 	}
 
 	private static final double[] VertexNumeraireRealization (
