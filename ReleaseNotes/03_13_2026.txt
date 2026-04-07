@@ -1,0 +1,52 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #1 (1, 2, 3)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #2 (4, 5, 6)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #3 (7, 8, 9)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #4 (10, 11, 12)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #5 (13, 14, 15)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #6 (16, 17, 18)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #7 (19, 20, 21)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #8 (22, 23, 24)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #9 (25, 26, 27)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #10 (28, 29, 30)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #11 (31, 32, 33)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding #12 (34)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #1 (35, 36)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #2 (37, 38)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #3 (37, 38, 39)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #4 (40, 41, 42)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #5 (43, 44, 45)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #6 (46, 47, 48)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #7 (49, 50, 51)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #8 (52, 53, 54)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #9 (55, 56, 57)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #10 (58, 59, 60)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #21 (61, 62, 63)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #22 (64, 65, 66)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #23 (67, 68, 69)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #24 (70, 71, 72)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #25 (73, 74, 75)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #26 (76, 77, 78)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #27 (79, 80, 81)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #28 (82, 83, 84)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #29 (85, 86, 87)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #30 (88, 89, 90)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #31 (91, 92, 93)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #32 (94, 95, 96)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #33 (97, 98, 99)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #34 (100, 101, 102)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #35 (103, 104, 105)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #36 (106, 107, 108)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #37 (109, 110, 111)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #38 (112, 113, 114)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #39 (115, 116, 117)
+	- Burgard 2013 Semi-Replication Uncollateralized Funding Stochastic #40 (118, 119, 120)
+
+
+IdeaDRIP:
