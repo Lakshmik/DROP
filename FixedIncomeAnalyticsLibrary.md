@@ -254,6 +254,25 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 	* Some Trivial Closed Form Analytical Bond Math Results
  * Municipal Rate Dynamics and Tax Adjustment
  * Scaling of Yield Volatility in Pricing Callable Tax-exempt Municipal Bonds
+	* Abstract
+	* Introduction
+	* Background
+	* Spot Rates and Forward Rates
+	* Spot Dates
+	* Forward Rates
+	* Interest Rate Volatility
+	* Binomial Interest Rate Tree
+	* Volatility and Standard Deviation
+	* Determining the Value at a Node
+	* Constructing a Binomial Interest Rate Tree
+	* Using the Binomial Tree
+	* Valuing a Callable Bond
+	* Transaction Costs
+	* Other Embedded Options
+	* After-tax Valuation
+	* The Challenge of Implementation
+	* References
+ * A Model for Valuing Bonds with Embedded Options
 	* Background
 	* Yield Analysis and Calibration of Scaling Factor
  * Conservative PIK Bond Modeling Strategy
