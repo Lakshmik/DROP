@@ -1,0 +1,50 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- Burgard 2013 Setoff Uncollateralized Funding #1 (1, 2, 3)
+	- Burgard 2013 Setoff Uncollateralized Funding #2 (4, 5, 6)
+	- Burgard 2013 Setoff Uncollateralized Funding #3 (7, 8, 9)
+	- Burgard 2013 Setoff Uncollateralized Funding #4 (10, 11, 12)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #1 (13, 14, 15)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #2 (16, 17, 18)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #3 (19, 20, 21)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #4 (22, 23, 24)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #5 (25, 26, 27)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #6 (28, 29, 30)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #7 (31, 32, 33)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #8 (34, 35, 36)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #9 (37, 38, 39)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #10 (40, 41, 42)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #11 (43, 44, 45)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #12 (46, 47, 48)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #13 (49, 50, 51)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #14 (52, 53, 54)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #15 (55, 56, 57)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #16 (58, 59, 60)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #17 (61, 62, 63)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #18 (64, 65, 66)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #19 (67, 68, 69)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #20 (70, 71, 72)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #21 (73, 74, 75)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #22 (76, 77, 78)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #23 (79, 80, 81)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #24 (82, 83, 84)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #25 (85, 86, 87)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #26 (88, 89, 90)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #27 (91, 92, 93)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #28 (94, 95, 96)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #29 (97, 98, 99)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #30 (100, 101, 102)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #31 (103, 104, 105)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #32 (106, 107, 108)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #33 (109, 110, 111)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #34 (112, 113, 114)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #35 (115, 116, 117)
+	- Burgard 2013 Setoff Uncollateralized Funding Stochastic #36 (118, 119, 120)
+
+
+IdeaDRIP:
