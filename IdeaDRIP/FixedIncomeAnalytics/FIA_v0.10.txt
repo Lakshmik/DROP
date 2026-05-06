@@ -1,0 +1,214 @@
+
+ --------------------------
+ #1 - GBP/EUR/AUD Bond Futures Valuation
+ --------------------------
+ --------------------------
+	- Deliverable Basket
+		- Basket Components and their Conversion Factors
+		- Nominal yield for short term vs long term
+	- For GBP/EUR - deliver CTD as a physical settle
+	- For AUD, deliver the basket as a cash settle
+	- Contract Value = num Contracts X Nominal per Contract X Futures Price / Face Value
+	- AUD Futures quoted as yield, so price implied 100 - Quote for standardized bond yield
+	- GBP/EUR ZSP01 = num Contracts X Nominal per Contract X ZSP01_CTD / Face Value
+		- Tenor IR01 similar
+		- Repo Curve IR01 similar
+	- AUD ZSP01:
+		- [Sum(ZSP01_i/DV01_i)]/num Contracts X Nominal per Contract X DV01_f / Face Value
+		- Tenor IR01 similar
+		- Repo Curve IR01 similar
+	- DV01_f: Hypothetical AUD bond's DV01
+	- Deliverable bond CTD basis = (Clean prx of deliverable - P X CF_deliverable) X 32
+	- Repo curve based forward price of the deliverable bond
+		- Repo rate points may be interpolated
+	- Repo based Bond Forward NPV
+	- Forward Price of the CTD
+ --------------------------
+
+ --------------------------
+ #2 - Municipal Rate Dynamics and Tax Adjustment
+ --------------------------
+ --------------------------
+	- Muni Short-rate Relationship to Treasury
+	- Tax adjusted Muni Short-rate Dynamics
+ --------------------------
+
+ --------------------------
+ #3 - Scaling of Yield Volatility in Pricing Callable Tax-exempt Municipal Bonds
+ --------------------------
+ --------------------------
+	- Yield Analysis and Calibration of Scaling Factor
+ --------------------------
+
+ --------------------------
+ #4 - A Model for Valuing Bonds with Embedded Options
+ --------------------------
+ --------------------------
+	- Transaction Costs
+		- Refinancing Costs on a Call => Debt refinanced on a call - transaction costs
+		- Tree incorporation - Call option exercise should exceed the refinancing costs
+		- Debt Refinancing at Maturity in the tree
+	- After-tax Valuation
+		- Bonds on an After-tax Basis
+		- Scaling the Yield Curve by the Tax Rate => Multiplying the entire on-the-run yield curve by 1-TaxRate
+		- Impact of Volatility in the Tax-adjusted Curve
+ --------------------------
+
+ --------------------------
+ #5 - Conservative PIK Bond Modeling Strategy (COMPLETE)
+ --------------------------
+ --------------------------
+	- Absolute value of total risks after the application of PIK for each payment period is larger than the cash coupon
+	- Mathematical Proof
+ --------------------------
+
+ --------------------------
+ #6 - Floating Rate Indexes
+ --------------------------
+ --------------------------
+	- Swap Indexes
+	- Overnight Indexed Swaps
+	- TED Spread
+	- SOFR
+		- SOFR Lookback
+ --------------------------
+
+ --------------------------
+ #7 - Over-The-Counter Instruments
+ --------------------------
+ --------------------------
+	- Forward Rate Agreement
+	- Interest Rate Swaps
+	- Vanilla IRS
+		- Main/Other currencies
+		- Compounding
+	- Basis Swaps: IBOR for IBOR
+	- Cross-Currency Swap, IBOR for IBOR
+	- Constant Maturity Swaps
+	- Swaption
+	- Forex and Forward Swaps
+ --------------------------
+
+ --------------------------
+ #8 - PnL Explain
+ --------------------------
+ --------------------------
+	- Attribution Steps – EOD Revaluation: PnL(T+1B)=V_EOD (T+1B)-V_EOD (T)
+	- PnL Attribution Steps:
+		– PnL(T+1B)=PnL_Explained (T+1B)+PnL_Unexplained (T+1B)
+		- PnL_Explained=PL_θ+PL_SOD+PL_∆+PL_Π+PL_fix
+	- Model Based Valuations:
+		- Dynamic Nature of Calibration Instruments
+			- Price of the traded calibration deals fluctuate
+			- Calibration trades themselves expire and can be replaced
+		- Contribution from Trade Activity: Position Π(t) => new trade activity, up-sizing
+		- Contribution from Fixings and Results: Fix(t)
+		- Full Revaluation at EOD:
+			- V_EOD (T)=V(T,m(T,s(T)),Fix(T),Π(T))
+			- V_EOD (T+1B)=V(T+1B,m(T+1B,s(T+1B)),Fix(T+1B),Π(T+1B))
+	- PnL Attribution Steps – Time Decay - V_θ (T+1B) and 〖PnL〗_θ
+		- Forward Roll of Curves to T+1B: Moving the date forward from T→T+1B
+	- Risk-Based Valuations V ̃_PRED (T+1B) and PnL_∆
+		- PnL_∆=∑_i▒〖∂V/(∂s_i ) ∆s_i 〗+1/2 ∑_ij▒〖(∂^2 V)/(∂s_i ∂s_j ) ∆s_i ∆s_j 〗
+		- V ̃_PRED (T+1B)=V_SOD (T+1B)+PnL_∆
+		- Changes to the Trading Portfolio: Π(T+1B)=Π(T)+Π_NEW (T+1B)
+		- EOD Valuation V_(EOD-Only) (T+1B):
+		- Existing portfolio Π(T): new EOD fixings/portfolio elements
+			- Against the new market state data s(T+1B)
+		- EOD Valuation V_(EOD-Π) (T+1B) and PnL_Π: New trades, unwinds, up-sizing, etc.
+		- EOD Valuation V_EOD (T+1B) and PnL_Fix
+	- Theta Breakdown:
+		- Total Rolled Metric - 〖TRV〗_(t+1B,m)=〖PV〗_(t+1B,m)+c_(t,t+1B)
+		- θ(t,t+1B)=〖PV〗_(t+1B,SOD)-〖PV〗_(t,EOD)+c_(t,t+1B)=〖TRV〗_(t+1B,SOD)-〖PV〗_(t,EOD)
+		-〖PV〗_(t,m)=c_t+〖NPV〗_(t,m)=c_t+∑_(t=1)^n▒〖P_m (t,s_i ) c_(s_i ) 〗
+		- θ(t,t+1B)=
+			∑_(i=1)^n▒〖P_SOD (t+1B,s_i ) c_(s_i ) 〗-[c_t+∑_(i=1)^n▒〖P_EOD (t,s_i ) c_(s_i ) 〗]+c_(t,t+1B)=(c_(t,t+1B)-c_t )+∑_(i=1)^n▒〖c_(s_i ) [P_SOD (t+1B,s_i )-P_EOD (t,s_i )] 〗=c_t  (P_EOD (t,t)-P_EOD (t,t+1B))/(P_EOD (t,t+1B) )+∑_(i=1)^n▒〖c_(s_i ) [P_SOD (t+1B,s_i )-P_EOD (t,s_i )] 〗
+		- θ(t,t+1B)=θ_DECAY (t,t+1B)-θ_INSTRUMENT (t,t+1B)
+			- θ_DECAY (t,t+1B)=〖TRV〗_(t+1B,ROLLED)-〖PV〗_(t,EOD)
+			- θ_INSTRUMENT (t,t+1B)=〖TRV〗_(t+1B,SOD)-〖TRV〗_(t+1B,ROLLED)=〖PV〗_(t+1B,SOD)-〖PV〗_(t+1B,ROLLED)
+		- Rolled Model Not Viable: Some SOD methods do not provide a viable model
+			- m=Rolled(t+1B) => m=SOD(t+1B)
+			- θ_DECAY (t,t+1B)
+				=〖TRV〗_(t+1B,ROLLED)-〖PV〗_(t,EOD)=〖TRV〗_(t+1B,SOD)-〖PV〗_(t,EOD)
+				=〖PV〗_(t+1B,SOD)+c_t-〖PV〗_(t,EOD)=〖PV〗_(t+1B,SOD)-(〖PV〗_(t,EOD)-c_t )
+				=〖PV〗_(t+1B,SOD)-〖NPV〗_(tB,SOD)
+			- θ_INSTRUMENT (t,t+1B)
+				=〖PV〗_(t+1B,SOD)-〖PV〗_(t+1B,ROLLED)
+				=〖PV〗_(t+1B,SOD)-〖PV〗_(t+1B,SOD)=0
+ --------------------------
+
+ --------------------------
+ #9 - The SABR Model
+ --------------------------
+ --------------------------
+	- Introduction
+		- β=0 => Normal
+		- β=1 => Log-normal
+	- SABR Model Closed Form => Black '76 implied volatility
+		- σ_Model (K,f_0 )=A.(z/χ(z) ).B
+		- A=σ_0/((f_0 K)^((1-β)/2) [1+{(1-β)^2/24 〖log〗^2  f_0/K+(1-β)^4/1920 〖log〗^4  f_0/K+⋯}] )
+		- B=[1+{(1-β)^2/24-〖σ_0〗^2/(f_0 K)^(1-β) +(ρβvσ_0)/(4(f_0 K)^((1-β)/2) )+〖2-3ρ〗^2/24 v^2 }+⋯]
+		- z=v/σ_0  (f_0 K)^((1-β)/2)  log⁡〖f_0/K〗
+		- χ(z)=log⁡〖(√(z^2-2ρz+1)+z-ρ)/(1-ρ)〗
+	- Parameter Estimation
+		- Implied Volatility Curve Shape
+			- Parameter	"Curve Property"	Definition
+			  --------- ----------------    ----------
+			- σ_0		Level				The curve shifts upwards as it increases
+			- β			Slope				The curve steepens as it decreases
+			- ρ			Slope				The curve steepens as it decreases
+			- v			Curvature			The curvature increases as it increases
+		- Calibrate Parameters
+			- Estimate β
+			- Imply σ_0 from ρ and v
+			- Calibrate ρ and v
+			- A common industry practice: β=0.5
+		- Step 1 - Estimate β
+			- σ_(ATM,Market)≈σ_Model (f_0,f_0 )=σ_0/〖f_0〗^(1-β)  {1+[(1-β)^2/24  〖σ_0〗^2/〖f_0〗^(2-2β) +(ρβvσ_0)/(4〖f_0〗^(1-β) )+(2-3ρ^2)/24 v^2 ]T}
+			- log⁡〖σ_(ATM,Market) 〗=log⁡〖σ_0 〗-(1-β)  log⁡〖f_0 〗
+			- β be estimated from a linear regression between the log ATM volatilities and the log forward rate time series
+		- Step 2 - Imply σ_0 from ρ and v
+			- Invert the above equation to obtain the following cubic equation in σ_0
+			- [((1-β)^2 T)/(24〖f_0〗^(2-2β) )] 〖σ_0〗^3+[ρβvT/(4〖f_0〗^(1-β) )] 〖σ_0〗^2+[1+(2-3ρ^2)/24 v^2 T] σ_0-σ_(ATM,Market) 〖f_0〗^(1-β)=0
+		- Smallest Positive Solution σ_0
+			- σ_0, as the smallest positive real root to this equation.
+			- Function of the parameters ρ and v, which will be calibrated in the next step
+		- Step 3 - Calibrate ρ and v:
+			- Choose parameters that bring the model volatilities down to the market quote implied volatilities
+				- (ρ,v)=■(arg⁡min@ρ,v) ∑_i▒[σ ̂_i (ρ,v)-σ_(i,Market) ]^2 
+		- Step 3 Full Surface Calibration
+			- Steps 1, 2, and 3, SABR in its primitive form is relatively straightforward to calibrate
+			- Calibration to a volatility surface σ(K,T) (or a volatility cube σ(K,T_α,T_β ) in the case of swap options), process complicated
+			- So SABR fixes the forward rate (and T) and calibrates to a smile/skew curve with respect to the K
+ --------------------------
+
+ --------------------------
+ #10 - The SABR Volatility Model
+ --------------------------
+ --------------------------
+	- Dynamics
+		- Stochastic Dynamics of F(t) and A(t)
+			- ∆F(t)=A(t) 〖F(t)〗^β ∆W(t)
+			- ∆A(t)=αA(t)∆Z(t)
+		- ∆W(t)∆Z(t)=ρ∆T
+		- α≥0; 0≤β≤1
+	- Asymptotic Solution
+		- European Call Closed-form Solution - Asymptotic Solution using Tα^2 Series
+	- Black Lognormal Model Implied Volatility
+		- C(F)=F^β
+		- F_Mid midpoint between F(T_0 ) and K – such as geometric average √(F(T_0 )∙K) or arithmetic average (F(T_0 )+K)/2
+		- γ_1=1/C(F_Mid ) ∙dC(F_Mid )/(dF_Mid )=β/F_Mid 
+		- γ_2=1/C(F_Mid ) ∙(d^2 C(F_Mid ))/(dF_Mid^2 )=-β(1-β)/(F_Mid^2 )
+		- ς=α/σ(T_0 )  ∫_K^F(T_0 )▒dx/C(x) =α/σ(T_0 )(1-β)  [F(T_0 )^(1-β)-K^(1-β) ]
+		- D(ς)=log⁡〖(√(1-2ρς+ς^2 )+ς-ρ)/(1-ρ)〗
+		- σ_(IMPLIED,Lognormal)=α  log⁡(F(T_0 )/K)/D(ς)  {1+[(2γ_2-γ_1^2+1/(F_Mid^2 ))/24  (A(T_0 )C(F_Mid ) ) ̅^2/α+(ργ_1)/4  A(T_0 )C(F_Mid )/α+(2-3ρ^2)/24]ε}
+		- K→F(T_0 ) => log⁡(F(T_0 )/K)/D(ς) => 1
+		- σ_(IMPLIED,Normal)=α (F(T_0 )-K)/D(ς)  {[(2γ_2-γ_1^2)/24  (A(T_0 )C(F_Mid ) ) ̅^2/α+(ργ_1)/4  A(T_0 )C(F_Mid )/α+(2-3ρ^2)/24]ε}
+	- SABR for the Negative Rates
+		- ∆F(t)=σ(t) [F(t)+s]^β ∆W(t)
+		- Shifts Included in Market Quotes
+		- Anotonov, Konikov, and Spector (2015) Model
+			- ∆F(t)=σ(t) |F(t)|^β ∆W(t)
+			- ∆σ(t)=ασ(t)∆Z(t)
+			- 0≤β≤1/2 and free boundary condition for F≡0
+ --------------------------

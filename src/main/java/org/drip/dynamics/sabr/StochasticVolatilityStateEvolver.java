@@ -95,112 +95,18 @@ package org.drip.dynamics.sabr;
  */
 
 public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolution.PointStateEvolver {
-	private double _dblRho = java.lang.Double.NaN;
-	private double _dblBeta = java.lang.Double.NaN;
 	private double _dblIdiosyncraticRho = java.lang.Double.NaN;
-	private double _dblVolatilityOfVolatility = java.lang.Double.NaN;
+	private ForwardProcessParameters _forwardProcessParameters = null;
 	private org.drip.state.identifier.ForwardLabel _lslForward = null;
 	private org.drip.sequence.random.UnivariateSequenceGenerator _usgForwardRate = null;
 	private org.drip.sequence.random.UnivariateSequenceGenerator _usgForwardRateVolatilityIdiosyncratic =
 		null;
 
 	/**
-	 * Create a Gaussian SABR Instance
-	 * 
-	 * @param lslForward The Forward Rate Latent State Label
-	 * @param dblRho SABR Rho
-	 * @param dblVolatilityOfVolatility SABR Volatility Of Volatility
-	 * @param usgForwardRate The Forward Rate Univariate Sequence Generator
-	 * @param usgForwardRateVolatilityIdiosyncratic The Idiosyncratic Component Forward Rate Volatility
-	 *  Univariate Sequence Generator
-	 * 
-	 * @return The Gaussian SABR Instance
-	 */
-
-	public static final StochasticVolatilityStateEvolver Gaussian (
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final double dblRho,
-		final double dblVolatilityOfVolatility,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRate,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRateVolatilityIdiosyncratic)
-	{
-		try {
-			return new StochasticVolatilityStateEvolver (lslForward, 0., dblRho, dblVolatilityOfVolatility,
-				usgForwardRate, usgForwardRateVolatilityIdiosyncratic);
-		} catch (java.lang.Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Create a Log-normal SABR Instance
-	 * 
-	 * @param lslForward The Forward Rate Latent State Label
-	 * @param dblRho SABR Rho
-	 * @param dblVolatilityOfVolatility SABR Volatility Of Volatility
-	 * @param usgForwardRate The Forward Rate Univariate Sequence Generator
-	 * @param usgForwardRateVolatilityIdiosyncratic The Idiosyncratic Component Forward Rate Volatility
-	 *  Univariate Sequence Generator
-	 * 
-	 * @return The Log-normal SABR Instance
-	 */
-
-	public static final StochasticVolatilityStateEvolver Lognormal (
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final double dblRho,
-		final double dblVolatilityOfVolatility,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRate,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRateVolatilityIdiosyncratic)
-	{
-		try {
-			return new StochasticVolatilityStateEvolver (lslForward, 1., dblRho, dblVolatilityOfVolatility,
-				usgForwardRate, usgForwardRateVolatilityIdiosyncratic);
-		} catch (java.lang.Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Create a Constant Elasticity of Variance SABR Instance
-	 * 
-	 * @param lslForward The Forward Rate Latent State Label
-	 * @param dblBeta SABR Beta
-	 * @param dblRho SABR Rho
-	 * @param usgForwardRate The Forward Rate Univariate Sequence Generator
-	 * @param usgForwardRateVolatilityIdiosyncratic The Idiosyncratic Component Forward Rate Volatility
-	 *  Univariate Sequence Generator
-	 * 
-	 * @return The Constant Elasticity of Variance SABR Instance
-	 */
-
-	public static final StochasticVolatilityStateEvolver CEV (
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final double dblBeta,
-		final double dblRho,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRate,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRateVolatilityIdiosyncratic)
-	{
-		try {
-			return new StochasticVolatilityStateEvolver (lslForward, dblBeta, dblRho, 0., usgForwardRate,
-				usgForwardRateVolatilityIdiosyncratic);
-		} catch (java.lang.Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
 	 * StochasticVolatilityStateEvolver Constructor
 	 * 
 	 * @param lslForward The Forward Rate Latent State Label
-	 * @param dblBeta SABR Beta
-	 * @param dblRho SABR Rho
-	 * @param dblVolatilityOfVolatility SABR Volatility Of Volatility
+	 * @param forwardProcessParameters <i>ForwardProcessParameters</i> Instance
 	 * @param usgForwardRate The Forward Rate Univariate Sequence Generator
 	 * @param usgForwardRateVolatilityIdiosyncratic The Idiosyncratic Component Forward Rate Volatility
 	 *  Univariate Sequence Generator
@@ -210,22 +116,33 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 
 	public StochasticVolatilityStateEvolver (
 		final org.drip.state.identifier.ForwardLabel lslForward,
-		final double dblBeta,
-		final double dblRho,
-		final double dblVolatilityOfVolatility,
+		final ForwardProcessParameters forwardProcessParameters,
 		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRate,
 		final org.drip.sequence.random.UnivariateSequenceGenerator usgForwardRateVolatilityIdiosyncratic)
 		throws java.lang.Exception
 	{
-		if (null == (_lslForward = lslForward) || !org.drip.numerical.common.NumberUtil.IsValid (_dblBeta =
-			dblBeta) || !org.drip.numerical.common.NumberUtil.IsValid (_dblRho = dblRho) || _dblRho < -1. ||
-				_dblRho > 1. || !org.drip.numerical.common.NumberUtil.IsValid (_dblVolatilityOfVolatility =
-					dblVolatilityOfVolatility) || null == (_usgForwardRate = usgForwardRate) || (0. !=
-						_dblVolatilityOfVolatility && null == (_usgForwardRateVolatilityIdiosyncratic =
-							usgForwardRateVolatilityIdiosyncratic)))
+		if (null == (_lslForward = lslForward) ||
+			null == (_forwardProcessParameters = forwardProcessParameters) ||
+			null == (_usgForwardRate = usgForwardRate) ||
+			null == (_usgForwardRateVolatilityIdiosyncratic = usgForwardRateVolatilityIdiosyncratic))
+		{
 			throw new java.lang.Exception ("StochasticVolatilityStateEvolver ctr => Invalid Inputs");
+		}
 
-		_dblIdiosyncraticRho = java.lang.Math.sqrt (1. - _dblRho * _dblRho);
+		double rho = forwardProcessParameters.rho();
+
+		_dblIdiosyncraticRho = java.lang.Math.sqrt (1. - rho * rho);
+	}
+
+	/**
+	 * Retrieve the <i>ForwardProcessParameters</i> Instance
+	 * 
+	 * @return The <i>ForwardProcessParameters</i> Instance
+	 */
+
+	public ForwardProcessParameters forwardProcessParameters()
+	{
+		return _forwardProcessParameters;
 	}
 
 	/**
@@ -247,7 +164,7 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 
 	public double volatilityOfVolatility()
 	{
-		return _dblVolatilityOfVolatility;
+		return _forwardProcessParameters.alpha();
 	}
 
 	/**
@@ -258,7 +175,7 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 
 	public double beta()
 	{
-		return _dblBeta;
+		return _forwardProcessParameters.beta();
 	}
 
 	/**
@@ -269,7 +186,7 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 
 	public double rho()
 	{
-		return _dblRho;
+		return _forwardProcessParameters.rho();
 	}
 
 	/**
@@ -319,10 +236,11 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 			double dblForwardRateVolatility = fruPrev.forwardRateVolatility();
 
 			double dblForwardRateIncrement = dblForwardRateVolatility * java.lang.Math.pow (dblForwardRate,
-				_dblBeta) * dblAnnualizedIncrementSQRT * dblForwardRateZ;
+				_forwardProcessParameters.beta()) * dblAnnualizedIncrementSQRT * dblForwardRateZ;
 
-			double dblForwardRateVolatilityIncrement = _dblVolatilityOfVolatility * dblForwardRateVolatility
-				* dblAnnualizedIncrementSQRT * (_dblRho * dblForwardRateZ + _dblIdiosyncraticRho *
+			double dblForwardRateVolatilityIncrement = _forwardProcessParameters.volVol() *
+				dblForwardRateVolatility * dblAnnualizedIncrementSQRT * (_forwardProcessParameters.rho() *
+					dblForwardRateZ + _dblIdiosyncraticRho *
 					_usgForwardRateVolatilityIdiosyncratic.random());
 
 			return org.drip.dynamics.sabr.ForwardRateUpdate.Create (_lslForward, iSpotDate, iSpotDate +
@@ -356,13 +274,18 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 				(dblSigma0))
 			return null;
 
-		double dblF0KExpSQRT = java.lang.Math.pow (dblATMForwardRate, 1. - _dblBeta);
+		double rho = _forwardProcessParameters.rho();
+
+		double beta = _forwardProcessParameters.beta();
+
+		double alpha = _forwardProcessParameters.alpha();
+
+		double dblF0KExpSQRT = java.lang.Math.pow (dblATMForwardRate, 1. - beta);
 
 		double dblA = dblSigma0 / dblF0KExpSQRT;
-		double dblB = 1. + dblTTE * (((1. - _dblBeta) * (1. - _dblBeta) * dblSigma0 * dblSigma0 / (24. *
-			dblF0KExpSQRT * dblF0KExpSQRT)) + (_dblRho * _dblBeta * _dblVolatilityOfVolatility * dblSigma0 /
-				(4. * dblF0KExpSQRT)) + ((2. - 3. * _dblRho * _dblRho) * _dblVolatilityOfVolatility *
-					_dblVolatilityOfVolatility / 24.));
+		double dblB = 1. + dblTTE * (((1. - beta) * (1. - beta) * dblSigma0 * dblSigma0 / (24. *
+			dblF0KExpSQRT * dblF0KExpSQRT)) + (rho * beta * alpha * dblSigma0 / (4. * dblF0KExpSQRT)) + ((2.
+				- 3. * rho * rho) * alpha * alpha / 24.));
 
 		try {
 			return new org.drip.dynamics.sabr.ImpliedBlackVolatility (dblATMForwardRate, dblATMForwardRate,
@@ -400,21 +323,26 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 		if (dblStrike == dblATMForwardRate)
 			return computeATMBlackVolatility (dblATMForwardRate, dblTTE, dblSigma0);
 
+		double rho = _forwardProcessParameters.rho();
+
+		double beta = _forwardProcessParameters.beta();
+
+		double alpha = _forwardProcessParameters.alpha();
+
 		double dblLogF0ByK = java.lang.Math.log (dblATMForwardRate / dblStrike);
 
-		double dblF0KExpSQRT = java.lang.Math.pow (dblATMForwardRate * dblStrike, 0.5 * (1. - _dblBeta));
+		double dblF0KExpSQRT = java.lang.Math.pow (dblATMForwardRate * dblStrike, 0.5 * (1. - beta));
 
-		double dblZ = _dblVolatilityOfVolatility * dblF0KExpSQRT * dblLogF0ByK / dblSigma0;
-		double dblOneMinusBetaLogF0ByK = (1. - _dblBeta) * (1. - _dblBeta) * dblLogF0ByK * dblLogF0ByK;
+		double dblZ = alpha * dblF0KExpSQRT * dblLogF0ByK / dblSigma0;
+		double dblOneMinusBetaLogF0ByK = (1. - beta) * (1. - beta) * dblLogF0ByK * dblLogF0ByK;
 		double dblA = dblSigma0 / (dblF0KExpSQRT * (1. + (dblOneMinusBetaLogF0ByK / 24.) +
 			(dblOneMinusBetaLogF0ByK * dblOneMinusBetaLogF0ByK / 1920.)));
-		double dblB = 1. + dblTTE * (((1. - _dblBeta) * (1. - _dblBeta) * dblSigma0 * dblSigma0 / (24. *
-			dblF0KExpSQRT * dblF0KExpSQRT)) + (_dblRho * _dblBeta * _dblVolatilityOfVolatility * dblSigma0 /
-				(4. * dblF0KExpSQRT)) + ((2. - 3. * _dblRho * _dblRho) * _dblVolatilityOfVolatility *
-					_dblVolatilityOfVolatility / 24.));
+		double dblB = 1. + dblTTE * (((1. - beta) * (1. - beta) * dblSigma0 * dblSigma0 / (24. *
+			dblF0KExpSQRT * dblF0KExpSQRT)) + (rho * beta * alpha * dblSigma0 /
+				(4. * dblF0KExpSQRT)) + ((2. - 3. * rho * rho) * alpha * alpha / 24.));
 
-		double dblChiZ = java.lang.Math.log ((java.lang.Math.sqrt (1. - 2. * _dblRho * dblZ + dblZ * dblZ) +
-			dblZ - _dblRho) / (1. - _dblRho));
+		double dblChiZ = java.lang.Math.log ((java.lang.Math.sqrt (1. - 2. * rho * dblZ + dblZ * dblZ) +
+			dblZ - rho) / (1. - rho));
 
 		try {
 			return new org.drip.dynamics.sabr.ImpliedBlackVolatility (dblStrike, dblATMForwardRate, dblTTE,

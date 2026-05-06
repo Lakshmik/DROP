@@ -115,9 +115,7 @@ public class BlackVolatility {
 				"USD",
 				"6M"
 			),
-			dblBeta,
-			dblRho,
-			dblVolatilityOfVolatility,
+			new ForwardProcessParameters (dblBeta, dblRho, dblVolatilityOfVolatility),
 			new BoxMullerGaussian (
 				0.,
 				1.
