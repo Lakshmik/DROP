@@ -116,7 +116,7 @@ public class ForwardRateEvolution {
 				"USD",
 				"6M"
 			),
-			new ForwardProcessParameters (dblBeta, dblRho, dblVolatilityOfVolatility),
+			new ForwardProcessParameters (dblBeta, dblRho, dblVolatilityOfVolatility, 0.),
 			new BoxMullerGaussian (
 				0.,
 				1.

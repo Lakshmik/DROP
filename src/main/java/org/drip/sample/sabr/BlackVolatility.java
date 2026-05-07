@@ -105,9 +105,7 @@ import org.drip.state.identifier.ForwardLabel;
 public class BlackVolatility {
 
 	private static StochasticVolatilityStateEvolver SABREvolver (
-		final double dblBeta,
-		final double dblRho,
-		final double dblVolatilityOfVolatility)
+		final ForwardProcessParameters forwardProcessParameters)
 		throws Exception
 	{
 		return new StochasticVolatilityStateEvolver (
@@ -115,7 +113,7 @@ public class BlackVolatility {
 				"USD",
 				"6M"
 			),
-			new ForwardProcessParameters (dblBeta, dblRho, dblVolatilityOfVolatility),
+			forwardProcessParameters,
 			new BoxMullerGaussian (
 				0.,
 				1.
@@ -176,11 +174,10 @@ public class BlackVolatility {
 			0.25, 0.50, 0.75, 1.00, 2.00, 3.00, 4.00, 5.00, 7.00, 9.99
 		};
 
-		StochasticVolatilityStateEvolver seSABR = SABREvolver (
-			dblBeta,
-			dblRho,
-			dblVolatilityOfVolatility
-		);
+		ForwardProcessParameters forwardProcessParameters =
+			new ForwardProcessParameters (dblBeta, dblRho, dblVolatilityOfVolatility, 0.);
+
+		StochasticVolatilityStateEvolver seSABR = SABREvolver (forwardProcessParameters);
 
 		System.out.println ("\n\t|------------------------------------------------|");
 

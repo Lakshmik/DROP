@@ -119,6 +119,7 @@ public class ForwardProcessParameters
 	private double _rho = Double.NaN;
 	private double _beta = Double.NaN;
 	private double _alpha = Double.NaN;
+	private double _shift = Double.NaN;
 
 	/**
 	 * Construct a CEV Instance of <i>ForwardProcessParameters</i>
@@ -132,7 +133,7 @@ public class ForwardProcessParameters
 		final double beta)
 	{
 		try {
-			return new ForwardProcessParameters (0., beta, 0.);
+			return new ForwardProcessParameters (0., beta, 0., 0.);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -154,7 +155,31 @@ public class ForwardProcessParameters
 		final double rho)
 	{
 		try {
-			return new ForwardProcessParameters (alpha, 0., rho);
+			return new ForwardProcessParameters (alpha, 0., rho, 0.);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Construct a Shifted Normal Instance of <i>ForwardProcessParameters</i>
+	 * 
+	 * @param alpha SABR Alpha
+	 * @param rho SABR Rho
+	 * @param shift SABR Shift
+	 * 
+	 * @return Shifted Normal Instance of <i>ForwardProcessParameters</i>
+	 */
+
+	public static final ForwardProcessParameters ShiftedNormal (
+		final double alpha,
+		final double rho,
+		final double shift)
+	{
+		try {
+			return new ForwardProcessParameters (alpha, 0., rho, shift);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -176,7 +201,31 @@ public class ForwardProcessParameters
 		final double rho)
 	{
 		try {
-			return new ForwardProcessParameters (alpha, 1., rho);
+			return new ForwardProcessParameters (alpha, 1., rho, 0.);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Construct a Shifted Log-normal Instance of <i>ForwardProcessParameters</i>
+	 * 
+	 * @param alpha SABR Alpha
+	 * @param rho SABR Rho
+	 * @param shift SABR Shift
+	 * 
+	 * @return Shifted Log-normal Instance of <i>ForwardProcessParameters</i>
+	 */
+
+	public static final ForwardProcessParameters ShiftedLognormal (
+		final double alpha,
+		final double rho,
+		final double shift)
+	{
+		try {
+			return new ForwardProcessParameters (alpha, 1., rho, shift);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -190,6 +239,7 @@ public class ForwardProcessParameters
 	 * @param alpha SABR Alpha
 	 * @param beta SABR Beta
 	 * @param rho SABR Rho
+	 * @param shift SABR Shift
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
@@ -197,12 +247,14 @@ public class ForwardProcessParameters
 	public ForwardProcessParameters (
 		final double alpha,
 		final double beta,
-		final double rho)
+		final double rho,
+		final double shift)
 		throws Exception
 	{
 		if (!NumberUtil.IsValid (_alpha = alpha) || 0. > _alpha ||
 			!NumberUtil.IsValid (_beta = beta) || 0. > _beta || 1. < _beta ||
-			!NumberUtil.IsValid (_rho = rho) || -1. > _rho || 1. < _rho)
+			!NumberUtil.IsValid (_rho = rho) || -1. > _rho || 1. < _rho ||
+			!NumberUtil.IsValid (_shift = shift))
 		{
 			throw new Exception ("ForwardProcessParameters Constructor => Invalid Inputs");
 		}
@@ -250,5 +302,16 @@ public class ForwardProcessParameters
 	public double volVol()
 	{
 		return _alpha;
+	}
+
+	/**
+	 * Retrieve the SABR Shift
+	 * 
+	 * @return SABR Shift
+	 */
+
+	public double shift()
+	{
+		return _shift;
 	}
 }

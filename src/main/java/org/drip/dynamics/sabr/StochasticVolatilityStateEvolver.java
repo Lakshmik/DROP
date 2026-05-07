@@ -221,8 +221,8 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 		if (iViewDate < iSpotDate || null == lsqmPrev || !(lsqmPrev instanceof
 			org.drip.dynamics.sabr.ForwardRateUpdate))
 			return null;
-		double dblForwardRateZ = _usgForwardRate.random();
 
+		double dblForwardRateZ = _usgForwardRate.random();
 
 		double dblAnnualizedIncrement = 1. * iSpotTimeIncrement / 365.25;
 		org.drip.dynamics.sabr.ForwardRateUpdate fruPrev = (org.drip.dynamics.sabr.ForwardRateUpdate)
@@ -235,8 +235,9 @@ public class StochasticVolatilityStateEvolver implements org.drip.dynamics.evolu
 
 			double dblForwardRateVolatility = fruPrev.forwardRateVolatility();
 
-			double dblForwardRateIncrement = dblForwardRateVolatility * java.lang.Math.pow (dblForwardRate,
-				_forwardProcessParameters.beta()) * dblAnnualizedIncrementSQRT * dblForwardRateZ;
+			double dblForwardRateIncrement = dblForwardRateVolatility * java.lang.Math.pow (dblForwardRate +
+				_forwardProcessParameters.shift(), _forwardProcessParameters.beta()) *
+					dblAnnualizedIncrementSQRT * dblForwardRateZ;
 
 			double dblForwardRateVolatilityIncrement = _forwardProcessParameters.volVol() *
 				dblForwardRateVolatility * dblAnnualizedIncrementSQRT * (_forwardProcessParameters.rho() *
