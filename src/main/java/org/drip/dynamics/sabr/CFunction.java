@@ -1,6 +1,7 @@
 
 package org.drip.dynamics.sabr;
 
+import org.drip.function.definition.R1ToR1;
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -76,8 +77,7 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>ForwardProcessParameters</i> contains the Settings that determine the SABR Dynamics. The References
- * 	are:
+ * <i>CFunction</i> exposes the Variants of the SABR C Function. The References are:
  *  
  * <br><br>
  *  <ul>
@@ -114,204 +114,128 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ForwardProcessParameters
+public abstract class CFunction
+	extends R1ToR1
 {
-	private double _rho = Double.NaN;
-	private double _beta = Double.NaN;
-	private double _alpha = Double.NaN;
-	private double _shift = Double.NaN;
 
 	/**
-	 * Construct a CEV Instance of <i>ForwardProcessParameters</i>
-	 * 
-	 * @param beta SABR Beta
-	 * 
-	 * @return CEV Instance of <i>ForwardProcessParameters</i>
+	 * Empty <i>CFunction</i> Constructor
 	 */
 
-	public static final ForwardProcessParameters CEV (
-		final double beta)
+	public CFunction()
 	{
-		try {
-			return new ForwardProcessParameters (0., beta, 0., 0.);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		super (null);
 	}
 
 	/**
-	 * Construct a Normal Instance of <i>ForwardProcessParameters</i>
+	 * C Value for the given Shifted Forward
 	 * 
-	 * @param alpha SABR Alpha
-	 * @param rho SABR Rho
+	 * @param shiftedForward Shifted Forward
 	 * 
-	 * @return Normal Instance of <i>ForwardProcessParameters</i>
-	 */
-
-	public static final ForwardProcessParameters Normal (
-		final double alpha,
-		final double rho)
-	{
-		try {
-			return new ForwardProcessParameters (alpha, 0., rho, 0.);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Construct a Shifted Normal Instance of <i>ForwardProcessParameters</i>
-	 * 
-	 * @param alpha SABR Alpha
-	 * @param rho SABR Rho
-	 * @param shift SABR Shift
-	 * 
-	 * @return Shifted Normal Instance of <i>ForwardProcessParameters</i>
-	 */
-
-	public static final ForwardProcessParameters ShiftedNormal (
-		final double alpha,
-		final double rho,
-		final double shift)
-	{
-		try {
-			return new ForwardProcessParameters (alpha, 0., rho, shift);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Construct a Log-normal Instance of <i>ForwardProcessParameters</i>
-	 * 
-	 * @param alpha SABR Alpha
-	 * @param rho SABR Rho
-	 * 
-	 * @return Log-normal Instance of <i>ForwardProcessParameters</i>
-	 */
-
-	public static final ForwardProcessParameters Lognormal (
-		final double alpha,
-		final double rho)
-	{
-		try {
-			return new ForwardProcessParameters (alpha, 1., rho, 0.);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Construct a Shifted Log-normal Instance of <i>ForwardProcessParameters</i>
-	 * 
-	 * @param alpha SABR Alpha
-	 * @param rho SABR Rho
-	 * @param shift SABR Shift
-	 * 
-	 * @return Shifted Log-normal Instance of <i>ForwardProcessParameters</i>
-	 */
-
-	public static final ForwardProcessParameters ShiftedLognormal (
-		final double alpha,
-		final double rho,
-		final double shift)
-	{
-		try {
-			return new ForwardProcessParameters (alpha, 1., rho, shift);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * <i>ForwardProcessParameters</i> Constructor
-	 * 
-	 * @param alpha SABR Alpha
-	 * @param beta SABR Beta
-	 * @param rho SABR Rho
-	 * @param shift SABR Shift
+	 * @return C Value
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public ForwardProcessParameters (
-		final double alpha,
-		final double beta,
-		final double rho,
-		final double shift)
+	public abstract double c (
+		final double shiftedForward)
+		throws Exception;
+
+	/**
+	 * Evaluate C for the given Shifted Forward
+	 * 
+	 * @param shiftedForward Shifted Forward
+	 * 
+	 * @return C Value
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
+	@Override public double evaluate (
+		final double shiftedForward)
 		throws Exception
 	{
-		if (!NumberUtil.IsValid (_alpha = alpha) || 0. > _alpha ||
-			!NumberUtil.IsValid (_beta = beta) || 0. > _beta || 1. < _beta ||
-			!NumberUtil.IsValid (_rho = rho) || -1. > _rho || 1. < _rho ||
-			!NumberUtil.IsValid (_shift = shift))
-		{
-			throw new Exception ("ForwardProcessParameters Constructor => Invalid Inputs");
+		return c (shiftedForward);
+	}
+
+	/**
+	 * Compute the Reciprocal Integral between the Initial Shifted Forward and the Shifted Strike
+	 * 
+	 * @param initialShiftedForward Initial Shifted Forward
+	 * @param shiftedStrike Shifted Strike
+	 * 
+	 * @return Reciprocal Integral between the Initial Shifted Forward and the Shifted Strike
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
+	public double reciprocalIntegral (
+		final double initialShiftedForward,
+		final double shiftedStrike)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (initialShiftedForward) || !NumberUtil.IsValid (shiftedStrike)) {
+			throw new Exception ("CFunction::reciprocalIntegral => Invalid Inputs");
 		}
+
+		if (initialShiftedForward == shiftedStrike) {
+			return 0.;
+		}
+
+		boolean initialForwardAboveStrike = initialShiftedForward > shiftedStrike;
+
+		return (initialForwardAboveStrike ? 1. : -1.) * new R1ToR1 (null) {
+			@Override public double evaluate (
+				double shiftedForward)
+				throws Exception
+			{
+				return 1. / c (shiftedForward);
+			}
+		}.integrate (
+			initialForwardAboveStrike ? shiftedStrike : initialShiftedForward,
+			initialForwardAboveStrike ? initialShiftedForward : shiftedStrike
+		);
 	}
 
 	/**
-	 * Retrieve the SABR Alpha
+	 * Evaluate Gamma1 for the Shifted Forward Mid
 	 * 
-	 * @return SABR Alpha
+	 * @param shiftedForwardMid Shifted Forward Mid
+	 * 
+	 * @return Gamma1
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public double alpha()
+	public double gamma1 (
+		final double shiftedForwardMid)
+		throws Exception
 	{
-		return _alpha;
+		if (!NumberUtil.IsValid (shiftedForwardMid)) {
+			throw new Exception ("CFunction::gamma1 => Invalid Input");
+		}
+
+		return derivative (shiftedForwardMid, 1) / c (shiftedForwardMid);
 	}
 
 	/**
-	 * Retrieve the SABR Beta
+	 * Evaluate Gamma2 for the Shifted Forward Mid
 	 * 
-	 * @return SABR Beta
+	 * @param shiftedForwardMid Shifted Forward Mid
+	 * 
+	 * @return Gamma2
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public double beta()
+	public double gamma2 (
+		final double shiftedForwardMid)
+		throws Exception
 	{
-		return _beta;
-	}
+		if (!NumberUtil.IsValid (shiftedForwardMid)) {
+			throw new Exception ("CFunction::gamma2 => Invalid Input");
+		}
 
-	/**
-	 * Retrieve the SABR Rho
-	 * 
-	 * @return SABR Rho
-	 */
-
-	public double rho()
-	{
-		return _rho;
-	}
-
-	/**
-	 * Retrieve the SABR Vol-of-Vol
-	 * 
-	 * @return SABR Vol-of-Vol
-	 */
-
-	public double volVol()
-	{
-		return _alpha;
-	}
-
-	/**
-	 * Retrieve the SABR Shift
-	 * 
-	 * @return SABR Shift
-	 */
-
-	public double shift()
-	{
-		return _shift;
+		return derivative (shiftedForwardMid, 2) / c (shiftedForwardMid);
 	}
 }

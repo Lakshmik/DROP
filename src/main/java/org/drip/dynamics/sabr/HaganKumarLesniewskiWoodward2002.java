@@ -1,6 +1,8 @@
 
 package org.drip.dynamics.sabr;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -114,15 +116,17 @@ package org.drip.dynamics.sabr;
 
 public class HaganKumarLesniewskiWoodward2002
 {
+	private double PROXIMITY_TOLERANCE = 0.000000000001;
+
 	private boolean _arithmeticMid = false;
 	private boolean _normalImplication = false;
 	private EuropeanOptionSetting _europeanOptionSetting = null;
-	private ForwardProcessParameters _forwardProcessParameters = null;
+	private ForwardProcessSetting _forwardProcessSetting = null;
 
 	/**
 	 * <i>HaganKumarLesniewskiWoodward2002</i> Constructor
 	 * 
-	 * @param forwardProcessParameters <i>ForwardProcessParameters</i> Instance
+	 * @param forwardProcessSetting <i>ForwardProcessSetting</i> Instance
 	 * @param europeanOptionSetting <i>EuropeanOptionSetting</i> Instance
 	 * @param arithmeticMid TRUE - Arithmetic; FALSE - Geometric
 	 * @param normalImplication TRUE - Normal/Bachelor; FALSE - Log-normal/Black
@@ -131,13 +135,13 @@ public class HaganKumarLesniewskiWoodward2002
 	 */
 
 	public HaganKumarLesniewskiWoodward2002 (
-		final ForwardProcessParameters forwardProcessParameters,
+		final ForwardProcessSetting forwardProcessSetting,
 		final EuropeanOptionSetting europeanOptionSetting,
 		final boolean arithmeticMid,
 		final boolean normalImplication)
 		throws Exception
 	{
-		if (null == (_forwardProcessParameters = forwardProcessParameters) ||
+		if (null == (_forwardProcessSetting = forwardProcessSetting) ||
 			null == (_europeanOptionSetting = europeanOptionSetting))
 		{
 			throw new Exception ("HaganKumarLesniewskiWoodward2002 Constructor => Invalid Inputs");
@@ -148,14 +152,14 @@ public class HaganKumarLesniewskiWoodward2002
 	}
 
 	/**
-	 * Retrieve the <i>ForwardProcessParameters</i> Instance
+	 * Retrieve the <i>ForwardProcessSetting</i> Instance
 	 * 
-	 * @return <i>ForwardProcessParameters</i> Instance
+	 * @return <i>ForwardProcessSetting</i> Instance
 	 */
 
-	public ForwardProcessParameters forwardProcessParameters()
+	public ForwardProcessSetting forwardProcessSetting()
 	{
-		return _forwardProcessParameters;
+		return _forwardProcessSetting;
 	}
 
 	/**
@@ -206,70 +210,77 @@ public class HaganKumarLesniewskiWoodward2002
 			return null;
 		}
 
-		double rho = _forwardProcessParameters.rho();
+		double rho = _forwardProcessSetting.rho();
 
-		double beta = _forwardProcessParameters.beta();
+		double alpha = _forwardProcessSetting.alpha();
 
-		double strike = _europeanOptionSetting.strike();
+		double shift = _forwardProcessSetting.shift();
 
-		double alpha = _forwardProcessParameters.alpha();
+		CFunction cFunction = _forwardProcessSetting.cFunction();
 
-		double startingForward = startingStateRealization.forward();
+		double shiftedStrike = _europeanOptionSetting.strike() + shift;
+
+		double shiftedStartingForward = startingStateRealization.forward() + shift;
 
 		double startingForwardVolatility = startingStateRealization.forwardVolatility();
 
-		double oneMinusBeta = 1. - beta;
+		double shiftedForwardMid = _arithmeticMid ? 0.5 * (shiftedStrike + shiftedStartingForward) :
+			Math.sqrt (shiftedStrike * shiftedStartingForward);
 
-		double zeta = alpha * (
-			Math.pow (startingForward, oneMinusBeta) - Math.pow (strike, oneMinusBeta)
-		) / (startingForwardVolatility * oneMinusBeta);
-
-		double dOfZeta = Math.log (
-			(Math.sqrt (1. - 2. * rho * zeta + zeta * zeta) + zeta - rho) / (1. - rho)
-		);
-
-		double inTheMoneyScaler = strike == startingForward ? 1. : _normalImplication ?
-			(startingForward - strike) / dOfZeta : Math.log (startingForward / strike) / dOfZeta;
-
-		double forwardMid = _arithmeticMid ? 0.5 * (strike + startingForward) :
-			Math.sqrt (strike * startingForward);
-
-		double cOfForwardMid = Math.pow (forwardMid, beta);
-
-		double oneOverForwardMid = 1. / forwardMid;
-		double gamma1 = beta * oneOverForwardMid;
-		double oneOverForwardMidSquared = oneOverForwardMid * oneOverForwardMid;
-		double gamma2 = -1. * beta * oneMinusBeta * oneOverForwardMidSquared;
-		double twoGamma2MinusGamma1Squared = 2. + gamma2 - gamma1 * gamma1;
-		double twoGamma2MinusGamma1SquaredPlus1OverFMidSquaredOver24 =
-			(twoGamma2MinusGamma1Squared + oneOverForwardMidSquared) / 24.;
-		double sigma0COfForwardMidOverAlpha = startingForwardVolatility * cOfForwardMid / alpha;
-		double sigma0COfForwardMidOverAlphaSquared =
-			sigma0COfForwardMidOverAlpha * sigma0COfForwardMidOverAlpha;
-		double rhoGamma1Sigma0COfForwardMidOver4Alpha =
-			0.25 * rho * gamma1 * sigma0COfForwardMidOverAlpha;
 		double twoMinus3RhoSquaredOver24 = (2. - 3. * rho * rho) / 24.;
 
 		double epsilon = _europeanOptionSetting.tte() * alpha * alpha;
 
 		try {
+			double cOfShiftedForwardMid = cFunction.c (shiftedForwardMid);
+
+			double gamma1 = cFunction.gamma1 (shiftedForwardMid);
+
+			double gamma2 = cFunction.gamma2 (shiftedForwardMid);
+
+			double twoGamma2MinusGamma1Squared = 2. + gamma2 - gamma1 * gamma1;
+			double twoGamma2MinusGamma1SquaredPlus1OverFMidSquaredOver24 =
+				(twoGamma2MinusGamma1Squared + (1. / (shiftedForwardMid * shiftedForwardMid))) / 24.;
+			double sigma0COfShiftedForwardMidOverAlpha = startingForwardVolatility * cOfShiftedForwardMid /
+				alpha;
+			double sigma0COfShiftedForwardMidOverAlphaSquared =
+				sigma0COfShiftedForwardMidOverAlpha * sigma0COfShiftedForwardMidOverAlpha;
+			double rhoGamma1Sigma0COfForwardMidOver4Alpha =
+				0.25 * rho * gamma1 * sigma0COfShiftedForwardMidOverAlpha;
+
+			double zeta = alpha * cFunction.reciprocalIntegral (shiftedStartingForward, shiftedStrike) /
+				startingForwardVolatility;
+
+			double dOfZeta = Math.log (
+				(Math.sqrt (1. - 2. * rho * zeta + zeta * zeta) + zeta - rho) / (1. - rho)
+			);
+
+			double inTheMoneyScaler = NumberUtil.WithinTolerance (
+				shiftedStrike,
+				shiftedStartingForward,
+				PROXIMITY_TOLERANCE,
+				PROXIMITY_TOLERANCE
+			) ? 1. : _normalImplication ?
+				(shiftedStartingForward - shiftedStrike) / dOfZeta :
+				Math.log (shiftedStartingForward / shiftedStrike) / dOfZeta;
+
 			return new VolatilityImplication (
 				zeta,
 				dOfZeta,
 				gamma2,
 				gamma1,
-				forwardMid,
-				cOfForwardMid,
+				shiftedForwardMid,
+				cOfShiftedForwardMid,
 				epsilon,
 				!_normalImplication ? alpha * inTheMoneyScaler * (
 					1. + epsilon * (
 						twoGamma2MinusGamma1SquaredPlus1OverFMidSquaredOver24 *
-							sigma0COfForwardMidOverAlphaSquared +
+							sigma0COfShiftedForwardMidOverAlphaSquared +
 							rhoGamma1Sigma0COfForwardMidOver4Alpha + twoMinus3RhoSquaredOver24
 					)
 				) : alpha * inTheMoneyScaler * (
 					1. + epsilon * (
-						twoGamma2MinusGamma1Squared * sigma0COfForwardMidOverAlphaSquared / 24. +
+						twoGamma2MinusGamma1Squared * sigma0COfShiftedForwardMidOverAlphaSquared / 24. +
 							rhoGamma1Sigma0COfForwardMidOver4Alpha + twoMinus3RhoSquaredOver24
 					)
 				)
@@ -279,38 +290,5 @@ public class HaganKumarLesniewskiWoodward2002
 		}
 
 		return null;
-	}
-
-	public static final void main (
-		final String[] argumentArray)
-		throws Exception
-	{
-		double shift = 0.;
-		double rho = -0.10;
-		double beta = 0.25;
-		double alpha = 1.;
-		double initialForward = 1.;
-		double initialForwardVolatility = 0.35;
-
-		double timeToExpiry = 1.;
-		double strike = initialForward * 2.;
-
-		StartingStateRealization startingStateRealization = new StartingStateRealization (
-			initialForward,
-			initialForwardVolatility
-		);
-
-		HaganKumarLesniewskiWoodward2002 haganKumarLesniewskiWoodward2002 =
-			new HaganKumarLesniewskiWoodward2002 (
-				new ForwardProcessParameters (alpha, beta, rho, shift),
-				new EuropeanOptionSetting (strike, timeToExpiry),
-				false,
-				true
-			);
-
-		VolatilityImplication volatilityImplication =
-			haganKumarLesniewskiWoodward2002.imply (startingStateRealization);
-
-		System.out.println (volatilityImplication.implied());
 	}
 }

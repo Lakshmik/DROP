@@ -1,11 +1,25 @@
 
 package org.drip.dynamics.sabr;
 
+import org.drip.analytics.definition.LatentStateStatic;
+import org.drip.dynamics.evolution.LSQMPointRecord;
+import org.drip.dynamics.evolution.LSQMPointUpdate;
+import org.drip.state.identifier.ForwardLabel;
+import org.drip.state.identifier.VolatilityLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,7 +95,8 @@ package org.drip.dynamics.sabr;
  */
 
 /**
- * <i>ImpliedBlackVolatility</i> contains the Output of the Black Volatility Implication Calculations.
+ * <i>ForwardUpdate</i> contains the Increment and Snapshot of the Forward Latent State evolved through the
+ *  SABR Dynamics.
  *
  *	<br><br>
  *  <ul>
@@ -94,139 +109,162 @@ package org.drip.dynamics.sabr;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ImpliedBlackVolatility {
-	private double _dblA = java.lang.Double.NaN;
-	private double _dblB = java.lang.Double.NaN;
-	private double _dblZ = java.lang.Double.NaN;
-	private double _dblTTE = java.lang.Double.NaN;
-	private double _dblChiZ = java.lang.Double.NaN;
-	private double _dblStrike = java.lang.Double.NaN;
-	private double _dblATMForwardRate = java.lang.Double.NaN;
-	private double _dblImpliedVolatility = java.lang.Double.NaN;
+public class ForwardUpdate
+	extends LSQMPointUpdate
+{
+	private ForwardLabel _forwardLabel = null;
 
 	/**
-	 * ImpliedBlackVolatility Constructor
+	 * <i>ForwardUpdate</i> Creator
 	 * 
-	 * @param dblStrike Strike
-	 * @param dblATMForwardRate Forward Rate
-	 * @param dblTTE Time To Expiry
-	 * @param dblA A
-	 * @param dblZ Z
-	 * @param dblChiZ Chi (Z)
-	 * @param dblB B
-	 * @param dblImpliedVolatility The Implied Volatility
+	 * @param forwardLabel The Forward Rate Latent State Label
+	 * @param initialDate The Initial Date
+	 * @param finalDate The Final Date
+	 * @param targetPointDate The Target Point Date
+	 * @param forward The Forward
+	 * @param forwardIncrement The Forward Increment
+	 * @param forwardVolatility The Forward Volatility 
+	 * @param forwardVolatilityIncrement The Forward Volatility Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @return Instance of <i>ForwardRateUpdate</i>
 	 */
 
-	public ImpliedBlackVolatility (
-		final double dblStrike,
-		final double dblATMForwardRate,
-		final double dblTTE,
-		final double dblA,
-		final double dblZ,
-		final double dblChiZ,
-		final double dblB,
-		final double dblImpliedVolatility)
-		throws java.lang.Exception
+	public static final ForwardUpdate Create (
+		final ForwardLabel forwardLabel,
+		final int initialDate,
+		final int finalDate,
+		final int targetPointDate,
+		final double forward,
+		final double forwardIncrement,
+		final double forwardVolatility,
+		final double forwardVolatilityIncrement)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblStrike = dblStrike) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblATMForwardRate = dblATMForwardRate) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblTTE = dblTTE) ||
-					!org.drip.numerical.common.NumberUtil.IsValid (_dblA = dblA) ||
-						!org.drip.numerical.common.NumberUtil.IsValid (_dblZ = dblZ) ||
-							!org.drip.numerical.common.NumberUtil.IsValid (_dblChiZ = dblChiZ) ||
-								!org.drip.numerical.common.NumberUtil.IsValid (_dblB = dblB) ||
-									!org.drip.numerical.common.NumberUtil.IsValid (_dblImpliedVolatility =
-										dblImpliedVolatility))
-			throw new java.lang.Exception ("ImpliedBlackVolatility ctr: Invalid Inputs");
+		LSQMPointRecord snapshotLSQMPointRecord = new LSQMPointRecord();
+
+		if (!snapshotLSQMPointRecord.setQM (forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD, forward)) {
+			return null;
+		}
+
+		if (!snapshotLSQMPointRecord.setQM (
+			VolatilityLabel.Standard (forwardLabel),
+			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY,
+			forwardVolatility
+		))
+		{
+			return null;
+		}
+
+		LSQMPointRecord incrementLSQMPointRecord = new LSQMPointRecord();
+
+		if (!incrementLSQMPointRecord.setQM (
+			forwardLabel,
+			LatentStateStatic.FORWARD_QM_FORWARD,
+			forwardIncrement
+		))
+		{
+			return null;
+		}
+
+		if (!incrementLSQMPointRecord.setQM (
+			VolatilityLabel.Standard (forwardLabel),
+			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY,
+			forwardVolatilityIncrement
+		))
+		{
+			return null;
+		}
+
+		try {
+			return new ForwardUpdate (
+				forwardLabel,
+				initialDate,
+				finalDate,
+				targetPointDate,
+				snapshotLSQMPointRecord,
+				incrementLSQMPointRecord
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	private ForwardUpdate (
+		final ForwardLabel forwardLabel,
+		final int initialDate,
+		final int finalDate,
+		final int viewDate,
+		final LSQMPointRecord snapshotLSQMPointRecord,
+		final LSQMPointRecord incrementLSQMPointRecord)
+		throws Exception
+	{
+		super (initialDate, finalDate, viewDate, snapshotLSQMPointRecord, incrementLSQMPointRecord);
+
+		if (null == (_forwardLabel = forwardLabel)) {
+			throw new Exception ("ForwardUpdate Contructor => Invalid Inputs");
+		}
 	}
 
 	/**
-	 * Retrieve the Strike
+	 * Retrieve the Forward
 	 * 
-	 * @return The Strike
+	 * @return The Forward
+	 * 
+	 * @throws Exception Thrown if the Forward is not available
 	 */
 
-	public double strike()
+	public double forward()
+		throws Exception
 	{
-		return _dblStrike;
+		return snapshot().qm (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD);
 	}
 
 	/**
-	 * Retrieve the ATM Forward Rate
+	 * Retrieve the Forward Increment
 	 * 
-	 * @return The ATM Forward Rate
+	 * @return The Forward Increment
+	 * 
+	 * @throws Exception Thrown if the Forward Increment is not available
 	 */
 
-	public double atmForwardRate()
+	public double forwardIncrement()
+		throws Exception
 	{
-		return _dblATMForwardRate;
+		return increment().qm (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD);
 	}
 
 	/**
-	 * Retrieve TTE
+	 * Retrieve the Forward Volatility
 	 * 
-	 * @return TTE
+	 * @return The Forward Volatility
+	 * 
+	 * @throws Exception Thrown if the Forward Volatility is not available
 	 */
 
-	public double tte()
+	public double forwardVolatility()
+		throws Exception
 	{
-		return _dblTTE;
+		return snapshot().qm (
+			VolatilityLabel.Standard (_forwardLabel),
+			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY
+		);
 	}
 
 	/**
-	 * Retrieve A
+	 * Retrieve the Forward Volatility Increment
 	 * 
-	 * @return A
+	 * @return The Forward Volatility Increment
+	 * 
+	 * @throws Exception Thrown if the Forward Volatility Increment is not available
 	 */
 
-	public double a()
+	public double forwardVolatilityIncrement()
+		throws Exception
 	{
-		return _dblA;
-	}
-
-	/**
-	 * Retrieve Z
-	 * 
-	 * @return Z
-	 */
-
-	public double z()
-	{
-		return _dblZ;
-	}
-
-	/**
-	 * Retrieve Chi
-	 * 
-	 * @return Chi
-	 */
-
-	public double chi()
-	{
-		return _dblChiZ;
-	}
-
-	/**
-	 * Retrieve B
-	 * 
-	 * @return B
-	 */
-
-	public double b()
-	{
-		return _dblB;
-	}
-
-	/**
-	 * Retrieve the Implied Volatility
-	 * 
-	 * @return The Implied Volatility
-	 */
-
-	public double impliedVolatility()
-	{
-		return _dblImpliedVolatility;
+		return increment().qm (
+			VolatilityLabel.Standard (_forwardLabel),
+			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY
+		);
 	}
 }

@@ -104,6 +104,12 @@ public class LatentStateStatic {
 	public static final java.lang.String LATENT_STATE_FORWARD = "LATENT_STATE_FORWARD";
 
 	/**
+	 * Forward Latent State Quantification Metric - Forward
+	 */
+
+	public static final java.lang.String FORWARD_QM_FORWARD = "FORWARD_QM_FORWARD";
+
+	/**
 	 * Forward Latent State Quantification Metric - Forward Rate
 	 */
 
