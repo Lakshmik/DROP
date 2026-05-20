@@ -1,0 +1,51 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #1 (1, 2, 3)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #2 (4, 5, 6)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #3 (7, 8, 9)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #4 (10, 11, 12)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #5 (13, 14, 15)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #6 (16, 17, 18)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #7 (19, 20, 21)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #8 (22, 23, 24)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #9 (25, 26, 27)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #10 (28, 29, 30)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #11 (31, 32, 33)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #12 (34, 35, 36)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #13 (37, 38, 39)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #14 (40, 41, 42)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #15 (43, 44, 45)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #16 (46, 47, 48)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #17 (49, 50, 51)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #18 (52, 53, 54)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #19 (55, 56, 57)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #20 (58, 59, 60)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #21 (61, 62, 63)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #22 (64, 65, 66)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #23 (67, 68, 69)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #24 (70, 71, 72)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #25 (73, 74, 75)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #26 (76, 77, 78)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #27 (79, 80, 81)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #28 (82, 83, 84)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #29 (85, 86, 87)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #30 (88, 89, 90)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #31 (91, 92, 93)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #32 (94, 95, 96)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #33 (97, 98, 99)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #34 (100, 101)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding #35 (102, 103)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding Stochastic #1 (104, 105)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding Stochastic #2 (106, 107, 108)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding Stochastic #3 (109, 110, 111)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding Stochastic #4 (112, 113, 114)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding Stochastic #5 (115, 116, 117)
+	- Burgard 2013 Unilateral CSA Zero Threshold Funding Stochastic #6 (118, 119, 120)
+
+
+IdeaDRIP:
