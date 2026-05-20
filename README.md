@@ -67,10 +67,10 @@ DROP is composed of three modules.
 
 ## Misc
 
-  [**JUnit Tests**](https://lakshmik.github.io/DROP/junit/index.html)   |   [**Jacoco Coverage**](https://lakshmik.github.io/DROP/jacoco/index.html)   |   [**Jacoco Session**](https://lakshmik.github.io/DROP/jacoco/jacoco-sessions.html)   |   [**Credit Attributions**](https://lakshmik.github.io/DROP/credits.html)   |   [**Version Specifications**](https://lakshmik.github.io/DROP/version.html)
+  [**JUnit Tests**](https://lakshmidrip.github.io/DROP/junit/index.html)   |   [**Jacoco Coverage**](https://lakshmidrip.github.io/DROP/jacoco/index.html)   |   [**Jacoco Session**](https://lakshmidrip.github.io/DROP/jacoco/jacoco-sessions.html)   |   [**Credit Attributions**](https://lakshmidrip.github.io/DROP/credits.html)   |   [**Version Specifications**](https://lakshmidrip.github.io/DROP/version.html)
 
 ## Contact
 
-lakshmik7977@gmail.com
+lakshmi7977@gmail.com
 
 [![codecov.io](https://codecov.io/gh/lakshmik/DROP/branch/master/graphs/sunburst.svg)](https://codecov.io/gh/lakshmik/DROP/branch/master)  [![codecov.io](https://codecov.io/gh/lakshmik/DROP/branch/master/graphs/icicle.svg)](https://codecov.io/gh/lakshmik/DROP/branch/master)  [![codecov.io](https://codecov.io/gh/lakshmik/DROP/branch/master/graphs/tree.svg)](https://codecov.io/gh/lakshmik/DROP/branch/master)  [![codecov.io](https://codecov.io/gh/lakshmik/DROP/branch/master/graphs/commits.svg)](https://codecov.io/gh/lakshmik/DROP/branch/master)  
