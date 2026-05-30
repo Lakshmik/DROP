@@ -1,0 +1,52 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- Measure Brownian Bridge Convex #1 (1, 2, 3)
+	- Measure Brownian Bridge Convex #2 (4, 5, 6)
+	- Measure Brownian Bridge Convex #3 (7, 8, 9)
+	- Measure Brownian Bridge Convex #4 (10, 11, 12)
+	- Measure Brownian Bridge Convex #5 (13, 14, 15)
+	- Measure Brownian Bridge Linear #1 (16, 17, 18)
+	- Measure Brownian Bridge Linear #2 (19, 20, 21)
+	- Measure Brownian Bridge Linear #3 (22, 23, 24)
+	- Measure Brownian Bridge Linear #4 (25, 26, 27)
+	- Measure Brownian Bridge Linear #5 (28, 29, 30)
+	- Measure Brownian Bridge Linear #6 (31, 32, 33)
+	- Measure Brownian Bridge Linear #7 (34, 35, 36)
+	- Measure Brownian Bridge Linear #8 (37, 38, 39)
+	- Measure Brownian Bridge Linear #9 (40, 41)
+	- Measure Brownian Bridge Linear #10 (42, 43)
+	- Measure Gaussian Sequence #1 (44, 45)
+	- Measure Gaussian Sequence #2 (46, 47, 48)
+	- Measure Gaussian Sequence #3 (49, 50, 51)
+	- Measure Gaussian Sequence #4 (52, 53, 54)
+	- Measure Gaussian Sequence #5 (55, 56, 57)
+	- Measure Gaussian Sequence #6 (58, 59, 60)
+	- Measure Gaussian Sequence #7 (61, 62, 63)
+	- Measure Gaussian Sequence #8 (64, 65, 66)
+	- Measure Gaussian Sequence #9 (67, 68, 69)
+	- Measure Gaussian Sequence #10 (70, 71)
+	- Measure Gaussian Sequence #11 (72, 73)
+	- Measure Piecewise Displaced Lebesgue #1 (74, 75)
+	- Measure Piecewise Displaced Lebesgue #2 (76, 77, 78)
+	- Measure Piecewise Displaced Lebesgue #3 (79, 80, 81)
+	- Measure Piecewise Displaced Lebesgue #4 (82, 83, 84)
+	- Measure Piecewise Displaced Lebesgue #5 (85, 86, 87)
+	- Measure Piecewise Displaced Lebesgue #6 (88, 89, 90)
+	- Measure Piecewise Displaced Lebesgue #7 (91, 92, 93)
+	- Measure Piecewise Displaced Lebesgue #8 (94, 95, 96)
+	- Measure Piecewise Displaced Lebesgue #10 (97, 98, 99)
+	- Measure Piecewise Displaced Lebesgue #11 (100, 101, 102)
+	- Measure Piecewise Displaced Lebesgue #12 (103, 104, 105)
+	- Measure Piecewise Displaced Lebesgue #13 (106, 107, 108)
+	- Measure Piecewise Displaced Lebesgue #14 (109, 110, 111)
+	- Measure Piecewise Displaced Lebesgue #15 (112, 113, 114)
+	- Measure Piecewise Displaced Lebesgue #16 (115, 116, 117)
+	- Measure Piecewise Displaced Lebesgue #17 (118, 119, 120)
+
+
+IdeaDRIP:

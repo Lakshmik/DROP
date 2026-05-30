@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -88,118 +96,139 @@ import org.drip.service.env.EnvManager;
  * <i>PiecewiseLinearLebesgue</i> demonstrates the Generation, the Reconciliation, and the Usage of a
  * 	Piece-wise Linear Lebesgue Measure.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/measure/README.md">Lebesgue Measure Brownian Bridge Interpolation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/measure/README.md">Lebesgue Measure Brownian Bridge Interpolation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PiecewiseLinearLebesgue {
+public class PiecewiseLinearLebesgue
+{
 
 	private static final void RPLL (
-		final String strMessage,
-		final double dblXMin,
-		final double dblXMax,
-		final double[] adblX,
-		final double[] adblProb)
+		final String message,
+		final double xMin,
+		final double xMax,
+		final double[] xArray,
+		final double[] probabilityArray)
 		throws Exception
 	{
-		R1ContinuousUniformPiecewiseLinear rpll = R1ContinuousUniformPiecewiseLinear.Standard (
-			dblXMin,
-			dblXMax,
-			adblX,
-			adblProb
-		);
+		R1ContinuousUniformPiecewiseLinear r1ContinuousUniformPiecewiseLinear =
+			R1ContinuousUniformPiecewiseLinear.Standard (
+				xMin,
+				xMax,
+				xArray,
+				probabilityArray
+			);
 
-		double[] adblQuintile = new double[] {
+		double[] quintileArray = new double[] {
 			0.25,
 			0.50,
 			0.75
 		};
 
-		String strDump = "\t|| " + strMessage + " | ";
+		String dump = "\t|| " + message + " | ";
 
-		/* for (int i = 0; i < adblX.length; ++i)
-			strDump +=
-				FormatUtil.FormatDouble (adblX[i], 3, 3, 1.) + " =>" +
-				FormatUtil.FormatDouble (rpll.cumulative (adblX[i]), 1, 2, 1.) + " | "; */
+		for (int quintileIndex = 0; quintileIndex < quintileArray.length; ++quintileIndex) {
+			dump += " " + FormatUtil.FormatDouble (
+				r1ContinuousUniformPiecewiseLinear.invCumulative (quintileArray[quintileIndex]),
+				3,
+				3,
+				1.
+			) + " =>" + FormatUtil.FormatDouble (
+				quintileArray[quintileIndex],
+				1,
+				2,
+				1.
+			) + "   | ";
+		}
 
-		for (int i = 0; i < adblQuintile.length; ++i)
-			strDump += " " +
-				FormatUtil.FormatDouble (rpll.invCumulative (adblQuintile[i]), 3, 3, 1.) + " =>" +
-				FormatUtil.FormatDouble (adblQuintile[i], 1, 2, 1.) + "   | ";
+		double[] densityArray = r1ContinuousUniformPiecewiseLinear.piecewiseDensityArray();
 
-		double[] adblDensity = rpll.piecewiseDensityArray();
+		for (int densityArrayIndex = 0; densityArrayIndex < densityArray.length; ++densityArrayIndex) {
+			dump += FormatUtil.FormatDouble (densityArray[densityArrayIndex], 1, 9, 1.) + ",";
+		}
 
-		for (int i = 0; i < adblDensity.length; ++i)
-			strDump += FormatUtil.FormatDouble (adblDensity[i], 1, 9, 1.) + ",";
-
-		System.out.println (strDump + " ||");
+		System.out.println (dump + " ||");
 	}
 
 	private static final void DateRPLL (
-		final String strMessage,
-		final double dblXMin,
-		final double dblXMax,
-		final double[] adblX,
-		final double[] adblProb)
+		final String message,
+		final double xMin,
+		final double xMax,
+		final double[] xArray,
+		final double[] probabilityArray)
 		throws Exception
 	{
-		R1ContinuousUniformPiecewiseLinear rpll = R1ContinuousUniformPiecewiseLinear.Standard (
-			dblXMin,
-			dblXMax,
-			adblX,
-			adblProb
-		);
+		R1ContinuousUniformPiecewiseLinear r1ContinuousUniformPiecewiseLinear =
+			R1ContinuousUniformPiecewiseLinear.Standard (
+				xMin,
+				xMax,
+				xArray,
+				probabilityArray
+			);
 
-		double[] adblQuintile = new double[] {
+		double[] quintileArray = new double[] {
 			0.25,
 			0.50,
 			0.75
 		};
 
-		String strDump = "\t|| " + strMessage + " | ";
+		String dump = "\t|| " + message + " | ";
 
-		for (int i = 0; i < adblQuintile.length; ++i)
-			strDump +=
-				new JulianDate ((int) rpll.invCumulative (adblQuintile[i])) + " =>" +
-				FormatUtil.FormatDouble (adblQuintile[i], 1, 2, 1.) + " | ";
+		for (int quintileIndex = 0; quintileIndex < quintileArray.length; ++quintileIndex) {
+			dump += new JulianDate (
+				(int) r1ContinuousUniformPiecewiseLinear.invCumulative (quintileArray[quintileIndex])
+			) + " =>" + FormatUtil.FormatDouble (
+				quintileArray[quintileIndex],
+				1,
+				2,
+				1.
+			) + " | ";
+		}
 
-		double[] adblDensity = rpll.piecewiseDensityArray();
+		double[] densityArray = r1ContinuousUniformPiecewiseLinear.piecewiseDensityArray();
 
-		for (int i = 0; i < adblDensity.length; ++i)
-			strDump += FormatUtil.FormatDouble (adblDensity[i], 1, 9, 1.) + ",";
+		for (int densityArrayIndex = 0; densityArrayIndex < densityArray.length; ++densityArrayIndex) {
+			dump += FormatUtil.FormatDouble (densityArray[densityArrayIndex], 1, 9, 1.) + ",";
+		}
 
-		System.out.println (strDump + " ||");
+		System.out.println (dump + " ||");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
 		System.out.println();
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||             FIELD                |                       CUMULATIVE PROBABILITY                    |               PROBABILITY DENSITY NODES              ||");
+		System.out.println (
+			"\t||             FIELD                |                       CUMULATIVE PROBABILITY                    |               PROBABILITY DENSITY NODES              ||"
+		);
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		RPLL (
 			"Age (Months In Balance)         ",
@@ -309,7 +338,9 @@ public class PiecewiseLinearLebesgue {
 			new double[] {0.25, 0.50, 0.75}
 		);
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

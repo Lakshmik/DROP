@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -87,65 +95,54 @@ import org.drip.service.env.EnvManager;
  * <i>BrownianBridgeLinear</i> demonstrates using the Brownian Bridge Scheme to Interpolate Three Linear
  * 	Value Points.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/measure/README.md">Lebesgue Measure Brownian Bridge Interpolation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/measure/README.md">Lebesgue Measure Brownian Bridge Interpolation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BrownianBridgeLinear {
+public class BrownianBridgeLinear
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dt1 = DateUtil.CreateFromYMD (
-			2015,
-			DateUtil.JULY,
-			1
-		);
+		JulianDate date1 = DateUtil.CreateFromYMD (2015, DateUtil.JULY, 1);
 
-		JulianDate dt2 = DateUtil.CreateFromYMD (
-			2015,
-			DateUtil.AUGUST,
-			1
-		);
+		JulianDate date2 = DateUtil.CreateFromYMD (2015, DateUtil.AUGUST, 1);
 
-		JulianDate dt3 = DateUtil.CreateFromYMD (
-			2015,
-			DateUtil.SEPTEMBER,
-			1
-		);
+		JulianDate date3 = DateUtil.CreateFromYMD (2015, DateUtil.SEPTEMBER, 1);
 
-		double dblV1 = 10.;
-		double dblV2 = 15.;
-		double dblV3 = 20.;
+		double v1 = 10.;
+		double v2 = 15.;
+		double v3 = 20.;
 
-		int iDaysStep = 2;
+		int daysStep = 2;
 
 		BrokenDateInterpolatorBrownian3P tpbb = new BrokenDateInterpolatorBrownian3P (
-			dt1.julian(),
-			dt2.julian(),
-			dt3.julian(),
-			dblV1,
-			dblV2,
-			dblV3
+			date1.julian(),
+			date2.julian(),
+			date3.julian(),
+			v1,
+			v2,
+			v3
 		);
 
 		System.out.println();
@@ -157,24 +154,24 @@ public class BrownianBridgeLinear {
 		System.out.println ("\t||--------------------------||");
 
 		System.out.println (
-			"\t|| [" + dt1 + "] => " +
-			FormatUtil.FormatDouble (tpbb.interpolate (dt1.julian()), 2, 3, 1.) + " ||"
+			"\t|| [" + date1 + "] => " +
+			FormatUtil.FormatDouble (tpbb.interpolate (date1.julian()), 2, 3, 1.) + " ||"
 		);
 
-		JulianDate dt = dt1.addDays (iDaysStep);
+		JulianDate dt = date1.addDays (daysStep);
 
-		while (dt.julian() < dt3.julian()) {
+		while (dt.julian() < date3.julian()) {
 			System.out.println (
 				"\t|| [" + dt + "] => " +
 				FormatUtil.FormatDouble (tpbb.interpolate (dt.julian()), 2, 3, 1.) + " ||"
 			);
 
-			dt = dt.addDays (iDaysStep);
+			dt = dt.addDays (daysStep);
 		}
 
 		System.out.println (
-			"\t|| [" + dt3 + "] => " +
-			FormatUtil.FormatDouble (tpbb.interpolate (dt3.julian()), 2, 3, 1.) + " ||"
+			"\t|| [" + date3 + "] => " +
+			FormatUtil.FormatDouble (tpbb.interpolate (date3.julian()), 2, 3, 1.) + " ||"
 		);
 
 		System.out.println ("\t||--------------------------||");

@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -86,46 +94,45 @@ import org.drip.service.env.EnvManager;
  * <i>GaussianSequence</i> demonstrates the Generation of R<sup>1</sup> and Correlated/Uncorrelated
  * 	R<sup>d</sup> Gaussian Random Number Sequence.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/measure/README.md">Lebesgue Measure Brownian Bridge Interpolation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/measure/README.md">Lebesgue Measure Brownian Bridge Interpolation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class GaussianSequence {
+public class GaussianSequence
+{
 
 	private static final void CorrelatedSequence (
-		final int iCount,
-		final double[][] aadblCorrelation,
-		final String strHeader)
+		final int count,
+		final double[][] correlationMatrix,
+		final String header)
 		throws Exception
 	{
-		double[][] aadblGaussianJoint = RandomSequenceGenerator.GaussianJoint (
-			iCount,
-			aadblCorrelation
-		);
+		double[][] jointGaussianGrid = RandomSequenceGenerator.GaussianJoint (count, correlationMatrix);
 
 		System.out.println();
 
 		System.out.println ("\t||----------------------------------------------------||");
 
-		System.out.println (strHeader);
+		System.out.println (header);
 
 		System.out.println ("\t||----------------------------------------------------||");
 
-		for (int i = 0; i < iCount; ++i) {
-			String strDump = "\t||" + FormatUtil.FormatDouble (i, 2, 0, 1.) + " |";
+		for (int i = 0; i < count; ++i) {
+			String dump = "\t||" + FormatUtil.FormatDouble (i, 2, 0, 1.) + " |";
 
-			for (int j = 0; j < aadblCorrelation.length; ++j)
-				strDump = strDump + " " + FormatUtil.FormatDouble (aadblGaussianJoint[i][j], 1, 6, 1.) + " |";
+			for (int j = 0; j < correlationMatrix.length; ++j) {
+				dump = dump + " " + FormatUtil.FormatDouble (jointGaussianGrid[i][j], 1, 6, 1.) + " |";
+			}
 
-			System.out.println (strDump + "|");
+			System.out.println (dump + "|");
 		}
 
 		System.out.println ("\t||----------------------------------------------------||");
@@ -136,25 +143,25 @@ public class GaussianSequence {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		int iCount = 50;
-		double[][] aadblCorrelation1 = new double[][] {
+		int count = 50;
+		double[][] correlationMatix1 = new double[][] {
 			{1.00, 0.70, 0.25, 0.05},
 			{0.70, 1.00, 0.13, 0.01},
 			{0.25, 0.13, 1.00, 0.00},
 			{0.05, 0.01, 0.00, 1.00}
 		};
-		double[][] aadblCorrelation2 = new double[][] {
+		double[][] correlationMatix2 = new double[][] {
 			{1.00, 0.00, 0.00, 0.00},
 			{0.00, 1.00, 0.00, 0.00},
 			{0.00, 0.00, 1.00, 0.00},
@@ -162,14 +169,14 @@ public class GaussianSequence {
 		};
 
 		CorrelatedSequence (
-			iCount,
-			aadblCorrelation1,
+			count,
+			correlationMatix1,
 			"\t||            CORRELATED GAUSSIAN SEQUENCE            ||"
 		);
 
 		CorrelatedSequence (
-			iCount,
-			aadblCorrelation2,
+			count,
+			correlationMatix2,
 			"\t||           UNCORRELATED GAUSSIAN SEQUENCE           ||"
 		);
 
