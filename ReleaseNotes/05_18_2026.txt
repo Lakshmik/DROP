@@ -1,0 +1,50 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- XVA Zero Threshold Collateral Group #1 (1, 2, 3)
+	- XVA Zero Threshold Collateral Group #2 (4, 5, 6)
+	- XVA Zero Threshold Collateral Group #3 (7, 8, 9)
+	- XVA Zero Threshold Collateral Group #4 (10, 11, 12)
+	- XVA Zero Threshold Collateral Group #5 (13, 14, 15)
+	- XVA Zero Threshold Collateral Group #6 (16, 17, 18)
+	- XVA Zero Threshold Collateral Group #7 (19, 20, 21)
+	- XVA Zero Threshold Collateral Group #8 (22, 23, 24)
+	- XVA Zero Threshold Collateral Group #9 (25, 26, 27)
+	- XVA Zero Threshold Collateral Group #10 (28, 29, 30)
+	- XVA Zero Threshold Collateral Group #11 (31, 32, 33)
+	- XVA Zero Threshold Collateral Group Correlated #1 (34, 35, 36)
+	- XVA Zero Threshold Collateral Group Correlated #2 (37, 38, 39)
+	- XVA Zero Threshold Collateral Group Correlated #3 (40, 41, 42)
+	- XVA Zero Threshold Collateral Group Correlated #4 (43, 44, 45)
+	- XVA Zero Threshold Collateral Group Correlated #5 (46, 47, 48)
+	- XVA Zero Threshold Collateral Group Correlated #6 (49, 50, 51)
+	- XVA Zero Threshold Collateral Group Correlated #7 (52, 53, 54)
+	- XVA Zero Threshold Collateral Group Correlated #8 (55, 56, 57)
+	- XVA Zero Threshold Collateral Group Correlated #9 (58, 59, 60)
+	- XVA Zero Threshold Collateral Group Correlated #10 (61, 62, 63)
+	- XVA Zero Threshold Collateral Group Correlated #11 (64, 65, 66)
+	- XVA Zero Threshold Collateral Group Correlated #12 (67, 68, 69)
+	- XVA Zero Threshold Collateral Group Correlated #13 (70, 71, 72)
+	- XVA Zero Threshold Collateral Group Correlated #14 (73, 74, 75)
+	- XVA Zero Threshold Collateral Group Correlated #15 (76, 77, 78)
+	- XVA Zero Threshold Collateral Group Correlated #16 (79, 80, 81)
+	- XVA Zero Threshold Collateral Group Correlated #17 (82, 83, 84)
+	- XVA Zero Threshold Collateral Group Correlated #18 (85, 86, 87)
+	- XVA Zero Threshold Collateral Group Correlated #19 (88, 89, 90)
+	- XVA Zero Threshold Collateral Group Correlated #20 (91, 92, 93)
+	- XVA Zero Threshold Collateral Group Correlated #21 (94, 95, 96)
+	- XVA Zero Threshold Collateral Group Correlated #22 (97, 98, 99)
+	- XVA Zero Threshold Collateral Group Correlated #23 (100, 101, 102)
+	- XVA Zero Threshold Collateral Group Correlated #24 (103, 104, 105)
+	- XVA Zero Threshold Collateral Group Correlated #25 (106, 107, 108)
+	- XVA Zero Threshold Collateral Group Correlated #26 (109, 110, 111)
+	- XVA Zero Threshold Collateral Group Correlated #27 (112, 113, 114)
+	- XVA Zero Threshold Collateral Group Correlated #28 (115, 116, 117)
+	- XVA Zero Threshold Collateral Group Correlated #29 (118, 119, 120)
+
+
+IdeaDRIP:
