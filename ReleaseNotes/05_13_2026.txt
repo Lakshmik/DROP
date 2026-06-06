@@ -1,0 +1,51 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- XVA Uncollateralized Collateral Group #1 (1, 2, 3)
+	- XVA Uncollateralized Collateral Group #2 (4, 5)
+	- XVA Uncollateralized Collateral Group #3 (6, 7)
+	- XVA Uncollateralized Collateral Group Correlated #1 (8, 9)
+	- XVA Uncollateralized Collateral Group Correlated #2 (10, 11, 12)
+	- XVA Uncollateralized Collateral Group Correlated #3 (13, 14, 15)
+	- XVA Uncollateralized Collateral Group Correlated #4 (16, 17, 18)
+	- XVA Uncollateralized Collateral Group Correlated #5 (19, 20, 21)
+	- XVA Uncollateralized Collateral Group Correlated #6 (22, 23, 24)
+	- XVA Uncollateralized Collateral Group Correlated #7 (25, 26, 27)
+	- XVA Uncollateralized Collateral Group Correlated #8 (28, 29, 30)
+	- XVA Uncollateralized Collateral Group Correlated #9 (31, 32, 33)
+	- XVA Uncollateralized Collateral Group Correlated #10 (34, 35, 36)
+	- XVA Uncollateralized Collateral Group Correlated #11 (37, 38, 39)
+	- XVA Uncollateralized Collateral Group Correlated #12 (40, 41, 42)
+	- XVA Uncollateralized Collateral Group Correlated #13 (43, 44, 45)
+	- XVA Uncollateralized Collateral Group Correlated #14 (46, 47, 48)
+	- XVA Uncollateralized Collateral Group Correlated #15 (49, 50, 51)
+	- XVA Uncollateralized Collateral Group Correlated #16 (52, 53, 54)
+	- XVA Uncollateralized Collateral Group Correlated #17 (55, 56, 57)
+	- XVA Uncollateralized Collateral Group Correlated #18 (58, 59, 60)
+	- XVA Uncollateralized Collateral Group Correlated #18 (61, 62, 63)
+	- XVA Uncollateralized Collateral Group Correlated #20 (64, 65, 66)
+	- XVA Uncollateralized Collateral Group Correlated #21 (67, 68, 69)
+	- XVA Uncollateralized Collateral Group Correlated #22 (70, 71, 72)
+	- XVA Uncollateralized Collateral Group Correlated #23 (73, 74, 75)
+	- XVA Uncollateralized Collateral Group Correlated #24 (76, 77, 78)
+	- XVA Uncollateralized Collateral Group Correlated #25 (79, 80, 81)
+	- XVA Uncollateralized Collateral Group Correlated #26 (82, 83, 84)
+	- XVA Uncollateralized Collateral Group Correlated #27 (85, 86, 87)
+	- XVA Uncollateralized Collateral Group Correlated #28 (88, 89, 90)
+	- XVA Uncollateralized Collateral Group Correlated #29 (91, 92, 93)
+	- XVA Uncollateralized Collateral Group Correlated #30 (94, 95, 96)
+	- XVA Uncollateralized Collateral Group Correlated #31 (97, 98, 99)
+	- XVA Uncollateralized Collateral Group Correlated #32 (100, 101, 102)
+	- XVA Uncollateralized Collateral Group Correlated #33 (103, 104, 105)
+	- XVA Uncollateralized Collateral Group Correlated #34 (106, 107, 108)
+	- XVA Uncollateralized Collateral Group Correlated #35 (109, 110, 111)
+	- XVA Uncollateralized Collateral Group Correlated #36 (112, 113, 114)
+	- XVA Uncollateralized Collateral Group Correlated #37 (115, 116, 117)
+	- XVA Uncollateralized Collateral Group Correlated #38 (118, 119, 120)
+
+
+IdeaDRIP:

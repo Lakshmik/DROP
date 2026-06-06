@@ -18,6 +18,14 @@ import org.drip.xva.settings.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -117,155 +125,210 @@ import org.drip.xva.settings.*;
  *  			<i>Risk</i> <b>21 (2)</b> 97-102
  *  	</li>
  *  </ul>
- *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/xva/README.md">XVA Collateralized Uncollateralized Zero Threshold</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/xva/README.md">XVA Collateralized Uncollateralized Zero Threshold</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class PortfolioCollateralEstimate {
+public class PortfolioCollateralEstimate
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		int iNumStep = 40;
-		double dblTime = 10.;
-		double dblPortfolioDrift = 0.0;
-		double dblPortfolioVolatility = 0.15;
-		double dblPortfolioValueStart = 0.;
-		double dblBankThreshold = -0.1;
-		double dblCounterPartyThreshold = 0.1;
+		int stepCount = 40;
 
-		JulianDate dtSpot = DateUtil.Today();
+		double time = 10.;
+		double portfolioDrift = 0.;
+		double portfolioValueStart = 0.;
+		double portfolioVolatility = 0.15;
 
-		JulianDate dtStart = dtSpot;
-		double dblTimeWidth = dblTime / iNumStep;
-		double[] adblTimeWidth = new double[iNumStep];
+		double bankThreshold = -0.1;
+		double counterPartyThreshold = 0.1;
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblTimeWidth[i] = dblTimeWidth;
+		JulianDate spotDate = DateUtil.Today();
+
+		JulianDate startDate = spotDate;
+		double timeWidth =  time / stepCount;
+		double[] timeWidthArray = new double[stepCount];
+
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			timeWidthArray[stepIndex] = timeWidth;
+		}
 
 		PositionGroupSpecification positionGroupSpecification = PositionGroupSpecification.FixedThreshold (
 			"FIXEDTHRESHOLD",
-			dblCounterPartyThreshold,
-			dblBankThreshold,
+			counterPartyThreshold,
+			bankThreshold,
 			PositionReplicationScheme.ALBANESE_ANDERSEN_VERTEX,
 			BrokenDateScheme.SQUARE_ROOT_OF_TIME,
 			0.,
 			CloseOutScheme.ISDA_92
 		);
 
-		DiffusionEvolver dePortfolio = new DiffusionEvolver (
-			DiffusionEvaluatorLinear.Standard (
-				dblPortfolioDrift,
-				dblPortfolioVolatility
-			)
-		);
-
-		JumpDiffusionEdge[] aJDESwapRate = dePortfolio.incrementSequence (
-			new JumpDiffusionVertex (
-				dblTime,
-				dblPortfolioValueStart,
-				0.,
-				false
-			),
-			JumpDiffusionEdgeUnit.Diffusion (
-				adblTimeWidth,
-				RandomSequenceGenerator.Gaussian (iNumStep)
-			),
-			dblTimeWidth
+		JumpDiffusionEdge[] jumpDiffusionEdgeArray = new DiffusionEvolver (
+			DiffusionEvaluatorLinear.Standard (portfolioDrift, portfolioVolatility)
+		).incrementSequence (
+			new JumpDiffusionVertex (time, portfolioValueStart, 0., false),
+			JumpDiffusionEdgeUnit.Diffusion (timeWidthArray, RandomSequenceGenerator.Gaussian (stepCount)),
+			timeWidth
 		);
 
 		System.out.println();
 
-		System.out.println ("\t||--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||                                       COLLATERAL AMOUNT ESTIMATION OUTPUT METRICS                                        ||");
+		System.out.println (
+			"\t||                                       COLLATERAL AMOUNT ESTIMATION OUTPUT METRICS                                        ||"
+		);
 
-		System.out.println ("\t||--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||    L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t||    L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t||            - Forward Date                                                                                                ||");
+		System.out.println (
+			"\t||            - Forward Date                                                                                                ||"
+		);
 
-		System.out.println ("\t||            - Forward Value                                                                                               ||");
+		System.out.println (
+			"\t||            - Forward Value                                                                                               ||"
+		);
 
-		System.out.println ("\t||            - Bank Margin Date                                                                                            ||");
+		System.out.println (
+			"\t||            - Bank Margin Date                                                                                            ||"
+		);
 
-		System.out.println ("\t||            - Counter Party Margin Date                                                                                   ||");
+		System.out.println (
+			"\t||            - Counter Party Margin Date                                                                                   ||"
+		);
 
-		System.out.println ("\t||            - Bank Window Margin Value                                                                                    ||");
+		System.out.println (
+			"\t||            - Bank Window Margin Value                                                                                    ||"
+		);
 
-		System.out.println ("\t||            - Counter Party Window Margin Value                                                                           ||");
+		System.out.println (
+			"\t||            - Counter Party Window Margin Value                                                                           ||"
+		);
 
-		System.out.println ("\t||            - Bank Collateral Threshold                                                                                   ||");
+		System.out.println (
+			"\t||            - Bank Collateral Threshold                                                                                   ||"
+		);
 
-		System.out.println ("\t||            - Counter Party Collateral Threshold                                                                          ||");
+		System.out.println (
+			"\t||            - Counter Party Collateral Threshold                                                                          ||"
+		);
 
-		System.out.println ("\t||            - Bank Posting Requirement                                                                                    ||");
+		System.out.println (
+			"\t||            - Bank Posting Requirement                                                                                    ||"
+		);
 
-		System.out.println ("\t||            - Counter Party Posting Requirement                                                                           ||");
+		System.out.println (
+			"\t||            - Counter Party Posting Requirement                                                                           ||"
+		);
 
-		System.out.println ("\t||            - Gross Posting Requirement                                                                                   ||");
+		System.out.println (
+			"\t||            - Gross Posting Requirement                                                                                   ||"
+		);
 
-		System.out.println ("\t||--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int i = 0; i < iNumStep; ++i) {
-			JulianDate dtEnd = dtStart.addMonths (3);
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			JulianDate endDate = startDate.addMonths (3);
 
-			double dblPortfolioValueFinish = dblTimeWidth * (iNumStep - i) * aJDESwapRate[i].finish();
+			double portfolioValueFinish =
+				timeWidth * (stepCount - stepIndex) * jumpDiffusionEdgeArray[stepIndex].finish();
 
-			CollateralAmountEstimator hae = new CollateralAmountEstimator (
+			CollateralAmountEstimatorOutput collateralAmountEstimatorOutput = new CollateralAmountEstimator (
 				positionGroupSpecification,
 				new BrokenDateInterpolatorLinearT (
-					dtStart.julian(),
-					dtEnd.julian(),
-					dblPortfolioValueStart,
-					dblPortfolioValueFinish
+					startDate.julian(),
+					endDate.julian(),
+					portfolioValueStart,
+					portfolioValueFinish
 				),
 				Double.NaN
+			).output (
+				endDate
 			);
-
-			CollateralAmountEstimatorOutput haeo = hae.output (dtEnd);
 
 			System.out.println (
 				"\t|| " +
-				dtEnd + " => " +
-				FormatUtil.FormatDouble (dblPortfolioValueFinish, 1, 4, 1.) + " | " +
-				haeo.dealerMarginDate() + " | " +
-				haeo.clientMarginDate() + " | " +
-				FormatUtil.FormatDouble (haeo.dealerWindowMarginValue(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (haeo.clientWindowMarginValue(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (haeo.dealerCollateralThreshold(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (haeo.clientCollateralThreshold(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (haeo.dealerPostingRequirement(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (haeo.clientPostingRequirement(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (haeo.postingRequirement(), 1, 4, 1.) + " ||"
+				endDate + " => " +
+				FormatUtil.FormatDouble (portfolioValueFinish, 1, 4, 1.) + " | " +
+				collateralAmountEstimatorOutput.dealerMarginDate() + " | " +
+				collateralAmountEstimatorOutput.clientMarginDate() + " | " +
+				FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.dealerWindowMarginValue(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.clientWindowMarginValue(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.dealerCollateralThreshold(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.clientCollateralThreshold(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.dealerPostingRequirement(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.clientPostingRequirement(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					collateralAmountEstimatorOutput.postingRequirement(),
+					1,
+					4,
+					1.
+				) + " ||"
 			);
 
-			dtStart = dtEnd;
-			dblPortfolioValueStart = dblPortfolioValueFinish;
+			startDate = endDate;
+			portfolioValueStart = portfolioValueFinish;
 		}
 
-		System.out.println ("\t||--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
