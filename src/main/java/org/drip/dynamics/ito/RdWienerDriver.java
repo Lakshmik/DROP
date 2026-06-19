@@ -1,11 +1,24 @@
 
 package org.drip.dynamics.ito;
 
+import org.drip.measure.crng.CorrelatedFactorsPathVertexRealization;
+import org.drip.measure.crng.RandomNumberGenerator;
+import org.drip.measure.gaussian.JointVariance;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -103,51 +116,51 @@ package org.drip.dynamics.ito;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/ito/README.md">Ito Stochastic Process Dynamics Foundation</a></li>
- *  </ul>
+ * 		<li><i>RdWienerDriver</i> Constructor</li>
+ * 		<li>Retrieve the Square Root of the Time Width</li>
+ * 		<li>Retrieve the Joint Variance</li>
+ * 		<li>Emit the Random Sequence Array</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/ito/README.md">Ito Stochastic Process Dynamics Foundation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class RdWienerDriver
-	extends org.drip.dynamics.ito.RdStochasticDriver
+	extends RdStochasticDriver
 {
-	private double _timeWidthSQRT = java.lang.Double.NaN;
-	private org.drip.measure.gaussian.JointVariance _correlation = null;
+	private double _timeWidthSQRT = Double.NaN;
+	private JointVariance _jointVariance = null;
 
 	/**
-	 * RdWienerDriver Constructor
+	 * <i>RdWienerDriver</i> Constructor
 	 * 
 	 * @param timeWidth The Wiener Time Width
 	 * @param correlation The Correlation
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public RdWienerDriver (
 		final double timeWidth,
-		final org.drip.measure.gaussian.JointVariance correlation)
-		throws java.lang.Exception
+		final JointVariance correlation)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				timeWidth
-			) || 0. >= timeWidth ||
-			null == (_correlation = correlation)
-		)
-		{
-			throw new java.lang.Exception (
-				"RdWienerDriver Constructor => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (timeWidth) || 0. >= timeWidth || null == (_jointVariance = correlation)) {
+			throw new Exception ("RdWienerDriver Constructor => Invalid Inputs");
 		}
 
-		_timeWidthSQRT = java.lang.Math.sqrt (
-			timeWidth
-		);
+		_timeWidthSQRT = Math.sqrt (timeWidth);
 	}
 
 	/**
@@ -162,48 +175,45 @@ public class RdWienerDriver
 	}
 
 	/**
-	 * Retrieve the Correlation
+	 * Retrieve the Joint Variance
 	 * 
-	 * @return The Correlation
+	 * @return The Joint Variance
 	 */
 
-	public org.drip.measure.gaussian.JointVariance correlation()
+	public JointVariance jointVariance()
 	{
-		return _correlation;
+		return _jointVariance;
 	}
+
+	/**
+	 * Emit the Random Sequence Array
+	 * 
+	 * @return The Random Sequence Array
+	 */
 
 	@Override public double[] emitSingle()
 	{
-		try
-		{
-			double[] singleCorrelatedSuite = new org.drip.measure.crng.CorrelatedFactorsPathVertexRealization (
-				new org.drip.measure.crng.RandomNumberGenerator(),
-				_correlation.correlationMatrix(),
+		try {
+			double[] singleCorrelatedArray = new CorrelatedFactorsPathVertexRealization (
+				new RandomNumberGenerator(),
+				_jointVariance.correlationMatrix(),
 				1,
 				1,
 				false,
 				null
 			).straightNodeRd();
 
-			if (null == singleCorrelatedSuite)
-			{
+			if (null == singleCorrelatedArray) {
 				return null;
 			}
 
-			int dimension = _correlation.variateCount();
-
-			for (int dimensionIndex = 0;
-				dimensionIndex < dimension;
-				++dimensionIndex)
-			{
-				singleCorrelatedSuite[dimensionIndex] =
-					_timeWidthSQRT * singleCorrelatedSuite[dimensionIndex];
+			for (int dimensionIndex = 0; dimensionIndex < _jointVariance.variateCount(); ++dimensionIndex) {
+				singleCorrelatedArray[dimensionIndex] =
+					_timeWidthSQRT * singleCorrelatedArray[dimensionIndex];
 			}
 
-			return singleCorrelatedSuite;
-		}
-		catch (java.lang.Exception e)
-		{
+			return singleCorrelatedArray;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

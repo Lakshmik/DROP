@@ -281,7 +281,7 @@ public class PrincipalComponentQMDynamics {
 
 		System.out.println ("\t|                                                                                                                               ||");
 
-		System.out.println ("\t|        Number of Prinicipal Components: " + hjm.mfv().msg().numFactor() + "                                                                                     ||");
+		System.out.println ("\t|        Number of Prinicipal Components: " + hjm.multiFactorVolatility().principalFactorSequenceGenerator().numFactor() + "                                                                                     ||");
 
 		System.out.println ("\t|                                                                                                                               ||");
 

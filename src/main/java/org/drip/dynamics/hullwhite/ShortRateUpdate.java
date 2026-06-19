@@ -1,11 +1,25 @@
 
 package org.drip.dynamics.hullwhite;
 
+import org.drip.analytics.definition.LatentStateStatic;
+import org.drip.dynamics.evolution.LSQMPointRecord;
+import org.drip.dynamics.evolution.LSQMPointUpdate;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.state.identifier.FundingLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,79 +96,110 @@ package org.drip.dynamics.hullwhite;
 
 /**
  * <i>ShortRateUpdate</i> records the Metrics associated with the Evolution of the Instantaneous Short Rate
- * from a Starting to the Terminal Date.
+ * 	from a Starting to the Terminal Date. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></li>
+ * 		<li>Construct an Instance of <i>ShortRateUpdate</i></li>
+ * 		<li>Retrieve the Initial Short Rate</li>
+ * 		<li>Retrieve the Realized Final Short Rate</li>
+ * 		<li>Retrieve the Short Rate Increment</li>
+ * 		<li>Retrieve the Expected Final Short Rate</li>
+ * 		<li>Retrieve the Final Short Rate Variance</li>
+ * 		<li>Compute the Zero Coupon Bond Price</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate {
-	private double _dblExpectedFinalShortRate = java.lang.Double.NaN;
-	private double _dblFinalShortRateVariance = java.lang.Double.NaN;
-	private org.drip.state.identifier.FundingLabel _lslFunding = null;
+public class ShortRateUpdate
+	extends LSQMPointUpdate
+{
+	private FundingLabel _fundingLabel = null;
+	private double _expectedFinalShortRate = Double.NaN;
+	private double _finalShortRateVariance = Double.NaN;
 
 	/**
-	 * Construct an Instance of ShortRateUpdate
+	 * Construct an Instance of <i>ShortRateUpdate</i>
 	 * 
-	 * @param lslFunding The Funding Latent State Label
-	 * @param iInitialDate The Initial Date
-	 * @param iFinalDate The Final Date
-	 * @param iTargetPointDate The Target Point Date
-	 * @param dblInitialShortRate The Initial Short Rate
-	 * @param dblRealizedFinalShortRate The Realized Final Short Rate
-	 * @param dblExpectedFinalShortRate The Expected Final Short Rate
-	 * @param dblFinalShortRateVariance The Final Variance of the Short Rate
-	 * @param dblZeroCouponBondPrice The Zero Coupon Bond Price
+	 * @param fundingLabel The Funding Latent State Label
+	 * @param initialDate The Initial Date
+	 * @param finalDate The Final Date
+	 * @param targetPointDate The Target Point Date
+	 * @param initialShortRate The Initial Short Rate
+	 * @param realizedFinalShortRate The Realized Final Short Rate
+	 * @param expectedFinalShortRate The Expected Final Short Rate
+	 * @param finalShortRateVariance The Final Variance of the Short Rate
+	 * @param zeroCouponBondPrice The Zero Coupon Bond Price
 	 * 
-	 * @return The ShortRateUpdate Instance
+	 * @return The <i>ShortRateUpdate</i> Instance
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public static final ShortRateUpdate Create (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final int iInitialDate,
-		final int iFinalDate,
-		final int iTargetPointDate,
-		final double dblInitialShortRate,
-		final double dblRealizedFinalShortRate,
-		final double dblExpectedFinalShortRate,
-		final double dblFinalShortRateVariance,
-		final double dblZeroCouponBondPrice)
-		throws java.lang.Exception
+		final FundingLabel fundingLabel,
+		final int initialDate,
+		final int finalDate,
+		final int targetPointDate,
+		final double initialShortRate,
+		final double realizedFinalShortRate,
+		final double expectedFinalShortRate,
+		final double finalShortRateVariance,
+		final double zeroCouponBondPrice)
+		throws Exception
 	{
-		org.drip.dynamics.evolution.LSQMPointRecord lrSnapshot = new
-			org.drip.dynamics.evolution.LSQMPointRecord();
+		LSQMPointRecord snapshotLSQMPointRecord = new LSQMPointRecord();
 
-		if (!lrSnapshot.setQM (lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
-				dblRealizedFinalShortRate))
+		if (!snapshotLSQMPointRecord.setStateQuantificationMetric (
+			fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
+			realizedFinalShortRate
+		))
+		{
 			return null;
+		}
 
-		if (!lrSnapshot.setQM (lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR,
-				dblZeroCouponBondPrice))
+		if (!snapshotLSQMPointRecord.setStateQuantificationMetric (
+			fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR,
+			zeroCouponBondPrice
+		))
+		{
 			return null;
+		}
 
-		org.drip.dynamics.evolution.LSQMPointRecord lrIncrement = new
-			org.drip.dynamics.evolution.LSQMPointRecord();
+		LSQMPointRecord incrementLSQMPointRecord = new LSQMPointRecord();
 
-		if (!lrIncrement.setQM (lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
-				dblRealizedFinalShortRate - dblInitialShortRate))
+		if (!incrementLSQMPointRecord.setStateQuantificationMetric (
+			fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
+			realizedFinalShortRate - initialShortRate
+		))
+		{
 			return null;
+		}
 
 		try {
-			return new ShortRateUpdate (lslFunding, iInitialDate, iFinalDate, iTargetPointDate, lrSnapshot,
-				lrIncrement, dblExpectedFinalShortRate, dblFinalShortRateVariance);
-		} catch (java.lang.Exception e) {
+			return new ShortRateUpdate (
+				fundingLabel,
+				initialDate,
+				finalDate,
+				targetPointDate,
+				snapshotLSQMPointRecord,
+				incrementLSQMPointRecord,
+				expectedFinalShortRate,
+				finalShortRateVariance
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -162,29 +207,29 @@ public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate
 	}
 
 	private ShortRateUpdate (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final int iInitialDate,
-		final int iFinalDate,
-		final int iViewDate,
-		final org.drip.dynamics.evolution.LSQMPointRecord lrSnapshot,
-		final org.drip.dynamics.evolution.LSQMPointRecord lrIncrement,
-		final double dblExpectedFinalShortRate,
-		final double dblFinalShortRateVariance)
-		throws java.lang.Exception
+		final FundingLabel fundingLabel,
+		final int initialDate,
+		final int finalDate,
+		final int viewDate,
+		final LSQMPointRecord snapshotLSQMPointRecord,
+		final LSQMPointRecord incrementLSQMPointRecord,
+		final double expectedFinalShortRate,
+		final double finalShortRateVariance)
+		throws Exception
 	{
-		super (iInitialDate, iFinalDate, iViewDate, lrSnapshot, lrIncrement);
+		super (initialDate, finalDate, viewDate, snapshotLSQMPointRecord, incrementLSQMPointRecord);
 
-		if (null == (_lslFunding = lslFunding) || !org.drip.numerical.common.NumberUtil.IsValid
-			(_dblExpectedFinalShortRate = dblExpectedFinalShortRate) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblFinalShortRateVariance =
-					dblFinalShortRateVariance)) {
-			System.out.println (_lslFunding.fullyQualifiedName());
+		if (null == (_fundingLabel = fundingLabel) ||
+			!NumberUtil.IsValid (_expectedFinalShortRate = expectedFinalShortRate) ||
+			!NumberUtil.IsValid (_finalShortRateVariance = finalShortRateVariance))
+		{
+			System.out.println (_fundingLabel.fullyQualifiedName());
 
-			System.out.println ("Final Short Rate: " + _dblExpectedFinalShortRate);
+			System.out.println ("Final Short Rate: " + _expectedFinalShortRate);
 
-			System.out.println ("Final Short Rate Variance: " + _dblFinalShortRateVariance);
+			System.out.println ("Final Short Rate Variance: " + _finalShortRateVariance);
 
-			throw new java.lang.Exception ("ShortRateUpdate ctr: Invalid Inputs!");
+			throw new Exception ("ShortRateUpdate Constructor: Invalid Inputs!");
 		}
 	}
 
@@ -193,11 +238,11 @@ public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate
 	 * 
 	 * @return The Initial Short Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Initial Short Rate is not available
+	 * @throws Exception Thrown if the Initial Short Rate is not available
 	 */
 
 	public double initialShortRate()
-		throws java.lang.Exception
+		throws Exception
 	{
 		return realizedFinalShortRate() - shortRateIncrement();
 	}
@@ -207,14 +252,13 @@ public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate
 	 * 
 	 * @return The Realized Final Short Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Realized Final Short Rate is not available
+	 * @throws Exception Thrown if the Realized Final Short Rate is not available
 	 */
 
 	public double realizedFinalShortRate()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
+		return snapshot().quantificationMetric (_fundingLabel, LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
 	}
 
 	/**
@@ -222,14 +266,13 @@ public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate
 	 * 
 	 * @return The Short Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Short Rate Increment is not available
+	 * @throws Exception Thrown if the Short Rate Increment is not available
 	 */
 
 	public double shortRateIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
+		return increment().quantificationMetric (_fundingLabel, LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
 	}
 
 	/**
@@ -240,7 +283,7 @@ public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate
 
 	public double expectedFinalShortRate()
 	{
-		return _dblExpectedFinalShortRate;
+		return _expectedFinalShortRate;
 	}
 
 	/**
@@ -251,27 +294,30 @@ public class ShortRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate
 
 	public double finalShortRateVariance()
 	{
-		return _dblFinalShortRateVariance;
+		return _finalShortRateVariance;
 	}
 
 	/**
 	 * Compute the Zero Coupon Bond Price
 	 * 
-	 * @param dblFinalInitialZeroRatio The Final-to-Initial Zero-Coupon Bond Price Ratio
+	 * @param finalInitialZeroRatio The Final-to-Initial Zero-Coupon Bond Price Ratio
 	 * 
 	 * @return The Zero Coupon Bond Price
 	 * 
-	 * @throws java.lang.Exception Thrown if the Zero Coupon Bond Price cannot be computed
+	 * @throws Exception Thrown if the Zero Coupon Bond Price cannot be computed
 	 */
 
 	public double zeroCouponBondPrice (
-		final double dblFinalInitialZeroRatio)
-		throws java.lang.Exception
+		final double finalInitialZeroRatio)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblFinalInitialZeroRatio))
-			throw new java.lang.Exception ("ShortRateUpdate::zeroCouponBondPrice => Invalid Inputs");
+		if (!NumberUtil.IsValid (finalInitialZeroRatio)) {
+			throw new Exception ("ShortRateUpdate::zeroCouponBondPrice => Invalid Inputs");
+		}
 
-		return dblFinalInitialZeroRatio * snapshot().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR);
+		return finalInitialZeroRatio * snapshot().quantificationMetric (
+			_fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR
+		);
 	}
 }

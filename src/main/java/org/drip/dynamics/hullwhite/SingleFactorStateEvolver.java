@@ -1,11 +1,26 @@
 
 package org.drip.dynamics.hullwhite;
 
+import org.drip.dynamics.evolution.LSQMPointUpdate;
+import org.drip.dynamics.evolution.PointStateEvolver;
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.sequence.random.UnivariateSequenceGenerator;
+import org.drip.state.identifier.FundingLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,50 +97,73 @@ package org.drip.dynamics.hullwhite;
 
 /**
  * <i>SingleFactorStateEvolver</i> provides the Hull-White One-Factor Gaussian HJM Short Rate Dynamics
- * Implementation.
+ * 	Implementation. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></li>
+ * 		<li><i>SingleFactorStateEvolver</i> Constructor</li>
+ * 		<li>Retrieve the Funding Label</li>
+ * 		<li>Retrieve Sigma</li>
+ * 		<li>Retrieve A</li>
+ * 		<li>Retrieve the Initial Instantaneous Forward Rate Term Structure</li>
+ * 		<li>Retrieve the Random Sequence Generator</li>
+ * 		<li>Calculate the Alpha</li>
+ * 		<li>Calculate the Theta</li>
+ * 		<li>Calculate the Short Rate Increment</li>
+ * 		<li>Evolve the Latent State and return the LSQM Point Update</li>
+ * 		<li>Generate the Metrics associated with the Transition that results from using a Trinomial Tree Using the Starting Node Metrics</li>
+ * 		<li>Evolve the Trinomial Tree Sequence #1</li>
+ * 		<li>Evolve the Trinomial Tree Sequence #2</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.PointStateEvolver {
-	private double _dblA = java.lang.Double.NaN;
-	private double _dblSigma = java.lang.Double.NaN;
-	private org.drip.function.definition.R1ToR1 _auIFRInitial = null;
-	private org.drip.state.identifier.FundingLabel _lslFunding = null;
-	private org.drip.sequence.random.UnivariateSequenceGenerator _usg = null;
+public class SingleFactorStateEvolver
+	implements PointStateEvolver
+{
+	private double _a = Double.NaN;
+	private double _sigma = Double.NaN;
+	private FundingLabel _fundingLabel = null;
+	private R1ToR1 _initialSingleFactorFunction = null;
+	private UnivariateSequenceGenerator _univariateSequenceGenerator = null;
 
 	/**
-	 * SingleFactorStateEvolver Constructor
+	 * <i>SingleFactorStateEvolver</i> Constructor
 	 * 
-	 * @param lslFunding The Funding Latent State Label
-	 * @param dblSigma Sigma
-	 * @param dblA A
-	 * @param auIFRInitial The Initial Instantaneous Forward Rate Term Structure
-	 * @param usg Univariate Random Sequence Generator
+	 * @param fundingLabel The Funding Latent State Label
+	 * @param sigma Sigma
+	 * @param a A
+	 * @param initialSingleFactorFunction The Initial Instantaneous Forward Rate Term Structure
+	 * @param univariateSequenceGenerator Univariate Random Sequence Generator
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public SingleFactorStateEvolver (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final double dblSigma,
-		final double dblA,
-		final org.drip.function.definition.R1ToR1 auIFRInitial,
-		final org.drip.sequence.random.UnivariateSequenceGenerator usg)
-		throws java.lang.Exception
+		final FundingLabel fundingLabel,
+		final double sigma,
+		final double a,
+		final R1ToR1 initialSingleFactorFunction,
+		final UnivariateSequenceGenerator univariateSequenceGenerator)
+		throws Exception
 	{
-		if (null == (_lslFunding = lslFunding) || !org.drip.numerical.common.NumberUtil.IsValid (_dblSigma =
-			dblSigma) || !org.drip.numerical.common.NumberUtil.IsValid (_dblA = dblA) || null == (_auIFRInitial =
-				auIFRInitial) || null == (_usg = usg))
-			throw new java.lang.Exception ("SingleFactorStateEvolver ctr: Invalid Inputs");
+		if (null == (_fundingLabel = fundingLabel) ||
+			!NumberUtil.IsValid (_sigma = sigma) ||
+			!NumberUtil.IsValid (_a = a) ||
+			null == (_initialSingleFactorFunction = initialSingleFactorFunction) ||
+			null == (_univariateSequenceGenerator = univariateSequenceGenerator))
+		{
+			throw new Exception ("SingleFactorStateEvolver Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -134,9 +172,9 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 	 * @return The Funding Label
 	 */
 
-	public org.drip.state.identifier.FundingLabel fundingLabel()
+	public FundingLabel fundingLabel()
 	{
-		return _lslFunding;
+		return _fundingLabel;
 	}
 
 	/**
@@ -147,7 +185,7 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 
 	public double sigma()
 	{
-		return _dblSigma;
+		return _sigma;
 	}
 
 	/**
@@ -158,7 +196,7 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 
 	public double a()
 	{
-		return _dblA;
+		return _a;
 	}
 
 	/**
@@ -167,9 +205,9 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 	 * @return The Initial Instantaneous Forward Rate Term Structure
 	 */
 
-	public org.drip.function.definition.R1ToR1 ifrInitialTermStructure()
+	public R1ToR1 initialSingleFactorFunction()
 	{
-		return _auIFRInitial;
+		return _initialSingleFactorFunction;
 	}
 
 	/**
@@ -178,140 +216,162 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 	 * @return The Random Sequence Generator
 	 */
 
-	public org.drip.sequence.random.UnivariateSequenceGenerator rsg()
+	public UnivariateSequenceGenerator univariateSequenceGenerator()
 	{
-		return _usg;
+		return _univariateSequenceGenerator;
 	}
 
 	/**
 	 * Calculate the Alpha
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
 	 * 
 	 * @return Alpha
 	 * 
-	 * @throws java.lang.Exception Thrown if Alpha cannot be computed
+	 * @throws Exception Thrown if Alpha cannot be computed
 	 */
 
 	public double alpha (
-		final int iSpotDate,
-		final int iViewDate)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate)
-			throw new java.lang.Exception ("SingleFactorStateEvolver::alpha => Invalid Inputs");
+		if (spotDate > viewDate) {
+			throw new Exception ("SingleFactorStateEvolver::alpha => Invalid Inputs");
+		}
 
-		double dblAlphaVol = _dblSigma * (1. - java.lang.Math.exp (_dblA * (iViewDate - iSpotDate) / 365.25))
-			/ _dblA;
+		double alphaVol = _sigma * (1. - Math.exp (_a * (viewDate - spotDate) / 365.25)) / _a;
 
-		return _auIFRInitial.evaluate (iViewDate) + 0.5 * dblAlphaVol * dblAlphaVol;
+		return _initialSingleFactorFunction.evaluate (viewDate) + 0.5 * alphaVol * alphaVol;
 	}
 
 	/**
 	 * Calculate the Theta
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
 	 * 
 	 * @return Theta
 	 * 
-	 * @throws java.lang.Exception Thrown if Theta cannot be computed
+	 * @throws Exception Thrown if Theta cannot be computed
 	 */
 
 	public double theta (
-		final int iSpotDate,
-		final int iViewDate)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate)
-			throw new java.lang.Exception ("SingleFactorStateEvolver::theta => Invalid Inputs");
+		if (spotDate > viewDate) {
+			throw new Exception ("SingleFactorStateEvolver::theta => Invalid Inputs");
+		}
 
-		return _auIFRInitial.derivative (iViewDate, 1) + _dblA * _auIFRInitial.evaluate (iViewDate) +
-			_dblSigma * _dblSigma / (2. * _dblA) * (1. - java.lang.Math.exp (-2. * _dblA * (iViewDate -
-				iSpotDate) / 365.25));
+		return _initialSingleFactorFunction.derivative (viewDate, 1) +
+			_a * _initialSingleFactorFunction.evaluate (viewDate) +
+			_sigma * _sigma / (2. * _a) * (1. - Math.exp (-2. * _a * (viewDate - spotDate) / 365.25));
 	}
 
 	/**
 	 * Calculate the Short Rate Increment
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param dblShortRate The Short Rate
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param shortRate The Short Rate
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Short Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Short Rate cannot be computed
+	 * @throws Exception Thrown if the Short Rate cannot be computed
 	 */
 
 	public double shortRateIncrement (
-		final int iSpotDate,
-		final int iViewDate,
-		final double dblShortRate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final double shortRate,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate || !org.drip.numerical.common.NumberUtil.IsValid (dblShortRate))
-			throw new java.lang.Exception ("SingleFactorStateEvolver::shortRateIncrement => Invalid Inputs");
+		if (spotDate > viewDate || !NumberUtil.IsValid (shortRate)) {
+			throw new Exception ("SingleFactorStateEvolver::shortRateIncrement => Invalid Inputs");
+		}
 
-		double dblAnnualizedIncrement = 1. * iViewTimeIncrement / 365.25;
+		double annualizedIncrement = 1. * viewTimeIncrement / 365.25;
 
-		return (theta (iSpotDate, iViewDate) - _dblA * dblShortRate) * dblAnnualizedIncrement + _dblSigma *
-			java.lang.Math.sqrt (dblAnnualizedIncrement) * _usg.random();
+		return (theta (spotDate, viewDate) - _a * shortRate) * annualizedIncrement +
+			_sigma * Math.sqrt (annualizedIncrement) * _univariateSequenceGenerator.random();
 	}
 
-	@Override public org.drip.dynamics.evolution.LSQMPointUpdate evolve (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iSpotTimeIncrement,
-		final org.drip.dynamics.evolution.LSQMPointUpdate lsqmPrev)
-	{
-		if (iViewDate < iSpotDate || null == lsqmPrev || !(lsqmPrev instanceof
-			org.drip.dynamics.hullwhite.ShortRateUpdate))
-			return null;
+	/**
+	 * Evolve the Latent State and return the LSQM Point Update
+	 * 
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param spotTimeIncrement The Spot Time Increment
+	 * @param previousLSQMPointUpdate The Previous LSQM Point Update
+	 * 
+	 * @return The LSQM Point Update
+	 */
 
-		int iDate = iSpotDate;
-		int iTimeIncrement = 1;
-		int iFinalDate = iSpotDate + iSpotTimeIncrement;
-		double dblInitialShortRate = java.lang.Double.NaN;
+	@Override public LSQMPointUpdate evolve (
+		final int spotDate,
+		final int viewDate,
+		final int spotTimeIncrement,
+		final LSQMPointUpdate previousLSQMPointUpdate)
+	{
+		if (viewDate < spotDate ||
+			null == previousLSQMPointUpdate || !(previousLSQMPointUpdate instanceof ShortRateUpdate))
+		{
+			return null;
+		}
+
+		int date = spotDate;
+		int timeIncrement = 1;
+		double initialShortRate = Double.NaN;
+		int finalDate = spotDate + spotTimeIncrement;
 
 		try {
-			dblInitialShortRate = ((org.drip.dynamics.hullwhite.ShortRateUpdate)
-				lsqmPrev).realizedFinalShortRate();
-		} catch (java.lang.Exception e) {
+			initialShortRate = ((ShortRateUpdate) previousLSQMPointUpdate).realizedFinalShortRate();
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		double dblShortRate = dblInitialShortRate;
+		double shortRate = initialShortRate;
 
-		while (iDate < iFinalDate) {
+		while (date < finalDate) {
 			try {
-				dblShortRate += shortRateIncrement (iSpotDate, iDate, dblShortRate, iTimeIncrement);
-			} catch (java.lang.Exception e) {
+				shortRate += shortRateIncrement (spotDate, date, shortRate, timeIncrement);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 
-			++iDate;
+			++date;
 		}
 
-		double dblADF = java.lang.Math.exp (-1. * _dblA * iSpotTimeIncrement);
+		double adf = Math.exp (-1. * _a * spotTimeIncrement);
 
-		double dblB = (1. - dblADF) / _dblA;
+		double b = (1. - adf) / _a;
 
 		try {
-			return org.drip.dynamics.hullwhite.ShortRateUpdate.Create (_lslFunding, iSpotDate, iFinalDate,
-				iViewDate, dblInitialShortRate, dblShortRate, dblInitialShortRate * dblADF + alpha
-					(iSpotDate, iFinalDate) - alpha (iSpotDate, iViewDate) * dblADF, 0.5 * _dblSigma *
-						_dblSigma * (1. - dblADF * dblADF) / _dblA, java.lang.Math.exp (dblB *
-							_auIFRInitial.evaluate (iViewDate) - 0.25 * _dblSigma * _dblSigma * (1. -
-								java.lang.Math.exp (-2. * _dblA * (iViewDate - iSpotDate) / 365.25)) * dblB *
-									dblB / _dblA));
-		} catch (java.lang.Exception e) {
+			return ShortRateUpdate.Create (
+				_fundingLabel,
+				spotDate,
+				finalDate,
+				viewDate,
+				initialShortRate,
+				shortRate,
+				initialShortRate * adf + alpha (spotDate, finalDate) - alpha (spotDate, viewDate) * adf,
+				0.5 * _sigma * _sigma * (1. - adf * adf) / _a,
+				Math.exp (
+					b * _initialSingleFactorFunction.evaluate (viewDate) -
+						0.25 * _sigma * _sigma *
+							(1. - Math.exp (-2. * _a * (viewDate - spotDate) / 365.25)) * b * b / _a
+				)
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -322,42 +382,49 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 	 * Generate the Metrics associated with the Transition that results from using a Trinomial Tree Using the
 	 *  Starting Node Metrics
 	 * 
-	 * @param iSpotDate The Spot/Epoch Date
-	 * @param iInitialDate The Initial Date
-	 * @param iTerminalDate The Terminal Date
-	 * @param hwnmInitial The Initial Node Metrics
+	 * @param spotDate The Spot/Epoch Date
+	 * @param initialDate The Initial Date
+	 * @param terminalDate The Terminal Date
+	 * @param initialTrinomialTreeNodeMetrics The Initial Node Metrics
 	 * 
 	 * @return The Hull White Transition Metrics
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics evolveTrinomialTree (
-		final int iSpotDate,
-		final int iInitialDate,
-		final int iTerminalDate,
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmInitial)
+	public TrinomialTreeTransitionMetrics evolveTrinomialTree (
+		final int spotDate,
+		final int initialDate,
+		final int terminalDate,
+		final TrinomialTreeNodeMetrics initialTrinomialTreeNodeMetrics)
 	{
-		if (iInitialDate < iSpotDate || iTerminalDate <= iInitialDate) return null;
-
-		long lTreeTimeIndex = 0L;
-		double dblExpectedTerminalX = 0.;
-		long lTreeStochasticBaseIndex = 0L;
-
-		if (null != hwnmInitial) {
-			dblExpectedTerminalX = hwnmInitial.x();
-
-			lTreeTimeIndex = hwnmInitial.timeIndex() + 1;
-
-			lTreeStochasticBaseIndex = hwnmInitial.xStochasticIndex();
+		if (initialDate < spotDate || terminalDate <= initialDate) {
+			return null;
 		}
 
-		double dblADF = java.lang.Math.exp (-1. * _dblA * (iTerminalDate - iInitialDate) / 365.25);
+		long treeTimeIndex = 0L;
+		double expectedTerminalX = 0.;
+		long treeStochasticBaseIndex = 0L;
+
+		if (null != initialTrinomialTreeNodeMetrics) {
+			expectedTerminalX = initialTrinomialTreeNodeMetrics.x();
+
+			treeTimeIndex = initialTrinomialTreeNodeMetrics.timeIndex() + 1;
+
+			treeStochasticBaseIndex = initialTrinomialTreeNodeMetrics.xStochasticIndex();
+		}
+
+		double adf = Math.exp (-1. * _a * (terminalDate - initialDate) / 365.25);
 
 		try {
-			return new org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics (iInitialDate,
-				iTerminalDate, lTreeTimeIndex, lTreeStochasticBaseIndex, dblExpectedTerminalX * dblADF, 0.5 *
-					_dblSigma * _dblSigma * (1. - dblADF * dblADF) / _dblA, alpha (iSpotDate,
-						iTerminalDate));
-		} catch (java.lang.Exception e) {
+			return new TrinomialTreeTransitionMetrics (
+				initialDate,
+				terminalDate,
+				treeTimeIndex,
+				treeStochasticBaseIndex,
+				expectedTerminalX * adf,
+				0.5 * _sigma * _sigma * (1. - adf * adf) / _a,
+				alpha (spotDate, terminalDate)
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -365,55 +432,112 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 	}
 
 	/**
-	 * Evolve the Trinomial Tree Sequence
+	 * Evolve the Trinomial Tree Sequence #1
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iInitialDate The Initial Date
-	 * @param iDayIncrement The Day Increment
-	 * @param iNumIncrement Number of Times to Increment
-	 * @param hwnm Starting Node Metrics
-	 * @param hwsm The Sequence Metrics
+	 * @param spotDate The Spot Date
+	 * @param initialDate The Initial Date
+	 * @param dayIncrement The Day Increment
+	 * @param incrementCount Number of Times to Increment
+	 * @param trinomialTreeNodeMetrics Starting Node Metrics
+	 * @param trinomialTreeSequenceMetrics The Sequence Metrics
 	 * 
 	 * @return TRUE - The Tree Successfully Evolved
 	 */
 
 	public boolean evolveTrinomialTreeSequence (
-		final int iSpotDate,
-		final int iInitialDate,
-		final int iDayIncrement,
-		final int iNumIncrement,
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnm,
-		final org.drip.dynamics.hullwhite.TrinomialTreeSequenceMetrics hwsm)
+		final int spotDate,
+		final int initialDate,
+		final int dayIncrement,
+		final int incrementCount,
+		final TrinomialTreeNodeMetrics trinomialTreeNodeMetrics,
+		final TrinomialTreeSequenceMetrics trinomialTreeSequenceMetrics)
 	{
-		if (iInitialDate < iSpotDate || 0 >= iDayIncrement || null == hwsm) return false;
-
-		if (0 == iNumIncrement) return true;
-
-		org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics hwtm = evolveTrinomialTree (iSpotDate,
-			iInitialDate, iInitialDate + iDayIncrement, hwnm);
-
-		if (!hwsm.addTransitionMetrics (hwtm)) return false;
-
-		org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmUp = hwtm.upNodeMetrics();
-
-		if (!hwsm.addNodeMetrics (hwnmUp) || (null != hwnm && !hwsm.setTransitionProbability (hwnm, hwnmUp,
-			hwtm.probabilityUp())) || !evolveTrinomialTreeSequence (iSpotDate, iInitialDate + iDayIncrement,
-				iDayIncrement, iNumIncrement - 1, hwnmUp, hwsm))
+		if (initialDate < spotDate || 0 >= dayIncrement || null == trinomialTreeSequenceMetrics) {
 			return false;
+		}
 
-		org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmDown = hwtm.downNodeMetrics();
+		if (0 == incrementCount) {
+			return true;
+		}
 
-		if (!hwsm.addNodeMetrics (hwnmDown) || (null != hwnm && !hwsm.setTransitionProbability (hwnm,
-			hwnmDown, hwtm.probabilityDown())) || !evolveTrinomialTreeSequence (iSpotDate, iInitialDate +
-				iDayIncrement, iDayIncrement, iNumIncrement - 1, hwnmDown, hwsm))
+		TrinomialTreeTransitionMetrics trinomialTreeTransitionMetrics = evolveTrinomialTree (
+			spotDate,
+			initialDate,
+			initialDate + dayIncrement,
+			trinomialTreeNodeMetrics
+		);
+
+		if (!trinomialTreeSequenceMetrics.addTransitionMetrics (trinomialTreeTransitionMetrics)) {
 			return false;
+		}
 
-		org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmStay = hwtm.stayNodeMetrics();
+		TrinomialTreeNodeMetrics upTrinomialTreeNodeMetrics = trinomialTreeTransitionMetrics.upNodeMetrics();
 
-		if (!hwsm.addNodeMetrics (hwnmStay) || (null != hwnm && !hwsm.setTransitionProbability (hwnm,
-			hwnmStay, hwtm.probabilityStay())) || !evolveTrinomialTreeSequence (iSpotDate, iInitialDate +
-				iDayIncrement, iDayIncrement, iNumIncrement - 1, hwnmStay, hwsm))
+		if (!trinomialTreeSequenceMetrics.addNodeMetrics (upTrinomialTreeNodeMetrics) || (
+				null != trinomialTreeNodeMetrics &&
+				!trinomialTreeSequenceMetrics.setTransitionProbability (
+					trinomialTreeNodeMetrics,
+					upTrinomialTreeNodeMetrics,
+					trinomialTreeTransitionMetrics.probabilityUp()
+				)
+			) || !evolveTrinomialTreeSequence (
+				spotDate,
+				initialDate + dayIncrement,
+				dayIncrement,
+				incrementCount - 1,
+				upTrinomialTreeNodeMetrics,
+				trinomialTreeSequenceMetrics
+			)
+		)
+		{
 			return false;
+		}
+
+		TrinomialTreeNodeMetrics downTrinomialTreeNodeMetrics =
+			trinomialTreeTransitionMetrics.downNodeMetrics();
+
+		if (!trinomialTreeSequenceMetrics.addNodeMetrics (downTrinomialTreeNodeMetrics) || (
+				null != trinomialTreeNodeMetrics &&
+				!trinomialTreeSequenceMetrics.setTransitionProbability (
+					trinomialTreeNodeMetrics,
+					downTrinomialTreeNodeMetrics,
+					trinomialTreeTransitionMetrics.probabilityDown()
+				)
+			) || !evolveTrinomialTreeSequence (
+				spotDate,
+				initialDate + dayIncrement,
+				dayIncrement,
+				incrementCount - 1,
+				downTrinomialTreeNodeMetrics,
+				trinomialTreeSequenceMetrics
+			)
+		)
+		{
+			return false;
+		}
+
+		TrinomialTreeNodeMetrics stayTrinomialTreeNodeMetrics =
+			trinomialTreeTransitionMetrics.stayNodeMetrics();
+
+		if (!trinomialTreeSequenceMetrics.addNodeMetrics (stayTrinomialTreeNodeMetrics) || (
+				null != trinomialTreeNodeMetrics &&
+				!trinomialTreeSequenceMetrics.setTransitionProbability (
+					trinomialTreeNodeMetrics,
+					stayTrinomialTreeNodeMetrics,
+					trinomialTreeTransitionMetrics.probabilityStay()
+				)
+			) || !evolveTrinomialTreeSequence (
+				spotDate,
+				initialDate + dayIncrement,
+				dayIncrement,
+				incrementCount - 1,
+				stayTrinomialTreeNodeMetrics,
+				trinomialTreeSequenceMetrics
+			)
+		)
+		{
+			return false;
+		}
 
 		return true;
 	}
@@ -421,22 +545,27 @@ public class SingleFactorStateEvolver implements org.drip.dynamics.evolution.Poi
 	/**
 	 * Evolve the Trinomial Tree Sequence
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iDayIncrement The Day Increment
-	 * @param iNumIncrement Number of Times to Increment
+	 * @param spotDate The Spot Date
+	 * @param dayIncrement The Day Increment
+	 * @param incrementCount Number of Times to Increment
 	 * 
 	 * @return The Sequence Metrics
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeSequenceMetrics evolveTrinomialTreeSequence (
-		final int iSpotDate,
-		final int iDayIncrement,
-		final int iNumIncrement)
+	public TrinomialTreeSequenceMetrics evolveTrinomialTreeSequence (
+		final int spotDate,
+		final int dayIncrement,
+		final int incrementCount)
 	{
-		org.drip.dynamics.hullwhite.TrinomialTreeSequenceMetrics hwsm = new
-			org.drip.dynamics.hullwhite.TrinomialTreeSequenceMetrics();
+		TrinomialTreeSequenceMetrics trinomialTreeSequenceMetrics = new TrinomialTreeSequenceMetrics();
 
-		return evolveTrinomialTreeSequence (iSpotDate, iSpotDate, iDayIncrement, iNumIncrement, null, hwsm) ?
-			hwsm : null;
+		return evolveTrinomialTreeSequence (
+			spotDate,
+			spotDate,
+			dayIncrement,
+			incrementCount,
+			null,
+			trinomialTreeSequenceMetrics
+		) ? trinomialTreeSequenceMetrics : null;
 	}
 }

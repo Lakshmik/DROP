@@ -1,11 +1,23 @@
 
 package org.drip.dynamics.hjm;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.sequence.random.UnivariateSequenceGenerator;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,59 +93,80 @@ package org.drip.dynamics.hjm;
  */
 
 /**
- * <i>G2PlusPlus</i> provides the Hull-White-type, but 2F Gaussian HJM Short Rate Dynamics Implementation.
+ * <i>G2PlusPlus</i> provides the Hull-White-type, but 2F Gaussian HJM Short Rate Dynamics Implementation. It
+ *  provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></li>
+ * 		<li><i>G2PlusPlus</i> Constructor</li>
+ * 		<li>Retrieve Sigma</li>
+ * 		<li>Retrieve A</li>
+ * 		<li>Retrieve Eta</li>
+ * 		<li>Retrieve B</li>
+ * 		<li>Retrieve the Initial Instantaneous Forward Rate Term Structure</li>
+ * 		<li>Retrieve the Random Sequence Generator Array</li>
+ * 		<li>Retrieve Rho</li>
+ * 		<li>Compute the G2++ Phi</li>
+ * 		<li>Compute the X Increment</li>
+ * 		<li>Compute the Y Increment</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class G2PlusPlus {
-	private double _dblA = java.lang.Double.NaN;
-	private double _dblB = java.lang.Double.NaN;
-	private double _dblEta = java.lang.Double.NaN;
-	private double _dblRho = java.lang.Double.NaN;
-	private double _dblSigma = java.lang.Double.NaN;
-	private org.drip.function.definition.R1ToR1 _auIFRInitial = null;
-	private org.drip.sequence.random.UnivariateSequenceGenerator[] _aRSG = null;
+public class G2PlusPlus
+{
+	private double _a = Double.NaN;
+	private double _b = Double.NaN;
+	private double _eta = Double.NaN;
+	private double _rho = Double.NaN;
+	private double _sigma = Double.NaN;
+	private R1ToR1 _initialInstantaneousForwardFunction = null;
+	private UnivariateSequenceGenerator[] _univariateSequenceGeneratorArray = null;
 
 	/**
-	 * G2PlusPlus Constructor
+	 * <i>G2PlusPlus</i> Constructor
 	 * 
-	 * @param dblSigma Sigma
-	 * @param dblA A
-	 * @param dblEta Eta
-	 * @param dblB B
-	 * @param aRSG Array of the Random Sequence Generators
-	 * @param dblRho Rho
-	 * @param auIFRInitial The Initial Instantaneous Forward Rate Term Structure
+	 * @param sigma Sigma
+	 * @param a A
+	 * @param eta Eta
+	 * @param b B
+	 * @param univariateSequenceGeneratorArray Array of the Random Sequence Generators
+	 * @param rho Rho
+	 * @param initialInstantaneousForwardFunction The Initial Instantaneous Forward Rate Term Structure
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public G2PlusPlus (
-		final double dblSigma,
-		final double dblA,
-		final double dblEta,
-		final double dblB,
-		final org.drip.sequence.random.UnivariateSequenceGenerator[] aRSG,
-		final double dblRho,
-		final org.drip.function.definition.R1ToR1 auIFRInitial)
-		throws java.lang.Exception
+		final double sigma,
+		final double a,
+		final double eta,
+		final double b,
+		final UnivariateSequenceGenerator[] univariateSequenceGeneratorArray,
+		final double rho,
+		final R1ToR1 initialInstantaneousForwardFunction)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblSigma = dblSigma) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblA = dblA) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblEta = dblEta) ||
-					!org.drip.numerical.common.NumberUtil.IsValid (_dblB = dblB) || null == (_aRSG = aRSG) || 2
-						!= _aRSG.length || !org.drip.numerical.common.NumberUtil.IsValid (_dblRho = dblRho) ||
-							null == (_auIFRInitial = auIFRInitial))
-			throw new java.lang.Exception ("G2PlusPlus ctr: Invalid Inputs");
+		if (!NumberUtil.IsValid (_sigma = sigma) ||
+			!NumberUtil.IsValid (_a = a) ||
+			!NumberUtil.IsValid (_eta = eta) ||
+			!NumberUtil.IsValid (_b = b) ||
+			null == (_univariateSequenceGeneratorArray = univariateSequenceGeneratorArray) ||
+				2 != _univariateSequenceGeneratorArray.length ||
+			!NumberUtil.IsValid (_rho = rho) ||
+			null == (_initialInstantaneousForwardFunction = initialInstantaneousForwardFunction))
+		{
+			throw new Exception ("G2PlusPlus Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -144,7 +177,7 @@ public class G2PlusPlus {
 
 	public double sigma()
 	{
-		return _dblSigma;
+		return _sigma;
 	}
 
 	/**
@@ -155,7 +188,7 @@ public class G2PlusPlus {
 
 	public double a()
 	{
-		return _dblA;
+		return _a;
 	}
 
 	/**
@@ -166,7 +199,7 @@ public class G2PlusPlus {
 
 	public double eta()
 	{
-		return _dblEta;
+		return _eta;
 	}
 
 	/**
@@ -177,7 +210,7 @@ public class G2PlusPlus {
 
 	public double b()
 	{
-		return _dblB;
+		return _b;
 	}
 
 	/**
@@ -186,9 +219,9 @@ public class G2PlusPlus {
 	 * @return The Initial Instantaneous Forward Rate Term Structure
 	 */
 
-	public org.drip.function.definition.R1ToR1 ifrInitialTermStructure()
+	public R1ToR1 initialInstantaneousForwardFunction()
 	{
-		return _auIFRInitial;
+		return _initialInstantaneousForwardFunction;
 	}
 
 	/**
@@ -197,9 +230,9 @@ public class G2PlusPlus {
 	 * @return The Random Sequence Generator Array
 	 */
 
-	public org.drip.sequence.random.UnivariateSequenceGenerator[] rsg()
+	public UnivariateSequenceGenerator[] univariateSequenceGeneratorArray()
 	{
-		return _aRSG;
+		return _univariateSequenceGeneratorArray;
 	}
 
 	/**
@@ -210,92 +243,96 @@ public class G2PlusPlus {
 
 	public double rho()
 	{
-		return _dblRho;
+		return _rho;
 	}
 
 	/**
 	 * Compute the G2++ Phi
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
 	 * 
 	 * @return The G2++ Phi
 	 * 
-	 * @throws java.lang.Exception Thrown if the G2++ Phi cannot be computed
+	 * @throws Exception Thrown if the G2++ Phi cannot be computed
 	 */
 
 	public double phi (
-		final int iSpotDate,
-		final int iViewDate)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate) throw new java.lang.Exception ("G2PlusPlus::phi => Invalid Inputs");
+		if (spotDate > viewDate) {
+			throw new Exception ("G2PlusPlus::phi => Invalid Inputs");
+		}
 
-		double dblSpotViewDCF = 1. * (iViewDate - iSpotDate) / 365.25;
+		double spotViewDCF = 1. * (viewDate - spotDate) / 365.25;
 
-		double dblFactor1Phi = _dblSigma / _dblA * (1. - java.lang.Math.exp (-1. * _dblA * dblSpotViewDCF));
+		double factor2Phi = _eta / _b * (1. - Math.exp (-1. * _b * spotViewDCF));
 
-		double dblFactor2Phi = _dblEta / _dblB * (1. - java.lang.Math.exp (-1. * _dblB * dblSpotViewDCF));
+		double factor1Phi = _sigma / _a * (1. - Math.exp (-1. * _a * spotViewDCF));
 
-		return _auIFRInitial.evaluate (iViewDate) + 0.5 * dblFactor1Phi * dblFactor1Phi + 0.5 * dblFactor2Phi
-			* dblFactor2Phi;
+		return _initialInstantaneousForwardFunction.evaluate (viewDate) +
+			0.5 * factor1Phi * factor1Phi + 0.5 * factor2Phi * factor2Phi;
 	}
 
 	/**
 	 * Compute the X Increment
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param dblX The X Value
-	 * @param iSpotTimeIncrement The Spot Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param x The X Value
+	 * @param spotTimeIncrement The Spot Time Increment
 	 * 
 	 * @return The X Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double deltaX (
-		final int iSpotDate,
-		final int iViewDate,
-		final double dblX,
-		final int iSpotTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final double x,
+		final int spotTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate || !org.drip.numerical.common.NumberUtil.IsValid (dblX))
-			throw new java.lang.Exception ("G2PlusPlus::deltaX => Invalid Inputs");
+		if (spotDate > viewDate || !NumberUtil.IsValid (x)) {
+			throw new Exception ("G2PlusPlus::deltaX => Invalid Inputs");
+		}
 
-		double dblAnnualizedIncrement = 1. * iSpotTimeIncrement / 365.25;
+		double annualizedIncrement = 1. * spotTimeIncrement / 365.25;
 
-		return -1. * _dblA * dblX * dblAnnualizedIncrement + _dblSigma * java.lang.Math.sqrt
-			(dblAnnualizedIncrement) * _aRSG[0].random();
+		return -1. * _a * x * annualizedIncrement +
+			_sigma * Math.sqrt (annualizedIncrement) * _univariateSequenceGeneratorArray[0].random();
 	}
 
 	/**
 	 * Compute the Y Increment
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param dblY The Y Value
-	 * @param iSpotTimeIncrement The Spot Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param y The Y Value
+	 * @param spotTimeIncrement The Spot Time Increment
 	 * 
 	 * @return The Y Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double deltaY (
-		final int iSpotDate,
-		final int iViewDate,
-		final double dblY,
-		final int iSpotTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final double y,
+		final int spotTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate || !org.drip.numerical.common.NumberUtil.IsValid (dblY))
-			throw new java.lang.Exception ("G2PlusPlus::deltaY => Invalid Inputs");
+		if (spotDate > viewDate || !NumberUtil.IsValid (y)) {
+			throw new Exception ("G2PlusPlus::deltaY => Invalid Inputs");
+		}
 
-		double dblAnnualizedIncrement = 1. * iSpotTimeIncrement / 365.25;
+		double annualizedIncrement = 1. * spotTimeIncrement / 365.25;
 
-		return -1. * _dblB * dblY * dblAnnualizedIncrement + _dblEta * java.lang.Math.sqrt
-			(dblAnnualizedIncrement) * _aRSG[1].random();
+		return -1. * _b * y * annualizedIncrement +
+			_eta * Math.sqrt (annualizedIncrement) * _univariateSequenceGeneratorArray[1].random();
 	}
 }

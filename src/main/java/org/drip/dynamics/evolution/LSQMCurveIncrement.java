@@ -1,11 +1,26 @@
 
 package org.drip.dynamics.evolution;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.drip.spline.grid.Span;
+import org.drip.state.identifier.LatentStateLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,26 +97,35 @@ package org.drip.dynamics.evolution;
 
 /**
  * <i>LSQMCurveIncrement</i> contains the Increment of the Evolving Term Structure of the Latent State
- * Quantification Metrics.
+ * 	Quantification Metrics. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></li>
+ * 		<li>Empty <i>LSQMCurveIncrement</i> Constructor</li>
+ * 		<li>Retrieve the Latent State Labels</li>
+ * 		<li>Indicate if Quantification Metrics are available for the specified Latent State</li>
+ * 		<li>Indicate if the Value for the specified Quantification Metric is available</li>
+ * 		<li>Set the LSQM Increment Span up</li>
+ * 		<li>Retrieve the specified Latent State Quantification Metric Span Increment</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LSQMCurveIncrement {
-	private java.util.Map<java.lang.String, java.util.Map<java.lang.String, org.drip.spline.grid.Span>>
-		_mmIncrement = new java.util.HashMap<java.lang.String, java.util.Map<java.lang.String,
-			org.drip.spline.grid.Span>>();
+public class LSQMCurveIncrement
+{
+	private Map<String, Map<String, Span>> _labelSpanMap = new HashMap<String, Map<String, Span>>();
 
 	/**
-	 * Empty LSQMCurveIncrement Constructor
+	 * Empty <i>LSQMCurveIncrement</i> Constructor
 	 */
 
 	public LSQMCurveIncrement()
@@ -114,71 +138,77 @@ public class LSQMCurveIncrement {
 	 * @return The Latent State Labels
 	 */
 
-	public java.util.Set<java.lang.String> latentStateLabel()
+	public Set<String> latentStateLabelSet()
 	{
-		return _mmIncrement.keySet();
+		return _labelSpanMap.keySet();
 	}
 
 	/**
 	 * Indicate if Quantification Metrics are available for the specified Latent State
 	 * 
-	 * @param lsl The Latent State Label
+	 * @param latentStateLabel The Latent State Label
 	 * 
 	 * @return TRUE - Quantification Metrics are available for the specified Latent State
 	 */
 
 	public boolean containsLatentState (
-		final org.drip.state.identifier.LatentStateLabel lsl)
+		final LatentStateLabel latentStateLabel)
 	{
-		return null == lsl ? false : _mmIncrement.containsKey (lsl.fullyQualifiedName());
+		return null != latentStateLabel && _labelSpanMap.containsKey (latentStateLabel.fullyQualifiedName());
 	}
 
 	/**
 	 * Indicate if the Value for the specified Quantification Metric is available
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
 	 * 
 	 * @return TRUE - The Requested Value is available
 	 */
 
-	public boolean containsQM (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM)
+	public boolean containsQuantificationMetric (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty()) return false;
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty()) {
+			return false;
+		}
 
-		java.lang.String strLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		return _mmIncrement.containsKey (strLabel) && _mmIncrement.get (strLabel).containsKey (strQM);
+		return _labelSpanMap.containsKey (label) &&
+			_labelSpanMap.get (label).containsKey (quantificationMetric);
 	}
 
 	/**
-	 * Set the LSQM Increment Span
+	 * Set the LSQM Increment Span up
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
-	 * @param spanIncrement The Increment Span
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
+	 * @param incrementalSpan The Incremental Span
 	 * 
-	 * @return TRUE - The LSQM Increment Span successfully set
+	 * @return TRUE - The LSQM Increment Span successfully set up
 	 */
 
-	public boolean setQMSpan (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM,
-		final org.drip.spline.grid.Span spanIncrement)
+	public boolean setupQuantificationMetricSpan (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric,
+		final Span incrementalSpan)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty() || null == spanIncrement) return false;
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty() ||
+			null == incrementalSpan)
+		{
+			return false;
+		}
 
-		java.lang.String strLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		java.util.Map<java.lang.String, org.drip.spline.grid.Span> mapSpanIncrement =
-			_mmIncrement.containsKey (strLabel) ? _mmIncrement.get (strLabel) : new
-				java.util.HashMap<java.lang.String, org.drip.spline.grid.Span>();
+		Map<String, Span> incrementalSpanMap = _labelSpanMap.containsKey (label) ?
+			_labelSpanMap.get (label) : new HashMap<String, Span>();
 
-		mapSpanIncrement.put (strQM, spanIncrement);
+		incrementalSpanMap.put (quantificationMetric, incrementalSpan);
 
-		_mmIncrement.put (strLabel, mapSpanIncrement);
+		_labelSpanMap.put (label, incrementalSpanMap);
 
 		return true;
 	}
@@ -186,23 +216,25 @@ public class LSQMCurveIncrement {
 	/**
 	 * Retrieve the specified Latent State Quantification Metric Span Increment
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
 	 * 
 	 * @return The Latent State Quantification Metric Span Increment
 	 */
 
-	public org.drip.spline.grid.Span span (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM)
+	public Span span (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty()) return null;
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty()) {
+			return null;
+		}
 
-		java.lang.String strLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		java.util.Map<java.lang.String, org.drip.spline.grid.Span> mapSpanIncrement = _mmIncrement.get
-			(strLabel);
+		Map<String, Span> incrementalSpanMap = _labelSpanMap.get (label);
 
-		return mapSpanIncrement.containsKey (strQM) ? mapSpanIncrement.get (strQM) : null;
+		return incrementalSpanMap.containsKey (quantificationMetric) ?
+			incrementalSpanMap.get (quantificationMetric) : null;
 	}
 }

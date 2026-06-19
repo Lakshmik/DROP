@@ -141,11 +141,11 @@ public class ForwardUpdate
 	{
 		LSQMPointRecord snapshotLSQMPointRecord = new LSQMPointRecord();
 
-		if (!snapshotLSQMPointRecord.setQM (forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD, forward)) {
+		if (!snapshotLSQMPointRecord.setStateQuantificationMetric (forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD, forward)) {
 			return null;
 		}
 
-		if (!snapshotLSQMPointRecord.setQM (
+		if (!snapshotLSQMPointRecord.setStateQuantificationMetric (
 			VolatilityLabel.Standard (forwardLabel),
 			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY,
 			forwardVolatility
@@ -156,7 +156,7 @@ public class ForwardUpdate
 
 		LSQMPointRecord incrementLSQMPointRecord = new LSQMPointRecord();
 
-		if (!incrementLSQMPointRecord.setQM (
+		if (!incrementLSQMPointRecord.setStateQuantificationMetric (
 			forwardLabel,
 			LatentStateStatic.FORWARD_QM_FORWARD,
 			forwardIncrement
@@ -165,7 +165,7 @@ public class ForwardUpdate
 			return null;
 		}
 
-		if (!incrementLSQMPointRecord.setQM (
+		if (!incrementLSQMPointRecord.setStateQuantificationMetric (
 			VolatilityLabel.Standard (forwardLabel),
 			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY,
 			forwardVolatilityIncrement
@@ -217,7 +217,7 @@ public class ForwardUpdate
 	public double forward()
 		throws Exception
 	{
-		return snapshot().qm (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD);
+		return snapshot().quantificationMetric (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD);
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class ForwardUpdate
 	public double forwardIncrement()
 		throws Exception
 	{
-		return increment().qm (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD);
+		return increment().quantificationMetric (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD);
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class ForwardUpdate
 	public double forwardVolatility()
 		throws Exception
 	{
-		return snapshot().qm (
+		return snapshot().quantificationMetric (
 			VolatilityLabel.Standard (_forwardLabel),
 			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY
 		);
@@ -262,7 +262,7 @@ public class ForwardUpdate
 	public double forwardVolatilityIncrement()
 		throws Exception
 	{
-		return increment().qm (
+		return increment().quantificationMetric (
 			VolatilityLabel.Standard (_forwardLabel),
 			LatentStateStatic.VOLATILITY_QM_SABR_VOLATILITY
 		);

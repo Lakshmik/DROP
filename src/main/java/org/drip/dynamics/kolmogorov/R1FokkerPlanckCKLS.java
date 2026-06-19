@@ -1,11 +1,24 @@
 
 package org.drip.dynamics.kolmogorov;
 
+import org.drip.dynamics.ito.R1ToR1Drift;
+import org.drip.dynamics.ito.R1ToR1Volatility;
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.dynamics.meanreverting.CKLSParameters;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,46 +117,49 @@ package org.drip.dynamics.kolmogorov;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></li>
- *  </ul>
+ * 		<li><i>R1FokkerPlanckCKLS</i> Constructor</li>
+ * 		<li>Retrieve the CKLS Parameters</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1FokkerPlanckCKLS
-	extends org.drip.dynamics.kolmogorov.R1FokkerPlanck
+	extends R1FokkerPlanck
 {
-	private org.drip.dynamics.meanreverting.CKLSParameters _cklsParameters = null;
+	private CKLSParameters _cklsParameters = null;
 
 	/**
-	 * R1FokkerPlanckCKLS Constructor
+	 * <i>R1FokkerPlanckCKLS</i> Constructor
 	 * 
 	 * @param cklsParameters The CKLS Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1FokkerPlanckCKLS (
-		final org.drip.dynamics.meanreverting.CKLSParameters cklsParameters)
-		throws java.lang.Exception
+		final CKLSParameters cklsParameters)
+		throws Exception
 	{
 		super (
-			new org.drip.dynamics.ito.R1ToR1Drift()
-			{
+			new R1ToR1Drift() {
 				@Override public double drift (
-					final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-					throws java.lang.Exception
+					final TimeR1Vertex r1TimeVertex)
+					throws Exception
 				{
-					if (null == r1TimeVertex)
-					{
-						throw new java.lang.Exception (
-							"R1FokkerPlanckCKLS::drift => Invalid Inputs"
-						);
+					if (null == r1TimeVertex) {
+						throw new Exception ("R1FokkerPlanckCKLS::drift => Invalid Inputs");
 					}
 
 					return cklsParameters.meanReversionSpeed() * (
@@ -151,20 +167,16 @@ public class R1FokkerPlanckCKLS
 					);
 				}
 			},
-			new org.drip.dynamics.ito.R1ToR1Volatility()
-			{
+			new R1ToR1Volatility() {
 				@Override public double volatility (
-					final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-					throws java.lang.Exception
+					final TimeR1Vertex r1TimeVertex)
+					throws Exception
 				{
-					if (null == r1TimeVertex)
-					{
-						throw new java.lang.Exception (
-							"R1FokkerPlanckCKLS::volatility => Invalid Inputs"
-						);
+					if (null == r1TimeVertex) {
+						throw new Exception ("R1FokkerPlanckCKLS::volatility => Invalid Inputs");
 					}
 
-					return cklsParameters.volatilityCoefficient() * java.lang.Math.pow (
+					return cklsParameters.volatilityCoefficient() * Math.pow (
 						r1TimeVertex.x(),
 						cklsParameters.volatilityExponent()
 					);
@@ -181,7 +193,7 @@ public class R1FokkerPlanckCKLS
 	 * @return The CKLS Parameters
 	 */
 
-	public org.drip.dynamics.meanreverting.CKLSParameters cklsParameters()
+	public CKLSParameters cklsParameters()
 	{
 		return _cklsParameters;
 	}

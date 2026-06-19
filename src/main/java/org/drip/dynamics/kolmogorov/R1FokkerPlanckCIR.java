@@ -1,11 +1,27 @@
 
 package org.drip.dynamics.kolmogorov;
 
+import org.drip.dynamics.meanreverting.CKLSParameters;
+import org.drip.dynamics.process.R1ProbabilityDensityFunction;
+import org.drip.dynamics.process.R1ProbabilityDensityFunctionCIR;
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.r1tor1custom.CIRPDF;
+import org.drip.specialfunction.bessel.ModifiedFirstFrobeniusSeriesEstimator;
+import org.drip.specialfunction.gamma.EulerIntegralSecondKind;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,63 +120,73 @@ package org.drip.dynamics.kolmogorov;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></li>
- *  </ul>
+ * 		<li><i>R1FokkerPlanckCIR</i> Constructor</li>
+ * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF #1</li>
+ * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF #2</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1FokkerPlanckCIR
-	extends org.drip.dynamics.kolmogorov.R1FokkerPlanckCKLS
+	extends R1FokkerPlanckCKLS
 {
 
 	/**
-	 * R1FokkerPlanckCIR Constructor
+	 * <i>R1FokkerPlanckCIR</i> Constructor
 	 *
 	 * @param cklsParameters The CKLS Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1FokkerPlanckCIR (
-		final org.drip.dynamics.meanreverting.CKLSParameters cklsParameters)
-		throws java.lang.Exception
+		final CKLSParameters cklsParameters)
+		throws Exception
 	{
-		super (
-			cklsParameters
-		);
+		super (cklsParameters);
 	}
 
-	@Override public org.drip.function.definition.R1ToR1 steadyStatePDF()
+	/**
+	 * Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 * 
+	 * @return The Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 */
+
+	@Override public R1ToR1 steadyStatePDF()
 	{
-		return org.drip.function.r1tor1custom.CIRPDF.Standard (
-			cklsParameters()
-		);
+		return CIRPDF.Standard (cklsParameters());
 	}
 
-	@Override public org.drip.dynamics.process.R1ProbabilityDensityFunction deltaStartTemporalPDF (
+	/**
+	 * Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 * 
+	 * @param r0 Anchor for the Delta Function
+	 * 
+	 * @return The Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 */
+
+	@Override public R1ProbabilityDensityFunction deltaStartTemporalPDF (
 		final double r0)
 	{
-		try
-		{
-			return new org.drip.dynamics.process.R1ProbabilityDensityFunctionCIR (
+		try {
+			return new R1ProbabilityDensityFunctionCIR (
 				r0,
 				cklsParameters(),
-				org.drip.specialfunction.bessel.ModifiedFirstFrobeniusSeriesEstimator.Standard (
-					new org.drip.specialfunction.gamma.EulerIntegralSecondKind (
-						null
-					),
-					20
-				)
+				ModifiedFirstFrobeniusSeriesEstimator.Standard (new EulerIntegralSecondKind (null), 20)
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

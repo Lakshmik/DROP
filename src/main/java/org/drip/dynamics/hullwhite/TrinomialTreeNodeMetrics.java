@@ -1,11 +1,21 @@
 
 package org.drip.dynamics.hullwhite;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,48 +92,63 @@ package org.drip.dynamics.hullwhite;
 
 /**
  * <i>TrinomialTreeNodeMetrics</i> records the Metrics associated with each Node in the Trinomial Tree
- * Evolution of the Instantaneous Short Rate using the Hull-White Model.
+ * 	Evolution of the Instantaneous Short Rate using the Hull-White Model. It provides the following
+ * 	Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></li>
+ * 		<li><i>TrinomialTreeNodeMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Node's X</li>
+ * 		<li>Retrieve the Node's Alpha</li>
+ * 		<li>Retrieve the Node's Short Rate</li>
+ * 		<li>Retrieve the Tree Node's Time Index</li>
+ * 		<li>Retrieve the Tree Node's X Stochastic Index</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class TrinomialTreeNodeMetrics {
-	private long _lTimeIndex = -1L;
-	private long _lXStochasticIndex = 0L;
-	private double _dblX = java.lang.Double.NaN;
-	private double _dblAlpha = java.lang.Double.NaN;
+public class TrinomialTreeNodeMetrics
+{
+	private long _timeIndex = -1L;
+	private double _x = Double.NaN;
+	private double _alpha = Double.NaN;
+	private long _xStochasticIndex = 0L;
 
 	/**
-	 * TrinomialTreeNodeMetrics Constructor
+	 * <i>TrinomialTreeNodeMetrics</i> Constructor
 	 * 
-	 * @param lTimeIndex The Tree Node's Time Index
-	 * @param lXStochasticIndex The Tree Node's Stochastic Index
-	 * @param dblX X
-	 * @param dblAlpha Alpha
+	 * @param timeIndex The Tree Node's Time Index
+	 * @param xStochasticIndex The Tree Node's Stochastic Index
+	 * @param x X
+	 * @param alpha Alpha
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public TrinomialTreeNodeMetrics (
-		final long lTimeIndex,
-		final long lXStochasticIndex,
-		final double dblX,
-		final double dblAlpha)
-		throws java.lang.Exception
+		final long timeIndex,
+		final long xStochasticIndex,
+		final double x,
+		final double alpha)
+		throws Exception
 	{
-		if (0 > (_lTimeIndex = lTimeIndex) || !org.drip.numerical.common.NumberUtil.IsValid (_dblX = dblX) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblAlpha = dblAlpha))
-			throw new java.lang.Exception ("TrinomialTreeNodeMetrics ctr: Invalid Inputs");
+		if (0 > (_timeIndex = timeIndex) ||
+			!NumberUtil.IsValid (_x = x) ||
+			!NumberUtil.IsValid (_alpha = alpha))
+		{
+			throw new Exception ("TrinomialTreeNodeMetrics Constructor: Invalid Inputs");
+		}
 
-		_lXStochasticIndex = lXStochasticIndex;
+		_xStochasticIndex = xStochasticIndex;
 	}
 
 	/**
@@ -134,7 +159,7 @@ public class TrinomialTreeNodeMetrics {
 
 	public double x()
 	{
-		return _dblX;
+		return _x;
 	}
 
 	/**
@@ -145,7 +170,7 @@ public class TrinomialTreeNodeMetrics {
 
 	public double alpha()
 	{
-		return _dblAlpha;
+		return _alpha;
 	}
 
 	/**
@@ -156,7 +181,7 @@ public class TrinomialTreeNodeMetrics {
 
 	public double shortRate()
 	{
-		return _dblX + _dblAlpha;
+		return _x + _alpha;
 	}
 
 	/**
@@ -167,7 +192,7 @@ public class TrinomialTreeNodeMetrics {
 
 	public long timeIndex()
 	{
-		return _lTimeIndex;
+		return _timeIndex;
 	}
 
 	/**
@@ -178,6 +203,6 @@ public class TrinomialTreeNodeMetrics {
 
 	public long xStochasticIndex()
 	{
-		return _lXStochasticIndex;
+		return _xStochasticIndex;
 	}
 }

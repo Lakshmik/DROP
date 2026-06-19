@@ -1,11 +1,21 @@
 
 package org.drip.dynamics.hullwhite;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,77 +92,99 @@ package org.drip.dynamics.hullwhite;
 
 /**
  * <i>TrinomialTreeTransitionMetrics</i> records the Transition Metrics associated with Node-to-Node
- * Evolution of the Instantaneous Short Rate using the Hull-White Model Trinomial Tree.
+ * 	Evolution of the Instantaneous Short Rate using the Hull-White Model Trinomial Tree. It provides the
+ * 	following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></li>
+ * 		<li><i>TrinomialTreeTransitionMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Initial Date</li>
+ * 		<li>Retrieve the Terminal Date</li>
+ * 		<li>Retrieve the Tree Time Index</li>
+ * 		<li>Retrieve the Expected Final/Terminal Value for X</li>
+ * 		<li>Retrieve the Variance in the Final Value of X</li>
+ * 		<li>Retrieve the Stochastic Shift of X</li>
+ * 		<li>Retrieve the Tree Stochastic Displacement Index</li>
+ * 		<li>Retrieve the Probability of the Up Stochastic Shift</li>
+ * 		<li>Retrieve the Probability of the Down Stochastic Shift</li>
+ * 		<li>Retrieve the Probability of the No Shift</li>
+ * 		<li>Retrieve the "Up" Value for X</li>
+ * 		<li>Retrieve the "Down" Value for X</li>
+ * 		<li>Retrieve the Final/Terminal Alpha</li>
+ * 		<li>Retrieve the "Up" Node Metrics</li>
+ * 		<li>Retrieve the "Down" Node Metrics</li>
+ * 		<li>Retrieve the "Stay" Node Metrics</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class TrinomialTreeTransitionMetrics {
-	private long _lTreeTimeIndex = -1L;
-	private long _lTreeStochasticBaseIndex = -1L;
-	private long _lTreeStochasticDisplacementIndex = -1L;
-	private double _dblXVariance = java.lang.Double.NaN;
-	private double _dblTerminalAlpha = java.lang.Double.NaN;
-	private double _dblProbabilityUp = java.lang.Double.NaN;
-	private int _iInitialDate = java.lang.Integer.MIN_VALUE;
-	private int _iTerminalDate = java.lang.Integer.MIN_VALUE;
-	private double _dblProbabilityDown = java.lang.Double.NaN;
-	private double _dblProbabilityStay = java.lang.Double.NaN;
-	private double _dblXStochasticShift = java.lang.Double.NaN;
-	private double _dblExpectedTerminalX = java.lang.Double.NaN;
+public class TrinomialTreeTransitionMetrics
+{
+	private long _treeTimeIndex = -1L;
+	private double _xVariance = Double.NaN;
+	private double _probabilityUp = Double.NaN;
+	private double _terminalAlpha = Double.NaN;
+	private long _treeStochasticBaseIndex = -1L;
+	private double _probabilityDown = Double.NaN;
+	private double _probabilityStay = Double.NaN;
+	private int _initialDate = Integer.MIN_VALUE;
+	private double _xStochasticShift = Double.NaN;
+	private int _terminalDate = Integer.MIN_VALUE;
+	private double _expectedTerminalX = Double.NaN;
+	private long _treeStochasticDisplacementIndex = -1L;
 
 	/**
-	 * TrinomialTreeTransitionMetrics Constructor
+	 * <i>TrinomialTreeTransitionMetrics</i> Constructor
 	 * 
-	 * @param iInitialDate The Initial Date
-	 * @param iTerminalDate The Terminal/Final Date
-	 * @param lTreeTimeIndex The Tree Time Index
-	 * @param lTreeStochasticBaseIndex The Tree Stochastic Base Index
-	 * @param dblExpectedTerminalX Expectation of the Final/Terminal Value for X
-	 * @param dblXVariance Variance of X
-	 * @param dblTerminalAlpha The Final/Terminal Alpha
+	 * @param initialDate The Initial Date
+	 * @param terminalDate The Terminal/Final Date
+	 * @param treeTimeIndex The Tree Time Index
+	 * @param treeStochasticBaseIndex The Tree Stochastic Base Index
+	 * @param expectedTerminalX Expectation of the Final/Terminal Value for X
+	 * @param xVariance Variance of X
+	 * @param terminalAlpha The Final/Terminal Alpha
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public TrinomialTreeTransitionMetrics (
-		final int iInitialDate,
-		final int iTerminalDate,
-		final long lTreeTimeIndex,
-		final long lTreeStochasticBaseIndex,
-		final double dblExpectedTerminalX,
-		final double dblXVariance,
-		final double dblTerminalAlpha)
-		throws java.lang.Exception
+		final int initialDate,
+		final int terminalDate,
+		final long treeTimeIndex,
+		final long treeStochasticBaseIndex,
+		final double expectedTerminalX,
+		final double xVariance,
+		final double terminalAlpha)
+		throws Exception
 	{
-		if (0 > (_lTreeTimeIndex = lTreeTimeIndex) || !org.drip.numerical.common.NumberUtil.IsValid
-			(_dblExpectedTerminalX = dblExpectedTerminalX) || !org.drip.numerical.common.NumberUtil.IsValid
-				(_dblXVariance = dblXVariance) || !org.drip.numerical.common.NumberUtil.IsValid
-					(_dblTerminalAlpha = dblTerminalAlpha))
-			throw new java.lang.Exception ("TrinomialTreeTransitionMetrics ctr: Invalid Inputs");
+		if (0 > (_treeTimeIndex = treeTimeIndex) ||
+			!NumberUtil.IsValid (_expectedTerminalX = expectedTerminalX) ||
+			!NumberUtil.IsValid (_xVariance = xVariance) ||
+			!NumberUtil.IsValid (_terminalAlpha = terminalAlpha))
+		{
+			throw new Exception ("TrinomialTreeTransitionMetrics Constructor: Invalid Inputs");
+		}
 
-		_dblXStochasticShift = java.lang.Math.sqrt (_dblXVariance * 3.);
+		_treeStochasticDisplacementIndex = Math.round (
+			_expectedTerminalX / (_xStochasticShift = Math.sqrt (_xVariance * 3.))
+		);
 
-		_lTreeStochasticDisplacementIndex = java.lang.Math.round (_dblExpectedTerminalX /
-			_dblXStochasticShift);
-
-		_iInitialDate = iInitialDate;
-		_iTerminalDate = iTerminalDate;
-		_lTreeStochasticBaseIndex = lTreeStochasticBaseIndex;
-		double dblEta = _dblExpectedTerminalX - _lTreeStochasticDisplacementIndex * _dblXStochasticShift;
-		_dblProbabilityStay = (2. / 3.) - (dblEta * dblEta / (3. * _dblXVariance));
-		_dblProbabilityDown = (1. / 6.) + (dblEta * dblEta / (6. * _dblXVariance)) - (0.5 * dblEta /
-			_dblXStochasticShift);
-		_dblProbabilityUp = (1. / 6.) + (dblEta * dblEta / (6. * _dblXVariance)) + (0.5 * dblEta /
-			_dblXStochasticShift);
+		_initialDate = initialDate;
+		_terminalDate = terminalDate;
+		_treeStochasticBaseIndex = treeStochasticBaseIndex;
+		double eta = _expectedTerminalX - _treeStochasticDisplacementIndex * _xStochasticShift;
+		_probabilityDown = (1. / 6.) + (eta * eta / (6. * _xVariance)) - (0.5 * eta / _xStochasticShift);
+		_probabilityUp = (1. / 6.) + (eta * eta / (6. * _xVariance)) + (0.5 * eta / _xStochasticShift);
+		_probabilityStay = (2. / 3.) - (eta * eta / (3. * _xVariance));
 	}
 
 	/**
@@ -163,7 +195,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public int initialDate()
 	{
-		return _iInitialDate;
+		return _initialDate;
 	}
 
 	/**
@@ -174,7 +206,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public int terminalDate()
 	{
-		return _iTerminalDate;
+		return _terminalDate;
 	}
 
 	/**
@@ -185,7 +217,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public long treeTimeIndex()
 	{
-		return _lTreeTimeIndex;
+		return _treeTimeIndex;
 	}
 
 	/**
@@ -196,7 +228,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double expectedTerminalX()
 	{
-		return _dblExpectedTerminalX;
+		return _expectedTerminalX;
 	}
 
 	/**
@@ -207,7 +239,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double xVariance()
 	{
-		return _dblXVariance;
+		return _xVariance;
 	}
 
 	/**
@@ -218,7 +250,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double xStochasticShift()
 	{
-		return _dblXStochasticShift;
+		return _xStochasticShift;
 	}
 
 	/**
@@ -229,7 +261,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public long treeStochasticDisplacementIndex()
 	{
-		return _lTreeStochasticDisplacementIndex;
+		return _treeStochasticDisplacementIndex;
 	}
 
 	/**
@@ -240,7 +272,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double probabilityUp()
 	{
-		return _dblProbabilityUp;
+		return _probabilityUp;
 	}
 
 	/**
@@ -251,7 +283,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double probabilityDown()
 	{
-		return _dblProbabilityDown;
+		return _probabilityDown;
 	}
 
 	/**
@@ -262,7 +294,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double probabilityStay()
 	{
-		return _dblProbabilityStay;
+		return _probabilityStay;
 	}
 
 	/**
@@ -273,7 +305,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double xUp()
 	{
-		return (_lTreeStochasticDisplacementIndex + 1) * _dblXStochasticShift;
+		return (_treeStochasticDisplacementIndex + 1) * _xStochasticShift;
 	}
 
 	/**
@@ -284,7 +316,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double xDown()
 	{
-		return (_lTreeStochasticDisplacementIndex - 1) * _dblXStochasticShift;
+		return (_treeStochasticDisplacementIndex - 1) * _xStochasticShift;
 	}
 
 	/**
@@ -295,7 +327,7 @@ public class TrinomialTreeTransitionMetrics {
 
 	public double terminalAlpha()
 	{
-		return _dblTerminalAlpha;
+		return _terminalAlpha;
 	}
 
 	/**
@@ -304,13 +336,16 @@ public class TrinomialTreeTransitionMetrics {
 	 * @return The "Up" Node Metrics
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics upNodeMetrics()
+	public TrinomialTreeNodeMetrics upNodeMetrics()
 	{
 		try {
-			return new org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics (_lTreeTimeIndex,
-				_lTreeStochasticBaseIndex + 1, (_lTreeStochasticDisplacementIndex + 1) *
-					_dblXStochasticShift, _dblTerminalAlpha);
-		} catch (java.lang.Exception e) {
+			return new TrinomialTreeNodeMetrics (
+				_treeTimeIndex,
+				_treeStochasticBaseIndex + 1,
+				(_treeStochasticDisplacementIndex + 1) * _xStochasticShift,
+				_terminalAlpha
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -323,13 +358,16 @@ public class TrinomialTreeTransitionMetrics {
 	 * @return The "Down" Node Metrics
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics downNodeMetrics()
+	public TrinomialTreeNodeMetrics downNodeMetrics()
 	{
 		try {
-			return new org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics (_lTreeTimeIndex,
-				_lTreeStochasticBaseIndex - 1, (_lTreeStochasticDisplacementIndex - 1) *
-					_dblXStochasticShift, _dblTerminalAlpha);
-		} catch (java.lang.Exception e) {
+			return new TrinomialTreeNodeMetrics (
+				_treeTimeIndex,
+				_treeStochasticBaseIndex - 1,
+				(_treeStochasticDisplacementIndex - 1) * _xStochasticShift,
+				_terminalAlpha
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -342,13 +380,16 @@ public class TrinomialTreeTransitionMetrics {
 	 * @return The "Stay" Node Metrics
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics stayNodeMetrics()
+	public TrinomialTreeNodeMetrics stayNodeMetrics()
 	{
 		try {
-			return new org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics (_lTreeTimeIndex,
-				_lTreeStochasticBaseIndex, _lTreeStochasticDisplacementIndex * _dblXStochasticShift,
-					_dblTerminalAlpha);
-		} catch (java.lang.Exception e) {
+			return new TrinomialTreeNodeMetrics (
+				_treeTimeIndex,
+				_treeStochasticBaseIndex,
+				_treeStochasticDisplacementIndex * _xStochasticShift,
+				_terminalAlpha
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

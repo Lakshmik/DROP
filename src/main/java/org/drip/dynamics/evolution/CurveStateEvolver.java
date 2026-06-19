@@ -6,6 +6,14 @@ package org.drip.dynamics.evolution;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,58 +90,65 @@ package org.drip.dynamics.evolution;
 
 /**
  * <i>CurveStateEvolver</i> is the Interface on top of which the Curve State Evolution Dynamics is
- * constructed.
+ * 	constructed. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></li>
+ * 		<li>Evolve the Latent State and return the LSQM Curve Update</li>
+ * 		<li>Simulate the Principal Metric from the Start to the End Date</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public interface CurveStateEvolver {
+public interface CurveStateEvolver
+{
 
 	/**
 	 * Evolve the Latent State and return the LSQM Curve Update
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param iSpotTimeIncrement The Spot Evolution Increment
-	 * @param lsqmPrev The Previous LSQM Curve Update
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param spotTimeIncrement The Spot Evolution Increment
+	 * @param previousLSQMCurveUpdate The Previous LSQM Curve Update
 	 * 
 	 * @return The LSQM Curve Update
 	 */
 
-	public abstract org.drip.dynamics.evolution.LSQMCurveUpdate evolve (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iSpotTimeIncrement,
-		final org.drip.dynamics.evolution.LSQMCurveUpdate lsqmPrev
+	public abstract LSQMCurveUpdate evolve (
+		final int spotDate,
+		final int viewDate,
+		final int spotTimeIncrement,
+		final LSQMCurveUpdate previousLSQMCurveUpdate
 	);
 
 	/**
 	 * Simulate the Principal Metric from the Start to the End Date
 	 * 
-	 * @param iEvolutionStartDate The Evolution Start Date
-	 * @param iEvolutionFinishDate The Evolution Finish Date
-	 * @param iEvolutionIncrement The Evolution Increment
-	 * @param iViewDate The View Date
-	 * @param lsqmStart The Starting State Metrics
-	 * @param iNumSimulation Number of Simulations
+	 * @param evolutionStartDate The Evolution Start Date
+	 * @param evolutionFinishDate The Evolution Finish Date
+	 * @param evolutionIncrement The Evolution Increment
+	 * @param viewDate The View Date
+	 * @param startingLSQMCurveUpdate The Starting State Metrics
+	 * @param simulationCount Number of Simulations
 	 * 
 	 * @return The Array of the Evolved Tenor LIBOR's
 	 */
 
 	public abstract double[][] simulatePrincipalMetric (
-		final int iEvolutionStartDate,
-		final int iEvolutionFinishDate,
-		final int iEvolutionIncrement,
-		final int iViewDate,
-		final org.drip.dynamics.evolution.LSQMCurveUpdate lsqmStart,
-		final int iNumSimulation
+		final int evolutionStartDate,
+		final int evolutionFinishDate,
+		final int evolutionIncrement,
+		final int viewDate,
+		final LSQMCurveUpdate startingLSQMCurveUpdate,
+		final int simulationCount
 	);
 }

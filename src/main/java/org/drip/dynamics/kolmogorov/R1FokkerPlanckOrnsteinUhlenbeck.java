@@ -1,11 +1,25 @@
 
 package org.drip.dynamics.kolmogorov;
 
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.dynamics.meanreverting.CKLSParameters;
+import org.drip.dynamics.process.R1ProbabilityDensityFunction;
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,82 +118,91 @@ package org.drip.dynamics.kolmogorov;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></li>
- *  </ul>
+ * 		<li><i>R1FokkerPlanckOrnsteinUhlenbeck</i> Constructor</li>
+ * 		<li>Compute the Steady-State Probability Distribution Function, if any</li>
+ * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1FokkerPlanckOrnsteinUhlenbeck
-	extends org.drip.dynamics.kolmogorov.R1FokkerPlanckCKLS
+	extends R1FokkerPlanckCKLS
 {
 
 	/**
-	 * R1FokkerPlanckOrnsteinUhlenbeck Constructor
+	 * <i>R1FokkerPlanckOrnsteinUhlenbeck</i> Constructor
 	 * 
 	 * @param cklsParameters The CKLS Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1FokkerPlanckOrnsteinUhlenbeck (
-		final org.drip.dynamics.meanreverting.CKLSParameters cklsParameters)
-		throws java.lang.Exception
+		final CKLSParameters cklsParameters)
+		throws Exception
 	{
-		super (
-			cklsParameters
-		);
+		super (cklsParameters);
 	}
 
-	@Override public org.drip.function.definition.R1ToR1 steadyStatePDF()
+	/**
+	 * Compute the Steady-State Probability Distribution Function, if any
+	 * 
+	 * @return The Steady-State Probability Distribution Function
+	 */
+
+	@Override public R1ToR1 steadyStatePDF()
 	{
-		return new org.drip.function.definition.R1ToR1 (
-			null
-		)
-		{
+		return new R1ToR1 (null) {
 			double volatility = cklsParameters().volatilityCoefficient();
 
 			final double sigmaSquared = volatility * volatility;
 
 			@Override public double evaluate (
 				final double x)
-				throws java.lang.Exception
+				throws Exception
 			{
-				if (!org.drip.numerical.common.NumberUtil.IsValid (x))
-				{
-					throw new java.lang.Exception (
+				if (!NumberUtil.IsValid (x)) {
+					throw new Exception (
 						"R1FokkerPlanckOrnsteinUhlenbeck::steadyStatePDF::evaluate => Invalid Inputs"
 					);
 				}
 
-				return java.lang.Math.sqrt (
-					cklsParameters().meanReversionSpeed() / (java.lang.Math.PI * sigmaSquared)
-				) * java.lang.Math.exp (
-					-1. * x * x / sigmaSquared
-				);
+				return Math.sqrt (cklsParameters().meanReversionSpeed() / (Math.PI * sigmaSquared)) *
+					Math.exp (-1. * x * x / sigmaSquared);
 			}
 		};
 	}
 
-	@Override public org.drip.dynamics.process.R1ProbabilityDensityFunction deltaStartTemporalPDF (
+	/**
+	 * Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 * 
+	 * @param xDeltaAnchor The X Anchor for the Delta Function
+	 * 
+	 * @return The Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 */
+
+	@Override public R1ProbabilityDensityFunction deltaStartTemporalPDF (
 		final double xDeltaAnchor)
 	{
-		return org.drip.numerical.common.NumberUtil.IsValid (
-			xDeltaAnchor
-		) ? new org.drip.dynamics.process.R1ProbabilityDensityFunction()
-		{
+		return NumberUtil.IsValid (xDeltaAnchor) ? new R1ProbabilityDensityFunction() {
 			@Override public double density (
-				final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-				throws java.lang.Exception
+				final TimeR1Vertex r1TimeVertex)
+				throws Exception
 			{
-				if (null == r1TimeVertex)
-				{
-					throw new java.lang.Exception (
+				if (null == r1TimeVertex) {
+					throw new Exception (
 						"R1FokkerPlanckOrnsteinUhlenbeck::pointZeroStartTemporalPDF::density"
 					);
 				}
@@ -188,22 +211,19 @@ public class R1FokkerPlanckOrnsteinUhlenbeck
 
 				double meanReversionSpeed = cklsParameters().meanReversionSpeed();
 
-				double ePowerMinusThetaT = java.lang.Math.exp (
-					-1. * meanReversionSpeed * r1TimeVertex.t()
-				);
+				double ePowerMinusThetaT = Math.exp (-1. * meanReversionSpeed * r1TimeVertex.t());
 
-				double xMinus_DeltaAnchorEPowerMinusThetaT_ = r1TimeVertex.x() - xDeltaAnchor *
-					ePowerMinusThetaT;
+				double xMinus_DeltaAnchorEPowerMinusThetaT_ =
+					r1TimeVertex.x() - xDeltaAnchor * ePowerMinusThetaT;
 
-				double twoDTimesoneMinusEPowerMinus2ThetaT = 0.5 * volatility * volatility * (1. -
-					ePowerMinusThetaT * ePowerMinusThetaT);
+				double twoDTimesoneMinusEPowerMinus2ThetaT =
+					0.5 * volatility * volatility * (1. - ePowerMinusThetaT * ePowerMinusThetaT);
 
-				return java.lang.Math.sqrt (
-					meanReversionSpeed / (java.lang.Math.PI * twoDTimesoneMinusEPowerMinus2ThetaT)
-				) * java.lang.Math.exp (
-					-1. * meanReversionSpeed * xMinus_DeltaAnchorEPowerMinusThetaT_ *
-						xMinus_DeltaAnchorEPowerMinusThetaT_  / twoDTimesoneMinusEPowerMinus2ThetaT
-				);
+				return Math.sqrt (meanReversionSpeed / (Math.PI * twoDTimesoneMinusEPowerMinus2ThetaT)) *
+					Math.exp (
+						-1. * meanReversionSpeed * xMinus_DeltaAnchorEPowerMinusThetaT_ *
+							xMinus_DeltaAnchorEPowerMinusThetaT_  / twoDTimesoneMinusEPowerMinus2ThetaT
+					);
 			}
 		} : null;
 	}

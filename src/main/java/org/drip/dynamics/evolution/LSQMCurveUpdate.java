@@ -6,6 +6,14 @@ package org.drip.dynamics.evolution;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,45 +90,56 @@ package org.drip.dynamics.evolution;
 
 /**
  * <i>LSQMCurveUpdate</i> contains the Snapshot and the Increment of the Evolving Curve Latent State
- * Quantification Metrics.
+ * 	Quantification Metrics. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></li>
+ * 		<li><i>LSQMCurveUpdate</i> Constructor</li>
+ * 		<li>Retrieve the Initial Date</li>
+ * 		<li>Retrieve the Final Date</li>
+ * 		<li>Retrieve the LSQM Curve Snapshot</li>
+ * 		<li>Retrieve the LSQM Curve Increment</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LSQMCurveUpdate {
-	private int _iFinalDate = java.lang.Integer.MIN_VALUE;
-	private int _iInitialDate = java.lang.Integer.MIN_VALUE;
-	private org.drip.dynamics.evolution.LSQMCurveSnapshot _snapshot = null;
-	private org.drip.dynamics.evolution.LSQMCurveIncrement _increment = null;
+public class LSQMCurveUpdate
+{
+	private LSQMCurveSnapshot _snapshot = null;
+	private int _finalDate = Integer.MIN_VALUE;
+	private LSQMCurveIncrement _increment = null;
+	private int _initialDate = Integer.MIN_VALUE;
 
 	/**
-	 * LSQMCurveUpdate Constructor
+	 * <i>LSQMCurveUpdate</i> Constructor
 	 * 
-	 * @param iInitialDate The Initial Date
-	 * @param iFinalDate The Final Date
+	 * @param initialDate The Initial Date
+	 * @param finalDate The Final Date
 	 * @param snapshot The LSQM Curve Snapshot
 	 * @param increment The LSQM Curve Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public LSQMCurveUpdate (
-		final int iInitialDate,
-		final int iFinalDate,
-		final org.drip.dynamics.evolution.LSQMCurveSnapshot snapshot,
-		final org.drip.dynamics.evolution.LSQMCurveIncrement increment)
-		throws java.lang.Exception
+		final int initialDate,
+		final int finalDate,
+		final LSQMCurveSnapshot snapshot,
+		final LSQMCurveIncrement increment)
+		throws Exception
 	{
-		if (null == (_snapshot = snapshot) || (_iFinalDate = iFinalDate) < (_iInitialDate = iInitialDate))
-			throw new java.lang.Exception ("LSQMCurveUpdate ctr: Invalid Inputs");
+		if (null == (_snapshot = snapshot) || (_finalDate = finalDate) < (_initialDate = initialDate)) {
+			throw new Exception ("LSQMCurveUpdate Constructor: Invalid Inputs");
+		}
 
 		_increment = increment;
 	}
@@ -133,7 +152,7 @@ public class LSQMCurveUpdate {
 
 	public int initialDate()
 	{
-		return _iInitialDate;
+		return _initialDate;
 	}
 
 	/**
@@ -144,7 +163,7 @@ public class LSQMCurveUpdate {
 
 	public int finalDate()
 	{
-		return _iFinalDate;
+		return _finalDate;
 	}
 
 	/**
@@ -153,7 +172,7 @@ public class LSQMCurveUpdate {
 	 * @return The LSQM Curve Snapshot
 	 */
 
-	public org.drip.dynamics.evolution.LSQMCurveSnapshot snapshot()
+	public LSQMCurveSnapshot snapshot()
 	{
 		return _snapshot;
 	}
@@ -164,7 +183,7 @@ public class LSQMCurveUpdate {
 	 * @return The LSQM Curve Increment
 	 */
 
-	public org.drip.dynamics.evolution.LSQMCurveIncrement increment()
+	public LSQMCurveIncrement increment()
 	{
 		return _increment;
 	}

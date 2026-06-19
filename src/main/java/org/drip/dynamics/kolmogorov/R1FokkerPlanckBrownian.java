@@ -1,11 +1,25 @@
 
 package org.drip.dynamics.kolmogorov;
 
+import org.drip.dynamics.ito.R1ToR1Drift;
+import org.drip.dynamics.ito.R1ToR1Volatility;
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.dynamics.process.R1ProbabilityDensityFunction;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,45 +118,50 @@ package org.drip.dynamics.kolmogorov;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></li>
- *  </ul>
+ * 		<li><i>R1FokkerPlanckBrownian</i> Constructor</li>
+ * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1FokkerPlanckBrownian
-	extends org.drip.dynamics.kolmogorov.R1FokkerPlanck
+	extends R1FokkerPlanck
 {
 
 	/**
-	 * R1FokkerPlanckBrownian Constructor
+	 * <i>R1FokkerPlanckBrownian</i> Constructor
 	 * 
-	 * @throws java.lang.Exception Thrown if R1FokkerPlanckBrownian cannot be constructed
+	 * @throws Exception Thrown if <i>R1FokkerPlanckBrownian</i> cannot be constructed
 	 */
 
 	public R1FokkerPlanckBrownian()
-		throws java.lang.Exception
+		throws Exception
 	{
 		super (
-			new org.drip.dynamics.ito.R1ToR1Drift()
-			{
+			new R1ToR1Drift() {
 				@Override public double drift (
-					final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-					throws java.lang.Exception
+					final TimeR1Vertex r1TimeVertex)
+					throws Exception
 				{
 					return 0.;
 				}
 			},
-			new org.drip.dynamics.ito.R1ToR1Volatility()
-			{
+			new R1ToR1Volatility() {
 				@Override public double volatility (
-					final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-					throws java.lang.Exception
+					final TimeR1Vertex r1TimeVertex)
+					throws Exception
 				{
 					return 1.;
 				}
@@ -150,33 +169,32 @@ public class R1FokkerPlanckBrownian
 		);
 	}
 
-	@Override public org.drip.dynamics.process.R1ProbabilityDensityFunction deltaStartTemporalPDF (
+	/**
+	 * Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 * 
+	 * @param x0 The X Anchor for the Delta Function
+	 * 
+	 * @return The Temporal Probability Distribution Function given the Delta 0 Starting PDF
+	 */
+
+	@Override public R1ProbabilityDensityFunction deltaStartTemporalPDF (
 		final double x0)
 	{
-		return org.drip.numerical.common.NumberUtil.IsValid (
-			x0
-		) ? new org.drip.dynamics.process.R1ProbabilityDensityFunction()
+		return NumberUtil.IsValid (x0) ? new R1ProbabilityDensityFunction()
 		{
 			@Override public double density (
-				final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-				throws java.lang.Exception
+				final TimeR1Vertex r1TimeVertex)
+				throws Exception
 			{
-				if (null == r1TimeVertex)
-				{
-					throw new java.lang.Exception (
-						"R1FokkerPlanckBrownian::deltaStartTemporalPDF::density"
-					);
+				if (null == r1TimeVertex) {
+					throw new Exception ("R1FokkerPlanckBrownian::deltaStartTemporalPDF::density");
 				}
 
 				double t = r1TimeVertex.t();
 
 				double xGap = r1TimeVertex.x() - x0;
 
-				return java.lang.Math.exp (
-					-0.5 * xGap * xGap / t
-				) / java.lang.Math.sqrt (
-					2. * java.lang.Math.PI * t
-				);
+				return Math.exp (-0.5 * xGap * xGap / t) / Math.sqrt (2. * Math.PI * t);
 			}
 		} : null;
 	}

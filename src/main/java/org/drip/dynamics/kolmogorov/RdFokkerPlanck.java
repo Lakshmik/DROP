@@ -1,11 +1,28 @@
 
 package org.drip.dynamics.kolmogorov;
 
+import org.drip.dynamics.ito.DiffusionTensor;
+import org.drip.dynamics.ito.RdToR1Drift;
+import org.drip.dynamics.ito.TimeRdVertex;
+import org.drip.dynamics.process.RdProbabilityDensityFunction;
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.definition.RdToR1;
+import org.drip.function.matrix.Square;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,67 +121,65 @@ package org.drip.dynamics.kolmogorov;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></li>
- *  </ul>
+ * 		<li><i>RdFokkerPlanck</i> Constructor</li>
+ * 		<li>Retrieve the Drift Function Array</li>
+ * 		<li>Retrieve the Diffusion Tensor</li>
+ * 		<li>Retrieve the Risken Omega Estimator</li>
+ * 		<li>Compute the Next Incremental Time Derivative of the PDF</li>
+ * 		<li>Compute the Temporal Probability Distribution Function, if any</li>
+ * 		<li>Compute the Steady-State Probability Distribution Function, if any</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class RdFokkerPlanck
 {
-	private org.drip.dynamics.ito.DiffusionTensor _diffusionTensor = null;
-	private org.drip.dynamics.ito.RdToR1Drift[] _driftFunctionArray = null;
-	private org.drip.dynamics.kolmogorov.RiskenOmegaEstimator _riskenOmegaEstimator = null;
+	private DiffusionTensor _diffusionTensor = null;
+	private RdToR1Drift[] _driftFunctionArray = null;
+	private RiskenOmegaEstimator _riskenOmegaEstimator = null;
 
 	/**
-	 * RdFokkerPlanck Constructor
+	 * <i>RdFokkerPlanck</i> Constructor
 	 * 
 	 * @param driftFunctionArray Drift Function Array
 	 * @param diffusionTensor Diffusion Tensor
 	 * @param riskenOmegaEstimator Risken Omega Estimator
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public RdFokkerPlanck (
-		final org.drip.dynamics.ito.RdToR1Drift[] driftFunctionArray,
-		final org.drip.dynamics.ito.DiffusionTensor diffusionTensor,
-		final org.drip.dynamics.kolmogorov.RiskenOmegaEstimator riskenOmegaEstimator)
-		throws java.lang.Exception
+		final RdToR1Drift[] driftFunctionArray,
+		final DiffusionTensor diffusionTensor,
+		final RiskenOmegaEstimator riskenOmegaEstimator)
+		throws Exception
 	{
 		if (null == (_driftFunctionArray = driftFunctionArray) ||
 			null == (_diffusionTensor = diffusionTensor) ||
-			null == (_riskenOmegaEstimator = riskenOmegaEstimator)
-		)
+			null == (_riskenOmegaEstimator = riskenOmegaEstimator))
 		{
-			throw new java.lang.Exception (
-				"RdFokkerPlanck Constructor => Invalid Inputs"
-			);
+			throw new Exception ("RdFokkerPlanck Constructor => Invalid Inputs");
 		}
 
-		int dimension = _driftFunctionArray.length;
-
-		if (dimension != _diffusionTensor.dimension())
-		{
-			throw new java.lang.Exception (
-				"RdFokkerPlanck Constructor => Invalid Inputs"
-			);
+		if (_driftFunctionArray.length != _diffusionTensor.dimension()) {
+			throw new Exception ("RdFokkerPlanck Constructor => Invalid Inputs");
 		}
 
-		for (int dimensionIndex = 0;
-			dimensionIndex < dimension;
-			++dimensionIndex)
-		{
-			if (null == _driftFunctionArray[dimensionIndex])
-			{
-				throw new java.lang.Exception (
-					"RdFokkerPlanck Constructor => Invalid Inputs"
-				);
+		for (int dimensionIndex = 0; dimensionIndex < _driftFunctionArray.length; ++dimensionIndex) {
+			if (null == _driftFunctionArray[dimensionIndex]) {
+				throw new Exception ("RdFokkerPlanck Constructor => Invalid Inputs");
 			}
 		}
 	}
@@ -175,7 +190,7 @@ public class RdFokkerPlanck
 	 * @return The Drift Function Array
 	 */
 
-	public org.drip.dynamics.ito.RdToR1Drift[] driftFunctionArray()
+	public RdToR1Drift[] driftFunctionArray()
 	{
 		return _driftFunctionArray;
 	}
@@ -186,7 +201,7 @@ public class RdFokkerPlanck
 	 * @return The Diffusion Tensor
 	 */
 
-	public org.drip.dynamics.ito.DiffusionTensor diffusionTensor()
+	public DiffusionTensor diffusionTensor()
 	{
 		return _diffusionTensor;
 	}
@@ -197,7 +212,7 @@ public class RdFokkerPlanck
 	 * @return The Risken Omega Estimator
 	 */
 
-	public org.drip.dynamics.kolmogorov.RiskenOmegaEstimator riskenOmegaEstimator()
+	public RiskenOmegaEstimator riskenOmegaEstimator()
 	{
 		return _riskenOmegaEstimator;
 	}
@@ -210,20 +225,16 @@ public class RdFokkerPlanck
 	 * 
 	 * @return Next Incremental Time Derivative of the PDF
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double pdfDot (
-		final org.drip.dynamics.process.RdProbabilityDensityFunction probabilityDensityFunction,
-		final org.drip.dynamics.ito.TimeRdVertex timeRdVertex)
-		throws java.lang.Exception
+		final RdProbabilityDensityFunction probabilityDensityFunction,
+		final TimeRdVertex timeRdVertex)
+		throws Exception
 	{
-		if (null == probabilityDensityFunction ||
-			null == timeRdVertex)
-		{
-			throw new java.lang.Exception (
-				"RdFokkerPlanck::pdfDot => Invalid Inputs"
-			);
+		if (null == probabilityDensityFunction || null == timeRdVertex) {
+			throw new Exception ("RdFokkerPlanck::pdfDot => Invalid Inputs");
 		}
 
 		final int dimension = _diffusionTensor.dimension();
@@ -232,16 +243,10 @@ public class RdFokkerPlanck
 
 		double pdfDot = 0.;
 
-		for (int dimensionIndex = 0;
-			dimensionIndex < dimension;
-			++dimensionIndex)
-		{
+		for (int dimensionIndex = 0; dimensionIndex < dimension; ++dimensionIndex) {
 			final int index = dimensionIndex;
 
-			pdfDot = pdfDot - new org.drip.function.definition.RdToR1 (
-				null
-			)
-			{
+			pdfDot = pdfDot - new RdToR1 (null) {
 				@Override public int dimension()
 				{
 					return dimension;
@@ -249,43 +254,23 @@ public class RdFokkerPlanck
 
 				@Override public double evaluate (
 					final double[] xArray)
-					throws java.lang.Exception
+					throws Exception
 				{
-					org.drip.dynamics.ito.TimeRdVertex localTimeRdVertex =
-						new org.drip.dynamics.ito.TimeRdVertex (
-							time,
-							xArray
-						);
+					TimeRdVertex localTimeRdVertex = new TimeRdVertex (time, xArray);
 
-					return _driftFunctionArray[index].drift (
-						localTimeRdVertex
-					) * probabilityDensityFunction.density (
-						localTimeRdVertex
-					);
+					return _driftFunctionArray[index].drift (localTimeRdVertex) *
+						probabilityDensityFunction.density (localTimeRdVertex);
 				}
-			}.derivative (
-				timeRdVertex.xArray(),
-				dimensionIndex,
-				1
-			);
+			}.derivative (timeRdVertex.xArray(), dimensionIndex, 1);
 		}
 
-		for (int dimensionIndexI = 0;
-			dimensionIndexI < dimension;
-			++dimensionIndexI)
-		{
+		for (int dimensionIndexI = 0; dimensionIndexI < dimension; ++dimensionIndexI) {
 			final int indexI = dimensionIndexI;
 
-			for (int dimensionIndexJ = 0;
-				dimensionIndexJ < dimension;
-				++dimensionIndexJ)
-			{
+			for (int dimensionIndexJ = 0; dimensionIndexJ < dimension; ++dimensionIndexJ) {
 				final int indexJ = dimensionIndexJ;
 
-				pdfDot = pdfDot + new org.drip.function.definition.RdToR1 (
-					null
-				)
-				{
+				pdfDot = pdfDot + new RdToR1 (null) {
 					@Override public int dimension()
 					{
 						return dimension;
@@ -293,25 +278,14 @@ public class RdFokkerPlanck
 
 					@Override public double evaluate (
 						final double[] xArray)
-						throws java.lang.Exception
+						throws Exception
 					{
-						org.drip.dynamics.ito.TimeRdVertex localTimeRdVertex =
-							new org.drip.dynamics.ito.TimeRdVertex (
-								time,
-								xArray
-							);
+						TimeRdVertex localTimeRdVertex = new TimeRdVertex (time, xArray);
 
-						return _diffusionTensor.diffusionCoefficient (
-							localTimeRdVertex,
-							indexI,
-							indexJ
-						) * probabilityDensityFunction.density (
-							localTimeRdVertex
-						);
+						return _diffusionTensor.diffusionCoefficient (localTimeRdVertex, indexI, indexJ) *
+							probabilityDensityFunction.density (localTimeRdVertex);
 					}
-				}.hessian (
-					timeRdVertex.xArray()
-				)[indexI][indexJ];
+				}.hessian (timeRdVertex.xArray())[indexI][indexJ];
 			};
 		}
 
@@ -326,8 +300,8 @@ public class RdFokkerPlanck
 	 * @return The Temporal Probability Distribution Function
 	 */
 
-	public org.drip.dynamics.process.RdProbabilityDensityFunction temporalPDF (
-		final org.drip.function.definition.RdToR1 intialProbabilityDensityFunction)
+	public RdProbabilityDensityFunction temporalPDF (
+		final RdToR1 intialProbabilityDensityFunction)
 	{
 		return null;
 	}
@@ -338,64 +312,40 @@ public class RdFokkerPlanck
 	 * @return The Steady-State Probability Distribution Function
 	 */
 
-	public org.drip.function.definition.RdToR1 steadyStatePDF()
+	public RdToR1 steadyStatePDF()
 	{
-		double[][] omega = _riskenOmegaEstimator.estimateOmega (
-			_diffusionTensor,
-			_driftFunctionArray
-		);
+		double[][] omega = _riskenOmegaEstimator.estimateOmega (_diffusionTensor, _driftFunctionArray);
 
-		final double[][] omegaInverse =
-			org.drip.numerical.linearalgebra.R1MatrixUtil.InvertUsingGaussianElimination (
-				omega
-			);
+		final double[][] omegaInverse = R1MatrixUtil.InvertUsingGaussianElimination (omega);
 
-		if (null == omegaInverse)
-		{
+		if (null == omegaInverse) {
 			return null;
 		}
 
 		final int dimension = _diffusionTensor.dimension();
 
-		double rdNormalizer = java.lang.Double.NaN;
+		double rdNormalizer = Double.NaN;
 
-		try
-		{
-			rdNormalizer = java.lang.Math.sqrt (
-				java.lang.Math.pow (
-					2. * java.lang.Math.PI,
-					-1. * dimension
-				) / new org.drip.function.matrix.Square (
-					omega
-				).determinant()
+		try {
+			rdNormalizer = Math.sqrt (
+				Math.pow (2. * Math.PI, -1. * dimension) / new Square (omega).determinant()
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		final double rdNormalizerFinal = rdNormalizer;
 
-		final org.drip.function.definition.R1ToR1 r1ToR1Exponential =
-			new org.drip.function.definition.R1ToR1 (
-				null
-			)
-		{
+		final R1ToR1 r1ToR1Exponential = new R1ToR1 (null) {
 			@Override public double evaluate (
 				final double x)
-				throws java.lang.Exception
+				throws Exception
 			{
-				return java.lang.Math.exp (
-					-0.5 * x
-				);
+				return Math.exp (-0.5 * x);
 			}
 		};
 
-		return new org.drip.function.definition.RdToR1 (
-			null
-		)
-		{
+		return new RdToR1 (null) {
 			@Override public int dimension()
 			{
 				return dimension;
@@ -403,16 +353,10 @@ public class RdFokkerPlanck
 
 			@Override public double evaluate (
 				final double[] xArray)
-				throws java.lang.Exception
+				throws Exception
 			{
 				return rdNormalizerFinal * r1ToR1Exponential.evaluate (
-					org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
-						xArray,
-						org.drip.numerical.linearalgebra.R1MatrixUtil.Product (
-							omegaInverse,
-							xArray
-						)
-					)
+					R1MatrixUtil.DotProduct (xArray, R1MatrixUtil.Product (omegaInverse, xArray))
 				);
 			}
 		};

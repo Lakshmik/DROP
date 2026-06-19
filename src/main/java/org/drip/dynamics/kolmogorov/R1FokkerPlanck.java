@@ -1,11 +1,25 @@
 
 package org.drip.dynamics.kolmogorov;
 
+import org.drip.dynamics.ito.R1ToR1Drift;
+import org.drip.dynamics.ito.R1ToR1Volatility;
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.dynamics.process.R1ProbabilityDensityFunction;
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,42 +118,50 @@ package org.drip.dynamics.kolmogorov;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></li>
- *  </ul>
+ * 		<li><i>R1FokkerPlanck</i> Constructor</li>
+ * 		<li>Retrieve the Drift Function</li>
+ * 		<li>Retrieve the Volatility Function</li>
+ * 		<li>Compute the Next Incremental Time Derivative of the PDF</li>
+ * 		<li>Compute the Temporal Probability Distribution Function, if any</li>
+ * 		<li>Compute the Steady-State Probability Distribution Function, if any</li>
+ * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/kolmogorov/README.md">Fokker Planck Kolmogorov Forward/Backward</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1FokkerPlanck
 {
-	private org.drip.dynamics.ito.R1ToR1Drift _driftFunction = null;
-	private org.drip.dynamics.ito.R1ToR1Volatility _volatilityFunction = null;
+	private R1ToR1Drift _driftFunction = null;
+	private R1ToR1Volatility _volatilityFunction = null;
 
 	/**
-	 * R1FokkerPlanck Constructor
+	 * <i>R1FokkerPlanck</i> Constructor
 	 * 
 	 * @param driftFunction The Drift Function
 	 * @param volatilityFunction The Volatility Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1FokkerPlanck (
-		final org.drip.dynamics.ito.R1ToR1Drift driftFunction,
-		final org.drip.dynamics.ito.R1ToR1Volatility volatilityFunction)
-		throws java.lang.Exception
+		final R1ToR1Drift driftFunction,
+		final R1ToR1Volatility volatilityFunction)
+		throws Exception
 	{
-		if (null == (_driftFunction = driftFunction) ||
-			null == (_volatilityFunction = volatilityFunction))
-		{
-			throw new java.lang.Exception (
-				"R1FokkerPlanck Constructor => Invalid Inputs"
-			);
+		if (null == (_driftFunction = driftFunction) || null == (_volatilityFunction = volatilityFunction)) {
+			throw new Exception ("R1FokkerPlanck Constructor => Invalid Inputs");
 		}
 	}
 
@@ -149,7 +171,7 @@ public class R1FokkerPlanck
 	 * @return The Drift Function
 	 */
 
-	public org.drip.dynamics.ito.R1ToR1Drift driftFunction()
+	public R1ToR1Drift driftFunction()
 	{
 		return _driftFunction;
 	}
@@ -160,7 +182,7 @@ public class R1FokkerPlanck
 	 * @return The Volatility Function
 	 */
 
-	public org.drip.dynamics.ito.R1ToR1Volatility volatilityFunction()
+	public R1ToR1Volatility volatilityFunction()
 	{
 		return _volatilityFunction;
 	}
@@ -173,73 +195,43 @@ public class R1FokkerPlanck
 	 * 
 	 * @return Next Incremental Time Derivative of the PDF
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double pdfDot (
-		final org.drip.dynamics.process.R1ProbabilityDensityFunction probabilityDensityFunction,
-		final org.drip.dynamics.ito.TimeR1Vertex timeR1Vertex)
-		throws java.lang.Exception
+		final R1ProbabilityDensityFunction probabilityDensityFunction,
+		final TimeR1Vertex timeR1Vertex)
+		throws Exception
 	{
-		if (null == probabilityDensityFunction ||
-			null == timeR1Vertex)
-		{
-			throw new java.lang.Exception (
-				"R1FokkerPlanck::pdfDot => Invalid Inputs"
-			);
+		if (null == probabilityDensityFunction || null == timeR1Vertex) {
+			throw new Exception ("R1FokkerPlanck::pdfDot => Invalid Inputs");
 		}
 
 		final double time = timeR1Vertex.t();
 
-		return new org.drip.function.definition.R1ToR1 (
-			null
-		)
-		{
+		return new R1ToR1 (null) {
 			@Override public double evaluate (
 				final double x)
-				throws java.lang.Exception
+				throws Exception
 			{
-				org.drip.dynamics.ito.TimeR1Vertex localTimeR1Vertex =
-					new org.drip.dynamics.ito.TimeR1Vertex (
-						time,
-						x
-					);
+				TimeR1Vertex localTimeR1Vertex = new TimeR1Vertex (time, x);
 
-				return _driftFunction.drift (
-					localTimeR1Vertex
-				) * probabilityDensityFunction.density (
-					localTimeR1Vertex
-				);
+				return _driftFunction.drift (localTimeR1Vertex) *
+					probabilityDensityFunction.density (localTimeR1Vertex);
 			}
-		}.derivative (
-			timeR1Vertex.x(),
-			1
-		) +  new org.drip.function.definition.R1ToR1 (
-			null
-		)
-		{
+		}.derivative (timeR1Vertex.x(), 1) +  new R1ToR1 (null) {
 			@Override public double evaluate (
 				final double x)
-				throws java.lang.Exception
+				throws Exception
 			{
-				org.drip.dynamics.ito.TimeR1Vertex localTimeR1Vertex =
-					new org.drip.dynamics.ito.TimeR1Vertex (
-						time,
-						x
-					);
+				TimeR1Vertex localTimeR1Vertex = new TimeR1Vertex (time, x);
 
-				double volatility = _volatilityFunction.volatility (
-					localTimeR1Vertex
-				);
+				double volatility = _volatilityFunction.volatility (localTimeR1Vertex);
 
-				return 0.5 * volatility * volatility * probabilityDensityFunction.density (
-					localTimeR1Vertex
-				);
+				return 0.5 * volatility * volatility *
+					probabilityDensityFunction.density (localTimeR1Vertex);
 			}
-		}.derivative (
-			timeR1Vertex.x(),
-			2
-		);
+		}.derivative (timeR1Vertex.x(), 2);
 	}
 
 	/**
@@ -250,8 +242,8 @@ public class R1FokkerPlanck
 	 * @return The Temporal Probability Distribution Function
 	 */
 
-	public org.drip.dynamics.process.R1ProbabilityDensityFunction temporalPDF (
-		final org.drip.function.definition.R1ToR1 intialProbabilityDensityFunction)
+	public R1ProbabilityDensityFunction temporalPDF (
+		final R1ToR1 intialProbabilityDensityFunction)
 	{
 		return null;
 	}
@@ -262,7 +254,7 @@ public class R1FokkerPlanck
 	 * @return The Steady-State Probability Distribution Function
 	 */
 
-	public org.drip.function.definition.R1ToR1 steadyStatePDF()
+	public R1ToR1 steadyStatePDF()
 	{
 		return null;
 	}
@@ -275,7 +267,7 @@ public class R1FokkerPlanck
 	 * @return The Temporal Probability Distribution Function given the Delta 0 Starting PDF
 	 */
 
-	public org.drip.dynamics.process.R1ProbabilityDensityFunction deltaStartTemporalPDF (
+	public R1ProbabilityDensityFunction deltaStartTemporalPDF (
 		final double x0)
 	{
 		return null;

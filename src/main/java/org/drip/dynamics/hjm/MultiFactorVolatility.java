@@ -1,11 +1,23 @@
 
 package org.drip.dynamics.hjm;
 
+import org.drip.analytics.definition.MarketSurface;
+import org.drip.function.definition.R1ToR1;
+import org.drip.sequence.random.PrincipalFactorSequenceGenerator;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,44 +94,64 @@ package org.drip.dynamics.hjm;
 
 /**
  * <i>MultiFactorVolatility</i> implements the Volatility of the Multi-factor Stochastic Evolution Process.
- * The Factors may come from the Underlying Stochastic Variables, or from Principal Components.
+ * 	The Factors may come from the Underlying Stochastic Variables, or from Principal Components. It provides
+ * 	the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></li>
+ * 		<li><i>MultiFactorVolatility</i> Constructor</li>
+ * 		<li>Retrieve the Array of Volatility Surfaces</li>
+ * 		<li>Retrieve the Principal Factor Sequence Generator</li>
+ * 		<li>Retrieve the Factor-Specific Univariate Volatility Function for the Specified Date</li>
+ * 		<li>Compute the Factor Volatility Integral</li>
+ * 		<li>Compute the Factor Point Volatility</li>
+ * 		<li>Compute the Array of Factor Point Volatilities</li>
+ * 		<li>Compute the Weighted Factor Point Volatility</li>
+ * 		<li>Compute the Point Volatility Modulus</li>
+ * 		<li>Compute the Point Volatility Modulus Derivative</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiFactorVolatility {
-	private org.drip.analytics.definition.MarketSurface[] _aMSVolatility = null;
-	private org.drip.sequence.random.PrincipalFactorSequenceGenerator _pfsg = null;
+public class MultiFactorVolatility
+{
+	private MarketSurface[] _volatilityMarketSurfaceArray = null;
+	private PrincipalFactorSequenceGenerator _principalFactorSequenceGenerator = null;
 
 	/**
-	 * MultiFactorVolatility Constructor
+	 * <i>MultiFactorVolatility</i> Constructor
 	 * 
-	 * @param aMSVolatility Array of the Multi-Factor Volatility Surfaces
-	 * @param pfsg Principal Factor Sequence Generator
+	 * @param volatilityMarketSurfaceArray Array of the Multi-Factor Volatility Surfaces
+	 * @param principalFactorSequenceGenerator Principal Factor Sequence Generator
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public MultiFactorVolatility (
-		final org.drip.analytics.definition.MarketSurface[] aMSVolatility,
-		final org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg)
-		throws java.lang.Exception
+		final MarketSurface[] volatilityMarketSurfaceArray,
+		final PrincipalFactorSequenceGenerator principalFactorSequenceGenerator)
+		throws Exception
 	{
-		if (null == (_aMSVolatility = aMSVolatility) || null == (_pfsg = pfsg))
-			throw new java.lang.Exception ("MultiFactorVolatility ctr: Invalid Inputs");
+		if (null == (_volatilityMarketSurfaceArray = volatilityMarketSurfaceArray) ||
+			null == (_principalFactorSequenceGenerator = principalFactorSequenceGenerator))
+		{
+			throw new Exception ("MultiFactorVolatility Constructor: Invalid Inputs");
+		}
 
-		int iNumFactor = _pfsg.numFactor();
+		int factorCount = _principalFactorSequenceGenerator.numFactor();
 
-		if (0 == iNumFactor || _aMSVolatility.length < iNumFactor)
-			throw new java.lang.Exception ("MultiFactorVolatility ctr: Invalid Inputs");
+		if (0 == factorCount || _volatilityMarketSurfaceArray.length < factorCount) {
+			throw new Exception ("MultiFactorVolatility Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -128,9 +160,9 @@ public class MultiFactorVolatility {
 	 * @return The Array of Volatility Surfaces
 	 */
 
-	public org.drip.analytics.definition.MarketSurface[] volatilitySurface()
+	public MarketSurface[] volatilityMarketSurfaceArray()
 	{
-		return _aMSVolatility;
+		return _volatilityMarketSurfaceArray;
 	}
 
 	/**
@@ -139,47 +171,51 @@ public class MultiFactorVolatility {
 	 * @return The Principal Factor Sequence Generator
 	 */
 
-	public org.drip.sequence.random.PrincipalFactorSequenceGenerator msg()
+	public PrincipalFactorSequenceGenerator principalFactorSequenceGenerator()
 	{
-		return _pfsg;
+		return _principalFactorSequenceGenerator;
 	}
 
 	/**
 	 * Retrieve the Factor-Specific Univariate Volatility Function for the Specified Date
 	 * 
-	 * @param iFactorIndex The Factor Index
-	 * @param iXDate The X Date
+	 * @param factorIndex The Factor Index
+	 * @param xDate The X Date
 	 * 
 	 * @return The Factor-Specific Univariate Volatility Function for the Specified Date
 	 */
 
-	public org.drip.function.definition.R1ToR1 xDateVolatilityFunction (
-		final int iFactorIndex,
-		final int iXDate)
+	public R1ToR1 xDateVolatilityFunction (
+		final int factorIndex,
+		final int xDate)
 	{
-		int iNumFactor = _pfsg.numFactor();
+		if (factorIndex >= _principalFactorSequenceGenerator.numFactor()) {
+			return null;
+		}
 
-		if (iFactorIndex >= iNumFactor) return null;
-
-		final int iNumVariate = _aMSVolatility.length;
-
-		return new org.drip.function.definition.R1ToR1 (null) {
+		return new R1ToR1 (null)
+		{
 			@Override public double evaluate (
-				final double dblX)
-				throws java.lang.Exception
+				final double x)
+				throws Exception
 			{
-				double dblMultiFactorVol = 0.;
+				double multiFactorVolatility = 0.;
 
-				double[] adblFactor = _pfsg.factors()[iFactorIndex];
+				double[] factorArray = _principalFactorSequenceGenerator.factors()[factorIndex];
 
-				for (int i = 0; i < iNumVariate; ++i) {
-					org.drip.analytics.definition.NodeStructure tsVolatilityXDate =
-						_aMSVolatility[iFactorIndex].xAnchorTermStructure (iXDate);
-
-					dblMultiFactorVol += adblFactor[i] * tsVolatilityXDate.node ((int) dblX);
+				for (int volatilityMarketSurfaceIndex = 0;
+					volatilityMarketSurfaceIndex < _volatilityMarketSurfaceArray.length;
+					++volatilityMarketSurfaceIndex)
+				{
+					multiFactorVolatility += factorArray[volatilityMarketSurfaceIndex] *
+						_volatilityMarketSurfaceArray[factorIndex].xAnchorTermStructure (
+							xDate
+						).node (
+							(int) x
+						);
 				}
 
-				return _pfsg.factorWeight()[iFactorIndex] * dblMultiFactorVol;
+				return _principalFactorSequenceGenerator.factorWeight()[factorIndex] * multiFactorVolatility;
 			}
 		};
 	}
@@ -187,205 +223,209 @@ public class MultiFactorVolatility {
 	/**
 	 * Compute the Factor Volatility Integral
 	 * 
-	 * @param iFactorIndex The Factor Index
-	 * @param iXDate The X Date
-	 * @param iYDate The Y Date
+	 * @param factorIndex The Factor Index
+	 * @param xDate The X Date
+	 * @param yDate The Y Date
 	 * 
 	 * @return The Factor Volatility Integral
 	 * 
-	 * @throws java.lang.Exception Thrown if the Factor Volatility Integral cannot be computed
+	 * @throws Exception Thrown if the Factor Volatility Integral cannot be computed
 	 */
 
 	public double volatilityIntegral (
-		final int iFactorIndex,
-		final int iXDate,
-		final int iYDate)
-		throws java.lang.Exception
+		final int factorIndex,
+		final int xDate,
+		final int yDate)
+		throws Exception
 	{
-		org.drip.function.definition.R1ToR1 auVolatilityFunction = xDateVolatilityFunction (iFactorIndex,
-			iXDate);
+		R1ToR1 volatilityFunction = xDateVolatilityFunction (factorIndex, xDate);
 
-		if (null == auVolatilityFunction)
-			throw new java.lang.Exception
-				("MultiFactorVolatility::volatilityIntegral => Cannot extract X Date Volatility Function");
+		if (null == volatilityFunction) {
+			throw new Exception (
+				"MultiFactorVolatility::volatilityIntegral => Cannot extract X Date Volatility Function"
+			);
+		}
 
-		return auVolatilityFunction.integrate (iXDate, iYDate) / 365.25;
+		return volatilityFunction.integrate (xDate, yDate) / 365.25;
 	}
 
 	/**
 	 * Compute the Factor Point Volatility
 	 * 
-	 * @param iFactorIndex The Factor Index
-	 * @param iXDate The X Date
-	 * @param iYDate The Y Date
+	 * @param factorIndex The Factor Index
+	 * @param xDate The X Date
+	 * @param yDate The Y Date
 	 * 
 	 * @return The Factor Point Volatility
 	 * 
-	 * @throws java.lang.Exception Thrown if the Factor Point Volatility cannot be computed
+	 * @throws Exception Thrown if the Factor Point Volatility cannot be computed
 	 */
 
 	public double factorPointVolatility (
-		final int iFactorIndex,
-		final int iXDate,
-		final int iYDate)
-		throws java.lang.Exception
+		final int factorIndex,
+		final int xDate,
+		final int yDate)
+		throws Exception
 	{
-		int iNumFactor = _pfsg.numFactor();
+		if (factorIndex >= _principalFactorSequenceGenerator.numFactor()) {
+			throw new Exception ("MultiFactorVolatility::factorPointVolatility => Invalid Factor Index");
+		}
 
-		if (iFactorIndex >= iNumFactor)
-			throw new java.lang.Exception
-				("MultiFactorVolatility::factorPointVolatility => Invalid Factor Index");
+		double[] factorArray = _principalFactorSequenceGenerator.factors()[factorIndex];
 
-		double[] adblFactor = _pfsg.factors()[iFactorIndex];
+		double factorPointVolatility = 0.;
 
-		int iNumVariate = adblFactor.length;
-		double dblFactorPointVolatility = 0.;
+		for (int index = 0; index < factorArray.length; ++index) {
+			factorPointVolatility +=
+				factorArray[index] * _volatilityMarketSurfaceArray[index].node (xDate, yDate);
+		}
 
-		for (int i = 0; i < iNumVariate; ++i)
-			dblFactorPointVolatility += adblFactor[i] * _aMSVolatility[i].node (iXDate, iYDate);
-
-		return dblFactorPointVolatility;
+		return factorPointVolatility;
 	}
 
 	/**
 	 * Compute the Array of Factor Point Volatilities
 	 * 
-	 * @param iXDate The X Date
-	 * @param iYDate The Y Date
+	 * @param xDate The X Date
+	 * @param yDate The Y Date
 	 * 
 	 * @return The Array of Factor Point Volatilities
 	 */
 
 	public double[] factorPointVolatility (
-		final int iXDate,
-		final int iYDate)
+		final int xDate,
+		final int yDate)
 	{
-		int iNumFactor = _pfsg.numFactor();
+		int factorCount = _principalFactorSequenceGenerator.numFactor();
 
-		double[][] aadblFactor = _pfsg.factors();
+		double[][] factorGrid = _principalFactorSequenceGenerator.factors();
 
-		int iNumVariate = aadblFactor[0].length;
-		double[] adblVariateVolatility = new double[iNumVariate];
-		double[] adblFactorPointVolatility = new double[iNumFactor];
+		int variateCount = factorGrid[0].length;
+		double[] variateVolatilityArray = new double[variateCount];
+		double[] factorPointVolatilityArray = new double[factorCount];
 
-		for (int iVariateIndex = 0; iVariateIndex < iNumVariate; ++iVariateIndex) {
+		for (int variateIndex = 0; variateIndex < variateCount; ++variateIndex) {
 			try {
-				adblVariateVolatility[iVariateIndex] = _aMSVolatility[iVariateIndex].node (iXDate, iYDate);
-			} catch (java.lang.Exception e) {
+				variateVolatilityArray[variateIndex] =
+					_volatilityMarketSurfaceArray[variateIndex].node (xDate, yDate);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		for (int iFactorIndex = 0; iFactorIndex < iNumFactor; ++iFactorIndex) {
-			adblFactorPointVolatility[iFactorIndex] = 0.;
-			double[] adblFactor = aadblFactor[iFactorIndex];
+		for (int factorIndex = 0; factorIndex < factorCount; ++factorIndex) {
+			factorPointVolatilityArray[factorIndex] = 0.;
+			double[] factorArray = factorGrid[factorIndex];
 
-			for (int iVariateIndex = 0; iVariateIndex < iNumVariate; ++iVariateIndex)
-				adblFactorPointVolatility[iFactorIndex] += adblFactor[iVariateIndex] *
-					adblVariateVolatility[iVariateIndex];
+			for (int variateIndex = 0; variateIndex < variateCount; ++variateIndex) {
+				factorPointVolatilityArray[factorIndex] +=
+					factorArray[variateIndex] * variateVolatilityArray[variateIndex];
+			}
 		}
 
-		return adblFactorPointVolatility;
+		return factorPointVolatilityArray;
 	}
 
 	/**
 	 * Compute the Weighted Factor Point Volatility
 	 * 
-	 * @param iFactorIndex The Factor Index
-	 * @param iXDate The X Date
-	 * @param iYDate The Y Date
+	 * @param factorIndex The Factor Index
+	 * @param xDate The X Date
+	 * @param yDate The Y Date
 	 * 
 	 * @return The Weighted Factor Point Volatility
 	 * 
-	 * @throws java.lang.Exception Thrown if the Weighted Factor Point Volatility cannot be computed
+	 * @throws Exception Thrown if the Weighted Factor Point Volatility cannot be computed
 	 */
 
 	public double weightedFactorPointVolatility (
-		final int iFactorIndex,
-		final int iXDate,
-		final int iYDate)
-		throws java.lang.Exception
+		final int factorIndex,
+		final int xDate,
+		final int yDate)
+		throws Exception
 	{
-		int iNumFactor = _pfsg.numFactor();
+		if (factorIndex >= _principalFactorSequenceGenerator.numFactor()) {
+			throw new Exception (
+				"MultiFactorVolatility::weightedFactorPointVolatility => Invalid Factor Index"
+			);
+		}
 
-		if (iFactorIndex >= iNumFactor)
-			throw new java.lang.Exception
-				("MultiFactorVolatility::weightedFactorPointVolatility => Invalid Factor Index");
+		double[] factorArray = _principalFactorSequenceGenerator.factors()[factorIndex];
 
-		double[] adblFactor = _pfsg.factors()[iFactorIndex];
+		double factorPointVolatility = 0.;
 
-		int iNumVariate = adblFactor.length;
-		double dblFactorPointVolatility = 0.;
+		for (int index = 0; index < factorArray.length; ++index) {
+			factorPointVolatility +=
+				factorArray[index] * _volatilityMarketSurfaceArray[index].node (xDate, yDate);
+		}
 
-		for (int i = 0; i < iNumVariate; ++i)
-			dblFactorPointVolatility += adblFactor[i] * _aMSVolatility[i].node (iXDate, iYDate);
-
-		return _pfsg.factorWeight()[iFactorIndex] * dblFactorPointVolatility;
+		return _principalFactorSequenceGenerator.factorWeight()[factorIndex] * factorPointVolatility;
 	}
 
 	/**
 	 * Compute the Point Volatility Modulus
 	 * 
-	 * @param iXDate The X Date
-	 * @param iYDate The Y Date
+	 * @param xDate The X Date
+	 * @param yDate The Y Date
 	 * 
 	 * @return The Point Volatility Modulus
 	 * 
-	 * @throws java.lang.Exception Thrown if the Point Volatility Modulus cannot be computed
+	 * @throws Exception Thrown if the Point Volatility Modulus cannot be computed
 	 */
 
 	public double pointVolatilityModulus (
-		final int iXDate,
-		final int iYDate)
-		throws java.lang.Exception
+		final int xDate,
+		final int yDate)
+		throws Exception
 	{
-		int iNumFactor = _pfsg.numFactor();
+		double pointVolatilityModulus = 0.;
 
-		double dblPointVolatilityModulus = 0.;
+		for (int factorIndex = 0;
+			factorIndex < _principalFactorSequenceGenerator.numFactor();
+			++factorIndex)
+		{
+			double weightedFactorPointVolatility = weightedFactorPointVolatility (factorIndex, xDate, yDate);
 
-		for (int i = 0; i < iNumFactor; ++i) {
-			double dblWeightedFactorPointVolatility = weightedFactorPointVolatility (i, iXDate, iYDate);
-
-			dblPointVolatilityModulus += dblWeightedFactorPointVolatility * dblWeightedFactorPointVolatility;
+			pointVolatilityModulus += weightedFactorPointVolatility * weightedFactorPointVolatility;
 		}
 
-		return dblPointVolatilityModulus;
+		return pointVolatilityModulus;
 	}
 
 	/**
 	 * Compute the Point Volatility Modulus Derivative
 	 * 
-	 * @param iXDate The X Date
-	 * @param iYDate The Y Date
-	 * @param iOrder The Derivative Order
-	 * @param bTerminal TRUE - Derivative off of the Y Date; FALSE - Derivative off of the X Date
+	 * @param xDate The X Date
+	 * @param yDate The Y Date
+	 * @param order The Derivative Order
+	 * @param terminal TRUE - Derivative off of the Y Date; FALSE - Derivative off of the X Date
 	 * 
 	 * @return The Point Volatility Modulus Derivative
 	 * 
-	 * @throws java.lang.Exception Thrown if the Point Volatility Modulus Derivative cannot be computed
+	 * @throws Exception Thrown if the Point Volatility Modulus Derivative cannot be computed
 	 */
 
 	public double pointVolatilityModulusDerivative (
-		final int iXDate,
-		final int iYDate,
-		final int iOrder,
-		final boolean bTerminal)
-		throws java.lang.Exception
+		final int xDate,
+		final int yDate,
+		final int order,
+		final boolean terminal)
+		throws Exception
 	{
-		org.drip.function.definition.R1ToR1 pointVolatilityR1ToR1 = new
-			org.drip.function.definition.R1ToR1 (null) {
+		R1ToR1 pointVolatilityFunction = new R1ToR1 (null)
+		{
 			@Override public double evaluate (
-				final double dblVariate)
-				throws java.lang.Exception
+				final double variate)
+				throws Exception
 			{
-				return bTerminal ? pointVolatilityModulus (iXDate, (int) dblVariate) : pointVolatilityModulus
-					((int) dblVariate, iYDate);
+				return terminal ? pointVolatilityModulus (xDate, (int) variate) :
+					pointVolatilityModulus ((int) variate, yDate);
 			}
 		};
 
-		return bTerminal ? pointVolatilityR1ToR1.derivative (iXDate, iOrder) :
-			pointVolatilityR1ToR1.derivative (iXDate, iOrder);
+		return terminal ? pointVolatilityFunction.derivative (xDate, order) :
+			pointVolatilityFunction.derivative (xDate, order);
 	}
 }

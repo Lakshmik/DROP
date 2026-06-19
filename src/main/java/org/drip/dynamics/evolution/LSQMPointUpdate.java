@@ -6,6 +6,14 @@ package org.drip.dynamics.evolution;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,51 +90,65 @@ package org.drip.dynamics.evolution;
 
 /**
  * <i>LSQMPointUpdate</i> contains the Snapshot and the Increment of the Evolving Point Latent State
- * Quantification Metrics.
+ * 	Quantification Metrics. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></li>
+ * 		<li><i>LSQMPointUpdate</i> Constructor</li>
+ * 		<li>Retrieve the Evolution Start Date</li>
+ * 		<li>Retrieve the Evolution Finish Date</li>
+ * 		<li>Retrieve the View Date</li>
+ * 		<li>Retrieve the LSQM Point Snapshot</li>
+ * 		<li>Retrieve the LSQM Point Increment</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LSQMPointUpdate {
-	private int _iViewDate = java.lang.Integer.MIN_VALUE;
-	private int _iEvolutionStartDate = java.lang.Integer.MIN_VALUE;
-	private int _iEvolutionFinishDate = java.lang.Integer.MIN_VALUE;
-	private org.drip.dynamics.evolution.LSQMPointRecord _lprSnapshot = null;
-	private org.drip.dynamics.evolution.LSQMPointRecord _lprIncrement = null;
+public class LSQMPointUpdate
+{
+	private LSQMPointRecord _snapshot = null;
+	private int _viewDate = Integer.MIN_VALUE;
+	private LSQMPointRecord _increment = null;
+	private int _evolutionStartDate = Integer.MIN_VALUE;
+	private int _evolutionFinishDate = Integer.MIN_VALUE;
 
 	/**
-	 * LSQMPointUpdate Constructor
+	 * <i>LSQMPointUpdate</i> Constructor
 	 * 
-	 * @param iEvolutionStartDate The Evolution Start Date
-	 * @param iEvolutionFinishDate The Evolution Finish Date
-	 * @param iViewDate The View Date
-	 * @param lprSnapshot The LSQM Point Record Snapshot
-	 * @param lprIncrement The LSQM Point Record Update
+	 * @param evolutionStartDate The Evolution Start Date
+	 * @param evolutionFinishDate The Evolution Finish Date
+	 * @param viewDate The View Date
+	 * @param snapshot The LSQM Point Record Snapshot
+	 * @param increment The LSQM Point Record Update
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public LSQMPointUpdate (
-		final int iEvolutionStartDate,
-		final int iEvolutionFinishDate,
-		final int iViewDate,
-		final org.drip.dynamics.evolution.LSQMPointRecord lprSnapshot,
-		final org.drip.dynamics.evolution.LSQMPointRecord lprIncrement)
-		throws java.lang.Exception
+		final int evolutionStartDate,
+		final int evolutionFinishDate,
+		final int viewDate,
+		final LSQMPointRecord snapshot,
+		final LSQMPointRecord increment)
+		throws Exception
 	{
-		if (null == (_lprSnapshot = lprSnapshot) || (_iEvolutionFinishDate = iEvolutionFinishDate) <
-			(_iEvolutionStartDate = iEvolutionStartDate) || (_iViewDate = iViewDate) < _iEvolutionStartDate)
-			throw new java.lang.Exception ("LSQMPointUpdate ctr: Invalid Inputs");
+		if (null == (_snapshot = snapshot) ||
+			(_evolutionFinishDate = evolutionFinishDate) < (_evolutionStartDate = evolutionStartDate) ||
+			(_viewDate = viewDate) < _evolutionStartDate)
+		{
+			throw new Exception ("LSQMPointUpdate Constructor: Invalid Inputs");
+		}
 
-		_lprIncrement = lprIncrement;
+		_increment = increment;
 	}
 
 	/**
@@ -137,7 +159,7 @@ public class LSQMPointUpdate {
 
 	public int evolutionStartDate()
 	{
-		return _iEvolutionStartDate;
+		return _evolutionStartDate;
 	}
 
 	/**
@@ -148,7 +170,7 @@ public class LSQMPointUpdate {
 
 	public int evolutionFinishDate()
 	{
-		return _iEvolutionFinishDate;
+		return _evolutionFinishDate;
 	}
 
 	/**
@@ -159,7 +181,7 @@ public class LSQMPointUpdate {
 
 	public int viewDate()
 	{
-		return _iViewDate;
+		return _viewDate;
 	}
 
 	/**
@@ -168,9 +190,9 @@ public class LSQMPointUpdate {
 	 * @return The LSQM Point Snapshot
 	 */
 
-	public org.drip.dynamics.evolution.LSQMPointRecord snapshot()
+	public LSQMPointRecord snapshot()
 	{
-		return _lprSnapshot;
+		return _snapshot;
 	}
 
 	/**
@@ -179,8 +201,8 @@ public class LSQMPointUpdate {
 	 * @return The LSQM Point Increment
 	 */
 
-	public org.drip.dynamics.evolution.LSQMPointRecord increment()
+	public LSQMPointRecord increment()
 	{
-		return _lprIncrement;
+		return _increment;
 	}
 }

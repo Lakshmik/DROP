@@ -1,11 +1,25 @@
 
 package org.drip.dynamics.hjm;
 
+import org.drip.analytics.definition.LatentStateStatic;
+import org.drip.dynamics.evolution.LSQMPointRecord;
+import org.drip.dynamics.evolution.LSQMPointUpdate;
+import org.drip.state.identifier.ForwardLabel;
+import org.drip.state.identifier.FundingLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,25 +96,44 @@ package org.drip.dynamics.hjm;
 
 /**
  * <i>ShortForwardRateUpdate</i> contains the Instantaneous Snapshot of the Evolving Discount Latent State
- * Quantification Metrics.
+ * 	Quantification Metrics. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></li>
+ * 		<li>Construct an Instance of <i>ShortForwardRateUpdate</i></li>
+ * 		<li>Retrieve the Instantaneous Forward Rate</li>
+ * 		<li>Retrieve the Instantaneous Forward Rate Increment</li>
+ * 		<li>Retrieve the LIBOR Forward Rate</li>
+ * 		<li>Retrieve the LIBOR Forward Rate Increment</li>
+ * 		<li>Retrieve the Shifted LIBOR Forward Rate</li>
+ * 		<li>Retrieve the Shifted LIBOR Forward Rate Increment</li>
+ * 		<li>Retrieve the Short Rate</li>
+ * 		<li>Retrieve the Short Rate Increment</li>
+ * 		<li>Retrieve the Compounded Short Rate</li>
+ * 		<li>Retrieve the Compounded Short Rate Increment</li>
+ * 		<li>Retrieve the Price</li>
+ * 		<li>Retrieve the Price Increment</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPointUpdate {
-	private org.drip.state.identifier.ForwardLabel _lslForward = null;
-	private org.drip.state.identifier.FundingLabel _lslFunding = null;
+public class ShortForwardRateUpdate
+	extends LSQMPointUpdate
+{
+	private ForwardLabel _forwardLabel = null;
+	private FundingLabel _fundingLabel = null;
 
 	/**
-	 * Construct an Instance of ShortForwardRateUpdate
+	 * Construct an Instance of <i>ShortForwardRateUpdate</i>
 	 * 
 	 * @param lslFunding The Funding Latent State Label
 	 * @param lslForward The Forward Latent State Label
@@ -124,8 +157,8 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 */
 
 	public static final ShortForwardRateUpdate Create (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final org.drip.state.identifier.ForwardLabel lslForward,
+		final FundingLabel lslFunding,
+		final ForwardLabel lslForward,
 		final int iInitialDate,
 		final int iFinalDate,
 		final int iTargetPointDate,
@@ -142,63 +175,63 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 		final double dblPrice,
 		final double dblPriceIncrement)
 	{
-		org.drip.dynamics.evolution.LSQMPointRecord lrSnapshot = new
-			org.drip.dynamics.evolution.LSQMPointRecord();
+		LSQMPointRecord lrSnapshot = new
+			LSQMPointRecord();
 
-		if (!lrSnapshot.setQM (lslFunding,
+		if (!lrSnapshot.setStateQuantificationMetric (lslFunding,
 			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE, dblShortRate))
 			return null;
 
-		if (!lrSnapshot.setQM (lslFunding,
+		if (!lrSnapshot.setStateQuantificationMetric (lslFunding,
 			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_COMPOUNDED_SHORT_RATE,
 				dblCompoundedShortRate))
 			return null;
 
-		if (!lrSnapshot.setQM (lslFunding,
+		if (!lrSnapshot.setStateQuantificationMetric (lslFunding,
 			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR, dblPrice))
 			return null;
 
-		if (!lrSnapshot.setQM (lslForward,
+		if (!lrSnapshot.setStateQuantificationMetric (lslForward,
 			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_FORWARD_RATE, dblLIBORForwardRate))
 			return null;
 
-		if (!lrSnapshot.setQM (lslForward,
+		if (!lrSnapshot.setStateQuantificationMetric (lslForward,
 			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_SHIFTED_FORWARD_RATE,
 				dblShiftedLIBORForwardRate))
 			return null;
 
-		if (!lrSnapshot.setQM (lslForward,
+		if (!lrSnapshot.setStateQuantificationMetric (lslForward,
 			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_INSTANTANEOUS_FORWARD_RATE,
 				dblInstantaneousForwardRate))
 			return null;
 
-		org.drip.dynamics.evolution.LSQMPointRecord lrIncrement = new
-			org.drip.dynamics.evolution.LSQMPointRecord();
+		LSQMPointRecord lrIncrement = new
+			LSQMPointRecord();
 
-		if (!lrIncrement.setQM (lslFunding,
+		if (!lrIncrement.setStateQuantificationMetric (lslFunding,
 			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE, dblShortRateIncrement))
 			return null;
 
-		if (!lrIncrement.setQM (lslFunding,
+		if (!lrIncrement.setStateQuantificationMetric (lslFunding,
 			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_COMPOUNDED_SHORT_RATE,
 				dblCompoundedShortRateIncrement))
 			return null;
 
-		if (!lrIncrement.setQM (lslFunding,
+		if (!lrIncrement.setStateQuantificationMetric (lslFunding,
 			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR, dblPriceIncrement))
 			return null;
 
-		if (!lrIncrement.setQM (lslForward,
+		if (!lrIncrement.setStateQuantificationMetric (lslForward,
 			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_FORWARD_RATE,
 				dblLIBORForwardRateIncrement))
 			return null;
 
-		if (!lrIncrement.setQM (lslForward,
+		if (!lrIncrement.setStateQuantificationMetric (lslForward,
 			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_SHIFTED_FORWARD_RATE,
 				dblShiftedLIBORForwardRateIncrement))
 			return null;
 
-		if (!lrIncrement.setQM (lslForward,
+		if (!lrIncrement.setStateQuantificationMetric (lslForward,
 			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_INSTANTANEOUS_FORWARD_RATE,
 				dblInstantaneousForwardRateIncrement))
 			return null;
@@ -206,7 +239,7 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 		try {
 			return new ShortForwardRateUpdate (lslFunding, lslForward, iInitialDate, iFinalDate,
 				iTargetPointDate, lrSnapshot, lrIncrement);
-		} catch (java.lang.Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -214,19 +247,20 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	}
 
 	private ShortForwardRateUpdate (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final int iInitialDate,
-		final int iFinalDate,
-		final int iViewDate,
-		final org.drip.dynamics.evolution.LSQMPointRecord lrSnapshot,
-		final org.drip.dynamics.evolution.LSQMPointRecord lrIncrement)
-		throws java.lang.Exception
+		final FundingLabel fundingLabel,
+		final ForwardLabel forwardLabel,
+		final int initialDate,
+		final int finalDate,
+		final int viewDate,
+		final LSQMPointRecord snapshotLSQMPointRecord,
+		final LSQMPointRecord incrementLSQMPointRecord)
+		throws Exception
 	{
-		super (iInitialDate, iFinalDate, iViewDate, lrSnapshot, lrIncrement);
+		super (initialDate, finalDate, viewDate, snapshotLSQMPointRecord, incrementLSQMPointRecord);
 
-		if (null == (_lslFunding = lslFunding) || null == (_lslForward = lslForward))
-			throw new java.lang.Exception ("ShortForwardRateUpdate ctr: Invalid Inputs");
+		if (null == (_fundingLabel = fundingLabel) || null == (_forwardLabel = forwardLabel)) {
+			throw new Exception ("ShortForwardRateUpdate Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -234,14 +268,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Instantaneous Forward Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Instantaneous Forward Rate is not available
+	 * @throws Exception Thrown if the Instantaneous Forward Rate is not available
 	 */
 
 	public double instantaneousForwardRate()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslForward,
-			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_INSTANTANEOUS_FORWARD_RATE);
+		return snapshot().quantificationMetric (
+			_forwardLabel,
+			LatentStateStatic.FORWARD_QM_INSTANTANEOUS_FORWARD_RATE
+		);
 	}
 
 	/**
@@ -249,14 +285,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Instantaneous Forward Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Instantaneous Forward Rate Increment is not available
+	 * @throws Exception Thrown if the Instantaneous Forward Rate Increment is not available
 	 */
 
 	public double instantaneousForwardRateIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslForward,
-			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_INSTANTANEOUS_FORWARD_RATE);
+		return increment().quantificationMetric (
+			_forwardLabel,
+			LatentStateStatic.FORWARD_QM_INSTANTANEOUS_FORWARD_RATE
+		);
 	}
 
 	/**
@@ -264,14 +302,13 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The LIBOR Forward Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Forward Rate is not available
+	 * @throws Exception Thrown if the Forward Rate is not available
 	 */
 
 	public double liborForwardRate()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslForward,
-			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_FORWARD_RATE);
+		return snapshot().quantificationMetric (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD_RATE);
 	}
 
 	/**
@@ -279,14 +316,13 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The LIBOR Forward Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Forward Rate Increment is not available
+	 * @throws Exception Thrown if the Forward Rate Increment is not available
 	 */
 
 	public double liborForwardRateIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslForward,
-			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_FORWARD_RATE);
+		return increment().quantificationMetric (_forwardLabel, LatentStateStatic.FORWARD_QM_FORWARD_RATE);
 	}
 
 	/**
@@ -294,14 +330,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Shifted LIBOR Forward Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Shifted Forward Rate is not available
+	 * @throws Exception Thrown if the Shifted Forward Rate is not available
 	 */
 
 	public double shiftedLIBORForwardRate()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslForward,
-			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_SHIFTED_FORWARD_RATE);
+		return snapshot().quantificationMetric (
+			_forwardLabel,
+			LatentStateStatic.FORWARD_QM_SHIFTED_FORWARD_RATE
+		);
 	}
 
 	/**
@@ -309,14 +347,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Shifted LIBOR Forward Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Shifted Forward Rate Increment is not available
+	 * @throws Exception Thrown if the Shifted Forward Rate Increment is not available
 	 */
 
 	public double shiftedLIBORForwardRateIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslForward,
-			org.drip.analytics.definition.LatentStateStatic.FORWARD_QM_SHIFTED_FORWARD_RATE);
+		return increment().quantificationMetric (
+			_forwardLabel,
+			LatentStateStatic.FORWARD_QM_SHIFTED_FORWARD_RATE
+		);
 	}
 
 	/**
@@ -324,14 +364,13 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Short Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Short Rate is not available
+	 * @throws Exception Thrown if the Short Rate is not available
 	 */
 
 	public double shortRate()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
+		return snapshot().quantificationMetric (_fundingLabel, LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
 	}
 
 	/**
@@ -339,14 +378,13 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Short Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Short Rate Increment is not available
+	 * @throws Exception Thrown if the Short Rate Increment is not available
 	 */
 
 	public double shortRateIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
+		return increment().quantificationMetric (_fundingLabel, LatentStateStatic.DISCOUNT_QM_ZERO_RATE);
 	}
 
 	/**
@@ -354,14 +392,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Compounded Short Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Compounded Short Rate is not available
+	 * @throws Exception Thrown if the Compounded Short Rate is not available
 	 */
 
 	public double compoundedShortRate()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_COMPOUNDED_SHORT_RATE);
+		return snapshot().quantificationMetric (
+			_fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_COMPOUNDED_SHORT_RATE
+		);
 	}
 
 	/**
@@ -369,14 +409,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Compounded Short Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Compounded Short Rate Increment is not available
+	 * @throws Exception Thrown if the Compounded Short Rate Increment is not available
 	 */
 
 	public double compoundedShortRateIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_COMPOUNDED_SHORT_RATE);
+		return increment().quantificationMetric (
+			_fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_COMPOUNDED_SHORT_RATE
+		);
 	}
 
 	/**
@@ -384,14 +426,16 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Price
 	 * 
-	 * @throws java.lang.Exception Thrown if the Price is not available
+	 * @throws Exception Thrown if the Price is not available
 	 */
 
 	public double price()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return snapshot().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR);
+		return snapshot().quantificationMetric (
+			_fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR
+		);
 	}
 
 	/**
@@ -399,13 +443,15 @@ public class ShortForwardRateUpdate extends org.drip.dynamics.evolution.LSQMPoin
 	 * 
 	 * @return The Price Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Price Increment is not available
+	 * @throws Exception Thrown if the Price Increment is not available
 	 */
 
 	public double priceIncrement()
-		throws java.lang.Exception
+		throws Exception
 	{
-		return increment().qm (_lslFunding,
-			org.drip.analytics.definition.LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR);
+		return increment().quantificationMetric (
+			_fundingLabel,
+			LatentStateStatic.DISCOUNT_QM_DISCOUNT_FACTOR
+		);
 	}
 }

@@ -1,11 +1,24 @@
 
 package org.drip.dynamics.hullwhite;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,41 +95,56 @@ package org.drip.dynamics.hullwhite;
 
 /**
  * <i>TrinomialTreeSequenceMetrics</i> records the Evolution Metrics of the Hull-White Model Trinomial Tree
- * Sequence.
+ * 	Sequence. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></li>
+ * 		<li>Empty <i>TrinomialTreeSequenceMetrics</i> Constructor</li>
+ * 		<li>Add a Path Transition Metrics Instance</li>
+ * 		<li>Retrieve the Transition Metrics associated with the specified Tree Time Index</li>
+ * 		<li>Retrieve the Transition Metrics Map</li>
+ * 		<li>Add the Hull-White Node Metrics Instance</li>
+ * 		<li>Retrieve the Node Metrics from the corresponding Tree Time/Space Indexes</li>
+ * 		<li>Retrieve the Node Metrics Map</li>
+ * 		<li>Set the Transition Probability for the specified Pair of Nodes</li>
+ * 		<li>Retrieve the Source-To-Target Transition Probability</li>
+ * 		<li>Retrieve the FULL Source-Target Transition Probability Map</li>
+ * 		<li>Retrieve the Target-From-Source Transition Probability</li>
+ * 		<li>Retrieve the FULL Target-Source Transition Probability Map</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hullwhite/README.md">Hull White Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class TrinomialTreeSequenceMetrics {
-	private java.util.Map<java.lang.String, java.lang.Double> _mapSourceTargetTransitionProbability = new
-		java.util.HashMap<java.lang.String, java.lang.Double>();
+public class TrinomialTreeSequenceMetrics
+{
+	private Map<String, Double> _sourceTargetTransitionProbabilityMap = new HashMap<String, Double>();
 
-	private java.util.Map<java.lang.String, java.lang.Double> _mapTargetSourceTransitionProbability = new
-		java.util.HashMap<java.lang.String, java.lang.Double>();
+	private Map<String, Double> _targetSourceTransitionProbabilityMap = new HashMap<String, Double>();
 
-	private java.util.Map<java.lang.String, org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics> _mapTTNM =
-		new java.util.HashMap<java.lang.String, org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics>();
+	private Map<Long, TrinomialTreeTransitionMetrics> _trinomialTreeTransitionMetricsMap =
+		new HashMap<Long, TrinomialTreeTransitionMetrics>();
 
-	private java.util.Map<java.lang.Long, org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics>
-		_mapTTTM = new java.util.HashMap<java.lang.Long,
-			org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics>();
+	private Map<String, TrinomialTreeNodeMetrics> _trinomialTreeNodeMetricsMap =
+		new HashMap<String, TrinomialTreeNodeMetrics>();
 
-	private static final java.lang.String NodeMetricsKey (
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnm)
+	private static final String NodeMetricsKey (
+		final TrinomialTreeNodeMetrics trinomialTreeTransitionMetrics)
 	{
-		return hwnm.timeIndex() + "," + hwnm.xStochasticIndex();
+		return trinomialTreeTransitionMetrics.timeIndex() + "," +
+			trinomialTreeTransitionMetrics.xStochasticIndex();
 	}
 
 	/**
-	 * Empty TrinomialTreeSequenceMetrics Constructor
+	 * Empty <i>TrinomialTreeSequenceMetrics</i> Constructor
 	 */
 
 	public TrinomialTreeSequenceMetrics()
@@ -126,17 +154,22 @@ public class TrinomialTreeSequenceMetrics {
 	/**
 	 * Add a Path Transition Metrics Instance
 	 * 
-	 * @param hwtm The Path Transition Metrics Instance
+	 * @param trinomialTreeTransitionMetrics The Path Transition Metrics Instance
 	 * 
 	 * @return TRUE - The Path Transition Metrics Instance successfully added
 	 */
 
 	public boolean addTransitionMetrics (
-		final org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics hwtm)
+		final TrinomialTreeTransitionMetrics trinomialTreeTransitionMetrics)
 	{
-		if (null == hwtm) return false;
+		if (null == trinomialTreeTransitionMetrics) {
+			return false;
+		}
 
-		_mapTTTM.put (hwtm.treeTimeIndex(), hwtm);
+		_trinomialTreeTransitionMetricsMap.put (
+			trinomialTreeTransitionMetrics.treeTimeIndex(),
+			trinomialTreeTransitionMetrics
+		);
 
 		return true;
 	}
@@ -144,15 +177,16 @@ public class TrinomialTreeSequenceMetrics {
 	/**
 	 * Retrieve the Transition Metrics associated with the specified Tree Time Index
 	 * 
-	 * @param lTreeTimeIndex The Tree Time Index
+	 * @param treeTimeIndex The Tree Time Index
 	 * 
 	 * @return The Transition Metrics associated with the specified Tree Time Index
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics transitionMetrics (
-		final long lTreeTimeIndex)
+	public TrinomialTreeTransitionMetrics transitionMetrics (
+		final long treeTimeIndex)
 	{
-		return _mapTTTM.containsKey (lTreeTimeIndex) ? _mapTTTM.get (lTreeTimeIndex) : null;
+		return _trinomialTreeTransitionMetricsMap.containsKey (treeTimeIndex) ?
+			_trinomialTreeTransitionMetricsMap.get (treeTimeIndex) : null;
 	}
 
 	/**
@@ -161,26 +195,30 @@ public class TrinomialTreeSequenceMetrics {
 	 * @return The Transition Metrics Map
 	 */
 
-	public java.util.Map<java.lang.Long, org.drip.dynamics.hullwhite.TrinomialTreeTransitionMetrics>
-		transitionMetrics()
+	public Map<Long, TrinomialTreeTransitionMetrics> trinomialTreeTransitionMetricsMap()
 	{
-		return _mapTTTM;
+		return _trinomialTreeTransitionMetricsMap;
 	}
 
 	/**
 	 * Add the Hull-White Node Metrics Instance
 	 * 
-	 * @param hwnm The Hull-White Node Metrics Instance
+	 * @param trinomialTreeTransitionMetrics The Hull-White Node Metrics Instance
 	 * 
 	 * @return The Node Met5rics Instance successfully added
 	 */
 
 	public boolean addNodeMetrics (
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnm)
+		final TrinomialTreeNodeMetrics trinomialTreeTransitionMetrics)
 	{
-		if (null == hwnm) return false;
+		if (null == trinomialTreeTransitionMetrics) {
+			return false;
+		}
 
-		_mapTTNM.put (NodeMetricsKey (hwnm), hwnm);
+		_trinomialTreeNodeMetricsMap.put (
+			NodeMetricsKey (trinomialTreeTransitionMetrics),
+			trinomialTreeTransitionMetrics
+		);
 
 		return true;
 	}
@@ -188,19 +226,20 @@ public class TrinomialTreeSequenceMetrics {
 	/**
 	 * Retrieve the Node Metrics from the corresponding Tree Time/Space Indexes
 	 * 
-	 * @param lTreeTimeIndex The Tree Time Index
-	 * @param lTreeStochasticIndex The Tree Space Index
+	 * @param treeTimeIndex The Tree Time Index
+	 * @param treeStochasticIndex The Tree Space Index
 	 * 
 	 * @return The Node Metrics
 	 */
 
-	public org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics nodeMetrics (
-		final long lTreeTimeIndex,
-		final long lTreeStochasticIndex)
+	public TrinomialTreeNodeMetrics nodeMetrics (
+		final long treeTimeIndex,
+		final long treeStochasticIndex)
 	{
-		java.lang.String strKey = lTreeTimeIndex + "," + lTreeStochasticIndex;
+		String key = treeTimeIndex + "," + treeStochasticIndex;
 
-		return _mapTTNM.containsKey (strKey) ? _mapTTNM.get (strKey) : null;
+		return _trinomialTreeNodeMetricsMap.containsKey (key) ?
+			_trinomialTreeNodeMetricsMap.get (key) : null;
 	}
 
 	/**
@@ -209,40 +248,47 @@ public class TrinomialTreeSequenceMetrics {
 	 * @return The Node Metrics Map
 	 */
 
-	public java.util.Map<java.lang.String, org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics>
-		nodeMetrics()
+	public Map<String, TrinomialTreeNodeMetrics> trinomialTreeNodeMetricsMap()
 	{
-		return _mapTTNM;
+		return _trinomialTreeNodeMetricsMap;
 	}
 
 	/**
 	 * Set the Transition Probability for the specified Pair of Nodes
 	 * 
-	 * @param hwnmSource Source Node
-	 * @param hwnmTarget Target Node
-	 * @param dblTransitionProbability The Transition Probability
+	 * @param sourceTrinomialTreeNodeMetrics Source Node
+	 * @param targetTrinomialTreeNodeMetrics Target Node
+	 * @param transitionProbability The Transition Probability
 	 * 
 	 * @return TRUE - The Transition Probability Successfully set
 	 */
 
 	public boolean setTransitionProbability (
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmSource,
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmTarget,
-		final double dblTransitionProbability)
+		final TrinomialTreeNodeMetrics sourceTrinomialTreeNodeMetrics,
+		final TrinomialTreeNodeMetrics targetTrinomialTreeNodeMetrics,
+		final double transitionProbability)
 	{
-		if (null == hwnmSource || null == hwnmTarget || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblTransitionProbability) || 0. >= dblTransitionProbability || 1. < dblTransitionProbability)
+		if (null == sourceTrinomialTreeNodeMetrics ||
+			null == targetTrinomialTreeNodeMetrics ||
+			!NumberUtil.IsValid (transitionProbability) ||
+				0. >= transitionProbability || 1. < transitionProbability)
+		{
 			return false;
+		}
 
-		java.lang.String strSourceNodeKey = NodeMetricsKey (hwnmSource);
+		String sourceNodeKey = NodeMetricsKey (sourceTrinomialTreeNodeMetrics);
 
-		java.lang.String strTargetNodeKey = NodeMetricsKey (hwnmTarget);
+		String targetNodeKey = NodeMetricsKey (targetTrinomialTreeNodeMetrics);
 
-		_mapSourceTargetTransitionProbability.put (strSourceNodeKey + "#" + strTargetNodeKey,
-			dblTransitionProbability);
+		_sourceTargetTransitionProbabilityMap.put (
+			sourceNodeKey + "#" + targetNodeKey,
+			transitionProbability
+		);
 
-		_mapTargetSourceTransitionProbability.put (strTargetNodeKey + "#" + strSourceNodeKey,
-			dblTransitionProbability);
+		_targetSourceTransitionProbabilityMap.put (
+			targetNodeKey + "#" + sourceNodeKey,
+			transitionProbability
+		);
 
 		return true;
 	}
@@ -250,30 +296,35 @@ public class TrinomialTreeSequenceMetrics {
 	/**
 	 * Retrieve the Source-To-Target Transition Probability
 	 * 
-	 * @param hwnmSource Source Node
-	 * @param hwnmTarget Target Node
+	 * @param sourceTrinomialTreeNodeMetrics Source Node
+	 * @param targetTrinomialTreeNodeMetrics Target Node
 	 * 
 	 * @return The Source-To-Target Transition Probability
 	 * 
-	 * @throws java.lang.Exception Thrown if the Source-To-Target Transition Probability cannot be computed
+	 * @throws Exception Thrown if the Source-To-Target Transition Probability cannot be computed
 	 */
 
 	public double sourceTargetTransitionProbability (
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmSource,
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmTarget)
-		throws java.lang.Exception
+		final TrinomialTreeNodeMetrics sourceTrinomialTreeNodeMetrics,
+		final TrinomialTreeNodeMetrics targetTrinomialTreeNodeMetrics)
+		throws Exception
 	{
-		if (null == hwnmSource || null == hwnmTarget)
-			throw new java.lang.Exception
-				("TrinomialTreeSequenceMetrics::sourceTargetTransitionProbability => Invalid Inputs!");
+		if (null == sourceTrinomialTreeNodeMetrics || null == targetTrinomialTreeNodeMetrics) {
+			throw new Exception (
+				"TrinomialTreeSequenceMetrics::sourceTargetTransitionProbability => Invalid Inputs!"
+			);
+		}
 
-		java.lang.String strKey = NodeMetricsKey (hwnmSource) + "#" + NodeMetricsKey (hwnmTarget);
+		String key = NodeMetricsKey (sourceTrinomialTreeNodeMetrics) + "#" +
+			NodeMetricsKey (targetTrinomialTreeNodeMetrics);
 
-		if (!_mapSourceTargetTransitionProbability.containsKey (strKey))
-			throw new java.lang.Exception
-				("TrinomialTreeSequenceMetrics::sourceTargetTransitionProbability => No Transition Entry!");
+		if (!_sourceTargetTransitionProbabilityMap.containsKey (key)) {
+			throw new Exception (
+				"TrinomialTreeSequenceMetrics::sourceTargetTransitionProbability => No Transition Entry!"
+			);
+		}
 
-		return _mapSourceTargetTransitionProbability.get (strKey);
+		return _sourceTargetTransitionProbabilityMap.get (key);
 	}
 
 	/**
@@ -282,38 +333,43 @@ public class TrinomialTreeSequenceMetrics {
 	 * @return The Source-Target Transition Probability Map
 	 */
 
-	public java.util.Map<java.lang.String, java.lang.Double> sourceTargetTransitionProbability()
+	public Map<String, Double> sourceTargetTransitionProbability()
 	{
-		return _mapSourceTargetTransitionProbability;
+		return _sourceTargetTransitionProbabilityMap;
 	}
 
 	/**
 	 * Retrieve the Target-From-Source Transition Probability
 	 * 
-	 * @param hwnmTarget Target Node
-	 * @param hwnmSource Source Node
+	 * @param targetTrinomialTreeNodeMetrics Target Node
+	 * @param sourceTargetTransitionProbability Source Node
 	 * 
 	 * @return The Target-From-Source Transition Probability
 	 * 
-	 * @throws java.lang.Exception Thrown if the Target-From-Source Transition Probability cannot be computed
+	 * @throws Exception Thrown if the Target-From-Source Transition Probability cannot be computed
 	 */
 
 	public double targetSourceTransitionProbability (
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmTarget,
-		final org.drip.dynamics.hullwhite.TrinomialTreeNodeMetrics hwnmSource)
-		throws java.lang.Exception
+		final TrinomialTreeNodeMetrics targetTrinomialTreeNodeMetrics,
+		final TrinomialTreeNodeMetrics sourceTargetTransitionProbability)
+		throws Exception
 	{
-		if (null == hwnmSource || null == hwnmTarget)
-			throw new java.lang.Exception
-				("TrinomialTreeSequenceMetrics::targetSourceTransitionProbability => Invalid Inputs!");
+		if (null == sourceTargetTransitionProbability || null == targetTrinomialTreeNodeMetrics) {
+			throw new Exception (
+				"TrinomialTreeSequenceMetrics::targetSourceTransitionProbability => Invalid Inputs!"
+			);
+		}
 
-		java.lang.String strKey = NodeMetricsKey (hwnmTarget) + "#" + NodeMetricsKey (hwnmSource);
+		String key = NodeMetricsKey (targetTrinomialTreeNodeMetrics) + "#" +
+			NodeMetricsKey (sourceTargetTransitionProbability);
 
-		if (!_mapTargetSourceTransitionProbability.containsKey (strKey))
-			throw new java.lang.Exception
-				("TrinomialTreeSequenceMetrics::targetSourceTransitionProbability => No Transition Entry!");
+		if (!_targetSourceTransitionProbabilityMap.containsKey (key)) {
+			throw new Exception (
+				"TrinomialTreeSequenceMetrics::targetSourceTransitionProbability => No Transition Entry!"
+			);
+		}
 
-		return _mapTargetSourceTransitionProbability.get (strKey);
+		return _targetSourceTransitionProbabilityMap.get (key);
 	}
 
 	/**
@@ -322,8 +378,8 @@ public class TrinomialTreeSequenceMetrics {
 	 * @return The Target-Source Transition Probability Map
 	 */
 
-	public java.util.Map<java.lang.String, java.lang.Double> targetSourceTransitionProbability()
+	public Map<String, Double> targetSourceTransitionProbability()
 	{
-		return _mapTargetSourceTransitionProbability;
+		return _targetSourceTransitionProbabilityMap;
 	}
 }

@@ -1,11 +1,22 @@
 
 package org.drip.dynamics.ito;
 
+import org.drip.measure.gaussian.NormalQuadrature;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -103,47 +114,47 @@ package org.drip.dynamics.ito;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/ito/README.md">Ito Stochastic Process Dynamics Foundation</a></li>
- *  </ul>
+ * 		<li><i>R1WienerDriver</i> Constructor</li>
+ * 		<li>Retrieve the Square Root of the Time Width</li>
+ * 		<li>Emit the Random Sequence Array</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/ito/README.md">Ito Stochastic Process Dynamics Foundation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1WienerDriver
-	extends org.drip.dynamics.ito.R1StochasticDriver
+	extends R1StochasticDriver
 {
-	private double _timeWidthSQRT = java.lang.Double.NaN;
+	private double _timeWidthSQRT = Double.NaN;
 
 	/**
-	 * R1WienerDriver Constructor
+	 * <i>R1WienerDriver</i> Constructor
 	 * 
 	 * @param timeWidth Wiener Time Width
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1WienerDriver (
 		final double timeWidth)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				timeWidth
-			) || 0. >= timeWidth
-		)
-		{
-			throw new java.lang.Exception (
-				"R1WienerDriver Constructor => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (timeWidth) || 0. >= timeWidth) {
+			throw new Exception ("R1WienerDriver Constructor => Invalid Inputs");
 		}
 
-		_timeWidthSQRT = java.lang.Math.sqrt (
-			timeWidth
-		);
+		_timeWidthSQRT = Math.sqrt (timeWidth);
 	}
 
 	/**
@@ -157,16 +168,19 @@ public class R1WienerDriver
 		return _timeWidthSQRT;
 	}
 
+	/**
+	 * Emit the Random Sequence Array
+	 * 
+	 * @return The Random Sequence Array
+	 */
+
 	@Override public double emitSingle()
 	{
-		try
-		{
-			return _timeWidthSQRT * org.drip.measure.gaussian.NormalQuadrature.Random();
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return _timeWidthSQRT * NormalQuadrature.Random();
+		} catch (Exception e) {
 		}
 
-		return java.lang.Double.NaN;
+		return Double.NaN;
 	}
 }

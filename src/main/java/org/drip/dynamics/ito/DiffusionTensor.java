@@ -6,6 +6,14 @@ package org.drip.dynamics.ito;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -77,8 +85,8 @@ package org.drip.dynamics.ito;
  */
 
 /**
- * <i>DiffusionTensor</i> Diffusion Tensor generates Cross-Product from the Multivariate Volatility
- * 	Functions. The References are:
+ * <i>DiffusionTensor</i> generates Cross-Product from the Multivariate Volatility Functions. The References
+ * 	are:
  *  
  * 	<br><br>
  *  <ul>
@@ -104,77 +112,68 @@ package org.drip.dynamics.ito;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/ito/README.md">Ito Stochastic Process Dynamics Foundation</a></li>
- *  </ul>
+ * 		<li><i>DiffusionTensor</i> Constructor</li>
+ * 		<li>Retrieve the Square Volatility Grid</li>
+ * 		<li>Retrieve the Dimension Count</li>
+ * 		<li>Retrieve the Factor Count</li>
+ * 		<li>Estimate the Diffusion Coefficient</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/ito/README.md">Ito Stochastic Process Dynamics Foundation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class DiffusionTensor
 {
-	private org.drip.dynamics.ito.RdToR1Volatility[][] _volatilityFunctionGrid = null;
+	private RdToR1Volatility[][] _volatilityFunctionGrid = null;
 
 	/**
-	 * DiffusionTensor Constructor
+	 * <i>DiffusionTensor</i> Constructor
 	 * 
-	 * @param volatilityFunctionGrid  Square Volatility Grid
+	 * @param volatilityFunctionGrid Square Volatility Grid
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public DiffusionTensor (
-		final org.drip.dynamics.ito.RdToR1Volatility[][] volatilityFunctionGrid)
-		throws java.lang.Exception
+		final RdToR1Volatility[][] volatilityFunctionGrid)
+		throws Exception
 	{
-		if (null == (_volatilityFunctionGrid = volatilityFunctionGrid))
-		{
-			throw new java.lang.Exception (
-				"DiffusionTensor Constructor => Invalid Inputs"
-			);
+		if (null == (_volatilityFunctionGrid = volatilityFunctionGrid)) {
+			throw new Exception ("DiffusionTensor Constructor => Invalid Inputs");
 		}
 
 		int factorCount = 0;
-		int dimension = _volatilityFunctionGrid.length;
 
-		if (0 == dimension)
-		{
-			throw new java.lang.Exception (
-				"DiffusionTensor Constructor => Invalid Inputs"
-			);
+		if (0 == _volatilityFunctionGrid.length) {
+			throw new Exception ("DiffusionTensor Constructor => Invalid Inputs");
 		}
 
-		for (int dimensionIndex = 0;
-			dimensionIndex < dimension;
-			++dimensionIndex)
-		{
-			if (null == _volatilityFunctionGrid[dimensionIndex])
-			{
-				throw new java.lang.Exception (
-					"DiffusionTensor Constructor => Invalid Inputs"
-				);
+		for (int dimensionIndex = 0; dimensionIndex < _volatilityFunctionGrid.length; ++dimensionIndex) {
+			if (null == _volatilityFunctionGrid[dimensionIndex]) {
+				throw new Exception ("DiffusionTensor Constructor => Invalid Inputs");
 			}
 
-			if (0 == dimensionIndex)
-			{
-				if (0 == (factorCount = _volatilityFunctionGrid[dimensionIndex].length))
-				{
-					throw new java.lang.Exception (
-						"DiffusionTensor Constructor => Invalid Inputs"
-					);
+			if (0 == dimensionIndex) {
+				if (0 == (factorCount = _volatilityFunctionGrid[dimensionIndex].length)) {
+					throw new Exception ("DiffusionTensor Constructor => Invalid Inputs");
 				}
 			}
 
 			if (null == _volatilityFunctionGrid[dimensionIndex] ||
-					factorCount != _volatilityFunctionGrid[dimensionIndex].length)
+				factorCount != _volatilityFunctionGrid[dimensionIndex].length)
 			{
-				throw new java.lang.Exception (
-					"DiffusionTensor Constructor => Invalid Inputs"
-				);
+				throw new Exception ("DiffusionTensor Constructor => Invalid Inputs");
 			}
 		}
 	}
@@ -185,7 +184,7 @@ public class DiffusionTensor
 	 * @return The Square Volatility Grid
 	 */
 
-	public org.drip.dynamics.ito.RdToR1Volatility[][] volatilityFunctionGrid()
+	public RdToR1Volatility[][] volatilityFunctionGrid()
 	{
 		return _volatilityFunctionGrid;
 	}
@@ -221,43 +220,31 @@ public class DiffusionTensor
 	 * 
 	 * @return The Diffusion Coefficient
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double diffusionCoefficient (
-		final org.drip.dynamics.ito.TimeRdVertex timeRdVertex,
+		final TimeRdVertex timeRdVertex,
 		final int variateIndexI,
 		final int variateIndexJ)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (null == timeRdVertex)
-		{
-			throw new java.lang.Exception (
-				"DiffusionTensor::diffusionCoefficient => Invalid Inputs"
-			);
+		if (null == timeRdVertex) {
+			throw new Exception ("DiffusionTensor::diffusionCoefficient => Invalid Inputs");
 		}
 
 		double diffusionCoefficient = 0.;
-		int dimension = _volatilityFunctionGrid.length;
-		int factorCount = _volatilityFunctionGrid[0].length;
 
-		if (dimension >= variateIndexI || dimension >= variateIndexJ)
+		if (_volatilityFunctionGrid.length <= variateIndexI ||
+			_volatilityFunctionGrid.length <= variateIndexJ)
 		{
-			throw new java.lang.Exception (
-				"DiffusionTensor::diffusionCoefficient => Invalid Inputs"
-			);
+			throw new Exception ("DiffusionTensor::diffusionCoefficient => Invalid Inputs");
 		}
 
-		for (int factorIndex = 0;
-			factorIndex < factorCount;
-			++factorIndex)
-		{
+		for (int factorIndex = 0; factorIndex < _volatilityFunctionGrid[0].length; ++factorIndex) {
 			diffusionCoefficient = diffusionCoefficient +
-				_volatilityFunctionGrid[variateIndexI][factorIndex].volatility (
-					timeRdVertex
-				) * _volatilityFunctionGrid[variateIndexJ][factorIndex].volatility (
-					timeRdVertex
-				);
+				_volatilityFunctionGrid[variateIndexI][factorIndex].volatility (timeRdVertex) *
+				_volatilityFunctionGrid[variateIndexJ][factorIndex].volatility (timeRdVertex);
 		}
 
 		return 0.5 * diffusionCoefficient;

@@ -1,11 +1,28 @@
 
 package org.drip.dynamics.hjm;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.dynamics.evolution.LSQMPointUpdate;
+import org.drip.dynamics.evolution.PointStateEvolver;
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.sequence.random.PrincipalFactorSequenceGenerator;
+import org.drip.state.identifier.ForwardLabel;
+import org.drip.state.identifier.FundingLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +99,7 @@ package org.drip.dynamics.hjm;
 
 /**
  * <i>MultiFactorStateEvolver</i> sets up and implements the Base Multi-Factor No-arbitrage Dynamics of the
- * Rates State Quantifiers as formulated in:
+ * 	Rates State Quantifiers as formulated in:
  * 
  * <ul>
  * 	<li>
@@ -92,46 +109,69 @@ package org.drip.dynamics.hjm;
  * </ul>
  *
  *	<br><br>
- * In particular it looks to evolve the Multi-factor Instantaneous Forward Rates.
+ * 	In particular it looks to evolve the Multi-factor Instantaneous Forward Rates. It provides the following
+ * 	Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></li>
+ * 		<li><i>MultiFactorStateEvolver</i> Constructor</li>
+ * 		<li>Retrieve the Funding Label</li>
+ * 		<li>Retrieve the Forward Label</li>
+ * 		<li>Retrieve the Multi-factor Volatility Instance</li>
+ * 		<li>Retrieve the Initial Instantaneous Forward Rate Term Structure</li>
+ * 		<li>Compute the Instantaneous Forward Rate Increment given the View Date, the Target Date, and the View Time Increment</li>
+ * 		<li>Compute the Proportional Price Increment given the View Date, the Target Date, the Short Rate, and the View Time Increment</li>
+ * 		<li>Compute the Short Rate Increment given the Spot Date, the View Date, and the View Time Increment</li>
+ * 		<li>Compute the Continuously Compounded Short Rate Increment given the Spot Date, the View Date, the Target Date, the Continuously Compounded Short Rate, the Current Short Rate, and the View Time Increment</li>
+ * 		<li>Compute the LIBOR Forward Rate Increment given the Spot Date, the View Date, the Target Date, the Current LIBOR Forward Rate, and the View Time Increment</li>
+ * 		<li>Compute the Shifted LIBOR Forward Rate Increment given the Spot Date, the View Date, the Target Date, the Current Shifted LIBOR Forward Rate, and the View Time Increment</li>
+ * 		<li>Evolve the Latent State and return the LSQM Point Update</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/hjm/README.md">HJM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiFactorStateEvolver implements org.drip.dynamics.evolution.PointStateEvolver {
-	private org.drip.dynamics.hjm.MultiFactorVolatility _mfv = null;
-	private org.drip.state.identifier.ForwardLabel _lslForward = null;
-	private org.drip.state.identifier.FundingLabel _lslFunding = null;
-	private org.drip.function.definition.R1ToR1 _auInitialInstantaneousForwardRate = null;
+public class MultiFactorStateEvolver
+	implements PointStateEvolver
+{
+	private ForwardLabel _forwardLabel = null;
+	private FundingLabel _fundingLabel = null;
+	private MultiFactorVolatility _multiFactorVolatility = null;
+	private R1ToR1 _initialInstantaneousForwardRateFunction = null;
 
 	/**
-	 * MultiFactorStateEvolver Constructor
+	 * <i>MultiFactorStateEvolver</i> Constructor
 	 * 
-	 * @param lslFunding The Funding Latent State Label
-	 * @param lslForward The Forward Latent State Label
-	 * @param mfv The Multi-Factor Volatility Instance
-	 * @param auInitialInstantaneousForwardRate The Initial Instantaneous Forward Rate Term Structure
+	 * @param fundingLabel The Funding Latent State Label
+	 * @param forwardLabel The Forward Latent State Label
+	 * @param multiFactorVolatility The Multi-Factor Volatility Instance
+	 * @param initialInstantaneousForwardRateFunction The Initial Instantaneous Forward Rate Term Structure
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public MultiFactorStateEvolver (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final org.drip.dynamics.hjm.MultiFactorVolatility mfv,
-		final org.drip.function.definition.R1ToR1 auInitialInstantaneousForwardRate)
-		throws java.lang.Exception
+		final FundingLabel fundingLabel,
+		final ForwardLabel forwardLabel,
+		final MultiFactorVolatility multiFactorVolatility,
+		final R1ToR1 initialInstantaneousForwardRateFunction)
+		throws Exception
 	{
-		if (null == (_lslFunding = lslFunding) || null == (_lslForward = lslForward) || null == (_mfv = mfv)
-			|| null == (_auInitialInstantaneousForwardRate = auInitialInstantaneousForwardRate))
-			throw new java.lang.Exception ("MultiFactorStateEvolver ctr: Invalid Inputs");
+		if (null == (_fundingLabel = fundingLabel) ||
+			null == (_forwardLabel = forwardLabel) ||
+			null == (_multiFactorVolatility = multiFactorVolatility) ||
+			null == (_initialInstantaneousForwardRateFunction = initialInstantaneousForwardRateFunction))
+		{
+			throw new Exception ("MultiFactorStateEvolver Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -140,9 +180,9 @@ public class MultiFactorStateEvolver implements org.drip.dynamics.evolution.Poin
 	 * @return The Funding Label
 	 */
 
-	public org.drip.state.identifier.FundingLabel fundingLabel()
+	public FundingLabel fundingLabel()
 	{
-		return _lslFunding;
+		return _fundingLabel;
 	}
 
 	/**
@@ -151,9 +191,9 @@ public class MultiFactorStateEvolver implements org.drip.dynamics.evolution.Poin
 	 * @return The Forward Label
 	 */
 
-	public org.drip.state.identifier.ForwardLabel forwardLabel()
+	public ForwardLabel forwardLabel()
 	{
-		return _lslForward;
+		return _forwardLabel;
 	}
 
 	/**
@@ -162,9 +202,9 @@ public class MultiFactorStateEvolver implements org.drip.dynamics.evolution.Poin
 	 * @return The Multi-factor Volatility Instance
 	 */
 
-	public org.drip.dynamics.hjm.MultiFactorVolatility mfv()
+	public MultiFactorVolatility multiFactorVolatility()
 	{
-		return _mfv;
+		return _multiFactorVolatility;
 	}
 
 	/**
@@ -173,151 +213,169 @@ public class MultiFactorStateEvolver implements org.drip.dynamics.evolution.Poin
 	 * @return The Initial Instantaneous Forward Rate Term Structure
 	 */
 
-	public org.drip.function.definition.R1ToR1 instantaneousForwardInitialTermStructure()
+	public R1ToR1 instantaneousForwardInitialTermStructure()
 	{
-		return _auInitialInstantaneousForwardRate;
+		return _initialInstantaneousForwardRateFunction;
 	}
 
 	/**
 	 * Compute the Instantaneous Forward Rate Increment given the View Date, the Target Date, and the View
 	 * 	Time Increment
 	 * 
-	 * @param iViewDate The View Date
-	 * @param iTargetDate The Target Date
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param viewDate The View Date
+	 * @param targetDate The Target Date
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Instantaneous Forward Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Instantaneous Forward Rate Increment cannot be computed
+	 * @throws Exception Thrown if the Instantaneous Forward Rate Increment cannot be computed
 	 */
 
 	public double instantaneousForwardRateIncrement (
-		final int iViewDate,
-		final int iTargetDate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int viewDate,
+		final int targetDate,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iTargetDate <= iViewDate)
-			throw new java.lang.Exception
-				("MultiFactorStateEvolver::instantaneousForwardRateIncrement => Invalid Inputs");
-
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
-
-		int iNumFactor = pfsg.numFactor();
-
-		double[] adblMultivariateRandom = pfsg.random();
-
-		double dblIntantaneousForwardRateIncrement = 0.;
-		double dblAnnualizedTimeIncrement = 1. * iViewTimeIncrement / 365.25;
-
-		double dblAnnualizedTimeIncrementSQRT = java.lang.Math.sqrt (dblAnnualizedTimeIncrement);
-
-		for (int i = 0; i < iNumFactor; ++i) {
-			double dblWeightedFactorPointVolatility = _mfv.weightedFactorPointVolatility (i, iViewDate,
-				iTargetDate);
-
-			if (!org.drip.numerical.common.NumberUtil.IsValid (dblWeightedFactorPointVolatility))
-				throw new java.lang.Exception
-					("MultiFactorStateEvolver::instantaneousForwardRateIncrement => Cannot compute View/Target Date Point Volatility");
-
-			dblIntantaneousForwardRateIncrement += _mfv.volatilityIntegral (i, iViewDate, iTargetDate) *
-				dblWeightedFactorPointVolatility * dblAnnualizedTimeIncrement +
-					dblWeightedFactorPointVolatility * dblAnnualizedTimeIncrementSQRT *
-						adblMultivariateRandom[i];
+		if (targetDate <= viewDate) {
+			throw new Exception (
+				"MultiFactorStateEvolver::instantaneousForwardRateIncrement => Invalid Inputs"
+			);
 		}
 
-		return dblIntantaneousForwardRateIncrement;
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
+
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
+
+		double instantaneousForwardRateIncrement = 0.;
+		double annualizedTimeIncrement = 1. * viewTimeIncrement / 365.25;
+
+		double annualizedTimeIncrementSQRT = Math.sqrt (annualizedTimeIncrement);
+
+		for (int factorIndex = 0; factorIndex < principalFactorSequenceGenerator.numFactor(); ++factorIndex)
+		{
+			double weightedFactorPointVolatility = _multiFactorVolatility.weightedFactorPointVolatility (
+				factorIndex,
+				viewDate,
+				targetDate
+			);
+
+			if (!NumberUtil.IsValid (weightedFactorPointVolatility)) {
+				throw new Exception (
+					"MultiFactorStateEvolver::instantaneousForwardRateIncrement => Cannot compute View/Target Date Point Volatility"
+				);
+			}
+
+			instantaneousForwardRateIncrement += _multiFactorVolatility.volatilityIntegral (
+				factorIndex,
+				viewDate,
+				targetDate
+			) * weightedFactorPointVolatility * annualizedTimeIncrement +
+			weightedFactorPointVolatility * annualizedTimeIncrementSQRT *
+				multivariateRandomArray[factorIndex];
+		}
+
+		return instantaneousForwardRateIncrement;
 	}
 
 	/**
 	 * Compute the Proportional Price Increment given the View Date, the Target Date, the Short Rate, and the
 	 *  View Time Increment
 	 * 
-	 * @param iViewDate The View Date
-	 * @param iTargetDate The Target Date
-	 * @param dblShortRate The Short Rate
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param viewDate The View Date
+	 * @param targetDate The Target Date
+	 * @param shortRate The Short Rate
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Proportional Price Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Proportional Price Increment cannot be computed
+	 * @throws Exception Thrown if the Proportional Price Increment cannot be computed
 	 */
 
 	public double proportionalPriceIncrement (
-		final int iViewDate,
-		final int iTargetDate,
-		final double dblShortRate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int viewDate,
+		final int targetDate,
+		final double shortRate,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iTargetDate <= iViewDate || !org.drip.numerical.common.NumberUtil.IsValid (dblShortRate))
-			throw new java.lang.Exception
-				("MultiFactorStateEvolver::proportionalPriceIncrement => Invalid Inputs");
+		if (targetDate <= viewDate || !NumberUtil.IsValid (shortRate)) {
+			throw new Exception ("MultiFactorStateEvolver::proportionalPriceIncrement => Invalid Inputs");
+		}
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
 
-		int iNumFactor = pfsg.numFactor();
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
 
-		double[] adblMultivariateRandom = pfsg.random();
+		double annualizedTimeIncrement = 1. * viewTimeIncrement / 365.25;
+		double proportionalPriceIncrement = shortRate * annualizedTimeIncrement;
 
-		double dblAnnualizedTimeIncrement = 1. * iViewTimeIncrement / 365.25;
-		double dblProportionalPriceIncrement = dblShortRate * dblAnnualizedTimeIncrement;
+		double annualizedTimeIncrementSQRT = Math.sqrt (annualizedTimeIncrement);
 
-		double dblAnnualizedTimeIncrementSQRT = java.lang.Math.sqrt (dblAnnualizedTimeIncrement);
+		for (int factorIndex = 0; factorIndex < principalFactorSequenceGenerator.numFactor(); ++factorIndex)
+		{
+			proportionalPriceIncrement -=
+				_multiFactorVolatility.volatilityIntegral (factorIndex, viewDate, targetDate) *
+				annualizedTimeIncrementSQRT * multivariateRandomArray[factorIndex];
+		}
 
-		for (int i = 0; i < iNumFactor; ++i)
-			dblProportionalPriceIncrement -= _mfv.volatilityIntegral (i, iViewDate, iTargetDate) *
-				dblAnnualizedTimeIncrementSQRT * adblMultivariateRandom[i];
-
-		return dblProportionalPriceIncrement;
+		return proportionalPriceIncrement;
 	}
 
 	/**
 	 * Compute the Short Rate Increment given the Spot Date, the View Date, and the View Time Increment
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Short Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Short Rate Increment cannot be computed
+	 * @throws Exception Thrown if the Short Rate Increment cannot be computed
 	 */
 
 	public double shortRateIncrement (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate)
-			throw new java.lang.Exception ("MultiFactorStateEvolver::shortRateIncrement => Invalid Inputs");
-
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
-
-		double[] adblMultivariateRandom = pfsg.random();
-
-		int iNumFactor = pfsg.numFactor();
-
-		double dblShortRateIncrement = 0.;
-		double dblAnnualizedIncrement = 1. * iViewTimeIncrement / 365.25;
-
-		double dblAnnualizedIncrementSQRT = java.lang.Math.sqrt (dblAnnualizedIncrement);
-
-		for (int i = 0; i < iNumFactor; ++i) {
-			double dblViewWeightedFactorVolatility = _mfv.weightedFactorPointVolatility (i, iViewDate,
-				iViewDate);
-
-			if (!org.drip.numerical.common.NumberUtil.IsValid (dblViewWeightedFactorVolatility))
-				throw new java.lang.Exception
-					("MultiFactorStateEvolver::shortRateIncrement => Cannot compute View Date Factor Volatility");
-
-			dblShortRateIncrement += _mfv.volatilityIntegral (i, iSpotDate, iViewDate) *
-				dblViewWeightedFactorVolatility * dblAnnualizedIncrement + dblViewWeightedFactorVolatility *
-					dblAnnualizedIncrementSQRT * adblMultivariateRandom[i];
+		if (spotDate > viewDate) {
+			throw new Exception ("MultiFactorStateEvolver::shortRateIncrement => Invalid Inputs");
 		}
 
-		return dblShortRateIncrement;
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
+
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
+
+		double shortRateIncrement = 0.;
+		double annualizedIncrement = 1. * viewTimeIncrement / 365.25;
+
+		double annualizedIncrementSQRT = Math.sqrt (annualizedIncrement);
+
+		for (int factorIndex = 0; factorIndex < principalFactorSequenceGenerator.numFactor(); ++factorIndex)
+		{
+			double viewWeightedFactorVolatility = _multiFactorVolatility.weightedFactorPointVolatility (
+				factorIndex,
+				viewDate,
+				viewDate
+			);
+
+			if (!NumberUtil.IsValid (viewWeightedFactorVolatility)) {
+				throw new Exception (
+					"MultiFactorStateEvolver::shortRateIncrement => Cannot compute View Date Factor Volatility"
+				);
+			}
+
+			shortRateIncrement += _multiFactorVolatility.volatilityIntegral (factorIndex, spotDate, viewDate)
+				* viewWeightedFactorVolatility * annualizedIncrement + viewWeightedFactorVolatility *
+				annualizedIncrementSQRT * multivariateRandomArray[factorIndex];
+		}
+
+		return shortRateIncrement;
 	}
 
 	/**
@@ -325,243 +383,301 @@ public class MultiFactorStateEvolver implements org.drip.dynamics.evolution.Poin
 	 *  Target Date, the Continuously Compounded Short Rate, the Current Short Rate, and the View Time
 	 *  Increment.
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param iTargetDate The Target Date
-	 * @param dblCompoundedShortRate The Compounded Short Rate
-	 * @param dblShortRate The Short Rate
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param targetDate The Target Date
+	 * @param compoundedShortRate The Compounded Short Rate
+	 * @param shortRate The Short Rate
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Short Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Continuously Compounded Short Rate Increment cannot be
-	 * computed
+	 * @throws Exception Thrown if the Continuously Compounded Short Rate Increment cannot be computed
 	 */
 
 	public double compoundedShortRateIncrement (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iTargetDate,
-		final double dblCompoundedShortRate,
-		final double dblShortRate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final int targetDate,
+		final double compoundedShortRate,
+		final double shortRate,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate || iViewDate >= iTargetDate)
-			throw new java.lang.Exception
-				("MultiFactorStateEvolver::compoundedShortRateIncrement => Invalid Inputs");
-
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
-
-		int iNumFactor = pfsg.numFactor();
-
-		double[] adblMultivariateRandom = pfsg.random();
-
-		double dblAnnualizedIncrement = 1. * iViewTimeIncrement / 365.25;
-		double dblCompoundedShortRateIncrement = (dblCompoundedShortRate - dblShortRate) *
-			dblAnnualizedIncrement;
-
-		double dblAnnualizedIncrementSQRT = java.lang.Math.sqrt (dblAnnualizedIncrement);
-
-		for (int i = 0; i < iNumFactor; ++i) {
-			double dblViewTargetVolatilityIntegral = _mfv.volatilityIntegral (i, iViewDate, iTargetDate);
-
-			dblCompoundedShortRateIncrement += 0.5 * dblViewTargetVolatilityIntegral *
-				dblViewTargetVolatilityIntegral * dblAnnualizedIncrement + dblViewTargetVolatilityIntegral *
-					dblAnnualizedIncrementSQRT * adblMultivariateRandom[i];
+		if (spotDate > viewDate || viewDate >= targetDate) {
+			throw new Exception ("MultiFactorStateEvolver::compoundedShortRateIncrement => Invalid Inputs");
 		}
 
-		return dblCompoundedShortRateIncrement * 365.25 / (iTargetDate - iViewDate);
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
+
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
+
+		double annualizedIncrement = 1. * viewTimeIncrement / 365.25;
+		double compoundedShortRateIncrement = (compoundedShortRate - shortRate) * annualizedIncrement;
+
+		double annualizedIncrementSQRT = Math.sqrt (annualizedIncrement);
+
+		for (int factorIndex = 0; factorIndex < principalFactorSequenceGenerator.numFactor(); ++factorIndex)
+		{
+			double viewTargetVolatilityIntegral = _multiFactorVolatility.volatilityIntegral (
+				factorIndex,
+				viewDate,
+				targetDate
+			);
+
+			compoundedShortRateIncrement += 0.5 * viewTargetVolatilityIntegral *
+				viewTargetVolatilityIntegral * annualizedIncrement + viewTargetVolatilityIntegral *
+				annualizedIncrementSQRT * multivariateRandomArray[factorIndex];
+		}
+
+		return compoundedShortRateIncrement * 365.25 / (targetDate - viewDate);
 	}
 
 	/**
 	 * Compute the LIBOR Forward Rate Increment given the Spot Date, the View Date, the Target Date, the
 	 *  Current LIBOR Forward Rate, and the View Time Increment
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param iTargetDate The Target Date
-	 * @param dblLIBORForwardRate The LIBOR Forward Rate
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param targetDate The Target Date
+	 * @param liborForward The LIBOR Forward Rate
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Forward Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the LIBOR Forward Rate Increment cannot be computed
+	 * @throws Exception Thrown if the LIBOR Forward Rate Increment cannot be computed
 	 */
 
 	public double liborForwardRateIncrement (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iTargetDate,
-		final double dblLIBORForwardRate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final int targetDate,
+		final double liborForward,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate || iViewDate >= iTargetDate || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblLIBORForwardRate))
-			throw new java.lang.Exception
-				("MultiFactorStateEvolver::liborForwardRateIncrement => Invalid Inputs");
+		if (spotDate > viewDate || viewDate >= targetDate || !NumberUtil.IsValid (liborForward)) {
+			throw new Exception ("MultiFactorStateEvolver::liborForwardRateIncrement => Invalid Inputs");
+		}
 
-		double dblAnnualizedTimeIncrementSQRT = java.lang.Math.sqrt (1. * iViewTimeIncrement / 365.25);
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
+		double annualizedTimeIncrementSQRT = Math.sqrt (1. * viewTimeIncrement / 365.25);
 
-		double[] adblMultivariateRandom = pfsg.random();
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
 
-		double dblLIBORForwardRateVolIncrement = 0.;
+		double liborForwardVolatilityIncrement = 0.;
 
-		int iNumFactor = pfsg.numFactor();
+		for (int factorIndex = 0; factorIndex < principalFactorSequenceGenerator.numFactor(); ++factorIndex)
+		{
+			liborForwardVolatilityIncrement +=
+				_multiFactorVolatility.volatilityIntegral (factorIndex, viewDate, targetDate) * (
+					_multiFactorVolatility.volatilityIntegral (factorIndex, spotDate, targetDate) +
+					annualizedTimeIncrementSQRT * multivariateRandomArray[factorIndex]
+				);
+		}
 
-		for (int i = 0; i < iNumFactor; ++i)
-			dblLIBORForwardRateVolIncrement += _mfv.volatilityIntegral (i, iViewDate, iTargetDate) *
-				(_mfv.volatilityIntegral (i, iSpotDate, iTargetDate) + dblAnnualizedTimeIncrementSQRT *
-					adblMultivariateRandom[i]);
-
-		return (dblLIBORForwardRate + (365.25 / (iTargetDate - iViewDate))) *
-			dblLIBORForwardRateVolIncrement;
+		return (liborForward + (365.25 / (targetDate - viewDate))) * liborForwardVolatilityIncrement;
 	}
 
 	/**
 	 * Compute the Shifted LIBOR Forward Rate Increment given the Spot Date, the View Date, the Target Date,
 	 * 	the Current Shifted LIBOR Forward Rate, and the View Time Increment
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iViewDate The View Date
-	 * @param iTargetDate The Target Date
-	 * @param dblShiftedLIBORForwardRate The Shifted LIBOR Forward Rate
-	 * @param iViewTimeIncrement The View Time Increment
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param targetDate The Target Date
+	 * @param shiftedLIBORForward The Shifted LIBOR Forward Rate
+	 * @param viewTimeIncrement The View Time Increment
 	 * 
 	 * @return The Shifted Forward Rate Increment
 	 * 
-	 * @throws java.lang.Exception Thrown if the Shifted LIBOR Forward Rate Increment cannot be computed
+	 * @throws Exception Thrown if the Shifted LIBOR Forward Rate Increment cannot be computed
 	 */
 
 	public double shiftedLIBORForwardIncrement (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iTargetDate,
-		final double dblShiftedLIBORForwardRate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int spotDate,
+		final int viewDate,
+		final int targetDate,
+		final double shiftedLIBORForward,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		if (iSpotDate > iViewDate || iViewDate >= iTargetDate || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblShiftedLIBORForwardRate))
-			throw new java.lang.Exception
-				("MultiFactorStateEvolver::shiftedLIBORForwardIncrement => Invalid Inputs");
+		if (spotDate > viewDate || viewDate >= targetDate || !NumberUtil.IsValid (shiftedLIBORForward)) {
+			throw new Exception ("MultiFactorStateEvolver::shiftedLIBORForwardIncrement => Invalid Inputs");
+		}
 
-		double dblAnnualizedTimeIncrementSQRT = java.lang.Math.sqrt (1. * iViewTimeIncrement / 365.25);
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
+		double annualizedTimeIncrementSQRT = Math.sqrt (1. * viewTimeIncrement / 365.25);
 
-		double[] adblMultivariateRandom = pfsg.random();
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
 
-		double dblShiftedLIBORVolIncrement = 0.;
+		double shiftedLIBORVolatilityIncrement = 0.;
 
-		int iNumFactor = pfsg.numFactor();
+		for (int factorIndex = 0; factorIndex < principalFactorSequenceGenerator.numFactor(); ++factorIndex)
+		{
+			shiftedLIBORVolatilityIncrement +=
+				_multiFactorVolatility.volatilityIntegral (factorIndex, viewDate, targetDate) * (
+					_multiFactorVolatility.volatilityIntegral (factorIndex, spotDate, targetDate) +
+					annualizedTimeIncrementSQRT * multivariateRandomArray[factorIndex]
+				);
+		}
 
-		for (int i = 0; i < iNumFactor; ++i)
-			dblShiftedLIBORVolIncrement += _mfv.volatilityIntegral (i, iViewDate, iTargetDate) *
-				(_mfv.volatilityIntegral (i, iSpotDate, iTargetDate) + dblAnnualizedTimeIncrementSQRT *
-					adblMultivariateRandom[i]);
-
-		return dblShiftedLIBORForwardRate * dblShiftedLIBORVolIncrement;
+		return shiftedLIBORForward * shiftedLIBORVolatilityIncrement;
 	}
 
+	/**
+	 * Evolve the Latent State and return the LSQM Point Update
+	 * 
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param spotTimeIncrement The Spot Time Increment
+	 * @param previousLSQMPointUpdate The Previous LSQM Point Update
+	 * 
+	 * @return The LSQM Point Update
+	 */
+
 	@Override public org.drip.dynamics.evolution.LSQMPointUpdate evolve (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iSpotTimeIncrement,
-		final org.drip.dynamics.evolution.LSQMPointUpdate lsqmPrev)
+		final int spotDate,
+		final int viewDate,
+		final int spotTimeIncrement,
+		final LSQMPointUpdate previousLSQMPointUpdate)
 	{
-		if (iSpotDate > iViewDate || null == lsqmPrev || !(lsqmPrev instanceof
-			org.drip.dynamics.hjm.ShortForwardRateUpdate))
+		if (spotDate > viewDate ||
+			null == previousLSQMPointUpdate || !(previousLSQMPointUpdate instanceof ShortForwardRateUpdate))
+		{
 			return null;
+		}
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
 
-		double dblAnnualizedIncrement = 1. * iSpotTimeIncrement / 365.25;
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
 
-		double dblAnnualizedIncrementSQRT = java.lang.Math.sqrt (dblAnnualizedIncrement);
+		double annualizedIncrement = 1. * spotTimeIncrement / 365.25;
+		ShortForwardRateUpdate initialShortForwardRateUpdate =
+			(ShortForwardRateUpdate) previousLSQMPointUpdate;
 
-		double[] adblMultivariateRandom = pfsg.random();
-
-		int iNumFactor = pfsg.numFactor();
-
-		org.drip.dynamics.hjm.ShortForwardRateUpdate qmInitial =
-			(org.drip.dynamics.hjm.ShortForwardRateUpdate) lsqmPrev;
+		double annualizedIncrementSQRT = Math.sqrt (annualizedIncrement);
 
 		try {
-			double dblInitialPrice = qmInitial.price();
+			double initialPrice = initialShortForwardRateUpdate.price();
 
-			double dblInitialShortRate = qmInitial.shortRate();
+			double initialShortRate = initialShortForwardRateUpdate.shortRate();
 
-			double dblInitialLIBORForwardRate = qmInitial.liborForwardRate();
+			double initialLIBORForward = initialShortForwardRateUpdate.liborForwardRate();
 
-			double dblInitialCompoundedShortRate = qmInitial.compoundedShortRate();
+			int targetDate = new JulianDate (viewDate).addTenor (_forwardLabel.tenor()).julian();
 
-			int iTargetDate = new org.drip.analytics.date.JulianDate (iViewDate).addTenor
-				(_lslForward.tenor()).julian();
+			double initialCompoundedShortRate = initialShortForwardRateUpdate.compoundedShortRate();
 
-			double dblShortRateIncrement = 0.;
-			double dblShiftedLIBORForwardRateIncrement = 0.;
-			double dblInstantaneousForwardRateIncrement = 0.;
-			double dblPriceIncrement = dblInitialShortRate * dblAnnualizedIncrement;
-			double dblCompoundedShortRateIncrement = (dblInitialCompoundedShortRate - dblInitialShortRate) *
-				dblAnnualizedIncrement;
+			double shortRateIncrement = 0.;
+			double shiftedLIBORForwardIncrement = 0.;
+			double instantaneousForwardIncrement = 0.;
+			double priceIncrement = initialShortRate * annualizedIncrement;
+			double compoundedShortRateIncrement = (initialCompoundedShortRate - initialShortRate) *
+				annualizedIncrement;
 
-			for (int i = 0; i < iNumFactor; ++i) {
-				double dblViewDateFactorVolatility = _mfv.weightedFactorPointVolatility (i, iViewDate,
-					iViewDate);
+			for (int factorIndex = 0;
+				factorIndex < principalFactorSequenceGenerator.numFactor();
+				++factorIndex)
+			{
+				double viewDateFactorVolatility = _multiFactorVolatility.weightedFactorPointVolatility (
+					factorIndex,
+					viewDate,
+					viewDate
+				);
 
-				if (!org.drip.numerical.common.NumberUtil.IsValid (dblViewDateFactorVolatility)) return null;
+				if (!NumberUtil.IsValid (viewDateFactorVolatility)) {
+					return null;
+				}
 
-				double dblViewTargetFactorVolatility = _mfv.weightedFactorPointVolatility (i, iViewDate,
-					iTargetDate);
+				double viewTargetFactorVolatility = _multiFactorVolatility.weightedFactorPointVolatility (
+					factorIndex,
+					viewDate,
+					targetDate
+				);
 
-				if (!org.drip.numerical.common.NumberUtil.IsValid (dblViewTargetFactorVolatility)) return null;
+				if (!NumberUtil.IsValid (viewTargetFactorVolatility)) {
+					return null;
+				}
 
-				double dblViewTargetVolatilityIntegral = _mfv.volatilityIntegral (i, iViewDate, iTargetDate);
+				double viewTargetVolatilityIntegral = _multiFactorVolatility.volatilityIntegral (
+					factorIndex,
+					viewDate,
+					targetDate
+				);
 
-				if (!org.drip.numerical.common.NumberUtil.IsValid (dblViewTargetVolatilityIntegral)) return null;
+				if (!NumberUtil.IsValid (viewTargetVolatilityIntegral)) {
+					return null;
+				}
 
-				double dblSpotViewVolatilityIntegral = _mfv.volatilityIntegral (i, iSpotDate, iViewDate);
+				double spotViewVolatilityIntegral = _multiFactorVolatility.volatilityIntegral (
+					factorIndex,
+					spotDate,
+					viewDate
+				);
 
-				if (!org.drip.numerical.common.NumberUtil.IsValid (dblSpotViewVolatilityIntegral)) return null;
+				if (!NumberUtil.IsValid (spotViewVolatilityIntegral)) {
+					return null;
+				}
 
-				double dblSpotTargetVolatilityIntegral = _mfv.volatilityIntegral (i, iSpotDate, iTargetDate);
+				double spotTargetVolatilityIntegral = _multiFactorVolatility.volatilityIntegral (
+					factorIndex,
+					spotDate,
+					targetDate
+				);
 
-				if (!org.drip.numerical.common.NumberUtil.IsValid (dblSpotTargetVolatilityIntegral)) return null;
+				if (!NumberUtil.IsValid (spotTargetVolatilityIntegral)) {
+					return null;
+				}
 
-				double dblScaledMultivariateRandom = dblAnnualizedIncrementSQRT * adblMultivariateRandom[i];
-				dblInstantaneousForwardRateIncrement += dblViewTargetVolatilityIntegral *
-					dblViewTargetFactorVolatility * dblAnnualizedIncrement + dblViewTargetFactorVolatility *
-						dblScaledMultivariateRandom;
-				dblShortRateIncrement += dblSpotViewVolatilityIntegral * dblViewDateFactorVolatility *
-					dblAnnualizedIncrement + dblViewDateFactorVolatility * dblScaledMultivariateRandom;
-				dblCompoundedShortRateIncrement += 0.5 * dblViewTargetVolatilityIntegral *
-					dblViewTargetVolatilityIntegral * dblAnnualizedIncrement +
-						dblViewTargetVolatilityIntegral * dblScaledMultivariateRandom;
-				dblShiftedLIBORForwardRateIncrement += dblViewTargetVolatilityIntegral *
-					(dblSpotTargetVolatilityIntegral + dblScaledMultivariateRandom);
-				dblPriceIncrement -= dblViewTargetVolatilityIntegral * dblScaledMultivariateRandom;
+				double scaledMultivariateRandom =
+					annualizedIncrementSQRT * multivariateRandomArray[factorIndex];
+				instantaneousForwardIncrement +=
+					viewTargetVolatilityIntegral * viewTargetFactorVolatility * annualizedIncrement +
+					viewTargetFactorVolatility * scaledMultivariateRandom;
+				shortRateIncrement +=
+					spotViewVolatilityIntegral * viewDateFactorVolatility * annualizedIncrement +
+					viewDateFactorVolatility * scaledMultivariateRandom;
+				compoundedShortRateIncrement +=
+					0.5 * viewTargetVolatilityIntegral * viewTargetVolatilityIntegral * annualizedIncrement +
+					viewTargetVolatilityIntegral * scaledMultivariateRandom;
+				shiftedLIBORForwardIncrement += viewTargetVolatilityIntegral *
+					(spotTargetVolatilityIntegral + scaledMultivariateRandom);
+				priceIncrement -= viewTargetVolatilityIntegral * scaledMultivariateRandom;
 			}
 
-			dblPriceIncrement *= dblInitialPrice;
-			dblCompoundedShortRateIncrement *= 365.25 / (iTargetDate - iViewDate);
-			double dblLIBORForwardRateIncrement = (dblInitialLIBORForwardRate + (365.25 / (iTargetDate -
-				iViewDate))) * dblShiftedLIBORForwardRateIncrement;
+			priceIncrement *= initialPrice;
+			compoundedShortRateIncrement *= 365.25 / (targetDate - viewDate);
+			double liborForwardIncrement = (initialLIBORForward + (365.25 / (targetDate - viewDate))) *
+				shiftedLIBORForwardIncrement;
 
-			return org.drip.dynamics.hjm.ShortForwardRateUpdate.Create (_lslFunding, _lslForward, iSpotDate,
-				iSpotDate + iSpotTimeIncrement, iTargetDate, qmInitial.instantaneousForwardRate() +
-					dblInstantaneousForwardRateIncrement, dblInstantaneousForwardRateIncrement,
-						dblInitialLIBORForwardRate + dblLIBORForwardRateIncrement,
-							dblLIBORForwardRateIncrement, qmInitial.shiftedLIBORForwardRate() +
-								dblShiftedLIBORForwardRateIncrement, dblShiftedLIBORForwardRateIncrement,
-									dblInitialShortRate + dblShortRateIncrement, dblShortRateIncrement,
-										dblInitialCompoundedShortRate + dblCompoundedShortRateIncrement,
-											dblCompoundedShortRateIncrement, dblInitialPrice +
-												dblPriceIncrement, dblPriceIncrement);
-		} catch (java.lang.Exception e) {
+			return ShortForwardRateUpdate.Create (
+				_fundingLabel,
+				_forwardLabel,
+				spotDate,
+				spotDate + spotTimeIncrement,
+				targetDate,
+				initialShortForwardRateUpdate.instantaneousForwardRate() +
+				instantaneousForwardIncrement,
+				instantaneousForwardIncrement,
+				initialLIBORForward + liborForwardIncrement,
+				liborForwardIncrement,
+				initialShortForwardRateUpdate.shiftedLIBORForwardRate() + shiftedLIBORForwardIncrement,
+				shiftedLIBORForwardIncrement,
+				initialShortRate + shortRateIncrement,
+				shortRateIncrement,
+				initialCompoundedShortRate + compoundedShortRateIncrement,
+				compoundedShortRateIncrement,
+				initialPrice + priceIncrement,
+				priceIncrement
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

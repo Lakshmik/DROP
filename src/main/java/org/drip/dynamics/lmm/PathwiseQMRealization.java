@@ -6,6 +6,14 @@ package org.drip.dynamics.lmm;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +90,7 @@ package org.drip.dynamics.lmm;
 
 /**
  * <i>PathwiseQMRealization</i> contains the Sequence of the Simulated Target Point State QM Realizations and
- * their corresponding Date Nodes. The formulations for the case of the Forward Rates are in:
+ * 	their corresponding Date Nodes. The formulations for the case of the Forward Rates are in:
  *
  *	<br><br>
  *  <ul>
@@ -100,37 +108,46 @@ package org.drip.dynamics.lmm;
  *  	</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>PathwiseQMRealization</i> Constructor</li>
+ * 		<li>Retrieve the Array of the Target Date Nodes</li>
+ * 		<li>Retrieve the Array of the Realized QM</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PathwiseQMRealization {
-	private int[] _aiTargetDateNode = null;
-	private double[] _adblPointStateQMRealization = null;
+public class PathwiseQMRealization
+{
+	private int[] _targetDateNodeArray = null;
+	private double[] _pointStateQMRealizationArray = null;
 
 	/**
-	 * PathwiseQMRealization Constructor
+	 * <i>PathwiseQMRealization</i> Constructor
 	 * 
-	 * @param aiTargetDateNode Array of Target Date Nodes
-	 * @param adblPointStateQMRealization Array of the Realized QM
+	 * @param targetDateNodeArray Array of Target Date Nodes
+	 * @param pointStateQMRealizationArray Array of the Realized QM
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public PathwiseQMRealization (
-		final int[] aiTargetDateNode,
-		final double[] adblPointStateQMRealization)
-		throws java.lang.Exception
+		final int[] targetDateNodeArray,
+		final double[] pointStateQMRealizationArray)
+		throws Exception
 	{
-		_aiTargetDateNode = aiTargetDateNode;
-		_adblPointStateQMRealization = adblPointStateQMRealization;
+		_targetDateNodeArray = targetDateNodeArray;
+		_pointStateQMRealizationArray = pointStateQMRealizationArray;
 	}
 
 	/**
@@ -139,9 +156,9 @@ public class PathwiseQMRealization {
 	 * @return Array of the Target Date Nodes
 	 */
 
-	public int[] targetDate()
+	public int[] targetDateNodeArray()
 	{
-		return _aiTargetDateNode;
+		return _targetDateNodeArray;
 	}
 
 	/**
@@ -150,8 +167,8 @@ public class PathwiseQMRealization {
 	 * @return Array of the Realized QM
 	 */
 
-	public double[] realizedQM()
+	public double[] pointStateQMRealizationArray()
 	{
-		return _adblPointStateQMRealization;
+		return _pointStateQMRealizationArray;
 	}
 }

@@ -1,11 +1,22 @@
 
 package org.drip.dynamics.lmm;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.service.common.FormatUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +93,7 @@ package org.drip.dynamics.lmm;
 
 /**
  * <i>BGMTenorNodeSequence</i> contains the Point Nodes of the Latent State Quantifiers and their Increments
- * present in the specified BGMForwardTenorSnap Instance. The References are:
+ * 	present in the specified BGMForwardTenorSnap Instance. The References are:
  *
  *	<br><br>
  *  <ul>
@@ -99,74 +110,94 @@ package org.drip.dynamics.lmm;
  * 				<i>Mathematical Finance</i> <b>7 (2)</b> 127-155
  *  	</li>
  *  </ul>
+ *  
+ * It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>BGMTenorNodeSequence</i> Constructor</li>
+ * 		<li>Retrieve the Array of Tenor Dates</li>
+ * 		<li>Retrieve the Array of Tenor LIBOR Rates</li>
+ * 		<li>Retrieve the Array of Tenor LIBOR Rate Increments</li>
+ * 		<li>Retrieve the Array of Tenor Discount Factors</li>
+ * 		<li>Retrieve the Array of Tenor Discount Factor Increments</li>
+ * 		<li>Retrieve the Array of Tenor Instantaneous Effective Annual Forward Rate</li>
+ * 		<li>Retrieve the Array of Tenor Instantaneous Nominal Annual Forward Rate</li>
+ * 		<li>Retrieve the Array of Tenor Instantaneous Continuously Compounded Forward Rate Increments</li>
+ * 		<li>Retrieve the Array of Tenor Spot Rate Increments</li>
+ * 		<li>JSON-ization of the Tenor Node Sequence</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BGMTenorNodeSequence {
-	private int[] _aiDate = null;
-	private double[] _adblLIBOR = null;
-	private double[] _adblLIBORIncrement = null;
-	private double[] _adblDiscountFactor = null;
-	private double[] _adblSpotRateIncrement = null;
-	private double[] _adblDiscountFactorIncrement = null;
-	private double[] _adblContinuousForwardRateIncrement = null;
-	private double[] _adblInstantaneousNominalForwardRate = null;
-	private double[] _adblInstantaneousEffectiveForwardRate = null;
+public class BGMTenorNodeSequence
+{
+	private int[] _dateArray = null;
+	private double[] _liborArray = null;
+	private double[] _liborIncrementArray = null;
+	private double[] _discountFactorArray = null;
+	private double[] _spotRateIncrementArray = null;
+	private double[] _discountFactorIncrementArray = null;
+	private double[] _continuousForwardRateIncrementArray = null;
+	private double[] _instantaneousNominalForwardRateArray = null;
+	private double[] _instantaneousEffectiveForwardRateArray = null;
 
 	/**
-	 * BGMTenorNodeSequence Constructor
+	 * <i>BGMTenorNodeSequence</i> Constructor
 	 * 
-	 * @param aBFTS Array of the BGM Forward Tenor Snap Instances
+	 * @param bgmForwardTenorSnapArray Array of the BGM Forward Tenor Snap Instances
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public BGMTenorNodeSequence (
-		final org.drip.dynamics.lmm.BGMForwardTenorSnap[] aBFTS)
-		throws java.lang.Exception
+		final BGMForwardTenorSnap[] bgmForwardTenorSnapArray)
+		throws Exception
 	{
-		if (null == aBFTS) throw new java.lang.Exception ("BGMTenorNodeSequence ctr: Invalid Inputs!");
+		if (null == bgmForwardTenorSnapArray || 0 == bgmForwardTenorSnapArray.length) {
+			throw new Exception ("BGMTenorNodeSequence Constructor: Invalid Inputs!");
+		}
 
-		int iNumSnap = aBFTS.length;
-		_aiDate = new int[iNumSnap];
-		_adblLIBOR = new double[iNumSnap];
-		_adblLIBORIncrement = new double[iNumSnap];
-		_adblDiscountFactor = new double[iNumSnap];
-		_adblSpotRateIncrement = new double[iNumSnap];
-		_adblDiscountFactorIncrement = new double[iNumSnap];
-		_adblContinuousForwardRateIncrement = new double[iNumSnap];
-		_adblInstantaneousNominalForwardRate = new double[iNumSnap];
-		_adblInstantaneousEffectiveForwardRate = new double[iNumSnap];
+		_dateArray = new int[bgmForwardTenorSnapArray.length];
+		_liborArray = new double[bgmForwardTenorSnapArray.length];
+		_liborIncrementArray = new double[bgmForwardTenorSnapArray.length];
+		_discountFactorArray = new double[bgmForwardTenorSnapArray.length];
+		_spotRateIncrementArray = new double[bgmForwardTenorSnapArray.length];
+		_discountFactorIncrementArray = new double[bgmForwardTenorSnapArray.length];
+		_continuousForwardRateIncrementArray = new double[bgmForwardTenorSnapArray.length];
+		_instantaneousNominalForwardRateArray = new double[bgmForwardTenorSnapArray.length];
+		_instantaneousEffectiveForwardRateArray = new double[bgmForwardTenorSnapArray.length];
 
-		if (0 == iNumSnap) throw new java.lang.Exception ("BGMTenorNodeSequence ctr: Invalid Inputs!");
+		for (int snapIndex = 0; snapIndex < bgmForwardTenorSnapArray.length; ++snapIndex) {
+			_dateArray[snapIndex] = bgmForwardTenorSnapArray[snapIndex].date();
 
-		for (int i = 0; i < iNumSnap; ++i) {
-			_aiDate[i] = aBFTS[i].date();
+			_liborArray[snapIndex] = bgmForwardTenorSnapArray[snapIndex].libor();
 
-			_adblLIBOR[i] = aBFTS[i].libor();
+			_liborIncrementArray[snapIndex] = bgmForwardTenorSnapArray[snapIndex].liborIncrement();
 
-			_adblLIBORIncrement[i] = aBFTS[i].liborIncrement();
+			_discountFactorArray[snapIndex] = bgmForwardTenorSnapArray[snapIndex].discountFactor();
 
-			_adblDiscountFactor[i] = aBFTS[i].discountFactor();
+			_spotRateIncrementArray[snapIndex] = bgmForwardTenorSnapArray[snapIndex].spotRateIncrement();
 
-			_adblSpotRateIncrement[i] = aBFTS[i].spotRateIncrement();
+			_discountFactorIncrementArray[snapIndex] =
+				bgmForwardTenorSnapArray[snapIndex].discountFactorIncrement();
 
-			_adblDiscountFactorIncrement[i] = aBFTS[i].discountFactorIncrement();
+			_instantaneousNominalForwardRateArray[snapIndex] =
+				bgmForwardTenorSnapArray[snapIndex].instantaneousNominalForwardRate();
 
-			_adblInstantaneousNominalForwardRate[i] = aBFTS[i].instantaneousNominalForwardRate();
+			_instantaneousEffectiveForwardRateArray[snapIndex] =
+				bgmForwardTenorSnapArray[snapIndex].instantaneousEffectiveForwardRate();
 
-			_adblInstantaneousEffectiveForwardRate[i] = aBFTS[i].instantaneousEffectiveForwardRate();
-
-			_adblContinuousForwardRateIncrement[i] = aBFTS[i].continuouslyCompoundedForwardIncrement();
+			_continuousForwardRateIncrementArray[snapIndex] =
+				bgmForwardTenorSnapArray[snapIndex].continuouslyCompoundedForwardIncrement();
 		}
 	}
 
@@ -176,9 +207,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Dates
 	 */
 
-	public int[] dates()
+	public int[] dateArray()
 	{
-		return _aiDate;
+		return _dateArray;
 	}
 
 	/**
@@ -187,9 +218,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor LIBOR Rates
 	 */
 
-	public double[] liborRates()
+	public double[] liborArray()
 	{
-		return _adblLIBOR;
+		return _liborArray;
 	}
 
 	/**
@@ -198,9 +229,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor LIBOR Rate Increments
 	 */
 
-	public double[] liborRateIncrements()
+	public double[] liborIncrementArray()
 	{
-		return _adblLIBORIncrement;
+		return _liborIncrementArray;
 	}
 
 	/**
@@ -209,9 +240,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Discount Factors
 	 */
 
-	public double[] discountFactors()
+	public double[] discountFactorArray()
 	{
-		return _adblDiscountFactor;
+		return _discountFactorArray;
 	}
 
 	/**
@@ -220,9 +251,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Discount Factor Increments
 	 */
 
-	public double[] discountFactorIncrements()
+	public double[] discountFactorIncrementArray()
 	{
-		return _adblDiscountFactorIncrement;
+		return _discountFactorIncrementArray;
 	}
 
 	/**
@@ -231,9 +262,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Instantaneous Effective Annual Forward Rate
 	 */
 
-	public double[] instantaneousEffectiveForwardRates()
+	public double[] instantaneousEffectiveForwardRateArray()
 	{
-		return _adblInstantaneousEffectiveForwardRate;
+		return _instantaneousEffectiveForwardRateArray;
 	}
 
 	/**
@@ -242,9 +273,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Instantaneous Nominal Annual Forward Rate
 	 */
 
-	public double[] instantaneousNominalForwardRates()
+	public double[] instantaneousNominalForwardRateArray()
 	{
-		return _adblInstantaneousNominalForwardRate;
+		return _instantaneousNominalForwardRateArray;
 	}
 
 	/**
@@ -253,9 +284,9 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Instantaneous Continuously Compounded Forward Rate Increments
 	 */
 
-	public double[] continuousForwardRateIncrements()
+	public double[] continuousForwardRateIncrementArray()
 	{
-		return _adblContinuousForwardRateIncrement;
+		return _continuousForwardRateIncrementArray;
 	}
 
 	/**
@@ -264,59 +295,103 @@ public class BGMTenorNodeSequence {
 	 * @return The Array of Tenor Spot Rate Increments
 	 */
 
-	public double[] spotRateIncrements()
+	public double[] spotRateIncrementArray()
 	{
-		return _adblSpotRateIncrement;
+		return _spotRateIncrementArray;
 	}
 
-	@Override public java.lang.String toString()
+	/**
+	 * JSON-ization of the Tenor Node Sequence
+	 * 
+	 * @return JSON-ized of the Tenor Node Sequence
+	 */
+
+	@Override public String toString()
 	{
-		int iNumTenor = _aiDate.length;
-		java.lang.String strDateDump = "\t |";
-		java.lang.String strPartition = "\t |";
-		java.lang.String strLIBORDump = "\t |";
-		java.lang.String strLIBORIncrementDump = "\t |";
-		java.lang.String strDiscountFactorDump = "\t |";
-		java.lang.String strSpotRateIncrementDump = "\t |";
-		java.lang.String strDiscountFactorIncrementDump = "\t |";
-		java.lang.String strContinuousForwardIncrementDump = "\t |";
-		java.lang.String strInstantaneousNominalForwardDump = "\t |";
-		java.lang.String strInstantaneousEffectiveForwardDump = "\t |";
+		String dateDump = "\t |";
+		String liborDump = "\t |";
+		String partition = "\t |";
+		String discountFactorDump = "\t |";
+		String liborIncrementDump = "\t |";
+		String spotRateIncrementDump = "\t |";
+		String discountFactorIncrementDump = "\t |";
+		String continuousForwardIncrementDump = "\t |";
+		String instantaneousNominalForwardDump = "\t |";
+		String instantaneousEffectiveForwardDump = "\t |";
 
-		for (int i = 0; i < iNumTenor; ++i) {
-			strPartition += "-------------";
+		for (int dateIndex = 0; dateIndex < _dateArray.length; ++dateIndex) {
+			partition += "-------------";
 
-			strDateDump += " " + new org.drip.analytics.date.JulianDate (_aiDate[i]) + " |";
+			dateDump += " " + new JulianDate (_dateArray[dateIndex]) + " |";
 
-			strLIBORDump += "  " + org.drip.service.common.FormatUtil.FormatDouble (_adblLIBOR[i], 1, 3, 100.)
-				+ "%   |";
+			liborDump += "  " + FormatUtil.FormatDouble (
+				_liborArray[dateIndex],
+				1,
+				3,
+				100.
+			) + "%   |";
 
-			strLIBORIncrementDump += "    " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblLIBORIncrement[i], 2, 0, 10000.) + "     |";
+			liborIncrementDump += "    " + FormatUtil.FormatDouble (
+				_liborIncrementArray[dateIndex],
+				2,
+				0,
+				10000.
+			) + "     |";
 
-			strDiscountFactorDump += "  " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblDiscountFactor[i], 2, 3, 100.) + "   |";
+			discountFactorDump += "  " + FormatUtil.FormatDouble (
+				_discountFactorArray[dateIndex],
+				2,
+				3,
+				100.
+			) + "   |";
 
-			strDiscountFactorIncrementDump += "    " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblDiscountFactorIncrement[i], 2, 0, 10000.) + "     |";
+			discountFactorIncrementDump += "    " + FormatUtil.FormatDouble (
+				_discountFactorIncrementArray[dateIndex],
+				2,
+				0,
+				10000.
+			) + "     |";
 
-			strContinuousForwardIncrementDump += "    " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblContinuousForwardRateIncrement[i], 2, 0, 10000.) + "     |";
+			continuousForwardIncrementDump += "    " + FormatUtil.FormatDouble (
+				_continuousForwardRateIncrementArray[dateIndex],
+				2,
+				0,
+				10000.
+			) + "     |";
 
-			strSpotRateIncrementDump += "    " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblSpotRateIncrement[i], 2, 0, 10000.) + "     |";
+			spotRateIncrementDump += "    " + FormatUtil.FormatDouble (
+				_spotRateIncrementArray[dateIndex],
+				2,
+				0,
+				10000.
+			) + "     |";
 
-			strInstantaneousEffectiveForwardDump += "    " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblInstantaneousEffectiveForwardRate[i], 2, 0, 10000.) + "     |";
+			instantaneousEffectiveForwardDump += "    " + FormatUtil.FormatDouble (
+				_instantaneousEffectiveForwardRateArray[dateIndex],
+				2,
+				0,
+				10000.
+			) + "     |";
 
-			strInstantaneousNominalForwardDump += "    " + org.drip.service.common.FormatUtil.FormatDouble
-				(_adblInstantaneousNominalForwardRate[i], 2, 0, 10000.) + "     |";
+			instantaneousNominalForwardDump += "    " + FormatUtil.FormatDouble (
+				_instantaneousNominalForwardRateArray[dateIndex],
+				2,
+				0,
+				10000.
+			) + "     |";
 		}
 
-		return "\n" + strPartition + "|\n" + strDateDump + "|\n" + strPartition + "|\n" + strLIBORDump +
-			"|\n" + strLIBORIncrementDump + "|\n" + strDiscountFactorDump + "|\n" +
-				strDiscountFactorIncrementDump + "|\n" + strContinuousForwardIncrementDump + "|\n" +
-					strSpotRateIncrementDump + "|\n" + strInstantaneousEffectiveForwardDump + "|\n" +
-						strInstantaneousNominalForwardDump + "|\n" + strPartition + "|\n";
+		return "\n" + partition + "|\n" +
+			dateDump + "|\n" +
+			partition + "|\n" +
+			liborDump + "|\n" +
+			liborIncrementDump + "|\n" +
+			discountFactorDump + "|\n" +
+			discountFactorIncrementDump + "|\n" +
+			continuousForwardIncrementDump + "|\n" +
+			spotRateIncrementDump + "|\n" +
+			instantaneousEffectiveForwardDump + "|\n" +
+			instantaneousNominalForwardDump + "|\n" +
+			partition + "|\n";
 	}
 }

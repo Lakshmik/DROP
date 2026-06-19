@@ -1,11 +1,21 @@
 
 package org.drip.dynamics.lmm;
 
+import org.drip.function.definition.R1R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +92,7 @@ package org.drip.dynamics.lmm;
 
 /**
  * <i>ShortRateProcess</i> implements the Short Rate Process defined in the LIBOR Market Model. The
- * References are:
+ * 	References are:
  *
  *	<br><br>
  *  <ul>
@@ -100,39 +110,50 @@ package org.drip.dynamics.lmm;
  *  	</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>ShortRateProcess</i> Constructor</li>
+ * 		<li>Retrieve the Spot Date</li>
+ * 		<li>Retrieve the Stochastic Short Rate Function</li>
+ * 		<li>Retrieve the Continuously Re-invested Accruing Bank Account</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ShortRateProcess {
-	private int _iSpotDate = java.lang.Integer.MIN_VALUE;
-	private org.drip.function.definition.R1R1ToR1 _funcR1R1ToR1 = null;
+public class ShortRateProcess
+{
+	private int _spotDate = Integer.MIN_VALUE;
+	private R1R1ToR1 _stochasticShortRateFunction = null;
 
 	/**
-	 * ShortRateProcess Constructor
+	 * <i>ShortRateProcess</i> Constructor
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param funcR1R1ToR1 The Stochastic Short Rate Function
+	 * @param spotDate The Spot Date
+	 * @param stochasticShortRateFunction The Stochastic Short Rate Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ShortRateProcess (
-		final int iSpotDate,
-		final org.drip.function.definition.R1R1ToR1 funcR1R1ToR1)
-		throws java.lang.Exception
+		final int spotDate,
+		final R1R1ToR1 stochasticShortRateFunction)
+		throws Exception
 	{
-		if (null == (_funcR1R1ToR1 = funcR1R1ToR1))
-			throw new java.lang.Exception ("ShortRateProcess ctr: Invalid Inputs");
+		if (null == (_stochasticShortRateFunction = stochasticShortRateFunction)) {
+			throw new Exception ("ShortRateProcess Constructor: Invalid Inputs");
+		}
 
-		_iSpotDate = iSpotDate;
+		_spotDate = spotDate;
 	}
 
 	/**
@@ -143,7 +164,7 @@ public class ShortRateProcess {
 
 	public int spotDate()
 	{
-		return _iSpotDate;
+		return _spotDate;
 	}
 
 	/**
@@ -152,29 +173,31 @@ public class ShortRateProcess {
 	 * @return The Stochastic Short Rate Function
 	 */
 
-	public org.drip.function.definition.R1R1ToR1 stochasticShortRateFunction()
+	public R1R1ToR1 stochasticShortRateFunction()
 	{
-		return _funcR1R1ToR1;
+		return _stochasticShortRateFunction;
 	}
 
 	/**
 	 * Retrieve the Continuously Re-invested Accruing Bank Account
 	 * 
-	 * @param iMaturityDate The Maturity Date
+	 * @param maturityDate The Maturity Date
 	 * 
 	 * @return The Continuously Re-invested Accruing Bank Account
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double continuouslyReinvestedAccrualFactor (
-		final int iMaturityDate)
-		throws java.lang.Exception
+		final int maturityDate)
+		throws Exception
 	{
-		if (iMaturityDate <= _iSpotDate)
-			throw new java.lang.Exception
-				("ShortRateProcess::continuouslyReinvestedAccrualFactor => Invalid Maturity Date");
+		if (maturityDate <= _spotDate) {
+			throw new Exception (
+				"ShortRateProcess::continuouslyReinvestedAccrualFactor => Invalid Maturity Date"
+			);
+		}
 
-		return java.lang.Math.exp (_funcR1R1ToR1.integralRealization (0., iMaturityDate - _iSpotDate));
+		return Math.exp (_stochasticShortRateFunction.integralRealization (0., maturityDate - _spotDate));
 	}
 }

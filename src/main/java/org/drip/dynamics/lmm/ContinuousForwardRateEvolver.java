@@ -1,11 +1,28 @@
 
 package org.drip.dynamics.lmm;
 
+import org.drip.dynamics.evolution.LSQMPointUpdate;
+import org.drip.dynamics.evolution.PointStateEvolver;
+import org.drip.dynamics.hjm.MultiFactorVolatility;
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.sequence.random.PrincipalFactorSequenceGenerator;
+import org.drip.state.identifier.ForwardLabel;
+import org.drip.state.identifier.FundingLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,8 +99,8 @@ package org.drip.dynamics.lmm;
 
 /**
  * <i>ContinuousForwardRateEvolver</i> sets up and implements the Multi-Factor No-arbitrage Dynamics of the
- * Rates State Quantifiers traced from the Evolution of the Continuously Compounded Forward Rate as
- * formulated in:
+ * 	Rates State Quantifiers traced from the Evolution of the Continuously Compounded Forward Rate as
+ * 	formulated in:
  *
  *	<br><br>
  *  <ul>
@@ -101,86 +118,104 @@ package org.drip.dynamics.lmm;
  *  	</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>ContinuousForwardRateEvolver</i> Constructor</li>
+ * 		<li>Retrieve the Funding Label</li>
+ * 		<li>Retrieve the Forward Label</li>
+ * 		<li>Retrieve the Multi-factor Volatility Instance</li>
+ * 		<li>Evolve the Latent State and return the LSQM Point Update</li>
+ * 		<li>Compute the Realized Zero Coupon Bond Forward Price</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *  
  * @author Lakshmi Krishnamurthy
  */
 
-public class ContinuousForwardRateEvolver implements org.drip.dynamics.evolution.PointStateEvolver {
-	private org.drip.dynamics.hjm.MultiFactorVolatility _mfv = null;
-	private org.drip.state.identifier.ForwardLabel _lslForward = null;
-	private org.drip.state.identifier.FundingLabel _lslFunding = null;
+public class ContinuousForwardRateEvolver
+	implements PointStateEvolver
+{
+	private ForwardLabel _forwardLabel = null;
+	private FundingLabel _fundingLabel = null;
+	private MultiFactorVolatility _multiFactorVolatility = null;
 
 	private double volatilityRandomDotProduct (
-		final int iViewDate,
-		final int iTargetDate,
-		final int iViewTimeIncrement)
-		throws java.lang.Exception
+		final int viewDate,
+		final int targetDate,
+		final int viewTimeIncrement)
+		throws Exception
 	{
-		double dblViewTimeIncrementSQRT = java.lang.Math.sqrt (iViewTimeIncrement);
+		double viewTimeIncrementSQRT = Math.sqrt (viewTimeIncrement);
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = _mfv.msg();
+		PrincipalFactorSequenceGenerator principalFactorSequenceGenerator =
+			_multiFactorVolatility.principalFactorSequenceGenerator();
 
-		double[] adblMultivariateRandom = pfsg.random();
+		double[] multivariateRandomArray = principalFactorSequenceGenerator.random();
 
-		double dblVolatilityRandomDotProduct = 0.;
+		double volatilityRandomDotProduct = 0.;
 
-		int iNumFactor = pfsg.numFactor();
+		for (int factorIndex = 0;
+			factorIndex < principalFactorSequenceGenerator.numFactor();
+			++factorIndex)
+		{
+			volatilityRandomDotProduct +=
+				_multiFactorVolatility.weightedFactorPointVolatility (factorIndex, viewDate, targetDate) *
+				multivariateRandomArray[factorIndex] * viewTimeIncrementSQRT;
+		}
 
-		for (int i = 0; i < iNumFactor; ++i)
-			dblVolatilityRandomDotProduct += _mfv.weightedFactorPointVolatility (i, iViewDate, iTargetDate) *
-				adblMultivariateRandom[i] * dblViewTimeIncrementSQRT;
-
-		return dblVolatilityRandomDotProduct;
+		return volatilityRandomDotProduct;
 	}
 
 	private double volatilityRandomDotDerivative (
-		final int iViewDate,
-		final int iTargetDate,
-		final int iViewTimeIncrement,
-		final boolean bTerminal)
-		throws java.lang.Exception
+		final int viewDate,
+		final int targetDate,
+		final int viewTimeIncrement,
+		final boolean terminal)
+		throws Exception
 	{
-		org.drip.function.definition.R1ToR1 pointVolatilityFunctionR1ToR1 = new
-			org.drip.function.definition.R1ToR1 (null) {
+		return new R1ToR1 (null) {
 			@Override public double evaluate (
-				final double dblX)
-				throws java.lang.Exception
+				final double x)
+				throws Exception
 			{
-				return bTerminal ? volatilityRandomDotProduct (iViewDate, (int) dblX, iViewTimeIncrement) :
-					volatilityRandomDotProduct ((int) dblX, iTargetDate, iViewTimeIncrement);
+				return terminal ? volatilityRandomDotProduct (viewDate, (int) x, viewTimeIncrement) :
+					volatilityRandomDotProduct ((int) x, targetDate, viewTimeIncrement);
 			}
-		};
-
-		return pointVolatilityFunctionR1ToR1.derivative (bTerminal ? iTargetDate : iViewDate, 1);
+		}.derivative (terminal ? targetDate : viewDate, 1);
 	}
 
 	/**
-	 * ContinuousForwardRateEvolver Constructor
+	 * <i>ContinuousForwardRateEvolver</i> Constructor
 	 * 
-	 * @param lslFunding The Funding Latent State Label
-	 * @param lslForward The Forward Latent State Label
-	 * @param mfv The Multi-Factor Volatility Instance
-	 * @param auInitialInstantaneousForwardRate The Instantaneous Forward Rate Function
+	 * @param fundingLabel The Funding Latent State Label
+	 * @param forwardLabel The Forward Latent State Label
+	 * @param multiFactorVolatility The Multi-Factor Volatility Instance
+	 * @param initialInstantaneousForwardRateFunction The Initial Instantaneous Forward Rate Function
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public ContinuousForwardRateEvolver (
-		final org.drip.state.identifier.FundingLabel lslFunding,
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final org.drip.dynamics.hjm.MultiFactorVolatility mfv,
-		final org.drip.function.definition.R1ToR1 auInitialInstantaneousForwardRate)
-		throws java.lang.Exception
+		final FundingLabel fundingLabel,
+		final ForwardLabel forwardLabel,
+		final MultiFactorVolatility multiFactorVolatility,
+		final R1ToR1 initialInstantaneousForwardRateFunction)
+		throws Exception
 	{
-		if (null == (_lslFunding = lslFunding) || null == (_lslForward = lslForward) || null == (_mfv = mfv))
-			throw new java.lang.Exception ("ContinuousForwardRateEvolver ctr: Invalid Inputs");
+		if (null == (_fundingLabel = fundingLabel) ||
+			null == (_forwardLabel = forwardLabel) ||
+			null == (_multiFactorVolatility = multiFactorVolatility))
+		{
+			throw new Exception ("ContinuousForwardRateEvolver Constructor: Invalid Inputs");
+		}
 	}
 
 	/**
@@ -189,9 +224,9 @@ public class ContinuousForwardRateEvolver implements org.drip.dynamics.evolution
 	 * @return The Funding Label
 	 */
 
-	public org.drip.state.identifier.FundingLabel fundingLabel()
+	public FundingLabel fundingLabel()
 	{
-		return _lslFunding;
+		return _fundingLabel;
 	}
 
 	/**
@@ -200,9 +235,9 @@ public class ContinuousForwardRateEvolver implements org.drip.dynamics.evolution
 	 * @return The Forward Label
 	 */
 
-	public org.drip.state.identifier.ForwardLabel forwardLabel()
+	public ForwardLabel forwardLabel()
 	{
-		return _lslForward;
+		return _forwardLabel;
 	}
 
 	/**
@@ -211,53 +246,84 @@ public class ContinuousForwardRateEvolver implements org.drip.dynamics.evolution
 	 * @return The Multi-factor Volatility Instance
 	 */
 
-	public org.drip.dynamics.hjm.MultiFactorVolatility mfv()
+	public MultiFactorVolatility multiFactorVolatility()
 	{
-		return _mfv;
+		return _multiFactorVolatility;
 	}
 
-	@Override public org.drip.dynamics.lmm.ContinuousForwardRateUpdate evolve (
-		final int iSpotDate,
-		final int iViewDate,
-		final int iSpotTimeIncrement,
-		final org.drip.dynamics.evolution.LSQMPointUpdate lsqmPrev)
+	/**
+	 * Evolve the Latent State and return the LSQM Point Update
+	 * 
+	 * @param spotDate The Spot Date
+	 * @param viewDate The View Date
+	 * @param spotTimeIncrement The Spot Time Increment
+	 * @param previousLSQMPointUpdate The Previous LSQM Point Update
+	 * 
+	 * @return The LSQM Point Update
+	 */
+
+	@Override public ContinuousForwardRateUpdate evolve (
+		final int spotDate,
+		final int viewDate,
+		final int spotTimeIncrement,
+		final LSQMPointUpdate previousLSQMPointUpdate)
 	{
-		if (iSpotDate > iViewDate || (null != lsqmPrev && !(lsqmPrev instanceof
-			org.drip.dynamics.lmm.ContinuousForwardRateUpdate)))
+		if (spotDate > viewDate || (
+			null != previousLSQMPointUpdate && !(
+				previousLSQMPointUpdate instanceof ContinuousForwardRateUpdate
+			)
+		))
+		{
 			return null;
+		}
 
-		org.drip.dynamics.lmm.ContinuousForwardRateUpdate bgmPrev =
-			(org.drip.dynamics.lmm.ContinuousForwardRateUpdate) lsqmPrev;
+		ContinuousForwardRateUpdate previousContinuousForwardRateUpdate =
+			(ContinuousForwardRateUpdate) previousLSQMPointUpdate;
 
-		double dblDContinuousForwardDXTerminalPrev = bgmPrev.dContinuousForwardDXTerminal();
+		double dContinuousForwardDXInitialPrevious =
+			previousContinuousForwardRateUpdate.dContinuousForwardDXInitial();
 
-		double dblDContinuousForwardDXInitialPrev = bgmPrev.dContinuousForwardDXInitial();
+		double dContinuousForwardDXTerminalPrevious =
+			previousContinuousForwardRateUpdate.dContinuousForwardDXTerminal();
 
 		try {
-			double dblDiscountFactorPrev = bgmPrev.discountFactor();
+			double previousDiscountFactor = previousContinuousForwardRateUpdate.discountFactor();
 
-			double dblSpotRateIncrement = dblDContinuousForwardDXInitialPrev * iSpotTimeIncrement +
-				volatilityRandomDotDerivative (iSpotDate, iViewDate, iSpotTimeIncrement, false);
+			double spotRateIncrement = dContinuousForwardDXInitialPrevious * spotTimeIncrement +
+				volatilityRandomDotDerivative (spotDate, viewDate, spotTimeIncrement, false);
 
-			double dblContinuousForwardIncrement = (dblDContinuousForwardDXTerminalPrev + 0.5 *
-				_mfv.pointVolatilityModulusDerivative (iSpotDate, iViewDate, 1, true)) * iSpotTimeIncrement +
-					volatilityRandomDotDerivative (iSpotDate, iViewDate, iSpotTimeIncrement, true);
+			double continuousForwardIncrement = (
+				dContinuousForwardDXTerminalPrevious +
+				0.5 * _multiFactorVolatility.pointVolatilityModulusDerivative (spotDate, viewDate, 1, true)
+			) * spotTimeIncrement +
+				volatilityRandomDotDerivative (spotDate, viewDate, spotTimeIncrement, true);
 
-			double dblContinuousForwardRate = bgmPrev.continuousForwardRate() +
-				dblContinuousForwardIncrement;
+			double continuousForwardRate = previousContinuousForwardRateUpdate.continuousForwardRate() +
+				continuousForwardIncrement;
 
-			double dblSpotRate = bgmPrev.spotRate() + dblSpotRateIncrement;
+			double spotRate = previousContinuousForwardRateUpdate.spotRate() + spotRateIncrement;
 
-			double dblDiscountFactorIncrement = dblDiscountFactorPrev * ((dblSpotRate -
-				dblContinuousForwardRate) * iSpotTimeIncrement - volatilityRandomDotProduct (iSpotDate,
-					iViewDate, iSpotTimeIncrement));
+			double discountFactorIncrement = previousDiscountFactor * (
+				(spotRate - continuousForwardRate) * spotTimeIncrement -
+				volatilityRandomDotProduct (spotDate, viewDate, spotTimeIncrement)
+			);
 
-			return org.drip.dynamics.lmm.ContinuousForwardRateUpdate.Create (_lslFunding, _lslForward,
-				iSpotDate, iSpotDate + iSpotTimeIncrement, iViewDate, dblContinuousForwardRate,
-					dblContinuousForwardIncrement, dblSpotRate, dblSpotRateIncrement, dblDiscountFactorPrev +
-						dblDiscountFactorIncrement, dblDiscountFactorIncrement,
-							dblDContinuousForwardDXInitialPrev, dblDContinuousForwardDXTerminalPrev);
-		} catch (java.lang.Exception e) {
+			return ContinuousForwardRateUpdate.Create (
+				_fundingLabel,
+				_forwardLabel,
+				spotDate,
+				spotDate + spotTimeIncrement,
+				viewDate,
+				continuousForwardRate,
+				continuousForwardIncrement,
+				spotRate,
+				spotRateIncrement,
+				previousDiscountFactor + discountFactorIncrement,
+				discountFactorIncrement,
+				dContinuousForwardDXInitialPrevious,
+				dContinuousForwardDXTerminalPrevious
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -267,35 +333,40 @@ public class ContinuousForwardRateEvolver implements org.drip.dynamics.evolution
 	/**
 	 * Compute the Realized Zero Coupon Bond Forward Price
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param iForwardDate The Forward Date
-	 * @param iMaturityDate The Maturity Date
-	 * @param dblSpotPrice The Spot Price
-	 * @param dblSpotForwardReinvestmentAccrual The Continuously Re-invested Accruing Bank Account
+	 * @param spotDate The Spot Date
+	 * @param forwardDate The Forward Date
+	 * @param maturityDate The Maturity Date
+	 * @param spotPrice The Spot Price
+	 * @param spotForwardReinvestmentAccrual The Continuously Re-invested Accruing Bank Account
 	 * 
 	 * @return The Realized Zero Coupon Bond Forward Price
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public double zeroCouponForwardPrice (
-		final int iSpotDate,
-		final int iForwardDate,
-		final int iMaturityDate,
-		final double dblSpotPrice,
-		final double dblSpotForwardReinvestmentAccrual)
-		throws java.lang.Exception
+		final int spotDate,
+		final int forwardDate,
+		final int maturityDate,
+		final double spotPrice,
+		final double spotForwardReinvestmentAccrual)
+		throws Exception
 	{
-		if (iSpotDate > iForwardDate || iForwardDate > iMaturityDate ||
-			!org.drip.numerical.common.NumberUtil.IsValid (dblSpotPrice) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (dblSpotForwardReinvestmentAccrual))
-			throw new java.lang.Exception
-				("ContinuousForwardRateEvolver::zeroCouponForwardPrice => Invalid Inputs");
+		if (spotDate > forwardDate ||
+			forwardDate > maturityDate ||
+			!NumberUtil.IsValid (spotPrice) ||
+			!NumberUtil.IsValid (spotForwardReinvestmentAccrual))
+		{
+			throw new Exception ("ContinuousForwardRateEvolver::zeroCouponForwardPrice => Invalid Inputs");
+		}
 
-		int iPeriodIncrement = iForwardDate - iSpotDate;
+		int periodIncrement = forwardDate - spotDate;
 
-		return dblSpotPrice / dblSpotForwardReinvestmentAccrual * java.lang.Math.exp (-1. *
-			(volatilityRandomDotProduct (iSpotDate, iForwardDate, iPeriodIncrement) + 0.5 * iPeriodIncrement
-				* _mfv.pointVolatilityModulus (iSpotDate, iForwardDate)));
+		return spotPrice / spotForwardReinvestmentAccrual * Math.exp (
+			-1. * (
+				volatilityRandomDotProduct (spotDate, forwardDate, periodIncrement) +
+				0.5 * periodIncrement * _multiFactorVolatility.pointVolatilityModulus (spotDate, forwardDate)
+			)
+		);
 	}
 }

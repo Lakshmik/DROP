@@ -1,11 +1,26 @@
 
 package org.drip.dynamics.evolution;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.drip.numerical.common.NumberUtil;
+import org.drip.state.identifier.LatentStateLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,25 +96,37 @@ package org.drip.dynamics.evolution;
  */
 
 /**
- * <i>LSQMPointRecord</i> contains the Record of the Evolving Point Latent State Quantification Metrics.
+ * <i>LSQMPointRecord</i> contains the Record of the Evolving Point Latent State Quantification Metrics. It
+ * 	provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></li>
+ * 		<li>Empty <i>LSQMPointRecord</i> Constructor</li>
+ * 		<li>Retrieve the Latent State Label Set</li>
+ * 		<li>Indicate if Quantification Metrics are available for the specified Latent State</li>
+ * 		<li>Set the LSQM Value</li>
+ * 		<li>Indicate if the Value for the specified Quantification Metric is available</li>
+ * 		<li>Retrieve the specified Quantification Metric Value</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LSQMPointRecord {
-	private java.util.Map<java.lang.String, java.util.Map<java.lang.String, java.lang.Double>> _mmLSQMValue =
-		new java.util.HashMap<java.lang.String, java.util.Map<java.lang.String, java.lang.Double>>();
+public class LSQMPointRecord
+{
+	private Map<String, Map<String, Double>> _stateLabelQuantificationMetricValueMap =
+		new HashMap<String, Map<String, Double>>();
 
 	/**
-	 * Empty LSQMPointRecord Constructor
+	 * Empty <i>LSQMPointRecord</i> Constructor
 	 */
 
 	public LSQMPointRecord()
@@ -107,58 +134,64 @@ public class LSQMPointRecord {
 	}
 
 	/**
-	 * Retrieve the Latent State Labels
+	 * Retrieve the Latent State Label Set
 	 * 
-	 * @return The Latent State Labels
+	 * @return The Latent State Label Set
 	 */
 
-	public java.util.Set<java.lang.String> latentStateLabel()
+	public Set<String> latentStateLabelSet()
 	{
-		return _mmLSQMValue.keySet();
+		return _stateLabelQuantificationMetricValueMap.keySet();
 	}
 
 	/**
 	 * Indicate if Quantification Metrics are available for the specified Latent State
 	 * 
-	 * @param lsl The Latent State Label
+	 * @param latentStateLabel The Latent State Label
 	 * 
 	 * @return TRUE - Quantification Metrics are available for the specified Latent State
 	 */
 
 	public boolean containsLatentState (
-		final org.drip.state.identifier.LatentStateLabel lsl)
+		final LatentStateLabel latentStateLabel)
 	{
-		return null == lsl ? false : _mmLSQMValue.containsKey (lsl.fullyQualifiedName());
+		return null != latentStateLabel &&
+			_stateLabelQuantificationMetricValueMap.containsKey (latentStateLabel.fullyQualifiedName());
 	}
 
 	/**
 	 * Set the LSQM Value
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
-	 * @param dblValue The QM's Value
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
+	 * @param quantificationMetricValue The QM's Value
 	 * 
 	 * @return TRUE - The QM successfully set
 	 */
 
-	public boolean setQM (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM,
-		final double dblValue)
+	public boolean setStateQuantificationMetric (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric,
+		final double quantificationMetricValue)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty() || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblValue))
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty() ||
+			!NumberUtil.IsValid (quantificationMetricValue))
+		{
 			return false;
+		}
 
-		java.lang.String strLatentStateLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		java.util.Map<java.lang.String, java.lang.Double> mapLSQM = _mmLSQMValue.containsKey
-			(strLatentStateLabel) ? _mmLSQMValue.get (strLatentStateLabel) : new
-				java.util.HashMap<java.lang.String, java.lang.Double>();
+		Map<String, Double> latentStateQuantificationMetricMap =
+			_stateLabelQuantificationMetricValueMap.containsKey (label) ?
+			_stateLabelQuantificationMetricValueMap.get (label) : new HashMap<String, Double>();
 
-		mapLSQM.put (strQM, dblValue);
+		latentStateQuantificationMetricMap.put (quantificationMetric, quantificationMetricValue);
 
-		_mmLSQMValue.put (lsl.fullyQualifiedName(), mapLSQM);
+		_stateLabelQuantificationMetricValueMap.put (
+			latentStateLabel.fullyQualifiedName(),
+			latentStateQuantificationMetricMap
+		);
 
 		return true;
 	}
@@ -166,53 +199,59 @@ public class LSQMPointRecord {
 	/**
 	 * Indicate if the Value for the specified Quantification Metric is available
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
 	 * 
 	 * @return TRUE - The Requested Value is available
 	 */
 
-	public boolean containsQM (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM)
+	public boolean containsQuantificationMetric (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty()) return false;
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty()) {
+			return false;
+		}
 
-		java.lang.String strLatentStateLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		return _mmLSQMValue.containsKey (strLatentStateLabel) && _mmLSQMValue.get
-			(strLatentStateLabel).containsKey (strQM);
+		return _stateLabelQuantificationMetricValueMap.containsKey (label) &&
+			_stateLabelQuantificationMetricValueMap.get (label).containsKey (quantificationMetric);
 	}
 
 	/**
 	 * Retrieve the specified Quantification Metric Value
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
 	 * 
 	 * @return The Quantification Metric Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Quantification Metric is not available
+	 * @throws Exception Thrown if the Quantification Metric is not available
 	 */
 
-	public double qm (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM)
-		throws java.lang.Exception
+	public double quantificationMetric (
+		final org.drip.state.identifier.LatentStateLabel latentStateLabel,
+		final String quantificationMetric)
+		throws Exception
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty())
-			throw new java.lang.Exception ("LSQMPointRecord::qm => Invalid Inputs");
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty()) {
+			throw new Exception ("LSQMPointRecord::quantificationMetric => Invalid Inputs");
+		}
 
-		java.lang.String strLatentStateLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		if (!_mmLSQMValue.containsKey (strLatentStateLabel))
-			throw new java.lang.Exception ("LSQMPointRecord::qm => Invalid Inputs");
+		if (!_stateLabelQuantificationMetricValueMap.containsKey (label)) {
+			throw new Exception ("LSQMPointRecord::quantificationMetric => Invalid Inputs");
+		}
 
-		java.util.Map<java.lang.String, java.lang.Double> mapLSQM = _mmLSQMValue.get (strLatentStateLabel);
+		Map<String, Double> quantificationMetricValueMap =
+			_stateLabelQuantificationMetricValueMap.get (label);
 
-		if (!mapLSQM.containsKey (strQM))
-			throw new java.lang.Exception ("LSQMPointRecord::qm => No LSQM Entry");
+		if (!quantificationMetricValueMap.containsKey (quantificationMetric)) {
+			throw new Exception ("LSQMPointRecord::quantificationMetric => No LSQM Entry");
+		}
 
-		return mapLSQM.get (strQM);
+		return quantificationMetricValueMap.get (quantificationMetric);
 	}
 }

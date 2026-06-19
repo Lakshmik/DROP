@@ -1,11 +1,23 @@
 
 package org.drip.dynamics.lmm;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.support.Helper;
+import org.drip.function.definition.R1R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +94,7 @@ package org.drip.dynamics.lmm;
 
 /**
  * <i>ContinuouslyCompoundedForwardProcess</i> implements the Continuously Compounded Forward Rate Process
- * defined in the LIBOR Market Model. The References are:
+ * 	defined in the LIBOR Market Model. The References are:
  *
  *	<br><br>
  *  <ul>
@@ -100,39 +112,54 @@ package org.drip.dynamics.lmm;
  *  	</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>ContinuouslyCompoundedForwardProcess</i> Constructor</li>
+ * 		<li>Retrieve the Spot Date</li>
+ * 		<li>Retrieve the Stochastic Forward Rate Function</li>
+ * 		<li>Retrieve a Realized Zero-Coupon Bond Price</li>
+ * 		<li>Compute the Realized/Expected Instantaneous Forward Rate Integral to the Target Date</li>
+ * 		<li>Retrieve a Realized/Expected Value of the Discount to the Target Date #1</li>
+ * 		<li>Retrieve a Realized/Expected Value of the Discount to the Target Date #2</li>
+ * 		<li>Retrieve a Realized/Expected Value of the LIBOR Rate at the Target Date</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ContinuouslyCompoundedForwardProcess {
-	private int _iSpotDate = java.lang.Integer.MIN_VALUE;
-	private org.drip.function.definition.R1R1ToR1 _funcR1R1ToR1 = null;
+public class ContinuouslyCompoundedForwardProcess
+{
+	private int _spotDate = Integer.MIN_VALUE;
+	private R1R1ToR1 _stochasticForwardRateFunction = null;
 
 	/**
-	 * ContinuouslyCompoundedForwardProcess Constructor
+	 * <i>ContinuouslyCompoundedForwardProcess</i> Constructor
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param funcR1R1ToR1 The Stochastic Forward Rate Function
+	 * @param spotDate The Spot Date
+	 * @param stochasticForwardRateFunction The Stochastic Forward Rate Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ContinuouslyCompoundedForwardProcess (
-		final int iSpotDate,
-		final org.drip.function.definition.R1R1ToR1 funcR1R1ToR1)
-		throws java.lang.Exception
+		final int spotDate,
+		final R1R1ToR1 stochasticForwardRateFunction)
+		throws Exception
 	{
-		if (null == (_funcR1R1ToR1 = funcR1R1ToR1))
-			throw new java.lang.Exception ("ContinuouslyCompoundedForwardProcess ctr: Invalid Inputs");
+		if (null == (_stochasticForwardRateFunction = stochasticForwardRateFunction)) {
+			throw new Exception ("ContinuouslyCompoundedForwardProcess ctr: Invalid Inputs");
+		}
 
-		_iSpotDate = iSpotDate;
+		_spotDate = spotDate;
 	}
 
 	/**
@@ -143,7 +170,7 @@ public class ContinuouslyCompoundedForwardProcess {
 
 	public int spotDate()
 	{
-		return _iSpotDate;
+		return _spotDate;
 	}
 
 	/**
@@ -152,108 +179,122 @@ public class ContinuouslyCompoundedForwardProcess {
 	 * @return The Stochastic Forward Rate Function
 	 */
 
-	public org.drip.function.definition.R1R1ToR1 stochasticForwardRateFunction()
+	public R1R1ToR1 stochasticForwardRateFunction()
 	{
-		return _funcR1R1ToR1;
+		return _stochasticForwardRateFunction;
 	}
 
 	/**
 	 * Retrieve a Realized Zero-Coupon Bond Price
 	 * 
-	 * @param iMaturityDate The Maturity Date
+	 * @param maturityDate The Maturity Date
 	 * 
 	 * @return The Realized Zero-Coupon Bond Price
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double realizedZeroCouponPrice (
-		final int iMaturityDate)
-		throws java.lang.Exception
+		final int maturityDate)
+		throws Exception
 	{
-		if (iMaturityDate <= _iSpotDate)
-			throw new java.lang.Exception
-				("ContinuouslyCompoundedForwardProcess::realizedZeroCouponPrice => Invalid Maturity Date");
+		if (maturityDate <= _spotDate) {
+			throw new Exception (
+				"ContinuouslyCompoundedForwardProcess::realizedZeroCouponPrice => Invalid Maturity Date"
+			);
+		}
 
-		return java.lang.Math.exp (-1. * _funcR1R1ToR1.integralRealization (0., iMaturityDate - _iSpotDate));
+		return Math.exp (
+			-1. * _stochasticForwardRateFunction.integralRealization (0., maturityDate - _spotDate)
+		);
 	}
 
 	/**
 	 * Compute the Realized/Expected Instantaneous Forward Rate Integral to the Target Date
 	 * 
-	 * @param iTargetDate The Target Date
-	 * @param bRealized TRUE - Compute the Realized (TRUE) / Expected (FALSE) Instantaneous Forward Rate
-	 *  Integral
+	 * @param targetDate The Target Date
+	 * @param realized
+	 * 	TRUE - Compute the Realized (TRUE) / Expected (FALSE) Instantaneous Forward Rate Integral
 	 * 
 	 * @return The Realized/Expected Instantaneous Forward Rate Integral
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double instantaneousForwardRateIntegral (
-		final int iTargetDate,
-		final boolean bRealized)
-		throws java.lang.Exception
+		final int targetDate,
+		final boolean realized)
+		throws Exception
 	{
-		if (iTargetDate <= _iSpotDate)
-			throw new java.lang.Exception
-				("ContinuouslyCompoundedForwardProcess::instantaneousForwardRateIntegral => Invalid Target Date");
+		if (targetDate <= _spotDate) {
+			throw new Exception (
+				"ContinuouslyCompoundedForwardProcess::instantaneousForwardRateIntegral => Invalid Target Date"
+			);
+		}
 
-		return bRealized ? java.lang.Math.exp (-1. * _funcR1R1ToR1.integralRealization (0., iTargetDate -
-			_iSpotDate)) : java.lang.Math.exp (-1. * _funcR1R1ToR1.integralExpectation (0., iTargetDate -
-				_iSpotDate));
+		return realized ? Math.exp (
+			-1. * _stochasticForwardRateFunction.integralRealization (0., targetDate - _spotDate)
+		) : Math.exp (
+			-1. * _stochasticForwardRateFunction.integralExpectation (0., targetDate - _spotDate)
+		);
 	}
 
 	/**
 	 * Retrieve a Realized/Expected Value of the Discount to the Target Date
 	 * 
-	 * @param iTargetDate The Target Date
-	 * @param bRealized TRUE - Compute the Realized (TRUE) / Expected (FALSE) Instantaneous Forward Rate
-	 *  Integral
+	 * @param targetDate The Target Date
+	 * @param realized
+	 * 	TRUE - Compute the Realized (TRUE) / Expected (FALSE) Instantaneous Forward Rate Integral
 	 * 
 	 * @return The Realized/Expected Value of the Discount to the Target Date
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double discountFunctionValue (
-		final int iTargetDate,
-		final boolean bRealized)
-		throws java.lang.Exception
+		final int targetDate,
+		final boolean realized)
+		throws Exception
 	{
-		if (iTargetDate <= _iSpotDate)
-			throw new java.lang.Exception
-				("ContinuouslyCompoundedForwardProcess::discountFunctionValue => Invalid Target Date");
+		if (targetDate <= _spotDate) {
+			throw new Exception (
+				"ContinuouslyCompoundedForwardProcess::discountFunctionValue => Invalid Target Date"
+			);
+		}
 
-		return bRealized ? java.lang.Math.exp (-1. * _funcR1R1ToR1.integralRealization (0., iTargetDate -
-			_iSpotDate)) : java.lang.Math.exp (-1. * _funcR1R1ToR1.integralExpectation (0., iTargetDate -
-				_iSpotDate));
+		return realized ? Math.exp (
+			-1. * _stochasticForwardRateFunction.integralRealization (0., targetDate - _spotDate)
+		) : Math.exp (
+			-1. * _stochasticForwardRateFunction.integralExpectation (0., targetDate - _spotDate)
+		);
 	}
 
 	/**
 	 * Retrieve a Realized/Expected Value of the LIBOR Rate at the Target Date
 	 * 
-	 * @param iTargetDate The Target Date
-	 * @param strTenor The LIBOR Tenor
-	 * @param bRealized TRUE - Compute the Realized (TRUE) / Expected (FALSE) LIBOR Rate
+	 * @param targetDate The Target Date
+	 * @param tenor The LIBOR Tenor
+	 * @param realized TRUE - Compute the Realized (TRUE) / Expected (FALSE) LIBOR Rate
 	 * 
 	 * @return The Realized/Expected Value of the LIBOR Rate at the Target Date
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double liborRate (
-		final int iTargetDate,
-		final java.lang.String strTenor,
-		final boolean bRealized)
-		throws java.lang.Exception
+		final int targetDate,
+		final String tenor,
+		final boolean realized)
+		throws Exception
 	{
-		if (iTargetDate <= _iSpotDate)
-			throw new java.lang.Exception
-				("ContinuouslyCompoundedForwardProcess::liborRate => Invalid Inputs");
+		if (targetDate <= _spotDate) {
+			throw new Exception ("ContinuouslyCompoundedForwardProcess::liborRate => Invalid Inputs");
+		}
 
-		return (discountFunctionValue (new org.drip.analytics.date.JulianDate (iTargetDate).addTenor
-			(strTenor).julian(), bRealized) / discountFunctionValue (iTargetDate, bRealized) - 1.) /
-				org.drip.analytics.support.Helper.TenorToYearFraction (strTenor);
+		return ((
+			discountFunctionValue (new JulianDate (targetDate).addTenor (tenor).julian(), realized) /
+				discountFunctionValue (targetDate, realized)
+			) - 1.
+		) / Helper.TenorToYearFraction (tenor);
 	}
 }

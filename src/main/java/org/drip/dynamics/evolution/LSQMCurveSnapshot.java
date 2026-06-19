@@ -1,11 +1,26 @@
 
 package org.drip.dynamics.evolution;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.drip.analytics.definition.Curve;
+import org.drip.state.identifier.LatentStateLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,26 +97,41 @@ package org.drip.dynamics.evolution;
 
 /**
  * <i>LSQMCurveSnapshot</i> contains the Snapshot of the Evolving Term Structure of the Latent State
- * Quantification Metrics.
+ * 	Quantification Metrics. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></li>
+ * 		<li>Empty <i>LSQMCurveSnapshot</i> Constructor</li>
+ * 		<li>Retrieve the Latent State Labels</li>
+ * 		<li>Indicate if Quantification Metrics are available for the specified Latent State</li>
+ * 		<li>Indicate if the Value for the specified Quantification Metric is available</li>
+ * 		<li>Set the Latent State Quantification Metric Curve</li>
+ * 		<li>Retrieve the specified Latent State Quantification Metric Curve</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/evolution/README.md">Latent State Evolution Edges/Vertexes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LSQMCurveSnapshot {
-	private java.util.Map<java.lang.String, java.util.Map<java.lang.String,
-		org.drip.analytics.definition.Curve>> _mmCurve = new java.util.HashMap<java.lang.String,
-			java.util.Map<java.lang.String, org.drip.analytics.definition.Curve>>();
+public class LSQMCurveSnapshot
+{
+	private Map<String, Map<String, Curve>> _labelQuantificationMetricCurveMap =
+		new HashMap<String, Map<String, Curve>>();
 
 	/**
-	 * Empty LSQMCurveSnapshot Constructor
+	 * Empty <i>LSQMCurveSnapshot</i> Constructor
+	 * Retrieve the Latent State Labels
+	 * Indicate if Quantification Metrics are available for the specified Latent State
+	 * Indicate if the Value for the specified Quantification Metric is available
+	 * Set the Latent State Quantification Metric Curve
+	 * Retrieve the specified Latent State Quantification Metric Curve
 	 */
 
 	public LSQMCurveSnapshot()
@@ -114,69 +144,77 @@ public class LSQMCurveSnapshot {
 	 * @return The Latent State Labels
 	 */
 
-	public java.util.Set<java.lang.String> latentStateLabel()
+	public Set<String> latentStateLabelSet()
 	{
-		return _mmCurve.keySet();
+		return _labelQuantificationMetricCurveMap.keySet();
 	}
 
 	/**
 	 * Indicate if Quantification Metrics are available for the specified Latent State
 	 * 
-	 * @param lsl The Latent State Label
+	 * @param latentStateLabel The Latent State Label
 	 * 
 	 * @return TRUE - Quantification Metrics are available for the specified Latent State
 	 */
 
 	public boolean containsLatentState (
-		final org.drip.state.identifier.LatentStateLabel lsl)
+		final LatentStateLabel latentStateLabel)
 	{
-		return null == lsl ? false : _mmCurve.containsKey (lsl.fullyQualifiedName());
+		return null != latentStateLabel &&
+			_labelQuantificationMetricCurveMap.containsKey (latentStateLabel.fullyQualifiedName());
 	}
 
 	/**
 	 * Indicate if the Value for the specified Quantification Metric is available
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
 	 * 
 	 * @return TRUE - The Requested Value is available
 	 */
 
-	public boolean containsQM (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM)
+	public boolean containsQuantificationMetric (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty()) return false;
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty()) {
+			return false;
+		}
 
-		java.lang.String strLabel = lsl.fullyQualifiedName();
+		String label = latentStateLabel.fullyQualifiedName();
 
-		return _mmCurve.containsKey (strLabel) && _mmCurve.get (strLabel).containsKey (strQM);
+		return _labelQuantificationMetricCurveMap.containsKey (label) &&
+			_labelQuantificationMetricCurveMap.get (label).containsKey (quantificationMetric);
 	}
 
 	/**
 	 * Set the LSQM Curve
+	 * Retrieve the specified Latent State Quantification Metric Curve
 	 * 
-	 * @param strQM The Quantification Metric
-	 * @param curve The QM Curve
+	 * @param quantificationMetric The Quantification Metric
+	 * @param quantificationMetricCurve The Quantification Metric Curve
 	 * 
-	 * @return TRUE - The QM successfully set
+	 * @return TRUE - The Quantification Metric successfully set
 	 */
 
-	public boolean setQMCurve (
-		final java.lang.String strQM,
-		final org.drip.analytics.definition.Curve curve)
+	public boolean setQuantificationMetricCurve (
+		final String quantificationMetric,
+		final Curve quantificationMetricCurve)
 	{
-		if (null == strQM || strQM.isEmpty() || null == curve) return false;
+		if (null == quantificationMetric || quantificationMetric.isEmpty() ||
+			null == quantificationMetricCurve) {
+			return false;
+		}
 
-		java.lang.String strLabel = curve.label().fullyQualifiedName();
+		String label = quantificationMetricCurve.label().fullyQualifiedName();
 
-		java.util.Map<java.lang.String, org.drip.analytics.definition.Curve> mapCurve = _mmCurve.containsKey
-			(strLabel) ? _mmCurve.get (strLabel) : new java.util.HashMap<java.lang.String,
-				org.drip.analytics.definition.Curve>();
+		Map<String, Curve> quantificationMetricCurveMap =
+			_labelQuantificationMetricCurveMap.containsKey (label) ?
+			_labelQuantificationMetricCurveMap.get (label) : new HashMap<String, Curve>();
 
-		mapCurve.put (strQM, curve);
+		quantificationMetricCurveMap.put (quantificationMetric, quantificationMetricCurve);
 
-		_mmCurve.put (strLabel, mapCurve);
+		_labelQuantificationMetricCurveMap.put (label, quantificationMetricCurveMap);
 
 		return true;
 	}
@@ -184,23 +222,24 @@ public class LSQMCurveSnapshot {
 	/**
 	 * Retrieve the specified Latent State Quantification Metric Curve
 	 * 
-	 * @param lsl The Latent State Label
-	 * @param strQM The Quantification Metric
+	 * @param latentStateLabel The Latent State Label
+	 * @param quantificationMetric The Quantification Metric
 	 * 
 	 * @return The Latent State Quantification Metric Curve
 	 */
 
-	public org.drip.analytics.definition.Curve qm (
-		final org.drip.state.identifier.LatentStateLabel lsl,
-		final java.lang.String strQM)
+	public Curve quantificationMetricCurve (
+		final LatentStateLabel latentStateLabel,
+		final String quantificationMetric)
 	{
-		if (null == lsl || null == strQM || strQM.isEmpty()) return null;
+		if (null == latentStateLabel || null == quantificationMetric || quantificationMetric.isEmpty()) {
+			return null;
+		}
 
-		java.lang.String strLabel = lsl.fullyQualifiedName();
+		Map<String, Curve> quantificationMetricCurveMap = _labelQuantificationMetricCurveMap.get
+			(latentStateLabel.fullyQualifiedName());
 
-		java.util.Map<java.lang.String, org.drip.analytics.definition.Curve> mapCurve = _mmCurve.get
-			(strLabel);
-
-		return mapCurve.containsKey (strQM) ? mapCurve.get (strQM) : null;
+		return quantificationMetricCurveMap.containsKey (quantificationMetric) ?
+			quantificationMetricCurveMap.get (quantificationMetric) : null;
 	}
 }

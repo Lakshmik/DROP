@@ -1,11 +1,29 @@
 
 package org.drip.dynamics.lmm;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.analytics.definition.MarketSurface;
+import org.drip.analytics.support.Helper;
+import org.drip.dynamics.hjm.MultiFactorVolatility;
+import org.drip.function.definition.R1ToR1;
+import org.drip.sequence.random.PrincipalFactorSequenceGenerator;
+import org.drip.state.discount.MergedDiscountForwardCurve;
+import org.drip.state.forward.ForwardCurve;
+import org.drip.state.identifier.ForwardLabel;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -99,45 +117,60 @@ package org.drip.dynamics.lmm;
  *  	</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>LognormalLIBORVolatility</i> Constructor</li>
+ * 		<li>Retrieve the Spot Date</li>
+ * 		<li>Retrieve the Forward Label</li>
+ * 		<li>Compute the Constraint in the Difference in the Volatility of the Continuously Compounded Forward Rate between the Target Date and the Target Date + Forward Tenor</li>
+ * 		<li>Compute the Volatility of the Continuously Compounded Forward Rate Up to the Target Date #1</li>
+ * 		<li>Compute the Volatility of the Continuously Compounded Forward Rate Up to the Target Date #2</li>
+ * 		<li>Multi-Factor Cross Volatility Integral</li>
+ *	<br>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">LMM Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LognormalLIBORVolatility extends org.drip.dynamics.hjm.MultiFactorVolatility {
-	private int _iSpotDate = java.lang.Integer.MIN_VALUE;
-	private org.drip.state.identifier.ForwardLabel _lslForward = null;
+public class LognormalLIBORVolatility
+	extends MultiFactorVolatility
+{
+	private ForwardLabel _forwardLabel = null;
+	private int _spotDate = Integer.MIN_VALUE;
 
 	/**
-	 * LognormalLIBORVolatility Constructor
+	 * <i>LognormalLIBORVolatility</i> Constructor
 	 * 
-	 * @param iSpotDate The Spot Date
-	 * @param lslForward The Forward Label
-	 * @param aMSVolatility Array of the Multi-Factor Volatility Surfaces
-	 * @param pfsg Principal Factor Sequence Generator
+	 * @param spotDate The Spot Date
+	 * @param forwardLabel The Forward Label
+	 * @param marketSurfaceVolatilityArray Array of the Multi-Factor Volatility Surfaces
+	 * @param principalFactorSequenceGenerator Principal Factor Sequence Generator
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public LognormalLIBORVolatility (
-		final int iSpotDate,
-		final org.drip.state.identifier.ForwardLabel lslForward,
-		final org.drip.analytics.definition.MarketSurface[] aMSVolatility,
-		final org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg)
-		throws java.lang.Exception
+		final int spotDate,
+		final ForwardLabel forwardLabel,
+		final MarketSurface[] marketSurfaceVolatilityArray,
+		final PrincipalFactorSequenceGenerator principalFactorSequenceGenerator)
+		throws Exception
 	{
-		super (aMSVolatility, pfsg);
+		super (marketSurfaceVolatilityArray, principalFactorSequenceGenerator);
 
-		if (null == (_lslForward = lslForward))
-			throw new java.lang.Exception ("LognormalLIBORVolatility ctr: Invalid Inputs");
+		if (null == (_forwardLabel = forwardLabel)) {
+			throw new Exception ("LognormalLIBORVolatility Constructor: Invalid Inputs");
+		}
 
-		_iSpotDate = iSpotDate;
+		_spotDate = spotDate;
 	}
 
 	/**
@@ -148,7 +181,7 @@ public class LognormalLIBORVolatility extends org.drip.dynamics.hjm.MultiFactorV
 
 	public int spotDate()
 	{
-		return _iSpotDate;
+		return _spotDate;
 	}
 
 	/**
@@ -157,45 +190,51 @@ public class LognormalLIBORVolatility extends org.drip.dynamics.hjm.MultiFactorV
 	 * @return The Forward Label
 	 */
 
-	public org.drip.state.identifier.ForwardLabel forwardLabel()
+	public ForwardLabel forwardLabel()
 	{
-		return _lslForward;
+		return _forwardLabel;
 	}
 
 	/**
 	 * Compute the Constraint in the Difference in the Volatility of the Continuously Compounded Forward Rate
 	 * 	between the Target Date and the Target Date + Forward Tenor
 	 * 
-	 * @param fc The Forward Curve Instance
-	 * @param iTargetDate The Target Date
+	 * @param forwardCurve The Forward Curve Instance
+	 * @param targetDate The Target Date
 	 * 
 	 * @return The Constraint in the Difference in the Volatility of the Continuously Compounded Forward Rate
 	 */
 
 	public double[] continuousForwardVolatilityConstraint (
-		final org.drip.state.forward.ForwardCurve fc,
-		final int iTargetDate)
+		final ForwardCurve forwardCurve,
+		final int targetDate)
 	{
-		if (null == fc || iTargetDate <= _iSpotDate) return null;
+		if (null == forwardCurve || targetDate <= _spotDate) {
+			return null;
+		}
 
-		java.lang.String strTenor = _lslForward.tenor();
+		String tenor = _forwardLabel.tenor();
 
-		org.drip.analytics.definition.MarketSurface[] aMS = volatilitySurface();
+		MarketSurface[] marketSurfaceArray = volatilityMarketSurfaceArray();
 
 		try {
-			double dblLIBORDCF = fc.forward (new org.drip.analytics.date.JulianDate (iTargetDate).addTenor
-				(strTenor)) * org.drip.analytics.support.Helper.TenorToYearFraction (strTenor);
+			double liborDCF = forwardCurve.forward (
+				new JulianDate (targetDate).addTenor (tenor)
+			) * Helper.TenorToYearFraction (tenor);
 
-			int iNumSurface = aMS.length;
-			double dblConstraintWeight = dblLIBORDCF / (1. + dblLIBORDCF);
-			double[] adblContinuousForwardVolatilityConstraint = new double[iNumSurface];
+			double constraintWeight = liborDCF / (1. + liborDCF);
+			double[] continuousForwardVolatilityConstraintArray = new double[marketSurfaceArray.length];
 
-			for (int i = 0; i < iNumSurface; ++i)
-				adblContinuousForwardVolatilityConstraint[i] = dblConstraintWeight * aMS[i].node (_iSpotDate,
-					iTargetDate);
+			for (int marketSurfaceIndex = 0;
+				marketSurfaceIndex < marketSurfaceArray.length;
+				++marketSurfaceIndex)
+			{
+				continuousForwardVolatilityConstraintArray[marketSurfaceIndex] =
+					constraintWeight * marketSurfaceArray[marketSurfaceIndex].node (_spotDate, targetDate);
+			}
 
-			return adblContinuousForwardVolatilityConstraint;
-		} catch (java.lang.Exception e) {
+			return continuousForwardVolatilityConstraintArray;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -205,166 +244,172 @@ public class LognormalLIBORVolatility extends org.drip.dynamics.hjm.MultiFactorV
 	/**
 	 * Compute the Volatility of the Continuously Compounded Forward Rate Up to the Target Date
 	 * 
-	 * @param iTargetDate The Target Date
-	 * @param fc The Forward Curve Instance
+	 * @param targetDate The Target Date
+	 * @param forwardCurve The Forward Curve Instance
 	 * 
 	 * @return The Volatility of the Continuously Compounded Forward Rate Up to the Target Date
 	 */
 
 	public double[] continuousForwardVolatility (
-		final int iTargetDate,
-		final org.drip.state.forward.ForwardCurve fc)
+		final int targetDate,
+		final ForwardCurve forwardCurve)
 	{
-		if (iTargetDate <= _iSpotDate || null == fc) return null;
+		if (targetDate <= _spotDate || null == forwardCurve) {
+			return null;
+		}
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = msg();
+		int factorCount = principalFactorSequenceGenerator().numFactor();
 
-		int iNumFactor = pfsg.numFactor();
+		boolean loop = true;
+		int endDate = _spotDate;
+		double tenorDCF = Double.NaN;
+		double[] continuousForwardVolatilityArray = new double[factorCount];
 
-		boolean bLoop = true;
-		int iEndDate = _iSpotDate;
-		double dblTenorDCF = java.lang.Double.NaN;
-		double[] adblContinuousForwardVolatility = new double[iNumFactor];
-
-		java.lang.String strTenor = _lslForward.tenor();
+		String tenor = _forwardLabel.tenor();
 
 		try {
-			dblTenorDCF = org.drip.analytics.support.Helper.TenorToYearFraction (strTenor);
-		} catch (java.lang.Exception e) {
+			tenorDCF = Helper.TenorToYearFraction (tenor);
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		for (int i = 0; i < iNumFactor; ++i)
-			adblContinuousForwardVolatility[i] = 0.;
+		for (int factorIndex = 0; factorIndex < factorCount; ++factorIndex) {
+			continuousForwardVolatilityArray[factorIndex] = 0.;
+		}
 
-		double[] adblFactorPointVolatility = factorPointVolatility (_iSpotDate, iEndDate);
+		double[] factorPointVolatilityArray = factorPointVolatility (_spotDate, endDate);
 
-		while (bLoop) {
+		while (loop) {
 			try {
-				if ((iEndDate = new org.drip.analytics.date.JulianDate (iEndDate).addTenor
-					(strTenor).julian()) > iTargetDate)
-					bLoop = false;
+				if ((endDate = new JulianDate (endDate).addTenor (tenor).julian()) > targetDate) {
+					loop = false;
+				}
 
-				double dblLIBORTenorDCF = fc.forward (iEndDate) * dblTenorDCF;
+				double liborTenorDCF = forwardCurve.forward (endDate) * tenorDCF;
 
-				double dblLIBORLognormalVolatilityScaler = dblLIBORTenorDCF / (1. + dblLIBORTenorDCF);
+				double liborLognormalVolatilityScaler = liborTenorDCF / (1. + liborTenorDCF);
 
-				for (int i = 0; i < iNumFactor; ++i)
-					adblContinuousForwardVolatility[i] += dblLIBORLognormalVolatilityScaler *
-						adblFactorPointVolatility[i];
-			} catch (java.lang.Exception e) {
+				for (int factorIndex = 0; factorIndex < factorCount; ++factorIndex) {
+					continuousForwardVolatilityArray[factorIndex] +=
+						liborLognormalVolatilityScaler * factorPointVolatilityArray[factorIndex];
+				}
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		return adblContinuousForwardVolatility;
+		return continuousForwardVolatilityArray;
 	}
 
 	/**
 	 * Compute the Volatility of the Continuously Compounded Forward Rate Up to the Target Date
 	 * 
-	 * @param iTargetDate The Target Date
-	 * @param dc The Discount Curve Instance
+	 * @param targetDate The Target Date
+	 * @param discountCurve The Discount Curve Instance
 	 * 
 	 * @return The Volatility of the Continuously Compounded Forward Rate Up to the Target Date
 	 */
 
 	public double[] continuousForwardVolatility (
-		final int iTargetDate,
-		final org.drip.state.discount.MergedDiscountForwardCurve dc)
+		final int targetDate,
+		final MergedDiscountForwardCurve discountCurve)
 	{
-		if (iTargetDate <= _iSpotDate || null == dc) return null;
+		if (targetDate <= _spotDate || null == discountCurve) {
+			return null;
+		}
 
-		org.drip.sequence.random.PrincipalFactorSequenceGenerator pfsg = msg();
+		int factorCount = principalFactorSequenceGenerator().numFactor();
 
-		int iNumFactor = pfsg.numFactor();
+		boolean loop = true;
+		int startDate = _spotDate;
+		double tenorDCF = Double.NaN;
+		double[] continuousForwardVolatilityArray = new double[factorCount];
 
-		boolean bLoop = true;
-		int iStartDate = _iSpotDate;
-		double dblTenorDCF = java.lang.Double.NaN;
-		double[] adblContinuousForwardVolatility = new double[iNumFactor];
-
-		java.lang.String strTenor = _lslForward.tenor();
+		String tenor = _forwardLabel.tenor();
 
 		try {
-			dblTenorDCF = org.drip.analytics.support.Helper.TenorToYearFraction (strTenor);
-		} catch (java.lang.Exception e) {
+			tenorDCF = Helper.TenorToYearFraction (tenor);
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		for (int i = 0; i < iNumFactor; ++i)
-			adblContinuousForwardVolatility[i] = 0.;
+		for (int factorIndex = 0; factorIndex < factorCount; ++factorIndex) {
+			continuousForwardVolatilityArray[factorIndex] = 0.;
+		}
 
-		double[] adblFactorPointVolatility = factorPointVolatility (_iSpotDate, iStartDate);
+		double[] factorPointVolatilityArray = factorPointVolatility (_spotDate, startDate);
 
-		while (bLoop) {
+		while (loop) {
 			try {
-				double dblLIBORTenorDCF = dc.libor (iStartDate, strTenor) * dblTenorDCF;
+				double liborTenorDCF = discountCurve.libor (startDate, tenor) * tenorDCF;
 
-				double dblLIBORLognormalVolatilityScaler = dblLIBORTenorDCF / (1. + dblLIBORTenorDCF);
+				double liborLognormalVolatilityScaler = liborTenorDCF / (1. + liborTenorDCF);
 
-				for (int i = 0; i < iNumFactor; ++i)
-					adblContinuousForwardVolatility[i] += dblLIBORLognormalVolatilityScaler *
-						adblFactorPointVolatility[i];
+				for (int factorIndex = 0; factorIndex < factorCount; ++factorIndex) {
+					continuousForwardVolatilityArray[factorIndex] +=
+						liborLognormalVolatilityScaler * factorPointVolatilityArray[factorIndex];
+				}
 
-				if ((iStartDate = new org.drip.analytics.date.JulianDate (iStartDate).addTenor
-					(strTenor).julian()) > iTargetDate)
-					bLoop = false;
-			} catch (java.lang.Exception e) {
+				if ((startDate = new JulianDate (startDate).addTenor (tenor).julian()) > targetDate) {
+					loop = false;
+				}
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		return adblContinuousForwardVolatility;
+		return continuousForwardVolatilityArray;
 	}
 
 	/**
 	 * Multi-Factor Cross Volatility Integral
 	 * 
-	 * @param iForwardDate1 Forward Date #1
-	 * @param iForwardDate2 Forward Date #2
-	 * @param iTerminalDate The Terminal Date
+	 * @param forwardDate1 Forward Date #1
+	 * @param forwardDate2 Forward Date #2
+	 * @param terminalDate The Terminal Date
 	 * 
 	 * @return The Multi-Factor Cross Volatility Integral
 	 * 
-	 * @throws java.lang.Exception Thrown if the Multi-Factor Cross Volatility Integral cannot be computed
+	 * @throws Exception Thrown if the Multi-Factor Cross Volatility Integral cannot be computed
 	 */
 
 	public double crossVolatilityIntegralProduct (
-		final int iForwardDate1,
-		final int iForwardDate2,
-		final int iTerminalDate)
-		throws java.lang.Exception
+		final int forwardDate1,
+		final int forwardDate2,
+		final int terminalDate)
+		throws Exception
 	{
-		if (iForwardDate1 < iTerminalDate || iForwardDate2 < iTerminalDate)
-			throw new java.lang.Exception
-				("LognormalLIBORVolatility::crossVolatilityIntegralProduct => Invalid Inputs");
+		if (forwardDate1 < terminalDate || forwardDate2 < terminalDate) {
+			throw new Exception (
+				"LognormalLIBORVolatility::crossVolatilityIntegralProduct => Invalid Inputs"
+			);
+		}
 
-		org.drip.function.definition.R1ToR1 crossVolR1ToR1 = new org.drip.function.definition.R1ToR1 (null) {
+		return new R1ToR1 (null) {
 			@Override public double evaluate (
 				final double dblDate)
-				throws java.lang.Exception
+				throws Exception
 			{
-				double dblCrossVolProduct = 0.;
+				double crossVolProduct = 0.;
 
-				int iNumFactor = msg().numFactor();
+				for (int iFactorIndex = 0;
+					iFactorIndex < principalFactorSequenceGenerator().numFactor();
+					++iFactorIndex)
+				{
+					crossVolProduct += factorPointVolatility (iFactorIndex, (int) dblDate, forwardDate1)
+						* factorPointVolatility (iFactorIndex, (int) dblDate, forwardDate2);
+				}
 
-				for (int iFactorIndex = 0; iFactorIndex < iNumFactor; ++iFactorIndex)
-					dblCrossVolProduct += factorPointVolatility (iFactorIndex, (int) dblDate, iForwardDate1)
-						* factorPointVolatility (iFactorIndex, (int) dblDate, iForwardDate2);
-
-				return dblCrossVolProduct;
+				return crossVolProduct;
 			}
-		};
-
-		return crossVolR1ToR1.integrate (_iSpotDate, iTerminalDate);
+		}.integrate (_spotDate, terminalDate);
 	}
 }
