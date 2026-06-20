@@ -881,88 +881,118 @@ public class CollateralizedCollateralReceivableStochastic
 	}
 
 	private static final void BaselAccountingMetrics (
-		final String strHeader,
-		final ExposureAdjustmentAggregator eaaGround,
-		final ExposureAdjustmentAggregator eaaExpanded)
+		final String header,
+		final ExposureAdjustmentAggregator groundExposureAdjustmentAggregator,
+		final ExposureAdjustmentAggregator expandedExposureAdjustmentAggregator)
 		throws Exception
 	{
-		OTCAccountingModus oasFCAFBA = new OTCAccountingModusFCAFBA (eaaGround);
+		OTCAccountingModus otcAccountingModusFCAFBA =
+			new OTCAccountingModusFCAFBA (groundExposureAdjustmentAggregator);
 
-		OTCAccountingModus oasFVAFDA = new OTCAccountingModusFVAFDA (eaaGround);
+		OTCAccountingModus otcAccountingModusFVAFDA =
+			new OTCAccountingModusFVAFDA (groundExposureAdjustmentAggregator);
 
-		OTCAccountingPolicy oapFCAFBA = oasFCAFBA.feePolicy (eaaExpanded);
+		OTCAccountingPolicy fcafbaOTCAccountingPolicy =
+			otcAccountingModusFCAFBA.feePolicy (expandedExposureAdjustmentAggregator);
 
-		OTCAccountingPolicy oapFVAFDA = oasFVAFDA.feePolicy (eaaExpanded);
+		OTCAccountingPolicy fvafdaOTCAccountingPolicy =
+			otcAccountingModusFVAFDA.feePolicy (expandedExposureAdjustmentAggregator);
 
 		System.out.println();
 
-		System.out.println (
-			"\t||---------------------------------------------------------------------||"
-		);
+		System.out.println ("\t||---------------------------------------------------------------------||");
 
-		System.out.println (strHeader);
+		System.out.println (header);
 
-		System.out.println (
-			"\t||---------------------------------------------------------------------||"
-		);
+		System.out.println ("\t||---------------------------------------------------------------------||");
 
-		System.out.println (
-			"\t|| L -> R:                                                             ||"
-		);
+		System.out.println ("\t|| L -> R:                                                             ||");
 
-		System.out.println (
-			"\t||         - Accounting Type (FCA/FBA vs. FVA/FDA)                     ||"
-		);
+		System.out.println ("\t||         - Accounting Type (FCA/FBA vs. FVA/FDA)                     ||");
 
-		System.out.println (
-			"\t||         - Contra Asset Adjustment                                   ||"
-		);
+		System.out.println ("\t||         - Contra Asset Adjustment                                   ||");
 
-		System.out.println (
-			"\t||         - Contra Liability Adjustment                               ||"
-		);
+		System.out.println ("\t||         - Contra Liability Adjustment                               ||");
+
+		System.out.println ("\t||         - FTP (Funding Transfer Pricing) (bp)                       ||");
+
+		System.out.println ("\t||         - CET1 (Common Equity Tier I) Change (bp)                   ||");
+
+		System.out.println ("\t||         - CL (Contra Liability) Change (bp)                         ||");
+
+		System.out.println ("\t||         - PFV (Porfolio Value) Change (Income) (bp)                 ||");
+
+		System.out.println ("\t||---------------------------------------------------------------------||");
 
 		System.out.println (
-			"\t||         - FTP (Funding Transfer Pricing) (bp)                       ||"
-		);
-
-		System.out.println (
-			"\t||         - CET1 (Common Equity Tier I) Change (bp)                   ||"
-		);
-
-		System.out.println (
-			"\t||         - CL (Contra Liability) Change (bp)                         ||"
-		);
-
-		System.out.println (
-			"\t||         - PFV (Porfolio Value) Change (Income) (bp)                 ||"
-		);
-
-		System.out.println (
-			"\t||---------------------------------------------------------------------||"
-		);
-
-		System.out.println ("\t|| FCA/FBA Accounting => " +
-			FormatUtil.FormatDouble (oasFCAFBA.contraAssetAdjustment(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (oasFCAFBA.contraLiabilityAdjustment(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (oapFCAFBA.fundingTransferPricing(), 3, 0, 10000.) + " | " +
-			FormatUtil.FormatDouble (oapFCAFBA.cet1Change(), 3, 0, 10000.) + " | " +
-			FormatUtil.FormatDouble (oapFCAFBA.contraLiabilityChange(), 3, 0, 10000.) + " | " +
-			FormatUtil.FormatDouble (oapFCAFBA.portfolioValueChange(), 3, 0, 10000.) + " || "
-		);
-
-		System.out.println ("\t|| FVA/FDA Accounting => " +
-			FormatUtil.FormatDouble (oasFVAFDA.contraAssetAdjustment(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (oasFVAFDA.contraLiabilityAdjustment(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (oapFVAFDA.fundingTransferPricing(), 3, 0, 10000.) + " | " +
-			FormatUtil.FormatDouble (oapFVAFDA.cet1Change(), 3, 0, 10000.) + " | " +
-			FormatUtil.FormatDouble (oapFVAFDA.contraLiabilityChange(), 3, 0, 10000.) + " | " +
-			FormatUtil.FormatDouble (oapFVAFDA.portfolioValueChange(), 3, 0, 10000.) + " || "
+			"\t|| FCA/FBA Accounting => " + FormatUtil.FormatDouble (
+				otcAccountingModusFCAFBA.contraAssetAdjustment(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				otcAccountingModusFCAFBA.contraLiabilityAdjustment(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				fcafbaOTCAccountingPolicy.fundingTransferPricing(),
+				3,
+				0,
+				10000.
+			) + " | " + FormatUtil.FormatDouble (
+				fcafbaOTCAccountingPolicy.cet1Change(),
+				3,
+				0,
+				10000.
+			) + " | " + FormatUtil.FormatDouble (
+				fcafbaOTCAccountingPolicy.contraLiabilityChange(),
+				3,
+				0,
+				10000.
+			) + " | " + FormatUtil.FormatDouble (
+				fcafbaOTCAccountingPolicy.portfolioValueChange(),
+				3,
+				0,
+				10000.
+			) + " || "
 		);
 
 		System.out.println (
-			"\t||---------------------------------------------------------------------||"
+			"\t|| FVA/FDA Accounting => " + FormatUtil.FormatDouble (
+				otcAccountingModusFVAFDA.contraAssetAdjustment(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				otcAccountingModusFVAFDA.contraLiabilityAdjustment(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				fvafdaOTCAccountingPolicy.fundingTransferPricing(),
+				3,
+				0,
+				10000.
+			) + " | " + FormatUtil.FormatDouble (
+				fvafdaOTCAccountingPolicy.cet1Change(),
+				3,
+				0,
+				10000.
+			) + " | " + FormatUtil.FormatDouble (
+				fvafdaOTCAccountingPolicy.contraLiabilityChange(),
+				3,
+				0,
+				10000.
+			) + " | " + FormatUtil.FormatDouble (
+				fvafdaOTCAccountingPolicy.portfolioValueChange(),
+				3,
+				0,
+				10000.
+			) + " || "
 		);
+
+		System.out.println ("\t||---------------------------------------------------------------------||");
 
 		System.out.println();
 	}
@@ -970,53 +1000,50 @@ public class CollateralizedCollateralReceivableStochastic
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		ExposureAdjustmentAggregator[] aEAA = Mix (
-			5.,
-			0.,
-			100.,
-			5.,
-			-0.05,
-			1.
-		);
+		ExposureAdjustmentAggregator[] exposureAdjustmentAggregatorArray = Mix (5., 0., 100., 5., -0.05, 1.);
 
-		ExposureAdjustmentAggregator eaaGround = aEAA[0];
-		ExposureAdjustmentAggregator eaaExtended = aEAA[1];
+		ExposureAdjustmentAggregator extendedExposureAdjustmentAggregator =
+			exposureAdjustmentAggregatorArray[1];
+		ExposureAdjustmentAggregator groundExposureAdjustmentAggregator =
+			exposureAdjustmentAggregatorArray[0];
 
-		ExposureAdjustmentDigest eadGround = eaaGround.digest();
+		ExposureAdjustmentDigest groundExposureAdjustmentDigest =
+			groundExposureAdjustmentAggregator.digest();
 
-		ExposureAdjustmentDigest eadExtended = eaaExtended.digest();
+		ExposureAdjustmentDigest extendedExposureAdjustmentDigest =
+			extendedExposureAdjustmentAggregator.digest();
 
 		CPGDDump (
 			"\t||                                        GROUND BOOK ADJUSTMENT METRICS                                        ||",
-			eadGround
+			groundExposureAdjustmentDigest
 		);
 
 		CPGDDump (
 			"\t||                                       EXTENDED BOOK ADJUSTMENT METRICS                                       ||",
-			eadExtended
+			extendedExposureAdjustmentDigest
 		);
 
 		CPGDDiffDump (
 			"\t||                                   TRADE INCREMENT ADJUSTMENT METRICS (bp)                                    ||",
-			eadGround,
-			eadExtended
+			groundExposureAdjustmentDigest,
+			extendedExposureAdjustmentDigest
 		);
 
 		BaselAccountingMetrics (
 			"\t||           ALBANESE & ANDERSEN (2015) BCBS OTC ACCOUNTING            ||",
-			eaaGround,
-			eaaExtended
+			groundExposureAdjustmentAggregator,
+			extendedExposureAdjustmentAggregator
 		);
 
 		EnvManager.TerminateEnv();
