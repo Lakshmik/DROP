@@ -144,7 +144,7 @@ import org.drip.state.identifier.FundingLabel;
  * 		<li>Evolve the Latent State and return the LSQM Curve Update</li>
  * 		<li>Simulate the Principal Metric from the Start to the End Date</li>
  * 		<li>Construct an Array of Forward Curves that Result from the Simulation</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

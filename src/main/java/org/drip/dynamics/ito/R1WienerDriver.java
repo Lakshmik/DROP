@@ -120,7 +120,7 @@ import org.drip.numerical.common.NumberUtil;
  * 		<li><i>R1WienerDriver</i> Constructor</li>
  * 		<li>Retrieve the Square Root of the Time Width</li>
  * 		<li>Emit the Random Sequence Array</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

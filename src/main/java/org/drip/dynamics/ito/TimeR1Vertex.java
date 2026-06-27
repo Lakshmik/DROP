@@ -120,6 +120,7 @@ import org.drip.numerical.common.NumberUtil;
  * 		<li><i>TimeR1Vertex</i> Constructor</li>
  * 		<li>Retrieve the Time Instant</li>
  * 		<li>Retrieve the Variate</li>
+ * </ul>
  *  
  *	<br>
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">

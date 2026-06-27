@@ -21,6 +21,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -97,75 +105,122 @@ import org.drip.state.identifier.*;
 
 /**
  * <i>MultiFactorQMDynamics</i> demonstrates the Construction and Usage of the 3-Factor Gaussian Model
- * Dynamics for the Evolution of the Discount Factor Quantification Metrics - the Instantaneous Forward Rate,
- * the LIBOR Forward Rate, the Shifted LIBOR Forward Rate, the Short Rate, the Compounded Short Rate, and the
- * Price.
+ * 	Dynamics for the Evolution of the Discount Factor Quantification Metrics - the Instantaneous Forward
+ *  Rate, the LIBOR Forward Rate, the Shifted LIBOR Forward Rate, the Short Rate, the Compounded Short Rate,
+ *  and the Price.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/hjm/README.md">HJM Multi-Factor Principal Dynamics</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/hjm/README.md">HJM Multi-Factor Principal Dynamics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiFactorQMDynamics {
+public class MultiFactorQMDynamics
+{
 
 	private static final MarketSurface FlatVolatilitySurface (
-		final JulianDate dtStart,
-		final String strCurrency,
-		final double dblFlatVol)
+		final JulianDate startDate,
+		final String currency,
+		final double flatVolatility)
 		throws Exception
 	{
+		JulianDate startDatePlus2Y = startDate.addYears (2);
+
+		JulianDate startDatePlus4Y = startDate.addYears (4);
+
+		JulianDate startDatePlus6Y = startDate.addYears (6);
+
+		JulianDate startDatePlus8Y = startDate.addYears (8);
+
+		JulianDate startDatePlus10Y = startDate.addYears (10);
+
 		return ScenarioMarketSurfaceBuilder.CustomSplineWireSurface (
 			"VIEW_TARGET_VOLATILITY_SURFACE",
-			dtStart,
-			strCurrency,
+			startDate,
+			currency,
 			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
+				startDate.julian(),
+				startDatePlus2Y.julian(),
+				startDatePlus4Y.julian(),
+				startDatePlus6Y.julian(),
+				startDatePlus8Y.julian(),
+				startDatePlus10Y.julian()
 			},
 			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
+				startDate.julian(),
+				startDatePlus2Y.julian(),
+				startDatePlus4Y.julian(),
+				startDatePlus6Y.julian(),
+				startDatePlus8Y.julian(),
+				startDatePlus10Y.julian()
 			},
 			new double[][] {
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
 			},
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			)
@@ -173,245 +228,287 @@ public class MultiFactorQMDynamics {
 	}
 
 	private static final MultiFactorStateEvolver HJMInstance (
-		final JulianDate dtStart,
-		final String strCurrency,
-		final String strTenor,
-		final MarketSurface mktSurfFlatVol1,
-		final MarketSurface mktSurfFlatVol2,
-		final MarketSurface mktSurfFlatVol3,
-		final R1ToR1 auForwardRate)
+		final JulianDate startDate,
+		final String currency,
+		final String tenor,
+		final MarketSurface flatVolatilityMarketSurface1,
+		final MarketSurface flatVolatilityMarketSurface2,
+		final MarketSurface flatVolatilityMarketSurface3,
+		final R1ToR1 forwardRateFunction)
 		throws Exception
 	{
-		MultiFactorVolatility mfv = new MultiFactorVolatility (
-			new MarketSurface[] {
-				mktSurfFlatVol1,
-				mktSurfFlatVol2,
-				mktSurfFlatVol3
-			},
-			new PrincipalFactorSequenceGenerator (
-				new UnivariateSequenceGenerator[] {
-					new BoxMullerGaussian (
-						0.,
-						1.
-					),
-					new BoxMullerGaussian (
-						0.,
-						1.
-					),
-					new BoxMullerGaussian (
-						0.,
-						1.
-					)
-				},
-				new double[][] {
-					{1.0, 0.1, 0.2},
-					{0.1, 1.0, 0.2},
-					{0.2, 0.1, 1.0}
-				},
-				3
-			)
-		);
-
 		return new MultiFactorStateEvolver (
-			FundingLabel.Standard (strCurrency),
-			ForwardLabel.Create (
-				strCurrency,
-				strTenor
+			FundingLabel.Standard (currency),
+			ForwardLabel.Create (currency, tenor),
+			new MultiFactorVolatility (
+				new MarketSurface[] {
+					flatVolatilityMarketSurface1,
+					flatVolatilityMarketSurface2,
+					flatVolatilityMarketSurface3
+				},
+				new PrincipalFactorSequenceGenerator (
+					new UnivariateSequenceGenerator[] {
+						new BoxMullerGaussian (0., 1.),
+						new BoxMullerGaussian (0., 1.),
+						new BoxMullerGaussian (0., 1.)
+					},
+					new double[][] {
+						{1.0, 0.1, 0.2},
+						{0.1, 1.0, 0.2},
+						{0.2, 0.1, 1.0}
+					},
+					3
+				)
 			),
-			mfv,
-			auForwardRate
+			forwardRateFunction
 		);
 	}
 
 	private static final ShortForwardRateUpdate InitQMSnap (
-		final JulianDate dtStart,
-		final String strCurrency,
+		final JulianDate startDate,
+		final String currency,
 		final String strViewTenor,
-		final String strTenor,
-		final double dblInitialForwardRate,
-		final double dblInitialPrice)
+		final String tenor,
+		final double initialForwardRate,
+		final double initialPrice)
 		throws Exception
 	{
 		return ShortForwardRateUpdate.Create (
-			FundingLabel.Standard (strCurrency),
-			ForwardLabel.Create (
-				strCurrency,
-				strTenor
-			),
-			dtStart.julian(),
-			dtStart.julian(),
-			dtStart.addTenor (strViewTenor).julian(),
-			dblInitialForwardRate,
+			FundingLabel.Standard (currency),
+			ForwardLabel.Create (currency, tenor),
+			startDate.julian(),
+			startDate.julian(),
+			startDate.addTenor (strViewTenor).julian(),
+			initialForwardRate,
 			0.,
-			dblInitialForwardRate,
+			initialForwardRate,
 			0.,
-			dblInitialForwardRate + (365.25 / Helper.TenorToDays (strTenor)),
+			initialForwardRate + (365.25 / Helper.TenorToDays (tenor)),
 			0.,
-			dblInitialForwardRate,
+			initialForwardRate,
 			0.,
-			dblInitialForwardRate,
+			initialForwardRate,
 			0.,
-			dblInitialPrice,
+			initialPrice,
 			0.
 		);
 	}
 
 	private static final void QMEvolution (
-		final MultiFactorStateEvolver hjm,
-		final JulianDate dtStart,
-		final String strCurrency,
-		final String strViewTenor,
-		final ShortForwardRateUpdate qmInitial)
+		final MultiFactorStateEvolver hjmMultiFactorStateEvolver,
+		final JulianDate startDate,
+		final String currency,
+		final String viewTenor,
+		final ShortForwardRateUpdate initialShortForwardRateUpdate)
 		throws Exception
 	{
-		int iViewDate = dtStart.addTenor (strViewTenor).julian();
+		int viewDate = startDate.addTenor (viewTenor).julian();
 
-		int iDayStep = 2;
-		ShortForwardRateUpdate qm = qmInitial;
-		JulianDate dtSpot = dtStart;
+		int dayStep = 2;
+		JulianDate spotDate = startDate;
+		ShortForwardRateUpdate shortForwardRateUpdate = initialShortForwardRateUpdate;
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                                                                                                               ||");
+		System.out.println (
+			"\t|                                                                                                                               ||"
+		);
 
-		System.out.println ("\t|    3-Factor Gaussian HJM Quantification Metric Run                                                                            ||");
+		System.out.println (
+			"\t|    3-Factor Gaussian HJM Quantification Metric Run                                                                            ||"
+		);
 
-		System.out.println ("\t|    -----------------------------------------------                                                                            ||");
+		System.out.println (
+			"\t|    -----------------------------------------------                                                                            ||"
+		);
 
-		System.out.println ("\t|                                                                                                                               ||");
+		System.out.println (
+			"\t|                                                                                                                               ||"
+		);
 
-		System.out.println ("\t|        L->R:                                                                                                                  ||");
+		System.out.println (
+			"\t|        L->R:                                                                                                                  ||"
+		);
 
-		System.out.println ("\t|            Date                                                                                                               ||");
+		System.out.println (
+			"\t|            Date                                                                                                               ||"
+		);
 
-		System.out.println ("\t|            Instantaneous Forward Rate (%)                                                                                     ||");
+		System.out.println (
+			"\t|            Instantaneous Forward Rate (%)                                                                                     ||"
+		);
 
-		System.out.println ("\t|            Instantaneous Forward Rate - Change (%)                                                                            ||");
+		System.out.println (
+			"\t|            Instantaneous Forward Rate - Change (%)                                                                            ||"
+		);
 
-		System.out.println ("\t|            LIBOR Forward Rate (%)                                                                                             ||");
+		System.out.println (
+			"\t|            LIBOR Forward Rate (%)                                                                                             ||"
+		);
 
-		System.out.println ("\t|            LIBOR Forward Rate - Change (%)                                                                                    ||");
+		System.out.println (
+			"\t|            LIBOR Forward Rate - Change (%)                                                                                    ||"
+		);
 
-		System.out.println ("\t|            Shifted LIBOR Forward Rate (%)                                                                                     ||");
+		System.out.println (
+			"\t|            Shifted LIBOR Forward Rate (%)                                                                                     ||"
+		);
 
-		System.out.println ("\t|            Shifted LIBOR Forward Rate - Change (%)                                                                            ||");
+		System.out.println (
+			"\t|            Shifted LIBOR Forward Rate - Change (%)                                                                            ||"
+		);
 
-		System.out.println ("\t|            Short Rate (%)                                                                                                     ||");
+		System.out.println (
+			"\t|            Short Rate (%)                                                                                                     ||"
+		);
 
-		System.out.println ("\t|            Short Rate - Change (%)                                                                                            ||");
+		System.out.println (
+			"\t|            Short Rate - Change (%)                                                                                            ||"
+		);
 
-		System.out.println ("\t|            Continuously Compounded Short Rate (%)                                                                             ||");
+		System.out.println (
+			"\t|            Continuously Compounded Short Rate (%)                                                                             ||"
+		);
 
-		System.out.println ("\t|            Continuously Compounded Short Rate - Change (%)                                                                    ||");
+		System.out.println (
+			"\t|            Continuously Compounded Short Rate - Change (%)                                                                    ||"
+		);
 
-		System.out.println ("\t|            Price                                                                                                              ||");
+		System.out.println (
+			"\t|            Price                                                                                                              ||"
+		);
 
-		System.out.println ("\t|            Price - Change                                                                                                     ||");
+		System.out.println (
+			"\t|            Price - Change                                                                                                     ||"
+		);
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		while (dtSpot.julian() < iViewDate) {
-			int iSpotDate = dtSpot.julian();
+		while (spotDate.julian() < viewDate) {
+			int spotDateJulian = spotDate.julian();
 
-			qm = (ShortForwardRateUpdate) hjm.evolve (
-				iSpotDate,
-				iViewDate,
-				iDayStep,
-				qm
+			shortForwardRateUpdate = (ShortForwardRateUpdate) hjmMultiFactorStateEvolver.evolve (
+				spotDateJulian,
+				viewDate,
+				dayStep,
+				shortForwardRateUpdate
 			);
 
-			System.out.println ("\t| [" + dtSpot + "] = " +
-				FormatUtil.FormatDouble (qm.instantaneousForwardRate(), 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (qm.instantaneousForwardRateIncrement(), 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (qm.liborForwardRate(), 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (qm.liborForwardRateIncrement(), 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (qm.shiftedLIBORForwardRate(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (qm.shiftedLIBORForwardRateIncrement(), 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (qm.shortRate(), 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (qm.shortRateIncrement(), 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (qm.compoundedShortRate(), 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (qm.compoundedShortRateIncrement(), 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (qm.price(), 2, 2, 100.) + " | " +
-				FormatUtil.FormatDouble (qm.priceIncrement(), 1, 2, 100.) + " || "
+			System.out.println (
+				"\t| [" + spotDate + "] = " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.instantaneousForwardRate(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.instantaneousForwardRateIncrement(),
+					1,
+					2,
+					100.
+				) + "% || " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.liborForwardRate(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.liborForwardRateIncrement(),
+					1,
+					2,
+					100.
+				) + "% || " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.shiftedLIBORForwardRate(),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.shiftedLIBORForwardRateIncrement(),
+					1,
+					2,
+					100.
+				) + "% || " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.shortRate(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.shortRateIncrement(),
+					1,
+					2,
+					100.
+				) + "% || " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.compoundedShortRate(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.compoundedShortRateIncrement(),
+					1,
+					2,
+					100.
+				) + "% || " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.price(),
+					2,
+					2,
+					100.
+				) + " | " + FormatUtil.FormatDouble (
+					shortForwardRateUpdate.priceIncrement(),
+					1,
+					2,
+					100.
+				) + " || "
 			);
 
-			dtSpot = dtSpot.addBusDays (
-				iDayStep,
-				strCurrency
-			);
+			spotDate = spotDate.addBusDays (dayStep, currency);
 		}
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------||"
+		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
-		double dblFlatVol1 = 0.007;
-		double dblFlatVol2 = 0.009;
-		double dblFlatVol3 = 0.004;
-		double dblFlatForwardRate = 0.05;
-		double dblInitialPrice = 0.9875;
-		String strViewTenor = "3M";
-		String strTenor = "6M";
+		String tenor = "6M";
+		String currency = "USD";
+		String viewTenor = "3M";
+		double initialPrice = 0.9875;
+		double flatForwardRate = 0.05;
+		double flatVolatility1 = 0.007;
+		double flatVolatility2 = 0.009;
+		double flatVolatility3 = 0.004;
 
-		JulianDate dtSpot = DateUtil.Today();
-
-		MarketSurface mktSurfFlatVol1 = FlatVolatilitySurface (
-			dtSpot,
-			strCurrency,
-			dblFlatVol1
-		);
-
-		MarketSurface mktSurfFlatVol2 = FlatVolatilitySurface (
-			dtSpot,
-			strCurrency,
-			dblFlatVol2
-		);
-
-		MarketSurface mktSurfFlatVol3 = FlatVolatilitySurface (
-			dtSpot,
-			strCurrency,
-			dblFlatVol3
-		);
-
-		MultiFactorStateEvolver hjm = HJMInstance (
-			dtSpot,
-			strCurrency,
-			strTenor,
-			mktSurfFlatVol1,
-			mktSurfFlatVol2,
-			mktSurfFlatVol3,
-			new Flat (dblFlatForwardRate)
-		);
-
-		ShortForwardRateUpdate qmInitial = InitQMSnap (
-			dtSpot,
-			strCurrency,
-			strViewTenor,
-			strTenor,
-			dblFlatForwardRate,
-			dblInitialPrice
-		);
+		JulianDate spotDate = DateUtil.Today();
 
 		QMEvolution (
-			hjm,
-			dtSpot,
-			strCurrency,
-			strViewTenor,
-			qmInitial
+			HJMInstance (
+				spotDate,
+				currency,
+				tenor,
+				FlatVolatilitySurface (spotDate, currency, flatVolatility1),
+				FlatVolatilitySurface (spotDate, currency, flatVolatility2),
+				FlatVolatilitySurface (spotDate, currency, flatVolatility3),
+				new Flat (flatForwardRate)
+			),
+			spotDate,
+			currency,
+			viewTenor,
+			InitQMSnap (spotDate, currency, viewTenor, tenor, flatForwardRate, initialPrice)
 		);
 
 		EnvManager.TerminateEnv();

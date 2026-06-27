@@ -122,7 +122,7 @@ import org.drip.dynamics.meanreverting.CKLSParameters;
  *  <ul>
  * 		<li><i>R1FokkerPlanckCKLS</i> Constructor</li>
  * 		<li>Retrieve the CKLS Parameters</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

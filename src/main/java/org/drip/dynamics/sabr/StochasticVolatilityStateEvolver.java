@@ -94,15 +94,25 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /**
- * <i>StochasticVolatilityStateEvolver</i> provides the SABR Stochastic Volatility Evolution Dynamics.
+ * <i>StochasticVolatilityStateEvolver</i> provides the SABR Stochastic Volatility Evolution Dynamics. It
+ * 	provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/sabr/README.md">SABR Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li><i>StochasticVolatilityStateEvolver</i> Constructor</li>
+ * 		<li>Retrieve the <i>ForwardProcessSetting</i> Instance</li>
+ * 		<li>Retrieve the Forward Label</li>
+ * 		<li>Retrieve the Forward Univariate Random Variable Generator Sequence</li>
+ * 		<li>Retrieve the Forward Volatility Univariate Random Variable Generator Sequence</li>
+ * 		<li>Evolve the Latent State and return the LSQM Point Update</li>
+ *	</ul>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/sabr/README.md">SABR Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -122,8 +132,8 @@ public class StochasticVolatilityStateEvolver
 	 * @param forwardLabel The Forward Rate Latent State Label
 	 * @param forwardProcessSetting <i>ForwardProcessSetting</i> Instance
 	 * @param forwardUnivariateSequenceGenerator The Forward Rate Univariate Sequence Generator
-	 * @param forwardVolatilityUnivariateSequenceGenerator The Idiosyncratic Component Forward Rate
-	 * 		Volatility Univariate Sequence Generator
+	 * @param forwardVolatilityUnivariateSequenceGenerator
+	 * 	The Idiosyncratic Component Forward Rate Volatility Univariate Sequence Generator
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */

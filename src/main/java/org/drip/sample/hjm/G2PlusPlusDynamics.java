@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,68 +97,63 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>G2PlusPlusDynamics</i> demonstrates the Construction and Usage of the G2++ 2-Factor HJM Model Dynamics
- * for the Evolution of the Short Rate.
+ * 	for the Evolution of the Short Rate.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/hjm/README.md">HJM Multi-Factor Principal Dynamics</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/hjm/README.md">HJM Multi-Factor Principal Dynamics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class G2PlusPlusDynamics {
+public class G2PlusPlusDynamics
+{
 
 	private static final G2PlusPlus G2PlusPlusEvolver (
-		final double dblSigma,
-		final double dblA,
-		final double dblEta,
-		final double dblB,
-		final double dblRho,
-		final double dblStartingForwardRate)
+		final double sigma,
+		final double a,
+		final double eta,
+		final double b,
+		final double rho,
+		final double startingForwardRate)
 		throws Exception
 	{
 		return new G2PlusPlus (
-			dblSigma,
-			dblA,
-			dblEta,
-			dblB,
+			sigma,
+			a,
+			eta,
+			b,
 			new UnivariateSequenceGenerator[] {
-				new BoxMullerGaussian (
-					0.,
-					1.
-				),
-				new BoxMullerGaussian (
-					0.,
-					1.
-				)
+				new BoxMullerGaussian (0., 1.),
+				new BoxMullerGaussian (0., 1.)
 			},
-			dblRho,
-			new Flat (dblStartingForwardRate)
+			rho,
+			new Flat (startingForwardRate)
 		);
 	}
 
 	private static final void ShortRateEvolution (
-		final G2PlusPlus g2pp,
-		final JulianDate dtStart,
-		final String strCurrency,
-		final String strViewTenor,
+		final G2PlusPlus g2PlusPlus,
+		final JulianDate startDate,
+		final String currency,
+		final String viewTenor,
 		final double dblStartingShortRate)
 		throws Exception
 	{
-		int iDayStep = 2;
-		double dblX = 0.;
-		double dblY = 0.;
-		JulianDate dtSpot = dtStart;
-		double dblShortRate = dblStartingShortRate;
+		double x = 0.;
+		double y = 0.;
+		int dayStep = 2;
+		JulianDate spotDate = startDate;
+		double shortRate = dblStartingShortRate;
 
-		int iStartDate = dtStart.julian();
+		int startDateJulian = startDate.julian();
 
-		int iEndDate = dtStart.addTenor (strViewTenor).julian();
+		int endDateJulian = startDate.addTenor (viewTenor).julian();
 
 		System.out.println ("\t|-----------------------------------------------------------------------||");
 
@@ -180,47 +183,31 @@ public class G2PlusPlusDynamics {
 
 		System.out.println ("\t|-----------------------------------------------------------------------||");
 
-		while (dtSpot.julian() < iEndDate) {
-			int iSpotDate = dtSpot.julian();
+		while (spotDate.julian() < endDateJulian) {
+			int spotDateJulian = spotDate.julian();
 
-			double dblDeltaX = g2pp.deltaX (
-				iStartDate,
-				iSpotDate,
-				dblX,
-				iDayStep
+			double deltaX = g2PlusPlus.deltaX (startDateJulian, spotDateJulian, x, dayStep);
+
+			x += deltaX;
+
+			double deltaY = g2PlusPlus.deltaY (startDateJulian, spotDateJulian, y, dayStep);
+
+			y += deltaY;
+
+			double phi = g2PlusPlus.phi (startDateJulian, spotDateJulian);
+
+			shortRate = x + y + phi;
+
+			System.out.println ("\t| [" + spotDate + "] = " +
+				FormatUtil.FormatDouble (x, 1, 2, 100.) + "% | " +
+				FormatUtil.FormatDouble (deltaX, 1, 2, 100.) + "% || " +
+				FormatUtil.FormatDouble (y, 1, 2, 100.) + "% | " +
+				FormatUtil.FormatDouble (deltaY, 1, 2, 100.) + "% || " +
+				FormatUtil.FormatDouble (phi, 1, 2, 100.) + "% || " +
+				FormatUtil.FormatDouble (shortRate, 1, 2, 100.) + "% || "
 			);
 
-			dblX += dblDeltaX;
-
-			double dblDeltaY = g2pp.deltaY (
-				iStartDate,
-				iSpotDate,
-				dblY,
-				iDayStep
-			);
-
-			dblY += dblDeltaY;
-
-			double dblPhi = g2pp.phi (
-				iStartDate,
-				iSpotDate
-			);
-
-			dblShortRate = dblX + dblY + dblPhi;
-
-			System.out.println ("\t| [" + dtSpot + "] = " +
-				FormatUtil.FormatDouble (dblX, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblDeltaX, 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (dblY, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblDeltaY, 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (dblPhi, 1, 2, 100.) + "% || " +
-				FormatUtil.FormatDouble (dblShortRate, 1, 2, 100.) + "% || "
-			);
-
-			dtSpot = dtSpot.addBusDays (
-				iDayStep,
-				strCurrency
-			);
+			spotDate = spotDate.addBusDays (dayStep, currency);
 		}
 
 		System.out.println ("\t|-----------------------------------------------------------------------||");
@@ -229,42 +216,33 @@ public class G2PlusPlusDynamics {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
-		String strCurrency = "USD";
-		double dblStartingShortRate = 0.05;
-		double dblSigma = 0.05;
-		double dblA = 0.5;
-		double dblEta = 0.05;
-		double dblB = 0.5;
-		double dblRho = 0.5;
-
-		G2PlusPlus g2pp = G2PlusPlusEvolver (
-			dblSigma,
-			dblA,
-			dblEta,
-			dblB,
-			dblRho,
-			dblStartingShortRate
-		);
+		double startingShortRate = 0.05;
+		String currency = "USD";
+		double sigma = 0.05;
+		double eta = 0.05;
+		double rho = 0.5;
+		double b = 0.5;
+		double a = 0.5;
 
 		ShortRateEvolution (
-			g2pp,
-			dtSpot,
-			strCurrency,
+			G2PlusPlusEvolver (sigma, a, eta, b, rho, startingShortRate),
+			spotDate,
+			currency,
 			"4M",
-			dblStartingShortRate
+			startingShortRate
 		);
 
 		EnvManager.TerminateEnv();

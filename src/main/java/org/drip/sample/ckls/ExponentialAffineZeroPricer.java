@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,14 +116,15 @@ import org.drip.service.env.EnvManager;
  * 				https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation
  * 		</li>
  *  </ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/ckls/README.md">Analysis of CKLS Process Variants</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/ckls/README.md">Analysis of CKLS Process Variants</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -134,39 +143,39 @@ public class ExponentialAffineZeroPricer
 		);
 
 		System.out.println (
-			"\t|      Mean Reversion Speed => " + r1CIRStochasticEvolver.cklsParameters().meanReversionSpeed()
+			"\t|      Mean Reversion Speed => " +
+				r1CIRStochasticEvolver.cklsParameters().meanReversionSpeed()
 		);
 
 		System.out.println (
-			"\t|      Mean Reversion Level => " + r1CIRStochasticEvolver.cklsParameters().meanReversionLevel()
+			"\t|      Mean Reversion Level => " +
+				r1CIRStochasticEvolver.cklsParameters().meanReversionLevel()
 		);
 
 		System.out.println (
-			"\t|      Volatility           => " + r1CIRStochasticEvolver.cklsParameters().volatilityCoefficient()
+			"\t|      Volatility           => " +
+				r1CIRStochasticEvolver.cklsParameters().volatilityCoefficient()
 		);
 
 		System.out.println (
 			"\t|--------------------------------------------------------------------------------------------------||"
 		);
 
-		for (double ttm : ttmArray)
-		{
+		for (double ttm : ttmArray) {
 			ExponentialAffineZeroCoefficients exponentialAffineZeroCoefficients =
-				ExponentialAffineZeroCoefficients.FromCIR (
-					r1CIRStochasticEvolver,
-					ttm
-				);
+				ExponentialAffineZeroCoefficients.FromCIR (r1CIRStochasticEvolver, ttm);
 
 			String dump = "\t|" + FormatUtil.FormatDouble (ttm, 1, 1, 1.) + " => {" +
 				FormatUtil.FormatDouble (exponentialAffineZeroCoefficients.a(), 2, 2, 1.) + " | " +
 				FormatUtil.FormatDouble (exponentialAffineZeroCoefficients.b(), 2, 2, 1.) + "}  "; 
 
-			for (double rate : rateArray)
-			{
+			for (double rate : rateArray) {
 				dump = dump + " " + FormatUtil.FormatDouble (
-					exponentialAffineZeroCoefficients.price (
-						rate
-					), 2, 3, 100., false
+					exponentialAffineZeroCoefficients.price (rate),
+					2,
+					3,
+					100.,
+					false
 				) + " |";
 			}
 
@@ -192,9 +201,7 @@ public class ExponentialAffineZeroPricer
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		double[] ttmArray =
 		{
@@ -244,12 +251,9 @@ public class ExponentialAffineZeroPricer
 			0.005,
 		};
 
-		for (double meanReversionLevel : meanReversionLevelArray)
-		{
-			for (double meanReversionSpeed : meanReversionSpeedArray)
-			{
-				for (double volatility : volatilityArray)
-				{
+		for (double meanReversionLevel : meanReversionLevelArray) {
+			for (double meanReversionSpeed : meanReversionSpeedArray) {
+				for (double volatility : volatilityArray) {
 					Price (
 						R1CIRStochasticEvolver.Wiener (
 							meanReversionSpeed,

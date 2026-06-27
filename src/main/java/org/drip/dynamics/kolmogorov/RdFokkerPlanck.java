@@ -131,7 +131,7 @@ import org.drip.numerical.linearalgebra.R1MatrixUtil;
  * 		<li>Compute the Next Incremental Time Derivative of the PDF</li>
  * 		<li>Compute the Temporal Probability Distribution Function, if any</li>
  * 		<li>Compute the Steady-State Probability Distribution Function, if any</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

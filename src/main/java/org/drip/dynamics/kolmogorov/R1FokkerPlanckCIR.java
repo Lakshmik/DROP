@@ -126,7 +126,7 @@ import org.drip.specialfunction.gamma.EulerIntegralSecondKind;
  * 		<li><i>R1FokkerPlanckCIR</i> Constructor</li>
  * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF #1</li>
  * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF #2</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

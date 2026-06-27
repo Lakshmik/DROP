@@ -31,6 +31,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -109,56 +117,55 @@ import org.drip.state.identifier.*;
 /**
  * <i>FRAStdCapFloor</i> demonstrates the creation, invocation, usage, and valuation of the FRA Cap/Floor.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/capfloor/README.md">FRA Standard Cap Floor Valuation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/capfloor/README.md">FRA Standard Cap Floor Valuation</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FRAStdCapFloor {
+public class FRAStdCapFloor
+{
 
 	private static final FixFloatComponent OTCFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
 	private static final FloatFloatComponent OTCFloatFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strDerivedTenor,
-		final String strMaturityTenor,
-		final double dblBasis)
+		final JulianDate spotDate,
+		final String currency,
+		final String derivedTenor,
+		final String maturityTenor,
+		final double basis)
 	{
-		FloatFloatSwapConvention ffConv = IBORFloatFloatContainer.ConventionFromJurisdiction (strCurrency);
-
-		return ffConv.createFloatFloatComponent (
-			dtSpot,
-			strDerivedTenor,
-			strMaturityTenor,
-			dblBasis,
+		return IBORFloatFloatContainer.ConventionFromJurisdiction (
+			currency
+		).createFloatFloatComponent (
+			spotDate,
+			derivedTenor,
+			maturityTenor,
+			basis,
 			1.
 		);
 	}
@@ -170,37 +177,31 @@ public class FRAStdCapFloor {
 	 */
 
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final int[] aiDay,
-		final int iNumFuture,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final int[] daysArray,
+		final int futuresCount,
+		final String currency)
 		throws Exception
 	{
-		CalibratableComponent[] aCalibComp = new CalibratableComponent[aiDay.length + iNumFuture];
+		CalibratableComponent[] calibratableComponentArray =
+			new CalibratableComponent[daysArray.length + futuresCount];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aCalibComp[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					strCurrency,
-					"3M"
-				)
+		for (int daysIndex = 0; daysIndex < daysArray.length; ++daysIndex)
+			calibratableComponentArray[daysIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (daysArray[daysIndex], currency),
+				ForwardLabel.Create (currency, "3M")
 			);
 
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtEffective,
-			iNumFuture,
-			strCurrency
-		);
+		CalibratableComponent[] edfCalibratableComponentArray =
+			SingleStreamComponentBuilder.ForwardRateFuturesPack (effectiveDate, futuresCount, currency);
 
-		for (int i = aiDay.length; i < aiDay.length + iNumFuture; ++i)
-			aCalibComp[i] = aEDF[i - aiDay.length];
+		for (int daysIndex = daysArray.length; daysIndex < daysArray.length + futuresCount; ++daysIndex) {
+			calibratableComponentArray[daysIndex] =
+				edfCalibratableComponentArray[daysIndex - daysArray.length];
+		}
 
-		return aCalibComp;
+		return calibratableComponentArray;
 	}
 
 	/*
@@ -210,23 +211,27 @@ public class FRAStdCapFloor {
 	 */
 
 	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] irsFixFloatComponentArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aIRS[i] = OTCFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityTenorIndex = 0;
+			maturityTenorIndex < maturityTenorArray.length;
+			++maturityTenorIndex)
+		{
+			irsFixFloatComponentArray[maturityTenorIndex] = OTCFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityTenorIndex],
+				couponArray[maturityTenorIndex]
 			);
+		}
 
-		return aIRS;
+		return irsFixFloatComponentArray;
 	}
 
 	/*
@@ -239,28 +244,42 @@ public class FRAStdCapFloor {
 	 */
 
 	private static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
 		/*
 		 * Construct the array of Deposit instruments and their quotes.
 		 */
 
-		CalibratableComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
+		CalibratableComponent[] depositComponentArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
 			new int[] {
-				1, 2, 3, 7, 14, 21, 30, 60
+				1,
+				2,
+				3,
+				7,
+				14,
+				21,
+				30,
+				60
 			},
 			0,
-			strCurrency
+			currency
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.01200, 0.01200, 0.01200, 0.01450, 0.01550, 0.01600, 0.01660, 0.01850
+		double[] depositQuoteArray = new double[] {
+			0.01200,
+			0.01200,
+			0.01200,
+			0.01450,
+			0.01550,
+			0.01600,
+			0.01660,
+			0.01850
 		};
 
-		String[] astrDepositManifestMeasure = new String[] {
+		String[] depositManifestMeasureArray = new String[] {
 			"ForwardRate",
 			"ForwardRate",
 			"ForwardRate",
@@ -275,7 +294,7 @@ public class FRAStdCapFloor {
 		 * Construct the array of Swap instruments and their quotes.
 		 */
 
-		double[] adblSwapQuote = new double[] {
+		double[] irsFixFloatComponentQuoteArray = new double[] {
 			0.02604,    //  4Y
 			0.02808,    //  5Y
 			0.02983,    //  6Y
@@ -293,7 +312,7 @@ public class FRAStdCapFloor {
 			0.03145     // 50Y
 		};
 
-		String[] astrSwapManifestMeasure = new String[] {
+		String[] irsFixFloatComponentManifestMeasureArray = new String[] {
 			"SwapRate",    //  4Y
 			"SwapRate",    //  5Y
 			"SwapRate",    //  6Y
@@ -311,13 +330,27 @@ public class FRAStdCapFloor {
 			"SwapRate"     // 50Y
 		};
 
-		CalibratableComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
+		CalibratableComponent[] irsFixFloatComponentArray = SwapInstrumentsFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[] {
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y"
 			},
-			adblSwapQuote
+			irsFixFloatComponentQuoteArray
 		);
 
 		/*
@@ -326,17 +359,13 @@ public class FRAStdCapFloor {
 
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
-			),
-			aDepositComp,
-			adblDepositQuote,
-			astrDepositManifestMeasure,
-			aSwapComp,
-			adblSwapQuote,
-			astrSwapManifestMeasure,
+			new ValuationParams (spotDate, spotDate, currency),
+			depositComponentArray,
+			depositQuoteArray,
+			depositManifestMeasureArray,
+			irsFixFloatComponentArray,
+			irsFixFloatComponentQuoteArray,
+			irsFixFloatComponentManifestMeasureArray,
 			false
 		);
 	}
@@ -348,69 +377,69 @@ public class FRAStdCapFloor {
 	 */
 
 	private static final FloatFloatComponent[] MakexM6MBasisSwap (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final int iTenorInMonths)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final int tenorInMonths)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFFC[i] = OTCFloatFloat (
-				dtSpot,
-				strCurrency,
-				iTenorInMonths + "M",
-				astrMaturityTenor[i],
+		for (int maturityTenorIndex = 0;
+			maturityTenorIndex < maturityTenorArray.length;
+			++maturityTenorIndex)
+		{
+			floatFloatComponentArray[maturityTenorIndex] = OTCFloatFloat (
+				spotDate,
+				currency,
+				tenorInMonths + "M",
+				maturityTenorArray[maturityTenorIndex],
 				0.
 			);
+		}
 
-		return aFFC;
+		return floatFloatComponentArray;
 	}
 
 	private static final ForwardCurve MakeFC (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final MergedDiscountForwardCurve dc,
-		final int iTenorInMonths,
-		final String[] astrxM6MFwdTenor,
-		final double[] adblxM6MBasisSwapQuote)
+		final JulianDate spotDate,
+		final String currency,
+		final MergedDiscountForwardCurve discountCurve,
+		final int tenorInMonths,
+		final String[] xM6MFwdTenorArray,
+		final double[] xM6MBasisSwapQuoteArray)
 		throws Exception
 	{
 		/*
 		 * Construct the 6M-xM float-float basis swap.
 		 */
 
-		FloatFloatComponent[] aFFC = MakexM6MBasisSwap (
-			dtSpot,
-			strCurrency,
-			astrxM6MFwdTenor,
-			iTenorInMonths
+		FloatFloatComponent[] floatFloatComponentArray = MakexM6MBasisSwap (
+			spotDate,
+			currency,
+			xM6MFwdTenorArray,
+			tenorInMonths
 		);
 
-		String strBasisTenor = iTenorInMonths + "M";
+		String basisTenor = tenorInMonths + "M";
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
 		/*
 		 * Calculate the starting forward rate off of the discount curve.
 		 */
 
-		double dblStartingFwd = dc.forward (
-			dtSpot.julian(),
-			dtSpot.addTenor (strBasisTenor).julian()
+		double startingForward = discountCurve.forward (
+			spotDate.julian(),
+			spotDate.addTenor (basisTenor).julian()
 		);
 
 		/*
 		 * Set the discount curve based component market parameters.
 		 */
 
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
 			null,
 			null,
 			null,
@@ -424,43 +453,55 @@ public class FRAStdCapFloor {
 		 */
 
 		return ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
-			"QUARTIC_FWD" + strBasisTenor,
-			ForwardLabel.Create (
-				strCurrency,
-				strBasisTenor
-			),
-			valParams,
+			"QUARTIC_FWD" + basisTenor,
+			ForwardLabel.Create (currency, basisTenor),
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null,
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (5),
-			aFFC,
+			floatFloatComponentArray,
 			"DerivedParBasisSpread",
-			adblxM6MBasisSwapQuote,
-			dblStartingFwd
+			xM6MBasisSwapQuoteArray,
+			startingForward
 		);
 	}
 
 	private static final Map<String, ForwardCurve> MakeFC (
-		final JulianDate dt,
-		final String strCurrency,
-		final MergedDiscountForwardCurve dc)
+		final JulianDate date,
+		final String currency,
+		final MergedDiscountForwardCurve discountCurve)
 		throws Exception
 	{
-		Map<String, ForwardCurve> mapFC = new HashMap<String, ForwardCurve>();
+		Map<String, ForwardCurve> forwardCurveMap = new HashMap<String, ForwardCurve>();
 
 		/*
 		 * Build and run the sampling for the 1M-6M Tenor Basis Swap from its instruments and quotes.
 		 */
 
-		ForwardCurve fc1M = MakeFC (
-			dt,
-			strCurrency,
-			dc,
+		ForwardCurve forwardCurve1M = MakeFC (
+			date,
+			currency,
+			discountCurve,
 			1,
 			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+				"1Y",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
 			},
 			new double[] {
 				0.00551,    //  1Y
@@ -482,22 +523,34 @@ public class FRAStdCapFloor {
 			}
 		);
 
-		mapFC.put (
-			"1M",
-			fc1M
-		);
+		forwardCurveMap.put ("1M", forwardCurve1M);
 
 		/*
 		 * Build and run the sampling for the 3M-6M Tenor Basis Swap from its instruments and quotes.
 		 */
 
-		ForwardCurve fc3M = MakeFC (
-			dt,
-			strCurrency,
-			dc,
+		ForwardCurve forwardCurve3M = MakeFC (
+			date,
+			currency,
+			discountCurve,
 			3,
 			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+				"1Y",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
 			},
 			new double[] {
 				0.00186,    //  1Y
@@ -519,23 +572,36 @@ public class FRAStdCapFloor {
 			}
 		);
 
-		mapFC.put (
-			"3M",
-			fc3M
-		);
+		forwardCurveMap.put ("3M", forwardCurve3M);
 
 		/*
 		 * Build and run the sampling for the 12M-6M Tenor Basis Swap from its instruments and quotes.
 		 */
 
-		ForwardCurve fc12M = MakeFC (
-			dt,
-			strCurrency,
-			dc,
+		ForwardCurve forwardCurve12M = MakeFC (
+			date,
+			currency,
+			discountCurve,
 			12,
 			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y",
-				"35Y", "40Y" // Extrapolated
+				"1Y",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"35Y",
+				"40Y" // Extrapolated
 			},
 			new double[] {
 				-0.00212,    //  1Y
@@ -559,60 +625,57 @@ public class FRAStdCapFloor {
 			}
 		);
 
-		mapFC.put (
-			"12M",
-			fc12M
-		);
+		forwardCurveMap.put ("12M", forwardCurve12M);
 
-		return mapFC;
+		return forwardCurveMap;
 	}
 
 	private static final void SetVolCorrelation (
-		final int iValueDate,
-		final CurveSurfaceQuoteContainer mktParams,
-		final ForwardLabel fri,
-		final double dblForwardVol,
-		final double dblFundingVol,
-		final double dblForwardFundingCorr)
+		final int valueDate,
+		final CurveSurfaceQuoteContainer curveSurfaceQuoteContainer,
+		final ForwardLabel forwardLabel,
+		final double forwardVolatility,
+		final double fundingVolatility,
+		final double forwardFundingCorrelation)
 		throws Exception
 	{
-		FundingLabel fundingLabel = FundingLabel.Standard (fri.currency());
+		FundingLabel fundingLabel = FundingLabel.Standard (forwardLabel.currency());
 
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				iValueDate,
-				VolatilityLabel.Standard (fri),
-				fri.currency(),
-				dblForwardVol
+				valueDate,
+				VolatilityLabel.Standard (forwardLabel),
+				forwardLabel.currency(),
+				forwardVolatility
 			)
 		);
 
-		mktParams.setFundingVolatility (
+		curveSurfaceQuoteContainer.setFundingVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				iValueDate,
+				valueDate,
 				VolatilityLabel.Standard (fundingLabel),
-				fri.currency(),
-				dblFundingVol
+				forwardLabel.currency(),
+				fundingVolatility
 			)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			forwardLabel,
 			fundingLabel,
-			new Flat (dblForwardFundingCorr)
+			new Flat (forwardFundingCorrelation)
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		/*
@@ -621,79 +684,50 @@ public class FRAStdCapFloor {
 
 		EnvManager.InitEnv ("");
 
-		double dblStrike = 0.02;
-		String strFRATenor = "3M";
-		String strCurrency = "USD";
-		String strMaturityTenor = "4Y";
-		String strManifestMeasure = "ParForward";
+		double strike = 0.02;
+		String currency = "USD";
+		String fraTenor = "3M";
+		String maturityTenor = "4Y";
+		String manifestMeasure = "ParForward";
 
-		JulianDate dtToday = DateUtil.Today().addTenorAndAdjust (
-			"0D",
-			strCurrency
-		);
+		JulianDate today = DateUtil.Today().addTenorAndAdjust ("0D", currency);
 
 		/*
 		 * Construct the Discount Curve using its instruments and quotes
 		 */
 
-		MergedDiscountForwardCurve dc = MakeDC (
-			dtToday,
-			strCurrency
-		);
+		MergedDiscountForwardCurve discountCurve = MakeDC (today, currency);
 
-		Map<String, ForwardCurve> mapFC = MakeFC (
-			dtToday,
-			strCurrency,
-			dc
-		);
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, fraTenor);
 
-		ForwardLabel fri = ForwardLabel.Create (
-			strCurrency,
-			strFRATenor
-		);
-
-		JulianDate dtEffective = dtToday.addTenor (strFRATenor);
-
-		ComposableFloatingUnitSetting cfus = new ComposableFloatingUnitSetting (
-			strFRATenor,
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
-			null,
-			fri,
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
-
-		CompositePeriodSetting cps = new CompositePeriodSetting (
-			4,
-			strFRATenor,
-			strCurrency,
-			null,
-			1.,
-			null,
-			null,
-			null,
-			null
-		);
+		Map<String, ForwardCurve> forwardCurveMap = MakeFC (today, currency, discountCurve);
 
 		Stream floatStream = new Stream (
 			CompositePeriodBuilder.FloatingCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective.julian(),
-					strFRATenor,
-					strMaturityTenor,
+					today.addTenor (fraTenor).julian(),
+					fraTenor,
+					maturityTenor,
 					null
 				),
-				cps,
-				cfus
+				new CompositePeriodSetting (4, fraTenor, currency, null, 1., null, null, null, null),
+				new ComposableFloatingUnitSetting (
+					fraTenor,
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
+					null,
+					forwardLabel,
+					CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+					0.
+				)
 			)
 		);
 
 		FRAStandardCapFloor fraCap = new FRAStandardCapFloor (
 			"FRA_CAP",
 			floatStream,
-			strManifestMeasure,
+			manifestMeasure,
 			true,
-			dblStrike,
+			strike,
 			new LastTradingDateSetting (
 				LastTradingDateSetting.MID_CURVE_OPTION_QUARTERLY,
 				"",
@@ -706,9 +740,9 @@ public class FRAStdCapFloor {
 		FRAStandardCapFloor fraFloor = new FRAStandardCapFloor (
 			"FRA_FLOOR",
 			floatStream,
-			strManifestMeasure,
+			manifestMeasure,
 			false,
-			dblStrike,
+			strike,
 			new LastTradingDateSetting (
 				LastTradingDateSetting.MID_CURVE_OPTION_QUARTERLY,
 				"",
@@ -718,9 +752,9 @@ public class FRAStdCapFloor {
 			new BlackScholesAlgorithm()
 		);
 
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
-			mapFC.get (strFRATenor),
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
+			forwardCurveMap.get (fraTenor),
 			null,
 			null,
 			null,
@@ -729,77 +763,71 @@ public class FRAStdCapFloor {
 			null
 		);
 
-		double dblForwardVol = 0.50;
-		double dblFundingVol = 0.50;
-		double dblForwardFundingCorr = 0.50;
+		double forwardVolatility = 0.5;
+		double fundingVolatility = 0.5;
+		double forwardFundingCorrelation = 0.5;
 
 		SetVolCorrelation (
-			dtToday.julian(),
-			mktParams,
-			fri,
-			dblForwardVol,
-			dblFundingVol,
-			dblForwardFundingCorr
+			today.julian(),
+			curveSurfaceQuoteContainer,
+			forwardLabel,
+			forwardVolatility,
+			fundingVolatility,
+			forwardFundingCorrelation
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			strCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (today, today, currency);
 
 		System.out.println ("\n\n\t-------------------------------------------------------------");
 
-		double dblCapATMPrice = fraCap.atmPriceFromVolatility (
-			valParams,
+		double atmCapPrice = fraCap.atmPriceFromVolatility (
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null,
-			dblForwardVol
+			forwardVolatility
 		);
 
 		System.out.println (
-			"\tCap ATM Price     : " +
-			FormatUtil.FormatDouble (dblCapATMPrice, 1, 2, 100.) + "%"
+			"\tCap ATM Price     : " + FormatUtil.FormatDouble (atmCapPrice, 1, 2, 100.) + "%"
 		);
 
-		double dblFloorATMPrice = fraFloor.atmPriceFromVolatility (
-			valParams,
+		double floorATMPrice = fraFloor.atmPriceFromVolatility (
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null,
-			dblForwardVol
+			forwardVolatility
 		);
 
 		System.out.println (
-			"\tFloor ATM Price   : " +
-			FormatUtil.FormatDouble (dblFloorATMPrice, 1, 2, 100.) + "%"
+			"\tFloor ATM Price   : " + FormatUtil.FormatDouble (floorATMPrice, 1, 2, 100.) + "%"
 		);
 
 		System.out.println ("\t-------------------------------------------------------------");
 
-		Map<String, Double> mapFRACapOutput = fraCap.value (
-			valParams,
+		Map<String, Double> fraCapOutputMap = fraCap.value (
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		for (Map.Entry<String, Double> me : mapFRACapOutput.entrySet())
+		for (Map.Entry<String, Double> me : fraCapOutputMap.entrySet())
 			System.out.println ("\t" + me.getKey() + " => " + me.getValue());
 
 		System.out.println ("\t-------------------------------------------------------------");
 
 		System.out.println ("\t-------------------------------------------------------------");
 
-		Map<String, Double> mapFRAFloorOutput = fraFloor.value (
-			valParams,
+		Map<String, Double> fraFloorOutputMap = fraFloor.value (
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		for (Map.Entry<String, Double> me : mapFRAFloorOutput.entrySet())
+		for (Map.Entry<String, Double> me : fraFloorOutputMap.entrySet())
 			System.out.println ("\t" + me.getKey() + " => " + me.getValue());
 
 		System.out.println ("\t-------------------------------------------------------------");
@@ -807,47 +835,63 @@ public class FRAStdCapFloor {
 		System.out.println ("\t-------------------------------------------------------------");
 
 		System.out.println (
-			"\tPrice Implied Cap Volatility         : " +
-			FormatUtil.FormatDouble (fraCap.flatVolatilityFromPrice (
-				valParams,
-				null,
-				mktParams,
-				null,
-				mapFRACapOutput.get ("Price")
-			), 1, 2, 100.) + "%"
+			"\tPrice Implied Cap Volatility         : " + FormatUtil.FormatDouble (
+				fraCap.flatVolatilityFromPrice (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null,
+					fraCapOutputMap.get ("Price")
+				),
+				1,
+				2,
+				100.
+			) + "%"
 		);
 
 		System.out.println (
-			"\tPrice Implied ATM Cap Volatility     : " +
-			FormatUtil.FormatDouble (fraCap.volatilityFromATMPrice (
-				valParams,
-				null,
-				mktParams,
-				null,
-				dblCapATMPrice
-			), 1, 2, 100.) + "%"
+			"\tPrice Implied ATM Cap Volatility     : " + FormatUtil.FormatDouble (
+				fraCap.volatilityFromATMPrice (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null,
+					atmCapPrice
+				),
+				1,
+				2,
+				100.
+			) + "%"
 		);
 
 		System.out.println (
-			"\tPrice Implied FRA Floor Volatility   : " +
-			FormatUtil.FormatDouble (fraFloor.flatVolatilityFromPrice (
-				valParams,
-				null,
-				mktParams,
-				null,
-				mapFRAFloorOutput.get ("Price")
-			), 1, 2, 100.) + "%"
+			"\tPrice Implied FRA Floor Volatility   : " + FormatUtil.FormatDouble (
+				fraFloor.flatVolatilityFromPrice (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null,
+					fraFloorOutputMap.get ("Price")
+				),
+				1,
+				2,
+				100.
+			) + "%"
 		);
 
 		System.out.println (
-			"\tPrice Implied ATM Floor Volatility   : " +
-			FormatUtil.FormatDouble (fraFloor.volatilityFromATMPrice (
-				valParams,
-				null,
-				mktParams,
-				null,
-				dblFloorATMPrice
-			), 1, 2, 100.) + "%"
+			"\tPrice Implied ATM Floor Volatility   : " + FormatUtil.FormatDouble (
+				fraFloor.volatilityFromATMPrice (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null,
+					floorATMPrice
+				),
+				1,
+				2,
+				100.
+			) + "%"
 		);
 
 		EnvManager.TerminateEnv();

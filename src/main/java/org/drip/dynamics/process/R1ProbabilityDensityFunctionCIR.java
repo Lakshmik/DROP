@@ -1,11 +1,24 @@
 
 package org.drip.dynamics.process;
 
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.dynamics.meanreverting.CKLSParameters;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.specialfunction.definition.ModifiedBesselFirstKindEstimator;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,61 +117,65 @@ package org.drip.dynamics.process;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/process/README.md">Ito-Dynamics Based Stochastic Process</a></li>
- *  </ul>
+ * 		<li><i>R1ProbabilityDensityFunctionCIR</i> Constructor</li>
+ * 		<li>Retrieve "q"</li>
+ * 		<li>Retrieve the Starting Value for r</li>
+ * 		<li>Retrieve the CKLS Parameters</li>
+ * 		<li>Retrieve the Modified Bessel Estimator of the First Kind</li>
+ * 		<li>Calculates the PDF Density Value</li>
+ *	</ul>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/process/README.md">Ito-Dynamics Based Stochastic Process</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class R1ProbabilityDensityFunctionCIR
-	extends org.drip.dynamics.process.R1ProbabilityDensityFunction
+	extends R1ProbabilityDensityFunction
 {
-	private double _q = java.lang.Double.NaN;
-	private double _r0 = java.lang.Double.NaN;
-	private double _twoAOverSigmaSquared = java.lang.Double.NaN;
-	private org.drip.dynamics.meanreverting.CKLSParameters _cklsParameters = null;
-	private org.drip.specialfunction.definition.ModifiedBesselFirstKindEstimator
-		_modifiedBesselFirstKindEstimator = null;
+	private double _q = Double.NaN;
+	private double _r0 = Double.NaN;
+	private CKLSParameters _cklsParameters = null;
+	private double _twoAOverSigmaSquared = Double.NaN;
+	private ModifiedBesselFirstKindEstimator _modifiedBesselFirstKindEstimator = null;
 
 	/**
-	 * R1ProbabilityDensityFunctionCIR Constructor
+	 * <i>R1ProbabilityDensityFunctionCIR</i> Constructor
 	 * 
 	 * @param r0 Starting Value for r
 	 * @param cklsParameters The CKLS Parameters
 	 * @param modifiedBesselFirstKindEstimator Modified Bessel Estimator of the First Kind
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1ProbabilityDensityFunctionCIR (
 		final double r0,
-		final org.drip.dynamics.meanreverting.CKLSParameters cklsParameters,
-		final org.drip.specialfunction.definition.ModifiedBesselFirstKindEstimator
-			modifiedBesselFirstKindEstimator)
-		throws java.lang.Exception
+		final CKLSParameters cklsParameters,
+		final ModifiedBesselFirstKindEstimator modifiedBesselFirstKindEstimator)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				_r0 = r0
-			) ||
+		if (!NumberUtil.IsValid (_r0 = r0) ||
 			null == (_cklsParameters = cklsParameters) ||
-			null == (_modifiedBesselFirstKindEstimator = modifiedBesselFirstKindEstimator)
-		)
+			null == (_modifiedBesselFirstKindEstimator = modifiedBesselFirstKindEstimator))
 		{
-			throw new java.lang.Exception (
-				"R1ProbabilityDensityFunctionCIR Constructor => Invalid Inputs"
-			);
+			throw new Exception ("R1ProbabilityDensityFunctionCIR Constructor => Invalid Inputs");
 		}
 
 		double volatilityCoefficient = _cklsParameters.volatilityCoefficient();
 
 		_q = _cklsParameters.meanReversionLevel() * (
-			_twoAOverSigmaSquared = 2. * _cklsParameters.meanReversionSpeed() / volatilityCoefficient /
-				volatilityCoefficient
+			_twoAOverSigmaSquared =
+				2. * _cklsParameters.meanReversionSpeed() / volatilityCoefficient / volatilityCoefficient
 		) - 1.;
 	}
 
@@ -190,7 +207,7 @@ public class R1ProbabilityDensityFunctionCIR
 	 * @return The CKLS Parameters
 	 */
 
-	public org.drip.dynamics.meanreverting.CKLSParameters cklsParameters()
+	public CKLSParameters cklsParameters()
 	{
 		return _cklsParameters;
 	}
@@ -201,42 +218,37 @@ public class R1ProbabilityDensityFunctionCIR
 	 * @return The Modified Bessel Estimator of the First Kind
 	 */
 
-	public org.drip.specialfunction.definition.ModifiedBesselFirstKindEstimator
-		modifiedBesselFirstKindEstimator()
+	public ModifiedBesselFirstKindEstimator modifiedBesselFirstKindEstimator()
 	{
 		return _modifiedBesselFirstKindEstimator;
 	}
 
+	/**
+	 * Calculates the PDF Density Value
+	 * 
+	 * @param timeR1Vertex The R<sup>1</sup> Property Variate/Time Coordinate Vertex
+	 * 
+	 * @return The PDF Density Value
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
 	@Override public double density (
-		final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-		throws java.lang.Exception
+		final TimeR1Vertex timeR1Vertex)
+		throws Exception
 	{
-		if (null == r1TimeVertex)
-		{
-			throw new java.lang.Exception (
-				"R1ProbabilityDensityFunctionCIR::density => Invalid Inputs"
-			);
+		if (null == timeR1Vertex) {
+			throw new Exception ("R1ProbabilityDensityFunctionCIR::density => Invalid Inputs");
 		}
 
-		double ePowerMinusAT = java.lang.Math.exp (
-			-1. * _cklsParameters.meanReversionSpeed() * r1TimeVertex.t()
-		);
+		double ePowerMinusAT = Math.exp (-1. * _cklsParameters.meanReversionSpeed() * timeR1Vertex.t());
 
 		double c = _twoAOverSigmaSquared / (1. - ePowerMinusAT);
 		double u = c * _r0 * ePowerMinusAT;
 
-		double v = c * r1TimeVertex.x();
+		double v = c * timeR1Vertex.x();
 
-		return c * java.lang.Math.exp (
-			-1. * (u + v)
-		) * java.lang.Math.pow (
-			u / v,
-			0.5 * _q
-		) * _modifiedBesselFirstKindEstimator.bigI (
-			_q,
-			2. * java.lang.Math.sqrt (
-				u * v
-			)
-		);
+		return c * Math.exp (-1. * (u + v)) * Math.pow (u / v, 0.5 * _q) *
+			_modifiedBesselFirstKindEstimator.bigI (_q, 2. * Math.sqrt (u * v));
 	}
 }

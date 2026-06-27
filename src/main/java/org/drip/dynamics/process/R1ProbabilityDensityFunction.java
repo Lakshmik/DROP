@@ -1,11 +1,22 @@
 
 package org.drip.dynamics.process;
 
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.function.definition.R2ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,45 +115,58 @@ package org.drip.dynamics.process;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/process/README.md">Ito-Dynamics Based Stochastic Process</a></li>
- *  </ul>
+ * 		<li>Calculates the PDF Density Value</li>
+ * 		<li>Evaluate for the given variate Pair</li>
+ *	</ul>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/process/README.md">Ito-Dynamics Based Stochastic Process</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public abstract class R1ProbabilityDensityFunction
-	implements org.drip.function.definition.R2ToR1
+	implements R2ToR1
 {
 
 	/**
 	 * Calculates the PDF Density Value
 	 * 
-	 * @param r1TimeVertex The R<sup>1</sup> Property Variate/Time Coordinate Vertex
+	 * @param timeR1Vertex The R<sup>1</sup> Property Variate/Time Coordinate Vertex
 	 * 
 	 * @return The PDF Density Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public abstract double density (
-		final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-		throws java.lang.Exception;
+		final TimeR1Vertex timeR1Vertex)
+		throws Exception;
+
+	/**
+	 * Evaluate for the given variate Pair
+	 * 
+	 * @param t T
+	 * @param x X
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
 		final double t,
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		return density (
-			new org.drip.dynamics.ito.TimeR1Vertex (
-				t,
-				x
-			)
-		);
+		return density (new TimeR1Vertex (t, x));
 	}
 }

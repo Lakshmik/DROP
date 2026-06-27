@@ -1,6 +1,8 @@
 
 package org.drip.product.credit;
 
+import org.drip.state.nonlinear.FlatForwardGovvieCurve;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -1215,7 +1217,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 
 		if (null != q) return q.value ("mid");
 
-		org.drip.state.govvie.GovvieCurve gc = csqc.govvieState (govvieLabel());;
+		org.drip.state.govvie.GovvieCurve gc = csqc.govvieState (govvieLabel());
 
 		return null == gc ? java.lang.Double.NaN : gc.yld (terminationAdjust (iWorkoutDate));
 	}
@@ -2629,6 +2631,137 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return weightedAverageLifeCredit (valParams, csqc, maturityDate().julian(), 1.);
 	}
 
+	@Override public double priceFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final boolean bApplyCouponExtension,
+		final double ySpread)
+		throws java.lang.Exception
+	{
+		if (null == valParams || !org.drip.numerical.common.NumberUtil.IsValid (dblWorkoutFactor))
+			throw new java.lang.Exception ("BondComponent::priceFromYSpread => Invalid inputs");
+
+		int iValueDate = valParams.valueDate();
+
+		if (iValueDate >= iWorkoutDate)
+			throw new java.lang.Exception ("BondComponent::priceFromYSpread => Invalid inputs");
+
+		org.drip.state.govvie.GovvieCurve gc = csqc.govvieState (govvieLabel());
+
+		if (null == gc || !(gc instanceof FlatForwardGovvieCurve))
+			throw new java.lang.Exception ("BondComponent::priceFromYSpread => Invalid inputs");
+
+		FlatForwardGovvieCurve flatForwardGovvieCurve = (FlatForwardGovvieCurve) gc;
+
+		boolean bFirstPeriod = true;
+		double dblCumulativePeriodPV = 0.;
+		boolean bTerminateCouponFlow = false;
+		boolean bApplyFlatForwardRate = false;
+		int iCashPayDate = java.lang.Integer.MIN_VALUE;
+		double dblFlatForwardRate = java.lang.Double.NaN;
+
+		double dblScalingNotional = null != _notionalSetting && _notionalSetting.priceOffOfOriginalNotional()
+			? 1. : notional (iValueDate);
+
+		java.lang.String strCalendar = currency();
+
+		if (null == strCalendar || strCalendar.isEmpty()) strCalendar = redemptionCurrency();
+
+		org.drip.param.valuation.ValuationCustomizationParams vcpQuote = null == _quoteConvention ? null :
+			_quoteConvention.valuationCustomizationParams();
+
+		if (null != vcp) {
+			strCalendar = vcp.yieldCalendar();
+
+			bApplyFlatForwardRate = vcp.applyFlatForwardRate();
+		} else if (null != vcpQuote) {
+			strCalendar = vcpQuote.yieldCalendar();
+
+			bApplyFlatForwardRate = vcpQuote.applyFlatForwardRate();
+		}
+
+		int iPeriodAmortizationMode = _notionalSetting.periodAmortizationMode();
+
+		for (org.drip.analytics.cashflow.CompositePeriod period : couponPeriods()) {
+			int iPeriodPayDate = period.payDate();
+
+			if (iPeriodPayDate < iValueDate) continue;
+
+			if (bFirstPeriod) {
+				bFirstPeriod = false;
+			}
+
+			int iPeriodEndDate = period.endDate();
+
+			int iPeriodStartDate = period.startDate();
+
+			if (iPeriodEndDate >= iWorkoutDate) {
+				iPeriodEndDate = iWorkoutDate;
+				bTerminateCouponFlow = true;
+			}
+
+			org.drip.analytics.output.CompositePeriodCouponMetrics cpcm = couponMetrics (iPeriodEndDate,
+				valParams, csqc);
+
+			if (null == cpcm)
+				throw new java.lang.Exception ("BondComponent::priceFromYSpread => No PCM for " + new
+					org.drip.analytics.date.JulianDate (iValueDate) + " | " + effectiveDate());
+
+			double dblYieldAnnuity = flatForwardGovvieCurve.df (
+				s_bYieldDFOffofCouponAccrualDCF ? iPeriodPayDate : period.endDate(),
+				ySpread
+			) * cpcm.cumulative();
+
+			double dblPeriodStartNotional = notional (iPeriodStartDate);
+
+			double dblPeriodEndNotional = notional (iPeriodEndDate);
+
+			double dblCouponNotional = dblPeriodStartNotional;
+
+			if (org.drip.product.params.NotionalSetting.PERIOD_AMORT_AT_START == iPeriodAmortizationMode)
+				dblCouponNotional = dblPeriodStartNotional;
+			else if (org.drip.product.params.NotionalSetting.PERIOD_AMORT_AT_END == iPeriodAmortizationMode)
+				dblCouponNotional = dblPeriodEndNotional;
+			else if (org.drip.product.params.NotionalSetting.PERIOD_AMORT_EFFECTIVE ==
+				iPeriodAmortizationMode)
+				dblCouponNotional = notional (iPeriodStartDate, iPeriodEndDate);
+
+			if (!org.drip.numerical.common.NumberUtil.IsValid (dblFlatForwardRate))
+				dblFlatForwardRate = cpcm.rate();
+
+			dblCumulativePeriodPV += (period.accrualDCF (iPeriodEndDate) * (bApplyFlatForwardRate ?
+				dblFlatForwardRate : cpcm.rate() + (bApplyCouponExtension ?
+					_couponSetting.couponRateExtension() : 0.)) * couponFactor (iPeriodEndDate) *
+						dblCouponNotional + dblPeriodStartNotional - dblPeriodEndNotional) * dblYieldAnnuity;
+
+			if (bTerminateCouponFlow) break;
+		}
+
+		try {
+			iCashPayDate = null != _quoteConvention ? _quoteConvention.settleDate (valParams) :
+				valParams.cashPayDate();
+		} catch (java.lang.Exception e) {
+			if (!s_bSuppressErrors) e.printStackTrace();
+
+			iCashPayDate = valParams.cashPayDate();
+		}
+
+		double dblCleanPrice = (((dblCumulativePeriodPV + dblWorkoutFactor * flatForwardGovvieCurve.df (
+			terminationAdjust (iWorkoutDate),
+			ySpread
+		) * notional (iWorkoutDate)) /
+			flatForwardGovvieCurve.df (iCashPayDate, ySpread)
+		) - accrued (
+			iValueDate,
+			csqc
+		)) / dblScalingNotional;
+
+		return dblCleanPrice;
+	}
+
 	@Override public double priceFromZeroCurve (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -3430,6 +3563,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return aswFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate ASW from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return ASW from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Y-Spread cannot be calculated
+	 */
+
+	@Override public double aswFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return aswFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate ASW from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return ASW from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if ASW cannot be calculated
+	 */
+
+	@Override public double aswFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return aswFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate ASW from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return ASW from Yield Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if ASW cannot be calculated
+	 */
+
+	@Override public double aswFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::aswFromYieldSpreadToOptimalExercise => " +
+				"Cannot calc ASW from Yield Spread to optimal exercise for bonds w emb option");
+
+		return aswFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double aswFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -3991,6 +4202,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc Bond Basis from Yield to optimal exercise for bonds w emb option");
 
 		return bondBasisFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate Bond Basis from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Bond Basis from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Bond Basis cannot be calculated
+	 */
+
+	@Override public double bondBasisFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return bondBasisFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Bond Basis from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Bond Basis from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Bond Basis cannot be calculated
+	 */
+
+	@Override public double bondBasisFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return bondBasisFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Bond Basis from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Bond Basis from Yield Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Bond Basis cannot be calculated
+	 */
+
+	@Override public double bondBasisFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::bondBasisFromYSpreadToOptimalExercise => " +
+				"Cannot calc ASW from Yield Spread to optimal exercise for bonds w emb option");
+
+		return bondBasisFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double bondBasisFromYieldSpread (
@@ -4594,6 +4883,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return convexityFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate Convexity from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Bond Basis from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Convexity cannot be calculated
+	 */
+
+	@Override public double convexityFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return convexityFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Convexity from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Convexity from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Bond Basis cannot be calculated
+	 */
+
+	@Override public double convexityFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return convexityFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Convexity from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Convexity from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Bond Basis cannot be calculated
+	 */
+
+	@Override public double convexityFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::convexityFromYSpreadToOptimalExercise => " +
+				"Cannot calc Convexity from Y Spread to optimal exercise for bonds w emb option");
+
+		return convexityFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double convexityFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -5153,6 +5520,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc Credit Basis from Yield to optimal exercise for bonds w emb option");
 
 		return creditBasisFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate Credit Basis from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Credit Basis from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Credit Basis cannot be calculated
+	 */
+
+	@Override public double creditBasisFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return creditBasisFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Credit Basis from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Credit Basis from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Credit Basis cannot be calculated
+	 */
+
+	@Override public double creditBasisFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return creditBasisFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Credit Basis from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Credit Basis from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Bond Basis cannot be calculated
+	 */
+
+	@Override public double creditBasisFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::creditBasisFromYSpreadToOptimalExercise => " +
+				"Cannot calc Credit Basis from Y Spread to optimal exercise for bonds w emb option");
+
+		return convexityFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double creditBasisFromYieldSpread (
@@ -5734,6 +6179,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				" Cant calc Discount Margin from Yield to optimal exercise for bonds w emb option");
 
 		return discountMarginFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate Discount Margin from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Discount Margin from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Discount Margin cannot be calculated
+	 */
+
+	@Override public double discountMarginFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return discountMarginFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Discount Margin from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Discount Margin from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Discount Margin cannot be calculated
+	 */
+
+	@Override public double discountMarginFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return discountMarginFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Discount Margin from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Discount Margin from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Discount Margin cannot be calculated
+	 */
+
+	@Override public double discountMarginFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::discountMarginFromYSpreadToOptimalExercise => " +
+				"Cannot calc Discount Margin from Y Spread to optimal exercise for bonds w emb option");
+
+		return discountMarginFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double discountMarginFromYieldSpread (
@@ -6333,6 +6856,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return durationFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate Duration from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Duration from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Duration cannot be calculated
+	 */
+
+	@Override public double durationFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return durationFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Duration from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Duration from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Duration cannot be calculated
+	 */
+
+	@Override public double durationFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return durationFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Duration from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Duration from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Duration cannot be calculated
+	 */
+
+	@Override public double durationFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::durationFromYSpreadToOptimalExercise => " +
+				"Cannot calc Duration from Y Spread to optimal exercise for bonds w emb option");
+
+		return durationFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double durationFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -6894,6 +7495,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return eSpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate E-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return E-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the E-Spread cannot be calculated
+	 */
+
+	@Override public double eSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return eSpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate E-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return E-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if E-Spread cannot be calculated
+	 */
+
+	@Override public double eSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return eSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate E-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return E-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if E-Spread cannot be calculated
+	 */
+
+	@Override public double eSpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::eSpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc E-Spread from Y Spread to optimal exercise for bonds w emb option");
+
+		return eSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double eSpreadFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -7422,6 +8101,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc G Spread from Yield to optimal exercise for bonds w emb option");
 
 		return gSpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate G-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return G-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the G-Spread cannot be calculated
+	 */
+
+	@Override public double gSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return gSpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate G-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return G-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if G-Spread cannot be calculated
+	 */
+
+	@Override public double gSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return gSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate G-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return G-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if G-Spread cannot be calculated
+	 */
+
+	@Override public double gSpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::gSpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc G-Spread from Y Spread to optimal exercise for bonds w emb option");
+
+		return gSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double gSpreadFromYieldSpread (
@@ -7991,6 +8748,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return iSpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate I-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return I-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the I-Spread cannot be calculated
+	 */
+
+	@Override public double iSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return iSpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate I-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return I-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if I-Spread cannot be calculated
+	 */
+
+	@Override public double iSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return iSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate I-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return I-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if I-Spread cannot be calculated
+	 */
+
+	@Override public double iSpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::iSpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc I-Spread from Y Spread to optimal exercise for bonds w emb option");
+
+		return iSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double iSpreadFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -8556,6 +9391,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc J Spread from Yield to optimal exercise for bonds w emb option");
 
 		return jSpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate J-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return J-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the J-Spread cannot be calculated
+	 */
+
+	@Override public double jSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return jSpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate J-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return J-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if J-Spread cannot be calculated
+	 */
+
+	@Override public double jSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return jSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate J-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return J-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if J-Spread cannot be calculated
+	 */
+
+	@Override public double jSpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::jSpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc J-Spread from Y Spread to optimal exercise for bonds w emb option");
+
+		return jSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double jSpreadFromYieldSpread (
@@ -9311,6 +10224,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return macaulayDurationFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate Macaulay Duration from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Macaulay Duration from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Macaulay Duration cannot be calculated
+	 */
+
+	@Override public double macaulayDurationFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return macaulayDurationFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Macaulay Duration from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Macaulay Duration from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Macaulay Duration cannot be calculated
+	 */
+
+	@Override public double macaulayDurationFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return macaulayDurationFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Macaulay Duration from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Macaulay Duration from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if J-Spread cannot be calculated
+	 */
+
+	@Override public double macaulayDurationFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::macaulayDurationFromYSpreadToOptimalExercise => " +
+				"Cannot calc Macaulay Duration from Y Spread to optimal exercise for bonds w emb option");
+
+		return macaulayDurationFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double macaulayDurationFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -9939,6 +10930,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return modifiedDurationFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate Modified Duration from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Modified Duration from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Modified Duration cannot be calculated
+	 */
+
+	@Override public double modifiedDurationFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return modifiedDurationFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Modified Duration from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Modified Duration from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Modified Duration cannot be calculated
+	 */
+
+	@Override public double modifiedDurationFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return modifiedDurationFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Modified Duration from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Modified Duration from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Modified Duration cannot be calculated
+	 */
+
+	@Override public double modifiedDurationFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::modifiedDurationFromYSpreadToOptimalExercise => " +
+				"Cannot calc Modified Duration from Y Spread to optimal exercise for bonds w emb option");
+
+		return modifiedDurationFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double modifiedDurationFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -10510,6 +11579,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return nSpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate N-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return N-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the N-Spread cannot be calculated
+	 */
+
+	@Override public double nSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return nSpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate N-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return N-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if N-Spread cannot be calculated
+	 */
+
+	@Override public double nSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return nSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate N-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return N-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if N-Spread cannot be calculated
+	 */
+
+	@Override public double nSpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::nSpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc N-Spread from Y-Spread to optimal exercise for bonds w emb option");
+
+		return nSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double nSpreadFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -11065,6 +12212,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc OAS from Yield to optimal exercise for bonds w emb option");
 
 		return oasFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate OAS from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return OAS from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the OAS cannot be calculated
+	 */
+
+	@Override public double oasFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return oasFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate OAS from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return OAS from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if OAS cannot be calculated
+	 */
+
+	@Override public double oasFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return oasFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate OAS from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return OAS from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if OAS cannot be calculated
+	 */
+
+	@Override public double oasFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::oasFromYSpreadToOptimalExercise => " +
+				"Cannot calc OAS from Y-Spread to optimal exercise for bonds w emb option");
+
+		return oasFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double oasFromYieldSpread (
@@ -11624,6 +12849,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return pecsFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate PECS from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return PECS from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the PECS cannot be calculated
+	 */
+
+	@Override public double pecsFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return pecsFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate PECS from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return PECS from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if PECS cannot be calculated
+	 */
+
+	@Override public double pecsFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return pecsFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate PECS from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return PECS from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if PECS cannot be calculated
+	 */
+
+	@Override public double pecsFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::pecsFromYSpreadToOptimalExercise => " +
+				"Cannot calc PECS from Y-Spread to optimal exercise for bonds w emb option");
+
+		return pecsFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double pecsFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -11633,7 +12936,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		final double dblYieldSpread)
 		throws java.lang.Exception
 	{
-		return pecsFromPrice (valParams, csqc, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYieldSpread
+		return pecsFromPrice (valParams, csqc, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
 			(valParams, csqc, vcp, iWorkoutDate, dblWorkoutFactor, dblYieldSpread));
 	}
 
@@ -12199,6 +13502,83 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return priceFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
 	}
 
+	/**
+	 * Calculate Price from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Price from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Price cannot be calculated
+	 */
+
+	@Override public double priceFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return priceFromYSpread (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread);
+	}
+
+	/**
+	 * Calculate Price from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Price from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Price cannot be calculated
+	 */
+
+	@Override public double priceFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return priceFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Price from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Price from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Price cannot be calculated
+	 */
+
+	@Override public double priceFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::priceFromYSpreadToOptimalExercise => " +
+				"Cannot calc Price from Y-Spread to optimal exercise for bonds w emb option");
+
+		return priceFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double priceFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -12756,6 +14136,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc TSY Spread from Yield to optimal exercise for bonds w emb option");
 
 		return tsySpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate TSY-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return TSY-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the TSY-Spread cannot be calculated
+	 */
+
+	@Override public double tsySpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return tsySpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate TSY-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return TSY-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if TSY-Spread cannot be calculated
+	 */
+
+	@Override public double tsySpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return tsySpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate TSY-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return TSY-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if TSY-Spread cannot be calculated
+	 */
+
+	@Override public double tsySpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::tsySpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc TSY-Spread from Y-Spread to optimal exercise for bonds w emb option");
+
+		return tsySpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double tsySpreadFromYieldSpread (
@@ -13373,6 +14831,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 		return yieldFromTSYSpread (valParams, csqc, vcp, maturityDate().julian(), 1., dblPrice);
 	}
 
+	/**
+	 * Calculate Yield from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Yield from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Yield cannot be calculated
+	 */
+
+	@Override public double yieldFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return yieldFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Yield from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Yield from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Yield cannot be calculated
+	 */
+
+	@Override public double yieldFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return yieldFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Yield from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Yield from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Yield cannot be calculated
+	 */
+
+	@Override public double yieldFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::yieldFromYSpreadToOptimalExercise => " +
+				"Cannot calc Yield from Y-Spread to optimal exercise for bonds w emb option");
+
+		return yieldFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
 	@Override public double yieldFromYieldSpread (
 		final org.drip.param.valuation.ValuationParams valParams,
 		final org.drip.param.market.CurveSurfaceQuoteContainer csqc,
@@ -13939,6 +15475,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc Yield01 from Yield to optimal exercise for bonds w emb option");
 
 		return yield01FromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate Yield01 from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Yield01 from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Yield01 cannot be calculated
+	 */
+
+	@Override public double yield01FromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return yield01FromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Yield01 from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Yield01 from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Yield01 cannot be calculated
+	 */
+
+	@Override public double yield01FromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return yield01FromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Yield01 from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Yield01 from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Yield01 cannot be calculated
+	 */
+
+	@Override public double yield01FromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::yield01FromYSpreadToOptimalExercise => " +
+				"Cannot calc Yield01 from Y-Spread to optimal exercise for bonds w emb option");
+
+		return yield01FromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double yield01FromYieldSpread (
@@ -15066,6 +16680,84 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"Cant calc Z Spread from Yield to optimal exercise for bonds w emb option");
 
 		return zSpreadFromYield (valParams, csqc, vcp, maturityDate().julian(), 1., dblYield);
+	}
+
+	/**
+	 * Calculate Z-Spread from Y-Spread to Work-out
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param iWorkoutDate Work-out Date
+	 * @param dblWorkoutFactor Work-out Factor
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Z-Spread from Y-Spread to Work-out
+	 * 
+	 * @throws java.lang.Exception Thrown if the Z-Spread cannot be calculated
+	 */
+
+	@Override public double zSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final int iWorkoutDate,
+		final double dblWorkoutFactor,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return zSpreadFromPrice (valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, priceFromYSpread
+			(valParams, csqs, vcp, iWorkoutDate, dblWorkoutFactor, true, dblYSpread));
+	}
+
+	/**
+	 * Calculate Z-Spread from Y-Spread to Maturity
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread Y-Spread to Work-out
+	 * 
+	 * @return Z-Spread from Y-Spread to Maturity
+	 * 
+	 * @throws java.lang.Exception Thrown if Z-Spread cannot be calculated
+	 */
+
+	@Override public double zSpreadFromYSpread (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		return zSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
+	}
+
+	/**
+	 * Calculate Z-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @param valParams Valuation Parameters
+	 * @param csqs Market Parameters
+	 * @param vcp Valuation Customization Parameters
+	 * @param dblYSpread YSpread to Optimal Exercise
+	 * 
+	 * @return Z-Spread from Y-Spread to Optimal Exercise
+	 * 
+	 * @throws java.lang.Exception Thrown if Z-Spread cannot be calculated
+	 */
+
+	@Override public double zSpreadFromYSpreadToOptimalExercise (
+		final org.drip.param.valuation.ValuationParams valParams,
+		final org.drip.param.market.CurveSurfaceQuoteContainer csqs,
+		final org.drip.param.valuation.ValuationCustomizationParams vcp,
+		final double dblYSpread)
+		throws java.lang.Exception
+	{
+		if (null != _eosCall || null != _eosPut)
+			throw new java.lang.Exception ("BondComponent::zSpreadFromYSpreadToOptimalExercise => " +
+				"Cannot calc Z-Spread from Y-Spread to optimal exercise for bonds w emb option");
+
+		return zSpreadFromYSpread (valParams, csqs, vcp, maturityDate().julian(), 1., dblYSpread);
 	}
 
 	@Override public double zSpreadFromYieldSpread (

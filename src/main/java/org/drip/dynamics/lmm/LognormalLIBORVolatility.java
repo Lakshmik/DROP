@@ -127,7 +127,7 @@ import org.drip.state.identifier.ForwardLabel;
  * 		<li>Compute the Volatility of the Continuously Compounded Forward Rate Up to the Target Date #1</li>
  * 		<li>Compute the Volatility of the Continuously Compounded Forward Rate Up to the Target Date #2</li>
  * 		<li>Multi-Factor Cross Volatility Integral</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

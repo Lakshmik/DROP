@@ -120,7 +120,7 @@ package org.drip.dynamics.ito;
  * 		<li>Retrieve the Dimension Count</li>
  * 		<li>Retrieve the Factor Count</li>
  * 		<li>Estimate the Diffusion Coefficient</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

@@ -1,11 +1,24 @@
 
 package org.drip.dynamics.meanreverting;
 
+import org.drip.dynamics.ito.R1StochasticDriver;
+import org.drip.dynamics.ito.R1WienerDriver;
+import org.drip.dynamics.kolmogorov.R1FokkerPlanck;
+import org.drip.dynamics.kolmogorov.R1FokkerPlanckOrnsteinUhlenbeck;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,7 +117,14 @@ package org.drip.dynamics.meanreverting;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
+ *  <ul>
+ * 		<li>Construct a Weiner Instance of <i>R1OrnsteinUhlenbeckStochasticEvolver</i> Process</li>
+ * 		<li><i>R1OrnsteinUhlenbeckStochasticEvolver</i> Constructor</li>
+ * 		<li>Construct the Fokker-Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver</li>
+ *	</ul>
+ *
  *  <ul>
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
@@ -116,17 +136,17 @@ package org.drip.dynamics.meanreverting;
  */
 
 public class R1OrnsteinUhlenbeckStochasticEvolver
-	extends org.drip.dynamics.meanreverting.R1VasicekStochasticEvolver
+	extends R1VasicekStochasticEvolver
 {
 
 	/**
-	 * Construct a Weiner Instance of R1OrnsteinUhlenbeckStochasticEvolver Process
+	 * Construct a Weiner Instance of <i>R1OrnsteinUhlenbeckStochasticEvolver</i> Process
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param volatility The Volatility
 	 * @param timeWidth Wiener Time Width
 	 * 
-	 * @return Weiner Instance of R1OrnsteinUhlenbeckStochasticEvolver Process
+	 * @return Weiner Instance of <i>R1OrnsteinUhlenbeckStochasticEvolver</i> Process
 	 */
 
 	public static R1OrnsteinUhlenbeckStochasticEvolver Wiener (
@@ -134,18 +154,13 @@ public class R1OrnsteinUhlenbeckStochasticEvolver
 		final double volatility,
 		final double timeWidth)
 	{
-		try
-		{
+		try {
 			return new R1OrnsteinUhlenbeckStochasticEvolver (
 				meanReversionSpeed,
 				volatility,
-				new org.drip.dynamics.ito.R1WienerDriver (
-					timeWidth
-				)
+				new R1WienerDriver (timeWidth)
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -153,39 +168,35 @@ public class R1OrnsteinUhlenbeckStochasticEvolver
 	}
 
 	/**
-	 * R1OrnsteinUhlenbeckStochasticEvolver Constructor
+	 * <i>R1OrnsteinUhlenbeckStochasticEvolver</i> Constructor
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param volatility The Volatility
 	 * @param r1StochasticDriver The Stochastic Driver
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1OrnsteinUhlenbeckStochasticEvolver (
 		final double meanReversionSpeed,
 		final double volatility,
-		final org.drip.dynamics.ito.R1StochasticDriver r1StochasticDriver)
-		throws java.lang.Exception
+		final R1StochasticDriver r1StochasticDriver)
+		throws Exception
 	{
-		super (
-			meanReversionSpeed,
-			0.,
-			volatility,
-			r1StochasticDriver
-		);
+		super (meanReversionSpeed, 0., volatility, r1StochasticDriver);
 	}
 
-	@Override public org.drip.dynamics.kolmogorov.R1FokkerPlanck fokkerPlanckGenerator()
+	/**
+	 * Construct the Fokker-Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver
+	 * 
+	 * @return The Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver
+	 */
+
+	@Override public R1FokkerPlanck fokkerPlanckGenerator()
 	{
-		try
-		{
-			return new org.drip.dynamics.kolmogorov.R1FokkerPlanckOrnsteinUhlenbeck (
-				cklsParameters()
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new R1FokkerPlanckOrnsteinUhlenbeck (cklsParameters());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

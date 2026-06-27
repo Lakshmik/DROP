@@ -24,6 +24,7 @@ org.drip.dynamics.evolution
 org.drip.dynamics.hjm
 org.drip.dynamics.hullwhite
 org.drip.dynamics.ito
+org.drip.dynamics.kalotay
 org.drip.dynamics.kolmogorov
 org.drip.dynamics.lmm
 org.drip.dynamics.meanreverting

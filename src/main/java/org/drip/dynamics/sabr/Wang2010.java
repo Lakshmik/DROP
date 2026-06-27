@@ -103,13 +103,24 @@ import org.drip.numerical.common.NumberUtil;
  *  		Wikipedia (2026): SABR Volatility Model https://en.wikipedia.org/wiki/SABR_volatility_model
  *  	</li>
  *  </ul>
+ * 
+ *  It provides the following Functions:
  *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/sabr/README.md">SABR Based Latent State Evolution</a></li>
- *  </ul>
+ * 		<li>Construct a Standard Instance of <i>Wang2020</i> Beta Calibrator</li>
+ * 		<li><i>Wang2010</i> Constructor</li>
+ * 		<li>Retrieve the Array of Log Implied ATM Volatilities</li>
+ * 		<li>Retrieve the Array of Log Shifted Initial Forwards</li>
+ * 		<li>Estimate SABR Beta using Linear Regression</li>
+ *	</ul>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/sabr/README.md">SABR Based Latent State Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -187,11 +198,11 @@ public class Wang2010
 		throws Exception
 	{
 		if (null == (_logATMImpliedVolatilityArray = logATMImpliedVolatilityArray) ||
-			0 == _logATMImpliedVolatilityArray.length ||
-			!NumberUtil.IsValid (_logATMImpliedVolatilityArray) ||
+				0 == _logATMImpliedVolatilityArray.length ||
+				!NumberUtil.IsValid (_logATMImpliedVolatilityArray) ||
 			null == (_logShiftedInitialForwardArray = logShiftedInitialForwardArray) ||
-			_logShiftedInitialForwardArray.length != _logATMImpliedVolatilityArray.length ||
-			!NumberUtil.IsValid (_logShiftedInitialForwardArray))
+				_logShiftedInitialForwardArray.length != _logATMImpliedVolatilityArray.length ||
+				!NumberUtil.IsValid (_logShiftedInitialForwardArray))
 		{
 			throw new Exception ("Wang2010 Constructor => Invalid Inputs");
 		}

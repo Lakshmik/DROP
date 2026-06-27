@@ -125,7 +125,7 @@ import org.drip.service.common.FormatUtil;
  * 		<li>Retrieve the Array of Tenor Instantaneous Continuously Compounded Forward Rate Increments</li>
  * 		<li>Retrieve the Array of Tenor Spot Rate Increments</li>
  * 		<li>JSON-ization of the Tenor Node Sequence</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

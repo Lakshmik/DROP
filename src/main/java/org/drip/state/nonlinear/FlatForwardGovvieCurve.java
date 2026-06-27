@@ -158,6 +158,65 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 		}
 	}
 
+	/**
+	 * Compute the Discount Factor given the Yield Spread to the Date
+	 * 
+	 * @param date Date
+	 * @param yieldSpread Yield Spread
+	 * 
+	 * @return Discount Factor
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
+	public double df (
+		final int date,
+		final double yieldSpread)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (yieldSpread)) {
+			throw new Exception ("FlatForwardGovvieCurve::df => Invalid Inputs");
+		}
+
+		if (date <= _epochDate) {
+			return 1.;
+		}
+
+		int i = 0;
+		double discountFactor = 1.;
+		int startDate = _epochDate;
+		int dateArrayCount = _dateArray.length;
+
+		int frequency = freq();
+
+		String dayCount = dayCount();
+
+		ActActDCParams actActDCParams = ActActDCParams.FromFrequency (frequency);
+
+		while (i < dateArrayCount && (int) date >= (int) _dateArray[i]) {
+			discountFactor *= Math.pow (
+				1. + ((_forwardYieldArray[i] + yieldSpread) / frequency),
+				-1. * yearFraction (startDate, _dateArray[i], actActDCParams, dayCount) * frequency
+			);
+
+			startDate = _dateArray[i++];
+		}
+
+		if (i >= dateArrayCount) {
+			i = dateArrayCount - 1;
+		}
+
+		return discountFactor * Math.pow (1. + ((_forwardYieldArray[i] + yieldSpread) / frequency),
+			-1. * yearFraction (startDate, date, actActDCParams, dayCount) * frequency);
+	}
+
+	@Override public double df (
+		final int date)
+		throws Exception
+	{
+		return df (date, 0.);
+	}
+
 	@Override public double yld (
 		final int date)
 		throws Exception

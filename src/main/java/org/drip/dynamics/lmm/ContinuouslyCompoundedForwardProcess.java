@@ -123,7 +123,7 @@ import org.drip.function.definition.R1R1ToR1;
  * 		<li>Retrieve a Realized/Expected Value of the Discount to the Target Date #1</li>
  * 		<li>Retrieve a Realized/Expected Value of the Discount to the Target Date #2</li>
  * 		<li>Retrieve a Realized/Expected Value of the LIBOR Rate at the Target Date</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

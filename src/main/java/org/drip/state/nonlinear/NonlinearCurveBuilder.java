@@ -15,11 +15,13 @@ import org.drip.param.market.LatentStateFixingsContainer;
 import org.drip.param.pricer.CreditPricerParams;
 import org.drip.param.valuation.ValuationCustomizationParams;
 import org.drip.param.valuation.ValuationParams;
+import org.drip.product.definition.Bond;
 import org.drip.product.definition.Component;
 import org.drip.state.credit.ExplicitBootCreditCurve;
 import org.drip.state.discount.ExplicitBootDiscountCurve;
 import org.drip.state.discount.MergedDiscountForwardCurve;
 import org.drip.state.forward.ForwardCurve;
+import org.drip.state.govvie.ExplicitBootGovvieCurve;
 import org.drip.state.govvie.GovvieCurve;
 import org.drip.state.volatility.ExplicitBootVolatilityCurve;
 
@@ -616,6 +618,127 @@ public class NonlinearCurveBuilder
 						valuationCustomizationParams
 					)
 				)) {
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Boot a Single Yield Curve Node
+	 * 
+	 * @param valuationParams Valuation Parameters
+	 * @param bond Bond Instance
+	 * @param marketYield Market Value to be calibrated
+	 * @param flat TRUE - Flat Calibration across Nodes
+	 * @param curveSegmentIndex Curve Segment Index
+	 * @param explicitBootGovvieCurve Explicit Boot Govvie Curve
+	 * 
+	 * @return The Flat Bump
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
+	public static final double YieldCurveNode (
+		final ValuationParams valuationParams,
+		final Bond bond,
+		final double marketYield,
+		final boolean flat,
+		final int curveSegmentIndex,
+		final ExplicitBootGovvieCurve explicitBootGovvieCurve)
+		throws Exception
+	{
+		if (null == bond || !NumberUtil.IsValid (marketYield)) {
+			throw new Exception ("NonlinearCurveBuilder::YieldCurveNode => Invalid inputs!");
+		}
+
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
+
+		curveSurfaceQuoteContainer.setGovvieState (explicitBootGovvieCurve);
+
+		R1ToR1 nodeObjectiveFunction = new R1ToR1 (null) {
+			@Override public double evaluate (
+				final double value)
+				throws Exception
+			{
+				if (!SetNode (explicitBootGovvieCurve, curveSegmentIndex, flat, value)) {
+					throw new Exception (
+						"NonlinearCurveBuilder::YieldCurveNode => Cannot set Value = " + value +
+							" for node " + curveSegmentIndex
+					);
+				}
+
+				return marketYield - bond.yieldFromYSpread (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					0.
+				);
+			}
+		};
+
+		FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBrent (
+			0.,
+			nodeObjectiveFunction,
+			true
+		).findRoot();
+
+		if (null == fixedPointFinderOutput || !fixedPointFinderOutput.containsRoot()) {
+			throw new Exception (
+				"NonlinearCurveBuilder::YieldCurveNode => Cannot calibrate IR segment for node #" +
+					curveSegmentIndex
+			);
+		}
+
+		return fixedPointFinderOutput.getRoot();
+	}
+
+	/**
+	 * Bootstrap a Yield Curve
+	 * 
+	 * @param valuationParams Valuation Parameters
+	 * @param bondArray Array of Calibration Bonds
+	 * @param marketYieldArray Array of Market Yields
+	 * @param flat TRUE - Flat Calibration across Nodes
+	 * @param explicitBootGovvieCurve Explicit Boot Govvie Curve
+	 * 
+	 * @return TRUE - The Yield Curve successfully bootstrapped
+	 */
+
+	public static final boolean YieldCurve (
+		final ValuationParams valuationParams,
+		final Bond[] bondArray,
+		final double[] marketYieldArray,
+		final boolean flat,
+		final ExplicitBootGovvieCurve explicitBootGovvieCurve)
+	{
+		if (null == valuationParams ||
+			null == bondArray || 0 == bondArray.length ||
+			null == marketYieldArray || bondArray.length != marketYieldArray.length ||
+			null == explicitBootGovvieCurve)
+		{
+			return false;
+		}
+
+		for (int bondIndex = 0; bondIndex < bondArray.length; ++bondIndex) {
+			try {
+				if (!NumberUtil.IsValid (
+					YieldCurveNode (
+						valuationParams,
+						bondArray[bondIndex],
+						marketYieldArray[bondIndex],
+						flat,
+						bondIndex,
+						explicitBootGovvieCurve
+					)
+				))
+				{
 					return false;
 				}
 			} catch (Exception e) {

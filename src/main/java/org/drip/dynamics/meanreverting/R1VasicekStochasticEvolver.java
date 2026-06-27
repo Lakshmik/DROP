@@ -1,11 +1,24 @@
 
 package org.drip.dynamics.meanreverting;
 
+import org.drip.dynamics.ito.R1StochasticDriver;
+import org.drip.dynamics.ito.R1WienerDriver;
+import org.drip.measure.statistics.PopulationCentralMeasures;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,7 +117,18 @@ package org.drip.dynamics.meanreverting;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
+ *  <ul>
+ * 		<li>Construct a Weiner Instance of <i>R1VasicekStochasticEvolver</i> Process</li>
+ * 		<li><i>R1VasicekStochasticEvolver</i> Constructor</li>
+ * 		<li>Compute the Expected Value of x at a time t from a Starting Value x0</li>
+ * 		<li>Compute the Time Co-variance of x across Time Values t and s</li>
+ * 		<li>Estimate the Temporal Central Measures for the Underlier given the Delta 0 Starting PDF</li>
+ * 		<li>Generate the Steady State Population Central Measures</li>
+ * 		<li>Construct the Ait-Sahalia Maximum Likelihood Estimation Sampling Interval Discreteness Error</li>
+ *	</ul>
+ *
  *  <ul>
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
@@ -116,18 +140,18 @@ package org.drip.dynamics.meanreverting;
  */
 
 public class R1VasicekStochasticEvolver
-	extends org.drip.dynamics.meanreverting.R1CKLSStochasticEvolver
+	extends R1CKLSStochasticEvolver
 {
 
 	/**
-	 * Construct a Weiner Instance of R1VasicekStochasticEvolver Process
+	 * Construct a Weiner Instance of <i>R1VasicekStochasticEvolver</i> Process
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param meanReversionLevel The Mean Reversion Level
 	 * @param volatility The Volatility
 	 * @param timeWidth Wiener Time Width
 	 * 
-	 * @return Weiner Instance of R1VasicekStochasticEvolver Process
+	 * @return Weiner Instance of <i>R1VasicekStochasticEvolver</i> Process
 	 */
 
 	public static R1VasicekStochasticEvolver Wiener (
@@ -136,19 +160,14 @@ public class R1VasicekStochasticEvolver
 		final double volatility,
 		final double timeWidth)
 	{
-		try
-		{
+		try {
 			return new R1VasicekStochasticEvolver (
 				meanReversionSpeed,
 				meanReversionLevel,
 				volatility,
-				new org.drip.dynamics.ito.R1WienerDriver (
-					timeWidth
-				)
+				new R1WienerDriver (timeWidth)
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -156,29 +175,25 @@ public class R1VasicekStochasticEvolver
 	}
 
 	/**
-	 * R1VasicekStochasticEvolver Constructor
+	 * <i>R1VasicekStochasticEvolver</i> Constructor
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param meanReversionLevel The Mean Reversion Level
 	 * @param volatility The Volatility
 	 * @param r1StochasticDriver The Stochastic Driver
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1VasicekStochasticEvolver (
 		final double meanReversionSpeed,
 		final double meanReversionLevel,
 		final double volatility,
-		final org.drip.dynamics.ito.R1StochasticDriver r1StochasticDriver)
-		throws java.lang.Exception
+		final R1StochasticDriver r1StochasticDriver)
+		throws Exception
 	{
 		super (
-			org.drip.dynamics.meanreverting.CKLSParameters.Vasicek (
-				meanReversionSpeed,
-				meanReversionLevel,
-				volatility
-			),
+			CKLSParameters.Vasicek (meanReversionSpeed, meanReversionLevel, volatility),
 			r1StochasticDriver
 		);
 	}
@@ -191,29 +206,19 @@ public class R1VasicekStochasticEvolver
 	 * 
 	 * @return Expected Value of x
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double mean (
 		final double x0,
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				x0
-			) || !org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
-			throw new java.lang.Exception (
-				"R1VasicekStochasticEvolver::mean => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (x0) || !NumberUtil.IsValid (t) || 0. > t) {
+			throw new Exception ("R1VasicekStochasticEvolver::mean => Invalid Inputs");
 		}
 
-		double timeDecayFactor = java.lang.Math.exp (
-			-1. * cklsParameters().meanReversionSpeed() * t
-		);
+		double timeDecayFactor = Math.exp (-1. * cklsParameters().meanReversionSpeed() * t);
 
 		return x0 * timeDecayFactor + cklsParameters().meanReversionLevel() * (1. - timeDecayFactor);
 	}
@@ -227,87 +232,72 @@ public class R1VasicekStochasticEvolver
 	 * 
 	 * @return Time Co-variance of x
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double timeCovariance (
 		final double x0,
 		final double s,
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				s
-			) || 0. > s || !org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
-			throw new java.lang.Exception (
-				"R1VasicekStochasticEvolver::timeCovariance => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (s) || 0. > s || !NumberUtil.IsValid (t) || 0. > t) {
+			throw new Exception ("R1VasicekStochasticEvolver::timeCovariance => Invalid Inputs");
 		}
 
 		double volatility = cklsParameters().volatilityCoefficient();
 
 		double meanReversionSpeed = cklsParameters().meanReversionSpeed();
 
-		return 0.5 * volatility * volatility / meanReversionSpeed *
-		(
+		return 0.5 * volatility * volatility / meanReversionSpeed * (
 			(
-				java.lang.Math.exp (
-					-1. * meanReversionSpeed * java.lang.Math.abs (
-						s - t
-					)
-				) - java.lang.Math.exp (
-					-1. * meanReversionSpeed * (s + t)
-				)
+				Math.exp (-1. * meanReversionSpeed * Math.abs (s - t)) -
+					Math.exp (-1. * meanReversionSpeed * (s + t))
 			)
 		);
 	}
 
-	@Override public org.drip.measure.statistics.PopulationCentralMeasures
-		temporalPopulationCentralMeasures (
-			final double x0,
-			final double t)
+	/**
+	 * Estimate the Temporal Central Measures for the Underlier given the Delta 0 Starting PDF
+	 * 
+	 * @param x0 The X Anchor for the Delta Function
+	 * @param t The Forward Time
+	 * 
+	 * @return The Temporal Central Measures for the Underlier
+	 */
+
+	@Override public PopulationCentralMeasures temporalPopulationCentralMeasures (
+		final double x0,
+		final double t)
 	{
-		try
-		{
-			return new org.drip.measure.statistics.PopulationCentralMeasures (
-				mean (
-					x0,
-					t
-				),
-				timeCovariance (
-					x0,
-					t,
-					t
-				)
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new PopulationCentralMeasures (mean (x0, t), timeCovariance (x0, t, t));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.measure.statistics.PopulationCentralMeasures
-		steadyStatePopulationCentralMeasures (
-			final double x0)
+	/**
+	 * Generate the Steady State Population Central Measures
+	 * 
+	 * @param x0 Starting Variate
+	 * 
+	 * @return The Steady State Population Central Measures
+	 */
+
+	@Override public PopulationCentralMeasures steadyStatePopulationCentralMeasures (
+		final double x0)
 	{
 		double volatility = cklsParameters().volatilityCoefficient();
 
-		try
-		{
-			return new org.drip.measure.statistics.PopulationCentralMeasures (
+		try {
+			return new PopulationCentralMeasures (
 				cklsParameters().meanReversionLevel(),
 				0.5 * volatility * volatility / cklsParameters().meanReversionSpeed()
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -325,11 +315,7 @@ public class R1VasicekStochasticEvolver
 	public double[][] aitSahaliaMLEAsymptote (
 		final double intervalWidth)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				intervalWidth
-			) || 0. >= intervalWidth
-		)
-		{
+		if (!NumberUtil.IsValid (intervalWidth) || 0. >= intervalWidth) {
 			return null;
 		}
 
@@ -340,9 +326,7 @@ public class R1VasicekStochasticEvolver
 		double tTheta = intervalWidth * meanReversionSpeed;
 		double tSquaredThetaSquared = tTheta * tTheta;
 
-		double ePower_TTheta_ = java.lang.Math.exp (
-			tTheta
-		);
+		double ePower_TTheta_ = Math.exp (tTheta);
 
 		double ePower_TwoTTheta_ = ePower_TTheta_ * ePower_TTheta_;
 		double ePower_TwoTTheta_MinusOne = ePower_TwoTTheta_ - 1.;

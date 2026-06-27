@@ -10,6 +10,10 @@ DROP Dynamics Process Package implements Ito-Dynamics Based Stochastic Process.
  * [***R1ProbabilityDensityFunction***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/process/R1ProbabilityDensityFunction.java)
  <i>R1ProbabilityDensityFunction</i> exposes the R<sup>1</sup> Probability Density Function Evaluation Equation.
 
+ * [***R1ProbabilityDensityFunctionCIR***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/process/R1ProbabilityDensityFunctionCIR.java)
+ <i>R1ProbabilityDensityFunctionCIR</i> exposes the R<sup>1</sup> Probability Density Function Evaluation
+ * 	Equation for an Underlying CIR Process.
+
  * [***R1StochasticEvolver***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/process/R1StochasticEvolver.java)
  <i>R1StochasticEvolver</i> implements the R<sup>1</sup> Stochastic Evolver.
 

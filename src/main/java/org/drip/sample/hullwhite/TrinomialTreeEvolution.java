@@ -14,6 +14,14 @@ import org.drip.state.identifier.FundingLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,204 +98,313 @@ import org.drip.state.identifier.FundingLabel;
 
 /**
  * <i>TrinomialTreeEvolution</i> demonstrates the Construction and Usage of the Hull-White Trinomial Tree and
- * the Eventual Evolution of the Short Rate on it.
+ * 	the Eventual Evolution of the Short Rate on it.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/hullwhite/README.md">Hull White Trinomial Tree Dynamics</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/hullwhite/README.md">Hull White Trinomial Tree Dynamics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class TrinomialTreeEvolution {
+public class TrinomialTreeEvolution
+{
 
 	private static final SingleFactorStateEvolver HullWhiteEvolver (
-		final String strCurrency,
-		final double dblSigma,
-		final double dblA,
-		final double dblStartingForwardRate)
+		final String currency,
+		final double sigma,
+		final double a,
+		final double startingForwardRate)
 		throws Exception
 	{
 		return new SingleFactorStateEvolver (
-			FundingLabel.Standard (strCurrency),
-			dblSigma,
-			dblA,
-			new Flat (dblStartingForwardRate),
-			new BoxMullerGaussian (
-				0.,
-				1.
-			)
+			FundingLabel.Standard (currency),
+			sigma,
+			a,
+			new Flat (startingForwardRate),
+			new BoxMullerGaussian (0., 1.)
 		);
 	}
 
 	private static final void DumpMetrics (
-		final TrinomialTreeTransitionMetrics hwtm)
+		final TrinomialTreeTransitionMetrics trinomialTreeTransitionMetrics)
 		throws Exception
 	{
-		System.out.println ("\t| [" + new JulianDate (hwtm.initialDate()) + " -> " +
-			new JulianDate (hwtm.terminalDate()) + "] => " +
-			FormatUtil.FormatDouble (hwtm.expectedTerminalX(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (Math.sqrt (hwtm.xVariance()), 1, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (hwtm.xStochasticShift(), 1, 4, 1.) + " || " +
-			FormatUtil.FormatDouble (hwtm.probabilityUp(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (hwtm.upNodeMetrics().x(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (hwtm.upNodeMetrics().shortRate(), 1, 2, 100.) + "% || " +
-			FormatUtil.FormatDouble (hwtm.probabilityDown(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (hwtm.downNodeMetrics().x(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (hwtm.downNodeMetrics().shortRate(), 1, 2, 100.) + "% || " +
-			FormatUtil.FormatDouble (hwtm.probabilityStay(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (hwtm.stayNodeMetrics().x(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (hwtm.stayNodeMetrics().shortRate(), 1, 2, 100.) + "% ||"
+		System.out.println (
+			"\t| [" + new JulianDate (
+				trinomialTreeTransitionMetrics.initialDate()
+			) + " -> " + new JulianDate (
+				trinomialTreeTransitionMetrics.terminalDate()
+			) + "] => " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.expectedTerminalX(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				Math.sqrt (trinomialTreeTransitionMetrics.xVariance()),
+				1,
+				2,
+				100.
+			) + "% | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.xStochasticShift(),
+				1,
+				4,
+				1.
+			) + " || " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.probabilityUp(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.upNodeMetrics().x(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.upNodeMetrics().shortRate(),
+				1,
+				2,
+				100.
+			) + "% || " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.probabilityDown(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.downNodeMetrics().x(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.downNodeMetrics().shortRate(),
+				1,
+				2,
+				100.
+			) + "% || " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.probabilityStay(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.stayNodeMetrics().x(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				trinomialTreeTransitionMetrics.stayNodeMetrics().shortRate(),
+				1,
+				2,
+				100.
+			) + "% ||"
 		);
 	}
 
 	private static final void TreeHeader (
-		final String strEvolutionComment)
+		final String evolutionComment)
 		throws Exception
 	{
-		System.out.println ("\n\n\t|----------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\n\t|----------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                                                                                                                                    ||");
+		System.out.println (
+			"\t|                                                                                                                                                    ||"
+		);
 
-		System.out.println (strEvolutionComment);
+		System.out.println (evolutionComment);
 
-		System.out.println ("\t|    ---------------------------------------------------                                                                                             ||");
+		System.out.println (
+			"\t|    ---------------------------------------------------                                                                                             ||"
+		);
 
-		System.out.println ("\t|                                                                                                                                                    ||");
+		System.out.println (
+			"\t|                                                                                                                                                    ||"
+		);
 
-		System.out.println ("\t|    L->R:                                                                                                                                           ||");
+		System.out.println (
+			"\t|    L->R:                                                                                                                                           ||"
+		);
 
-		System.out.println ("\t|                                                                                                                                                    ||");
+		System.out.println (
+			"\t|                                                                                                                                                    ||"
+		);
 
-		System.out.println ("\t|        Initial Date                                                                                                                                ||");
+		System.out.println (
+			"\t|        Initial Date                                                                                                                                ||"
+		);
 
-		System.out.println ("\t|        Final Date                                                                                                                                  ||");
+		System.out.println (
+			"\t|        Final Date                                                                                                                                  ||"
+		);
 
-		System.out.println ("\t|        Expected Final X                                                                                                                            ||");
+		System.out.println (
+			"\t|        Expected Final X                                                                                                                            ||"
+		);
 
-		System.out.println ("\t|        X Volatility (%)                                                                                                                            ||");
+		System.out.println (
+			"\t|        X Volatility (%)                                                                                                                            ||"
+		);
 
-		System.out.println ("\t|        X Stochastic Shift                                                                                                                          ||");
+		System.out.println (
+			"\t|        X Stochastic Shift                                                                                                                          ||"
+		);
 
-		System.out.println ("\t|        Move-Up Probability                                                                                                                         ||");
+		System.out.println (
+			"\t|        Move-Up Probability                                                                                                                         ||"
+		);
 
-		System.out.println ("\t|        Move-Up X Node Value                                                                                                                        ||");
+		System.out.println (
+			"\t|        Move-Up X Node Value                                                                                                                        ||"
+		);
 
-		System.out.println ("\t|        Move-Up Short Rate                                                                                                                          ||");
+		System.out.println (
+			"\t|        Move-Up Short Rate                                                                                                                          ||"
+		);
 
-		System.out.println ("\t|        Move-Down Probability                                                                                                                       ||");
+		System.out.println (
+			"\t|        Move-Down Probability                                                                                                                       ||"
+		);
 
-		System.out.println ("\t|        Move-Down X Node Value                                                                                                                      ||");
+		System.out.println (
+			"\t|        Move-Down X Node Value                                                                                                                      ||"
+		);
 
-		System.out.println ("\t|        Move-Down Short Rate                                                                                                                        ||");
+		System.out.println (
+			"\t|        Move-Down Short Rate                                                                                                                        ||"
+		);
 
-		System.out.println ("\t|        Stay Probability                                                                                                                            ||");
+		System.out.println (
+			"\t|        Stay Probability                                                                                                                            ||"
+		);
 
-		System.out.println ("\t|        Stay X Node Value                                                                                                                           ||");
+		System.out.println (
+			"\t|        Stay X Node Value                                                                                                                           ||"
+		);
 
-		System.out.println ("\t|        Stay Short Rate                                                                                                                             ||");
+		System.out.println (
+			"\t|        Stay Short Rate                                                                                                                             ||"
+		);
 
-		System.out.println ("\t|                                                                                                                                                    ||");
+		System.out.println (
+			"\t|                                                                                                                                                    ||"
+		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
-		String strCurrency = "USD";
-		double dblStartingShortRate = 0.05;
-		double dblSigma = 0.01;
-		double dblA = 1.;
+		double startingShortRate = 0.05;
+		String currency = "USD";
+		double sigma = 0.01;
+		double a = 1.;
 
-		SingleFactorStateEvolver hw = HullWhiteEvolver (
-			strCurrency,
-			dblSigma,
-			dblA,
-			dblStartingShortRate
+		SingleFactorStateEvolver singleFactorStateEvolver = HullWhiteEvolver (
+			currency,
+			sigma,
+			a,
+			startingShortRate
 		);
 
-		int iSpotDate = dtSpot.julian();
+		int spotDateJulian = spotDate.julian();
 
-		int iFinalDate = dtSpot.addMonths (6).julian();
+		int finalDate = spotDate.addMonths (6).julian();
 
-		int iInitialDate = iSpotDate;
-		TrinomialTreeTransitionMetrics hwtm = null;
+		int initialDate = spotDateJulian;
+		TrinomialTreeTransitionMetrics trinomialTreeTransitionMetrics = null;
 
-		TreeHeader ("\t|    Hull-White Trinomial Tree Upwards Evolution Metrics                                                                                             ||");
+		TreeHeader (
+			"\t|    Hull-White Trinomial Tree Upwards Evolution Metrics                                                                                             ||"
+		);
 
-		while (iInitialDate < iFinalDate) {
-			DumpMetrics (hwtm =
-				hw.evolveTrinomialTree (
-					iSpotDate,
-					iInitialDate,
-					iFinalDate,
-					null == hwtm ? null : hwtm.upNodeMetrics()
+		while (initialDate < finalDate) {
+			DumpMetrics (
+				trinomialTreeTransitionMetrics = singleFactorStateEvolver.evolveTrinomialTree (
+					spotDateJulian,
+					initialDate,
+					finalDate,
+					null == trinomialTreeTransitionMetrics ?
+						null : trinomialTreeTransitionMetrics.upNodeMetrics()
 				)
 			);
 
-			iInitialDate += 10;
+			initialDate += 10;
 		}
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		hwtm = null;
-		iInitialDate = iSpotDate;
+		trinomialTreeTransitionMetrics = null;
+		initialDate = spotDateJulian;
 
-		TreeHeader ("\t|    Hull-White Trinomial Tree Downwards Evolution Metrics                                                                                           ||");
+		TreeHeader (
+			"\t|    Hull-White Trinomial Tree Downwards Evolution Metrics                                                                                           ||"
+		);
 
-		while (iInitialDate < iFinalDate) {
-			DumpMetrics (hwtm =
-				hw.evolveTrinomialTree (
-					iSpotDate,
-					iInitialDate,
-					iFinalDate,
-					null == hwtm ? null : hwtm.downNodeMetrics()
+		while (initialDate < finalDate) {
+			DumpMetrics (
+				trinomialTreeTransitionMetrics = singleFactorStateEvolver.evolveTrinomialTree (
+					spotDateJulian,
+					initialDate,
+					finalDate,
+					null == trinomialTreeTransitionMetrics ?
+						null : trinomialTreeTransitionMetrics.downNodeMetrics()
 				)
 			);
 
-			iInitialDate += 10;
+			initialDate += 10;
 		}
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		hwtm = null;
-		iInitialDate = iSpotDate;
+		trinomialTreeTransitionMetrics = null;
+		initialDate = spotDateJulian;
 
-		TreeHeader ("\t|    Hull-White Trinomial Tree Stay-Put Evolution Metrics                                                                                            ||");
+		TreeHeader (
+			"\t|    Hull-White Trinomial Tree Stay-Put Evolution Metrics                                                                                            ||"
+		);
 
-		while (iInitialDate < iFinalDate) {
-			DumpMetrics (hwtm =
-				hw.evolveTrinomialTree (
-					iSpotDate,
-					iInitialDate,
-					iFinalDate,
-					null == hwtm ? null : hwtm.stayNodeMetrics()
+		while (initialDate < finalDate) {
+			DumpMetrics (
+				trinomialTreeTransitionMetrics = singleFactorStateEvolver.evolveTrinomialTree (
+					spotDateJulian,
+					initialDate,
+					finalDate,
+					null == trinomialTreeTransitionMetrics ?
+						null : trinomialTreeTransitionMetrics.stayNodeMetrics()
 				)
 			);
 
-			iInitialDate += 10;
+			initialDate += 10;
 		}
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

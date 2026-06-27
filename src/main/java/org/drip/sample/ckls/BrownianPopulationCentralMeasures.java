@@ -12,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -109,14 +117,15 @@ import org.drip.service.env.EnvManager;
  * 				https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation
  * 		</li>
  *  </ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/ckls/README.md">Analysis of CKLS Process Variants</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/ckls/README.md">Analysis of CKLS Process Variants</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -136,9 +145,8 @@ public class BrownianPopulationCentralMeasures
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
+
 		double[] tArray =
 		{
 			 1.0,
@@ -150,71 +158,85 @@ public class BrownianPopulationCentralMeasures
 			 7.0,
 		};
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|                                               BROWNIAN FOKKER-PLANCK PDF TEMPORAL CENTRAL MEASURES                                                ||");
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|        L -> R:                                                                                                                                    ||");
-
-		System.out.println ("\t|                - Row of PDF {Mean | Variance} Tuple over t                                                                                        ||");
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
-
-		R1StochasticEvolver r1StochasticEvolver = R1BrownianStochasticEvolver.Wiener (
-			0.01
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
 		);
 
-		java.lang.String dump = "\t|";
+		System.out.println (
+			"\t|                                               BROWNIAN FOKKER-PLANCK PDF TEMPORAL CENTRAL MEASURES                                                ||"
+		);
 
-		for (double t : tArray)
-		{
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println (
+			"\t|        L -> R:                                                                                                                                    ||"
+		);
+
+		System.out.println (
+			"\t|                - Row of PDF {Mean | Variance} Tuple over t                                                                                        ||"
+		);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		R1StochasticEvolver r1StochasticEvolver = R1BrownianStochasticEvolver.Wiener (0.1);
+
+		String dump = "\t|";
+
+		for (double t : tArray) {
 			PopulationCentralMeasures populationCentralMeasures =
-				r1StochasticEvolver.temporalPopulationCentralMeasures (
-					0.,
-					t
-				);
+				r1StochasticEvolver.temporalPopulationCentralMeasures (0., t);
 
-			dump = dump + " {" + FormatUtil.FormatDouble (
-				populationCentralMeasures.mean(), 1, 4, 1.
-			) + " |" + FormatUtil.FormatDouble (
-				populationCentralMeasures.variance(), 1, 4, 1.
-			) + "}";
+			dump = dump + " {" + FormatUtil.FormatDouble (populationCentralMeasures.mean(), 1, 4, 1.) + " |"
+				+ FormatUtil.FormatDouble (populationCentralMeasures.variance(), 1, 4, 1.) + "}";
 		}
 
 		System.out.println (dump);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|                                             BROWNIAN FOKKER-PLANCK PDF STEADY STATE CENTRAL MEASURES                                              ||");
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|        L -> R:                                                                                                                                    ||");
-
-		System.out.println ("\t|                - PDF {Mean | Variance} Tuple                                                                                                      ||");
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
-
-		PopulationCentralMeasures populationCentralMeasures =
-			r1StochasticEvolver.steadyStatePopulationCentralMeasures (
-				0.
-			);
-
 		System.out.println (
-			"\t| {" + FormatUtil.FormatDouble (
-				populationCentralMeasures.mean(), 1, 4, 1.
-			) + " |" + FormatUtil.FormatDouble (
-				populationCentralMeasures.variance(), 1, 4, 1.
-			) + "}"
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|                                             BROWNIAN FOKKER-PLANCK PDF STEADY STATE CENTRAL MEASURES                                              ||"
+		);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println (
+			"\t|        L -> R:                                                                                                                                    ||"
+		);
+
+		System.out.println (
+			"\t|                - PDF {Mean | Variance} Tuple                                                                                                      ||"
+		);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		PopulationCentralMeasures populationCentralMeasures =
+			r1StochasticEvolver.steadyStatePopulationCentralMeasures (0.);
+
+		System.out.println (
+			"\t| {" + FormatUtil.FormatDouble (populationCentralMeasures.mean(), 1, 4, 1.) + " |" +
+				FormatUtil.FormatDouble (populationCentralMeasures.variance(), 1, 4, 1.) + "}"
+		);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

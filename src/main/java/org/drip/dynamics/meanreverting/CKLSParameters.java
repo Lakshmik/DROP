@@ -1,11 +1,21 @@
 
 package org.drip.dynamics.meanreverting;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,23 +114,36 @@ package org.drip.dynamics.meanreverting;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/meanreverting/README.md">Mean Reverting Stochastic Process Dynamics</a></li>
- *  </ul>
+ * 		<li>Construct the Vasicek Instance of the CKLS Parameters</li>
+ * 		<li>Construct the Ornstein-Uhlenbeck Instance of the CKLS Parameters</li>
+ * 		<li>Construct the Cox-Ingersoll-Ross Instance of the CKLS Parameters</li>
+ * 		<li><i>CKLSParameters</i> Constructor</li>
+ * 		<li>Retrieve the Mean Reversion Speed</li>
+ * 		<li>Retrieve the Mean Reversion Level</li>
+ * 		<li>Retrieve the Volatility Coefficient</li>
+ * 		<li>Retrieve the CKLS Volatility Exponent</li>
+ *	</ul>
+ *
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/dynamics/meanreverting/README.md">Mean Reverting Stochastic Process Dynamics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class CKLSParameters
 {
-	private double _meanReversionLevel = java.lang.Double.NaN;
-	private double _meanReversionSpeed = java.lang.Double.NaN;
-	private double _volatilityExponent = java.lang.Double.NaN;
-	private double _volatilityCoefficient = java.lang.Double.NaN;
+	private double _meanReversionLevel = Double.NaN;
+	private double _meanReversionSpeed = Double.NaN;
+	private double _volatilityExponent = Double.NaN;
+	private double _volatilityCoefficient = Double.NaN;
 
 	/**
 	 * Construct the Vasicek Instance of the CKLS Parameters
@@ -137,17 +160,9 @@ public class CKLSParameters
 		final double meanReversionLevel,
 		final double volatility)
 	{
-		try
-		{
-			return new CKLSParameters (
-				meanReversionSpeed,
-				meanReversionLevel,
-				volatility,
-				0.
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new CKLSParameters (meanReversionSpeed, meanReversionLevel, volatility, 0.);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -167,17 +182,9 @@ public class CKLSParameters
 		final double meanReversionSpeed,
 		final double volatility)
 	{
-		try
-		{
-			return new CKLSParameters (
-				meanReversionSpeed,
-				0.,
-				volatility,
-				0.
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new CKLSParameters (meanReversionSpeed, 0., volatility, 0.);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -199,17 +206,9 @@ public class CKLSParameters
 		final double meanReversionLevel,
 		final double volatilityCoefficient)
 	{
-		try
-		{
-			return new CKLSParameters (
-				meanReversionSpeed,
-				meanReversionLevel,
-				volatilityCoefficient,
-				0.5
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new CKLSParameters (meanReversionSpeed, meanReversionLevel, volatilityCoefficient, 0.5);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -217,14 +216,14 @@ public class CKLSParameters
 	}
 
 	/**
-	 * CKLSParameters Constructor
+	 * <i>CKLSParameters</i> Constructor
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param meanReversionLevel The Mean Reversion Level
 	 * @param volatilityCoefficient The Volatility Coefficient
 	 * @param volatilityExponent The Volatility Exponent
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public CKLSParameters (
@@ -232,22 +231,16 @@ public class CKLSParameters
 		final double meanReversionLevel,
 		final double volatilityCoefficient,
 		final double volatilityExponent)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				_meanReversionSpeed = meanReversionSpeed
-			) || 0. > _meanReversionSpeed || !org.drip.numerical.common.NumberUtil.IsValid (
-				_meanReversionLevel = meanReversionLevel
-			) || 0. > _meanReversionLevel || !org.drip.numerical.common.NumberUtil.IsValid (
-				_volatilityCoefficient = volatilityCoefficient
-			) || 0. > _volatilityCoefficient || !org.drip.numerical.common.NumberUtil.IsValid (
-				_volatilityExponent = volatilityExponent
-			) || 0. > _volatilityExponent
-		)
+		if (!NumberUtil.IsValid (_meanReversionSpeed = meanReversionSpeed) || 0. > _meanReversionSpeed ||
+			!NumberUtil.IsValid (_meanReversionLevel = meanReversionLevel) || 0. > _meanReversionLevel ||
+			!NumberUtil.IsValid (_volatilityCoefficient = volatilityCoefficient) ||
+				0. > _volatilityCoefficient ||
+			!NumberUtil.IsValid (_volatilityExponent = volatilityExponent) ||
+				0. > _volatilityExponent)
 		{
-			throw new java.lang.Exception (
-				"CKLSParameters Constructor => Invalid Inputs"
-			);
+			throw new Exception ("CKLSParameters Constructor => Invalid Inputs");
 		}
 	}
 

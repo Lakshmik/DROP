@@ -21,7 +21,7 @@ DROP Sample Cap Floor illustrates FRA Standard Cap Floor Valuation.
  <i>FRAStdCapMonteCarlo</i> demonstrates the steps associated with a LMM-Based Monte-Carlo pricing of a FRA
  Cap.
 
- * [***FRAStdCapMonteCarlo***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/capfloor/FRAStdCapMonteCarlo.java)
+ * [***FRAStdCapSequence***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/capfloor/FRAStdCapSequence.java)
  <i>FRAStdCapSequence</i> demonstrates the Product Creation, Market Parameters Construction, and Valuation of
  a Sequence of Standard FRA Caps. The Marks and the Valuation References are sourced from the references
  below.

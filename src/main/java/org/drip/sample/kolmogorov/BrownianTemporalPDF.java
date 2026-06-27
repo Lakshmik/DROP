@@ -12,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,14 +116,15 @@ import org.drip.service.env.EnvManager;
  * 				https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation
  * 		</li>
  *  </ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">Kolmogorov and Fokker Planck Evolution</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/kolmogorov/README.md">Kolmogorov and Fokker Planck Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -177,44 +186,54 @@ public class BrownianTemporalPDF
 		};
 
 		R1ProbabilityDensityFunction r1ProbabilityDensityFunction =
-			new R1FokkerPlanckBrownian().deltaStartTemporalPDF (
-				0.
-			);
+			new R1FokkerPlanckBrownian().deltaStartTemporalPDF (0.);
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                     FOKKER PLANCK BROWNIAN MOTION DISTRIBUTION REALIZATIONS OVER TIME                                     ||");
+		System.out.println (
+			"\t|                                     FOKKER PLANCK BROWNIAN MOTION DISTRIBUTION REALIZATIONS OVER TIME                                     ||"
+		);
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                                            ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                                            ||"
+		);
 
-		System.out.println ("\t|                - Time                                                                                                                     ||");
+		System.out.println (
+			"\t|                - Time                                                                                                                     ||"
+		);
 
-		System.out.println ("\t|                - Row of PDF Values over x                                                                                                 ||");
+		System.out.println (
+			"\t|                - Row of PDF Values over x                                                                                                 ||"
+		);
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double t : timeArray)
-		{
-			java.lang.String dump = "\t| " + FormatUtil.FormatDouble (t, 1, 1, 1.) + " =>";
+		for (double t : timeArray) {
+			String dump = "\t| " + FormatUtil.FormatDouble (t, 1, 1, 1.) + " =>";
 
-			for (double x : xArray)
-			{
+			for (double x : xArray) {
 				dump = dump + " " + FormatUtil.FormatDouble (
-					r1ProbabilityDensityFunction.density (
-						new TimeR1Vertex (
-							t,
-							x
-						)
-					), 1, 6, 1.
+					r1ProbabilityDensityFunction.density (new TimeR1Vertex (t, x)),
+					1,
+					6,
+					1.
 				) + " |";
 			}
 
 			System.out.println (dump + "|");
 		}
 
-		System.out.println ("\t|-------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

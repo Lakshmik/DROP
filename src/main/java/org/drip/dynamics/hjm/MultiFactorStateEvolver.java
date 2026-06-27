@@ -108,7 +108,6 @@ import org.drip.state.identifier.FundingLabel;
  * 	</li>
  * </ul>
  *
- *	<br><br>
  * 	In particular it looks to evolve the Multi-factor Instantaneous Forward Rates. It provides the following
  * 	Functions:
  *

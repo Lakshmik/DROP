@@ -14,6 +14,14 @@ import org.drip.state.identifier.FundingLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,56 +98,54 @@ import org.drip.state.identifier.FundingLabel;
 
 /**
  * <i>ShortRateDynamics</i> demonstrates the Construction and Usage of the Hull-White 1F Model Dynamics for
- * the Evolution of the Short Rate.
+ * 	the Evolution of the Short Rate.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/hullwhite/README.md">Hull White Trinomial Tree Dynamics</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/hullwhite/README.md">Hull White Trinomial Tree Dynamics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ShortRateDynamics {
+public class ShortRateDynamics
+{
 
 	private static final SingleFactorStateEvolver HullWhiteEvolver (
-		final String strCurrency,
-		final double dblSigma,
-		final double dblA,
-		final double dblStartingForwardRate)
+		final String currency,
+		final double sigma,
+		final double a,
+		final double startingForwardRate)
 		throws Exception
 	{
 		return new SingleFactorStateEvolver (
-			FundingLabel.Standard (strCurrency),
-			dblSigma,
-			dblA,
-			new Flat (dblStartingForwardRate),
-			new BoxMullerGaussian (
-				0.,
-				1.
-			)
+			FundingLabel.Standard (currency),
+			sigma,
+			a,
+			new Flat (startingForwardRate),
+			new BoxMullerGaussian (0., 1.)
 		);
 	}
 
 	private static final void ShortRateEvolution (
-		final SingleFactorStateEvolver hw,
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strViewTenor,
-		final double dblStartingShortRate)
+		final SingleFactorStateEvolver singleFactorStateEvolver,
+		final JulianDate spotDate,
+		final String currency,
+		final String viewTenor,
+		final double startingShortRate)
 		throws Exception
 	{
-		int iDayStep = 2;
-		JulianDate dtView = dtSpot;
-		double dblShortRate = dblStartingShortRate;
+		int dayStep = 2;
+		JulianDate viewDate = spotDate;
+		double shortRate = startingShortRate;
 
-		int iSpotDate = dtSpot.julian();
+		int spotDateJulian = spotDate.julian();
 
-		int iEndDate = dtSpot.addTenor (strViewTenor).julian();
+		int endDateJulian = spotDate.addTenor (viewTenor).julian();
 
 		System.out.println ("\n\n\t|------------------------------------------------------||");
 
@@ -165,39 +171,43 @@ public class ShortRateDynamics {
 
 		System.out.println ("\t|------------------------------------------------------||");
 
-		while (dtView.julian() < iEndDate) {
-			int iViewDate = dtView.julian();
+		while (viewDate.julian() < endDateJulian) {
+			int viewDateJulian = viewDate.julian();
 
-			double dblAlpha = hw.alpha (
-				iSpotDate,
-				iViewDate
+			double shortRateIncrement = singleFactorStateEvolver.shortRateIncrement (
+				spotDateJulian,
+				viewDateJulian,
+				shortRate,
+				dayStep
 			);
 
-			double dblTheta = hw.theta (
-				iSpotDate,
-				iViewDate
+			shortRate += shortRateIncrement;
+
+			System.out.println (
+				"\t| [" + viewDate + "] = " + FormatUtil.FormatDouble (
+					shortRate,
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					shortRateIncrement,
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					singleFactorStateEvolver.alpha (spotDateJulian, viewDateJulian),
+					1,
+					4,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					singleFactorStateEvolver.theta (spotDateJulian, viewDateJulian),
+					1,
+					4,
+					100.
+				) + "% || "
 			);
 
-			double dblShortRateIncrement = hw.shortRateIncrement (
-				iSpotDate,
-				iViewDate,
-				dblShortRate,
-				iDayStep
-			);
-
-			dblShortRate += dblShortRateIncrement;
-
-			System.out.println ("\t| [" + dtView + "] = " +
-				FormatUtil.FormatDouble (dblShortRate, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblShortRateIncrement, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblAlpha, 1, 4, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblTheta, 1, 4, 100.) + "% || "
-			);
-
-			dtView = dtView.addBusDays (
-				iDayStep,
-				strCurrency
-			);
+			viewDate = viewDate.addBusDays (dayStep, currency);
 		}
 
 		System.out.println ("\t|------------------------------------------------------||");
@@ -206,37 +216,30 @@ public class ShortRateDynamics {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
-		String strCurrency = "USD";
-		double dblStartingShortRate = 0.05;
-		double dblSigma = 0.05;
-		double dblA = 1.;
-
-		SingleFactorStateEvolver hw = HullWhiteEvolver (
-			strCurrency,
-			dblSigma,
-			dblA,
-			dblStartingShortRate
-		);
+		double startingShortRate = 0.05;
+		String currency = "USD";
+		double sigma = 0.05;
+		double a = 1.;
 
 		ShortRateEvolution (
-			hw,
-			dtSpot,
-			strCurrency,
+			HullWhiteEvolver (currency, sigma, a, startingShortRate),
+			spotDate,
+			currency,
 			"4M",
-			dblStartingShortRate
+			startingShortRate
 		);
 
 		EnvManager.TerminateEnv();

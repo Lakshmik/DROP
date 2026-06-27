@@ -128,7 +128,7 @@ import org.drip.state.identifier.FundingLabel;
  * 		<li>Retrieve the Forward Curve Instance</li>
  * 		<li>Retrieve the Discount Curve Instance</li>
  * 		<li>Evolve the Latent State and return the LSQM Point Update</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

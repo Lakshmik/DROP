@@ -14,6 +14,14 @@ import org.drip.state.identifier.FundingLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,141 +98,172 @@ import org.drip.state.identifier.FundingLabel;
 
 /**
  * <i>EvolutionMetrics</i> demonstrates the Construction and Usage of the Hull-White Metrics Using Hull-White
- * 1F Model Dynamics for the Evolution of the Short Rate.
+ * 	1F Model Dynamics for the Evolution of the Short Rate.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/hullwhite/README.md">Hull White Trinomial Tree Dynamics</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/hullwhite/README.md">Hull White Trinomial Tree Dynamics</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class EvolutionMetrics {
+public class EvolutionMetrics
+{
 
 	private static final SingleFactorStateEvolver HullWhiteEvolver (
-		final String strCurrency,
-		final double dblSigma,
-		final double dblA,
-		final double dblStartingForwardRate)
+		final String currency,
+		final double sigma,
+		final double a,
+		final double startingForwardRate)
 		throws Exception
 	{
 		return new SingleFactorStateEvolver (
-			FundingLabel.Standard (strCurrency),
-			dblSigma,
-			dblA,
-			new Flat (dblStartingForwardRate),
-			new BoxMullerGaussian (
-				0.,
-				1.
-			)
+			FundingLabel.Standard (currency),
+			sigma,
+			a,
+			new Flat (startingForwardRate),
+			new BoxMullerGaussian (0., 1.)
 		);
 	}
 
 	private static final void DumpMetrics (
-		final ShortRateUpdate hwem)
+		final ShortRateUpdate shortRateUpdate)
 		throws Exception
 	{
-		System.out.println ("\t| [" + new JulianDate (hwem.evolutionStartDate()) + " -> " +
-			new JulianDate (hwem.evolutionFinishDate()) + "] => " +
-			FormatUtil.FormatDouble (hwem.initialShortRate(), 1, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (hwem.realizedFinalShortRate(), 1, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (hwem.expectedFinalShortRate(), 1, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (hwem.zeroCouponBondPrice (0.975), 1, 2, 100.) + " | " +
-			FormatUtil.FormatDouble (Math.sqrt (hwem.finalShortRateVariance()), 1, 2, 100.) + "% || "
+		System.out.println (
+			"\t| [" + new JulianDate (shortRateUpdate.evolutionStartDate()) + " -> " +
+			new JulianDate (shortRateUpdate.evolutionFinishDate()) + "] => " +
+			FormatUtil.FormatDouble (shortRateUpdate.initialShortRate(), 1, 2, 100.) + "% | " +
+			FormatUtil.FormatDouble (shortRateUpdate.realizedFinalShortRate(), 1, 2, 100.) + "% | " +
+			FormatUtil.FormatDouble (shortRateUpdate.expectedFinalShortRate(), 1, 2, 100.) + "% | " +
+			FormatUtil.FormatDouble (shortRateUpdate.zeroCouponBondPrice (0.975), 1, 2, 100.) + " | " +
+			FormatUtil.FormatDouble (Math.sqrt (shortRateUpdate.finalShortRateVariance()), 1, 2, 100.) +
+				"% ||"
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
-		String strCurrency = "USD";
-		double dblStartingShortRate = 0.05;
-		double dblSigma = 0.03;
-		double dblA = 1.;
-		int iNumRun = 50;
+		double a = 1.;
+		int runCount = 50;
+		double sigma = 0.03;
+		String currency = "USD";
+		double startingShortRate = 0.05;
 
-		SingleFactorStateEvolver hw = HullWhiteEvolver (
-			strCurrency,
-			dblSigma,
-			dblA,
-			dblStartingShortRate
+		SingleFactorStateEvolver singleFactorStateEvolver = HullWhiteEvolver (
+			currency,
+			sigma,
+			a,
+			startingShortRate
 		);
 
-		int iSpotDate = dtSpot.julian();
+		int spotDateJulian = spotDate.julian();
 
-		int iInitialDate = dtSpot.addMonths (1).julian();
+		int finalDate = spotDate.addMonths (7).julian();
 
-		int iFinalDate = dtSpot.addMonths (7).julian();
+		int initialDate = spotDate.addMonths (1).julian();
 
-		System.out.println ("\n\t|--------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|--------------------------------------------------------------------------||"
+			);
 
-		System.out.println ("\t|                                                                          ||");
+		System.out.println (
+			"\t|                                                                          ||"
+			);
 
-		System.out.println ("\t|    Hull-White Scenario Evolution Metrics                                 ||");
+		System.out.println (
+			"\t|    Hull-White Scenario Evolution Metrics                                 ||"
+			);
 
-		System.out.println ("\t|    -------------------------------------                                 ||");
+		System.out.println (
+			"\t|    -------------------------------------                                 ||"
+		);
 
-		System.out.println ("\t|                                                                          ||");
+		System.out.println (
+			"\t|                                                                          ||"
+		);
 
-		System.out.println ("\t|    L->R:                                                                 ||");
+		System.out.println (
+			"\t|    L->R:                                                                 ||"
+		);
 
-		System.out.println ("\t|        Initial Date                                                      ||");
+		System.out.println (
+			"\t|        Initial Date                                                      ||"
+		);
 
-		System.out.println ("\t|        Final Date                                                        ||");
+		System.out.println (
+			"\t|        Final Date                                                        ||"
+		);
 
-		System.out.println ("\t|        Initial Short Rate (%)                                            ||");
+		System.out.println (
+			"\t|        Initial Short Rate (%)                                            ||"
+		);
 
-		System.out.println ("\t|        Realized Final Short Rate (%)                                     ||");
+		System.out.println (
+			"\t|        Realized Final Short Rate (%)                                     ||"
+		);
 
-		System.out.println ("\t|        Expected Final Short Rate (%)                                     ||");
+		System.out.println (
+			"\t|        Expected Final Short Rate (%)                                     ||"
+		);
 
-		System.out.println ("\t|        Zero Coupon Bond Price                                            ||");
+		System.out.println (
+			"\t|        Zero Coupon Bond Price                                            ||"
+		);
 
-		System.out.println ("\t|        Final Short Rate Variance (%)                                     ||");
+		System.out.println (
+			"\t|        Final Short Rate Variance (%)                                     ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------||"
+		);
 
-		ShortRateUpdate sruInitial = ShortRateUpdate.Create (
-			FundingLabel.Standard (strCurrency),
-			iInitialDate,
-			iInitialDate,
-			iFinalDate,
-			dblStartingShortRate,
-			dblStartingShortRate,
-			dblStartingShortRate,
+		ShortRateUpdate initialShortRateUpdate = ShortRateUpdate.Create (
+			FundingLabel.Standard (currency),
+			initialDate,
+			initialDate,
+			finalDate,
+			startingShortRate,
+			startingShortRate,
+			startingShortRate,
 			0.,
 			1.
 		);
 
-		for (int i = 0; i < iNumRun; ++i)
+		for (int runIndex = 0; runIndex < runCount; ++runIndex) {
 			DumpMetrics (
-				(ShortRateUpdate) hw.evolve (
-					iSpotDate,
-					iInitialDate,
-					iFinalDate - iInitialDate,
-					sruInitial
+				(ShortRateUpdate) singleFactorStateEvolver.evolve (
+					spotDateJulian,
+					initialDate,
+					finalDate - initialDate,
+					initialShortRateUpdate
 				)
 			);
+		}
 
-		System.out.println ("\t|--------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

@@ -113,7 +113,7 @@ import org.drip.state.identifier.FundingLabel;
  * 		<li>Retrieve the Discount Factor Increment</li>
  * 		<li>Retrieve the Log-normal LIBOR Volatility</li>
  * 		<li>Retrieve the Continuously Compounded Forward Rate Volatility</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

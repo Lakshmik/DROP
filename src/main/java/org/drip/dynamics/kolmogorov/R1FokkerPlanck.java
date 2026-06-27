@@ -128,7 +128,7 @@ import org.drip.function.definition.R1ToR1;
  * 		<li>Compute the Temporal Probability Distribution Function, if any</li>
  * 		<li>Compute the Steady-State Probability Distribution Function, if any</li>
  * 		<li>Compute the Temporal Probability Distribution Function given the Delta 0 Starting PDF</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

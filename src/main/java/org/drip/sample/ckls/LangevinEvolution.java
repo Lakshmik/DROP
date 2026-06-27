@@ -3,6 +3,7 @@ package org.drip.sample.ckls;
 
 import org.drip.dynamics.ito.R1WienerDriver;
 import org.drip.dynamics.physical.LangevinEvolver;
+import org.drip.numerical.common.NumberUtil;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 
@@ -11,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,14 +117,15 @@ import org.drip.service.env.EnvManager;
  * 				Applications</i> <b>Springer</b>
  * 		</li>
  *  </ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/ckls/README.md">Analysis of CKLS Process Variants</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/ckls/README.md">Analysis of CKLS Process Variants</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -135,16 +145,14 @@ public class LangevinEvolution
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		double timeWidth = 1.;
 		double temperature = 300.;
 		double restLength = 1.e-10;
 		double initialLength = 3.e-10;
 		double dampingCoefficient = 0.5;
-		double elasticityCoefficient = 1.0;
+		double elasticityCoefficient = 1.;
 		double[] timeArray =
 		{
 			0.0,
@@ -169,41 +177,23 @@ public class LangevinEvolution
 			9.5
 		};
 
-		System.out.println (
-			"\t|-----------------------------------------------------------||"
-		);
+		System.out.println ("\t|-----------------------------------------------------------||");
 
-		System.out.println (
-			"\t|                 LANGEVIN SYSTEM EVOLUTION                 ||"
-		);
+		System.out.println ("\t|                 LANGEVIN SYSTEM EVOLUTION                 ||");
 
-		System.out.println (
-			"\t|-----------------------------------------------------------||"
-		);
+		System.out.println ("\t|-----------------------------------------------------------||");
 
-		System.out.println (
-			"\t| Temperature             => " + temperature
-		);
+		System.out.println ("\t| Temperature             => " + temperature);
 
-		System.out.println (
-			"\t| Rest Length             => " + restLength
-		);
+		System.out.println ("\t| Rest Length             => " + restLength);
 
-		System.out.println (
-			"\t| Damping Coefficient     => " + dampingCoefficient
-		);
+		System.out.println ("\t| Damping Coefficient     => " + dampingCoefficient);
 
-		System.out.println (
-			"\t| Elasticity Coefficient  => " + elasticityCoefficient
-		);
+		System.out.println ("\t| Elasticity Coefficient  => " + elasticityCoefficient);
 
-		System.out.println (
-			"\t|-----------------------------------------------------------||"
-		);
+		System.out.println ("\t|-----------------------------------------------------------||");
 
-		R1WienerDriver wienerDriver = new R1WienerDriver (
-			timeWidth
-		);
+		R1WienerDriver wienerDriver = new R1WienerDriver (timeWidth);
 
 		LangevinEvolver langevinEvolver = new LangevinEvolver (
 			elasticityCoefficient,
@@ -213,17 +203,13 @@ public class LangevinEvolution
 			wienerDriver
 		);
 
-		System.out.println (
-			"\t| Correlation Time        => " + langevinEvolver.correlationTime()
-		);
+		System.out.println ("\t| Correlation Time        => " + langevinEvolver.correlationTime());
 
 		System.out.println (
 			"\t| Diffusion Coefficient   => " + langevinEvolver.stokesEinsteinEffectiveDiffusionCoefficient()
 		);
 
-		System.out.println (
-			"\t| Equi-Partition Energy   => " + langevinEvolver.equiPartitionEnergy()
-		);
+		System.out.println ("\t| Equi-Partition Energy   => " + langevinEvolver.equiPartitionEnergy());
 
 		System.out.println (
 			"\t| Volatility              => " + langevinEvolver.cklsParameters().volatilityCoefficient()
@@ -237,68 +223,36 @@ public class LangevinEvolution
 			"\t| Mean-Reversion Speed    => " + langevinEvolver.cklsParameters().meanReversionSpeed()
 		);
 
-		System.out.println (
-			"\t|-----------------------------------------------------------||"
-		);
+		System.out.println ("\t|-----------------------------------------------------------||");
 
 		System.out.println();
 
-		System.out.println (
-			"\t|-----------------------------------------------------------||"
-		);
+		System.out.println ("\t|-----------------------------------------------------------||");
 
-		for (double time : timeArray)
-		{
+		for (double time : timeArray) {
 			System.out.println (
 				"\t| " + FormatUtil.FormatDouble (time, 1, 1, 1.) + " => " +
-				FormatUtil.FormatDouble (
-					langevinEvolver.fluctuationCorrelation (
-						time
-					), 1, 5, 1.
-				) + " | " + FormatUtil.FormatDouble (
-					langevinEvolver.fluctuationCovariance (
-						time
-					), 1, 25, 1.
-				) + " | " + FormatUtil.FormatDouble (
-					langevinEvolver.mean (
-						initialLength,
-						time
-					), 1, 15, 1.
-				)
+				FormatUtil.FormatDouble (langevinEvolver.fluctuationCorrelation (time), 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (langevinEvolver.fluctuationCovariance (time), 1, 25, 1.) + " | " +
+				FormatUtil.FormatDouble (langevinEvolver.mean (initialLength, time), 1, 15, 1.)
 			);
 		}
 
-		System.out.println (
-			"\t|-----------------------------------------------------------||"
-		);
+		System.out.println ("\t|-----------------------------------------------------------||");
 
 		System.out.println();
 
-		double[][] aitSahaliaMLEAsymptote = langevinEvolver.aitSahaliaMLEAsymptote (
-			1.
-		);
+		double[][] aitSahaliaMLEAsymptote = langevinEvolver.aitSahaliaMLEAsymptote (1.);
 
-		System.out.println (
-			"\t|---------------------------------||"
-		);
+		System.out.println ("\t|---------------------------------||");
 
-		System.out.println (
-			"\t| AIT SAHALIA MLE ASYMPTOTE ERROR ||"
-		);
+		System.out.println ("\t| AIT SAHALIA MLE ASYMPTOTE ERROR ||");
 
-		System.out.println (
-			"\t|---------------------------------||"
-		);
+		System.out.println ("\t|---------------------------------||");
 
-		org.drip.numerical.common.NumberUtil.Print2DArray (
-			"\t|\t",
-			aitSahaliaMLEAsymptote,
-			false
-		);
+		NumberUtil.Print2DArray ("\t|\t", aitSahaliaMLEAsymptote, false);
 
-		System.out.println (
-			"\t|---------------------------------||"
-		);
+		System.out.println ("\t|---------------------------------||");
 
 		EnvManager.TerminateEnv();
 	}

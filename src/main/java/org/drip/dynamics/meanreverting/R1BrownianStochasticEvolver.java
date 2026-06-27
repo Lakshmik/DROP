@@ -1,11 +1,30 @@
 
 package org.drip.dynamics.meanreverting;
 
+import org.drip.dynamics.ito.R1StochasticDriver;
+import org.drip.dynamics.ito.R1ToR1Drift;
+import org.drip.dynamics.ito.R1ToR1Volatility;
+import org.drip.dynamics.ito.R1WienerDriver;
+import org.drip.dynamics.ito.TimeR1Vertex;
+import org.drip.dynamics.kolmogorov.R1FokkerPlanck;
+import org.drip.dynamics.kolmogorov.R1FokkerPlanckBrownian;
+import org.drip.dynamics.process.R1StochasticEvolver;
+import org.drip.measure.statistics.PopulationCentralMeasures;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,7 +123,18 @@ package org.drip.dynamics.meanreverting;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
+ *  <ul>
+ * 		<li>Construct a Weiner Instance of <i>R1BrownianStochasticEvolver</i> Process</li>
+ * 		<li><i>R1BrownianStochasticEvolver</i> Constructor</li>
+ * 		<li>Compute the Expected Value of x at a time t from a Starting Value x0</li>
+ * 		<li>Compute the Time Co-variance of x across Time Values t and s</li>
+ * 		<li>Estimate the Temporal Central Measures for the Underlier given the Delta 0 Starting PDF</li>
+ * 		<li>Generate the Steady State Population Central Measures</li>
+ * 		<li>Construct the Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver</li>
+ *	</ul>
+ *
  *  <ul>
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
@@ -116,30 +146,23 @@ package org.drip.dynamics.meanreverting;
  */
 
 public class R1BrownianStochasticEvolver
-	extends org.drip.dynamics.process.R1StochasticEvolver
+	extends R1StochasticEvolver
 {
 
 	/**
-	 * Construct a Weiner Instance of R1BrownianStochasticEvolver Process
+	 * Construct a Weiner Instance of <i>R1BrownianStochasticEvolver</i> Process
 	 * 
 	 * @param timeWidth Wiener Time Width
 	 * 
-	 * @return Weiner Instance of R1BrownianStochasticEvolver Process
+	 * @return Weiner Instance of <i>R1BrownianStochasticEvolver</i> Process
 	 */
 
 	public static R1BrownianStochasticEvolver Wiener (
 		final double timeWidth)
 	{
-		try
-		{
-			return new R1BrownianStochasticEvolver (
-				new org.drip.dynamics.ito.R1WienerDriver (
-					timeWidth
-				)
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new R1BrownianStochasticEvolver (new R1WienerDriver (timeWidth));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -147,45 +170,37 @@ public class R1BrownianStochasticEvolver
 	}
 
 	/**
-	 * R1BrownianStochasticEvolver Constructor
+	 * <i>R1BrownianStochasticEvolver</i> Constructor
 	 * 
 	 * @param r1StochasticDriver The Stochastic Driver
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1BrownianStochasticEvolver (
-		final org.drip.dynamics.ito.R1StochasticDriver r1StochasticDriver)
-		throws java.lang.Exception
+		final R1StochasticDriver r1StochasticDriver)
+		throws Exception
 	{
 		super (
-			new org.drip.dynamics.ito.R1ToR1Drift()
-			{
+			new R1ToR1Drift() {
 				@Override public double drift (
-					final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-					throws java.lang.Exception
+					final TimeR1Vertex timeR1Vertex)
+					throws Exception
 				{
-					if (null == r1TimeVertex)
-					{
-						throw new java.lang.Exception (
-							"R1BrownianStochasticEvolver::drift => Invalid Inputs"
-						);
+					if (null == timeR1Vertex) {
+						throw new Exception ("R1BrownianStochasticEvolver::drift => Invalid Inputs");
 					}
 
 					return 0.;
 				}
 			},
-			new org.drip.dynamics.ito.R1ToR1Volatility()
-			{
+			new R1ToR1Volatility() {
 				@Override public double volatility (
-					final org.drip.dynamics.ito.TimeR1Vertex r1TimeVertex)
-					throws java.lang.Exception
+					final TimeR1Vertex timeR1Vertex)
+					throws Exception
 				{
-					if (null == r1TimeVertex)
-					{
-						throw new java.lang.Exception (
-							"R1BrownianStochasticEvolver::volatility => Invalid Inputs"
-						);
+					if (null == timeR1Vertex) {
+						throw new Exception ("R1BrownianStochasticEvolver::volatility => Invalid Inputs");
 					}
 
 					return 1.;
@@ -203,24 +218,16 @@ public class R1BrownianStochasticEvolver
 	 * 
 	 * @return Expected Value of x
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double mean (
 		final double x0,
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				x0
-			) || !org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
-			throw new java.lang.Exception (
-				"R1BrownianStochasticEvolver::mean => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (x0) || !NumberUtil.IsValid (t) || 0. > t) {
+			throw new Exception ("R1BrownianStochasticEvolver::mean => Invalid Inputs");
 		}
 
 		return x0;
@@ -235,77 +242,76 @@ public class R1BrownianStochasticEvolver
 	 * 
 	 * @return Time Co-variance of x
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double timeCovariance (
 		final double x0,
 		final double s,
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				s
-			) || 0. > s || !org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
-			throw new java.lang.Exception (
-				"R1BrownianStochasticEvolver::timeCovariance => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (s) || 0. > s || !NumberUtil.IsValid (t) || 0. > t) {
+			throw new Exception ("R1BrownianStochasticEvolver::timeCovariance => Invalid Inputs");
 		}
 
 		return s > t ? s - t : t - s;
 	}
 
-	@Override public org.drip.measure.statistics.PopulationCentralMeasures
-		temporalPopulationCentralMeasures (
-			final double x0,
-			final double t)
+	/**
+	 * Estimate the Temporal Central Measures for the Underlier given the Delta 0 Starting PDF
+	 * 
+	 * @param x0 The X Anchor for the Delta Function
+	 * @param t The Forward Time
+	 * 
+	 * @return The Temporal Central Measures for the Underlier
+	 */
+
+	@Override public PopulationCentralMeasures temporalPopulationCentralMeasures (
+		final double x0,
+		final double t)
 	{
-		try
-		{
-			return new org.drip.measure.statistics.PopulationCentralMeasures (
-				x0,
-				t
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new PopulationCentralMeasures (x0, t);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.measure.statistics.PopulationCentralMeasures
-		steadyStatePopulationCentralMeasures (
-			final double x0)
+	/**
+	 * Generate the Steady State Population Central Measures
+	 * 
+	 * @param x0 Starting Variate
+	 * 
+	 * @return The Steady State Population Central Measures
+	 */
+
+	@Override public PopulationCentralMeasures steadyStatePopulationCentralMeasures (
+		final double x0)
 	{
-		try
-		{
-			return new org.drip.measure.statistics.PopulationCentralMeasures (
-				x0,
-				java.lang.Double.POSITIVE_INFINITY
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new PopulationCentralMeasures (x0, Double.POSITIVE_INFINITY);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.dynamics.kolmogorov.R1FokkerPlanck fokkerPlanckGenerator()
+	/**
+	 * Construct the Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver
+	 * 
+	 * @return The Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver
+	 */
+
+	@Override public R1FokkerPlanck fokkerPlanckGenerator()
 	{
 		try
 		{
-			return new org.drip.dynamics.kolmogorov.R1FokkerPlanckBrownian();
-		}
-		catch (java.lang.Exception e)
-		{
+			return new R1FokkerPlanckBrownian();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

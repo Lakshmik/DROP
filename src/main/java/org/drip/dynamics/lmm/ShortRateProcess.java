@@ -117,7 +117,7 @@ import org.drip.function.definition.R1R1ToR1;
  * 		<li>Retrieve the Spot Date</li>
  * 		<li>Retrieve the Stochastic Short Rate Function</li>
  * 		<li>Retrieve the Continuously Re-invested Accruing Bank Account</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

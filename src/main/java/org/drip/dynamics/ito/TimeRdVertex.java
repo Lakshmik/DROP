@@ -118,6 +118,7 @@ import org.drip.numerical.common.NumberUtil;
  *
  *  <ul>
  * 		<li><i>TimeR1Vertex</i> Constructor</li>
+ * </ul>
  *  
  *	<br>
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">

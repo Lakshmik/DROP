@@ -114,7 +114,7 @@ package org.drip.dynamics.lmm;
  * 		<li><i>PathwiseQMRealization</i> Constructor</li>
  * 		<li>Retrieve the Array of the Target Date Nodes</li>
  * 		<li>Retrieve the Array of the Realized QM</li>
- *	<br>
+ * </ul>
  *
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>

@@ -1,11 +1,33 @@
 
 package org.drip.dynamics.meanreverting;
 
+import org.drip.dynamics.ito.R1StochasticDriver;
+import org.drip.dynamics.ito.R1WienerDriver;
+import org.drip.dynamics.kolmogorov.R1FokkerPlanckCIR;
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.definition.R2ToR1;
+import org.drip.measure.chisquare.R1NonCentral;
+import org.drip.measure.chisquare.R1NonCentralParameters;
+import org.drip.measure.statistics.PopulationCentralMeasures;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.specialfunction.bessel.ModifiedFirstFrobeniusSeriesEstimator;
+import org.drip.specialfunction.digamma.CumulativeSeriesEstimator;
+import org.drip.specialfunction.gamma.EulerIntegralSecondKind;
+import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,7 +126,20 @@ package org.drip.dynamics.meanreverting;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It provides the following Functions:
+ *
+ *  <ul>
+ * 		<li>Construct a Weiner Instance of <i>R1CIRStochasticEvolver</i> Process</li>
+ * 		<li><i>R1CIRStochasticEvolver</i> Constructor</li>
+ * 		<li>Indicate it the Evolution includes Zero, or is strictly Positive</li>
+ * 		<li>Compute the Expected Value of x at a time t from a Starting Value x0</li>
+ * 		<li>Compute the Time Variance of x across at a Time Value t</li>
+ * 		<li>Estimate the Temporal Central Measures for the Underlier given the Delta 0 Starting PDF</li>
+ * 		<li>Generate the Steady State Population Central Measures</li>
+ * 		<li>Generate the Future Value Distribution at Time t</li>
+ * 		<li>Construct the Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver</li>
+ *	</ul>
+ *
  *  <ul>
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
@@ -116,18 +151,18 @@ package org.drip.dynamics.meanreverting;
  */
 
 public class R1CIRStochasticEvolver
-	extends org.drip.dynamics.meanreverting.R1CKLSStochasticEvolver
+	extends R1CKLSStochasticEvolver
 {
 
 	/**
-	 * Construct a Weiner Instance of R1CIRStochasticEvolver Process
+	 * Construct a Weiner Instance of <i>R1CIRStochasticEvolver</i> Process
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param meanReversionLevel The Mean Reversion Level
 	 * @param volatility The Volatility
 	 * @param timeWidth Wiener Time Width
 	 * 
-	 * @return Weiner Instance of R1CIRStochasticEvolver Process
+	 * @return Weiner Instance of <i>R1CIRStochasticEvolver</i> Process
 	 */
 
 	public static R1CIRStochasticEvolver Wiener (
@@ -136,19 +171,14 @@ public class R1CIRStochasticEvolver
 		final double volatility,
 		final double timeWidth)
 	{
-		try
-		{
+		try {
 			return new R1CIRStochasticEvolver (
 				meanReversionSpeed,
 				meanReversionLevel,
 				volatility,
-				new org.drip.dynamics.ito.R1WienerDriver (
-					timeWidth
-				)
+				new R1WienerDriver (timeWidth)
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -156,29 +186,25 @@ public class R1CIRStochasticEvolver
 	}
 
 	/**
-	 * R1CIRStochasticEvolver Constructor
+	 * <i>R1CIRStochasticEvolver</i> Constructor
 	 * 
 	 * @param meanReversionSpeed The Mean Reversion Speed
 	 * @param meanReversionLevel The Mean Reversion Level
 	 * @param volatilityCoefficient The Volatility Coefficient
 	 * @param r1StochasticDriver The Stochastic Driver
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1CIRStochasticEvolver (
 		final double meanReversionSpeed,
 		final double meanReversionLevel,
 		final double volatilityCoefficient,
-		final org.drip.dynamics.ito.R1StochasticDriver r1StochasticDriver)
-		throws java.lang.Exception
+		final R1StochasticDriver r1StochasticDriver)
+		throws Exception
 	{
 		super (
-			org.drip.dynamics.meanreverting.CKLSParameters.CoxIngersollRoss (
-				meanReversionSpeed,
-				meanReversionLevel,
-				volatilityCoefficient
-			),
+			CKLSParameters.CoxIngersollRoss (meanReversionSpeed, meanReversionLevel, volatilityCoefficient),
 			r1StochasticDriver
 		);
 	}
@@ -191,7 +217,7 @@ public class R1CIRStochasticEvolver
 
 	public boolean evolutionStrictlyPositive()
 	{
-		org.drip.dynamics.meanreverting.CKLSParameters cklsParameters = cklsParameters();
+		CKLSParameters cklsParameters = cklsParameters();
 
 		double volatilityCoefficient = cklsParameters.volatilityCoefficient();
 
@@ -207,29 +233,19 @@ public class R1CIRStochasticEvolver
 	 * 
 	 * @return Expected Value of x
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double mean (
 		final double x0,
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				x0
-			) || !org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
-			throw new java.lang.Exception (
-				"R1CIRStochasticEvolver::mean => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (x0) || !NumberUtil.IsValid (t) || 0. > t) {
+			throw new Exception ("R1CIRStochasticEvolver::mean => Invalid Inputs");
 		}
 
-		double timeDecayFactor = java.lang.Math.exp (
-			-1. * cklsParameters().meanReversionSpeed() * t
-		);
+		double timeDecayFactor = Math.exp (-1. * cklsParameters().meanReversionSpeed() * t);
 
 		return x0 * timeDecayFactor + cklsParameters().meanReversionLevel() * (1. - timeDecayFactor);
 	}
@@ -242,165 +258,140 @@ public class R1CIRStochasticEvolver
 	 * 
 	 * @return Time Variance of x
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double timeVariance (
 		final double x0,
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
-			throw new java.lang.Exception (
-				"R1VasicekStochasticEvolver::timeCovariance => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (t) || 0. > t) {
+			throw new Exception ("R1CIRStochasticEvolver::timeCovariance => Invalid Inputs");
 		}
 
 		double volatilityCoefficient = cklsParameters().volatilityCoefficient();
 
 		double meanReversionSpeed = cklsParameters().meanReversionSpeed();
 
-		double timeDecayFactor = java.lang.Math.exp (
-			-1. * meanReversionSpeed * t
-		);
+		double timeDecayFactor = Math.exp (-1. * meanReversionSpeed * t);
 
 		double oneMinusTimeDecayFactor = 1. - timeDecayFactor;
 
 		return volatilityCoefficient * volatilityCoefficient / meanReversionSpeed * oneMinusTimeDecayFactor *
-		(
-			x0 * timeDecayFactor + 0.5 * cklsParameters().meanReversionLevel() * oneMinusTimeDecayFactor
-		);
+			(x0 * timeDecayFactor + 0.5 * cklsParameters().meanReversionLevel() * oneMinusTimeDecayFactor);
 	}
 
-	@Override public org.drip.measure.statistics.PopulationCentralMeasures
-		temporalPopulationCentralMeasures (
-			final double x0,
-			final double t)
+	/**
+	 * Estimate the Temporal Central Measures for the Underlier given the Delta 0 Starting PDF
+	 * 
+	 * @param x0 The X Anchor for the Delta Function
+	 * @param t The Forward Time
+	 * 
+	 * @return The Temporal Central Measures for the Underlier
+	 */
+
+	@Override public PopulationCentralMeasures temporalPopulationCentralMeasures (
+		final double x0,
+		final double t)
 	{
-		try
-		{
-			return new org.drip.measure.statistics.PopulationCentralMeasures (
-				mean (
-					x0,
-					t
-				),
-				timeVariance (
-					x0,
-					t
-				)
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new PopulationCentralMeasures (mean (x0, t), timeVariance (x0, t));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.measure.statistics.PopulationCentralMeasures
-		steadyStatePopulationCentralMeasures (
-			final double x0)
+	/**
+	 * Generate the Steady State Population Central Measures
+	 * 
+	 * @param x0 Starting Variate
+	 * 
+	 * @return The Steady State Population Central Measures
+	 */
+
+	@Override public PopulationCentralMeasures steadyStatePopulationCentralMeasures (
+		final double x0)
 	{
 		double volatility = cklsParameters().volatilityCoefficient();
 
-		try
-		{
-			return new org.drip.measure.statistics.PopulationCentralMeasures (
+		try {
+			return new PopulationCentralMeasures (
 				cklsParameters().meanReversionLevel(),
 				0.5 * volatility * volatility / cklsParameters().meanReversionSpeed()
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.measure.chisquare.R1NonCentral futureValueDistribution (
+	/**
+	 * Generate the Future Value Distribution at Time t
+	 * 
+	 * @param r0 Starting Variate
+	 * @param t Time
+	 * 
+	 * @return The Future Value Distribution
+	 */
+
+	@Override public R1NonCentral futureValueDistribution (
 		final double r0,
 		final double t)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				r0
-			) || !org.drip.numerical.common.NumberUtil.IsValid (
-				t
-			) || 0. > t
-		)
-		{
+		if (!NumberUtil.IsValid (r0) || !NumberUtil.IsValid (t) || 0. > t) {
 			return null;
 		}
 
 		int digammaTermCount = 1000;
 		int besselFirstTermCount = 20;
 
-		org.drip.dynamics.meanreverting.CKLSParameters cklsParameters = cklsParameters();
+		CKLSParameters cklsParameters = cklsParameters();
 
-		double ePowerMinusAT = java.lang.Math.exp (
-			-1. * cklsParameters.meanReversionSpeed() * t
-		);
+		double ePowerMinusAT = Math.exp (-1. * cklsParameters.meanReversionSpeed() * t);
 
-		org.drip.function.definition.R1ToR1 gammaEstimator =
-			new org.drip.specialfunction.gamma.EulerIntegralSecondKind (
-				null
-			);
+		R1ToR1 gammaEstimator = new EulerIntegralSecondKind (null);
 
-		try
-		{
-			return new org.drip.measure.chisquare.R1NonCentral (
-				new org.drip.measure.chisquare.R1NonCentralParameters (
+		try {
+			return new R1NonCentral (
+				new R1NonCentralParameters (
 					cklsParameters.meanReversionLevel() * (1. - ePowerMinusAT),
 					r0 * ePowerMinusAT
 				),
 				gammaEstimator,
-				org.drip.specialfunction.digamma.CumulativeSeriesEstimator.AbramowitzStegun2007 (
-					digammaTermCount
-				),
-				new org.drip.function.definition.R2ToR1()
-				{
+				CumulativeSeriesEstimator.AbramowitzStegun2007 (digammaTermCount),
+				new R2ToR1() {
 					@Override public double evaluate (
 						final double s,
 						final double t)
 						throws Exception
 					{
-						return new org.drip.specialfunction.incompletegamma.LowerEulerIntegral (
-							null,
-							t
-						).evaluate (
-							s
-						);
+						return new LowerEulerIntegral (null, t).evaluate (s);
 					}
 				},
-				org.drip.specialfunction.bessel.ModifiedFirstFrobeniusSeriesEstimator.Standard (
-					gammaEstimator,
-					besselFirstTermCount
-				)
+				ModifiedFirstFrobeniusSeriesEstimator.Standard (gammaEstimator, besselFirstTermCount)
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.dynamics.kolmogorov.R1FokkerPlanckCIR fokkerPlanckGenerator()
+	/**
+	 * Construct the Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver
+	 * 
+	 * @return The Fokker Planck PDF Generator corresponding to R<sup>1</sup> Stochastic Evolver
+	 */
+
+	@Override public R1FokkerPlanckCIR fokkerPlanckGenerator()
 	{
-		try
-		{
-			return new org.drip.dynamics.kolmogorov.R1FokkerPlanckCIR (
-				cklsParameters()
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new R1FokkerPlanckCIR (cklsParameters());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

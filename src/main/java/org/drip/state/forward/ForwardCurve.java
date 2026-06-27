@@ -184,7 +184,7 @@ public abstract class ForwardCurve implements ForwardRateEstimator, Curve
 			throw new Exception ("ForwardRate::forward got null for date");
 		}
 
-		return forward (date);
+		return forward (date.julian());
 	}
 
 	@Override public double forward (

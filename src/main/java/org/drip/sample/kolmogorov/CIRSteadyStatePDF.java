@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,14 +116,15 @@ import org.drip.service.env.EnvManager;
  * 				https://en.wikipedia.org/wiki/Fokker%E2%80%93Planck_equation
  * 		</li>
  *  </ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/lmm/README.md">Kolmogorov and Fokker Planck Evolution</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/kolmogorov/README.md">Kolmogorov and Fokker Planck Evolution</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -137,18 +146,12 @@ public class CIRSteadyStatePDF
 			0.01
 		).fokkerPlanckGenerator().steadyStatePDF();
 
-		java.lang.String dump = "\t| [" +
-			FormatUtil.FormatDouble (meanReversionSpeed, 1, 1, 1.) + ", " +
+		String dump = "\t| [" + FormatUtil.FormatDouble (meanReversionSpeed, 1, 1, 1.) + ", " +
 			FormatUtil.FormatDouble (meanReversionLevel, 1, 1, 1.) + ", " +
 			FormatUtil.FormatDouble (volatility, 1, 1, 1.) + "] =>";
 
-		for (double x : xArray)
-		{
-			dump = dump + " " + FormatUtil.FormatDouble (
-				steadyStatePDF.evaluate (
-					x
-				), 1, 6, 1.
-			) + " |";
+		for (double x : xArray) {
+			dump = dump + " " + FormatUtil.FormatDouble (steadyStatePDF.evaluate (x), 1, 6, 1.) + " |";
 		}
 
 		System.out.println (dump + "|");
@@ -166,9 +169,7 @@ public class CIRSteadyStatePDF
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		double[] xArray =
 		{
@@ -208,41 +209,53 @@ public class CIRSteadyStatePDF
 			3.0,
 		};
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                                 CIR FOKKER-PLANCK PDF STEADY STATE DISTRIBUTION                                                   ||");
+		System.out.println (
+			"\t|                                                 CIR FOKKER-PLANCK PDF STEADY STATE DISTRIBUTION                                                   ||"
+		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                                                    ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                                                    ||"
+		);
 
-		System.out.println ("\t|                - Mean Reversion Speed                                                                                                             ||");
+		System.out.println (
+			"\t|                - Mean Reversion Speed                                                                                                             ||"
+		);
 
-		System.out.println ("\t|                - Mean Reversion Level                                                                                                             ||");
+		System.out.println (
+			"\t|                - Mean Reversion Level                                                                                                             ||"
+		);
 
-		System.out.println ("\t|                - Volatility                                                                                                                       ||");
+		System.out.println (
+			"\t|                - Volatility                                                                                                                       ||"
+		);
 
-		System.out.println ("\t|                - Row of PDF Values over x                                                                                                         ||");
+		System.out.println (
+			"\t|                - Row of PDF Values over x                                                                                                         ||"
+		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double meanReversionSpeed : meanReversionSpeedArray)
-		{
-			for (double meanReversionLevel : meanReversionLevelArray)
-			{
-				for (double volatility : volatilityArray)
-				{
-					SteadyStateDistribution (
-						meanReversionSpeed,
-						meanReversionLevel,
-						volatility,
-						xArray
-					);
+		for (double meanReversionSpeed : meanReversionSpeedArray) {
+			for (double meanReversionLevel : meanReversionLevelArray) {
+				for (double volatility : volatilityArray) {
+					SteadyStateDistribution (meanReversionSpeed, meanReversionLevel, volatility, xArray);
 				}
 			}
 		}
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}
