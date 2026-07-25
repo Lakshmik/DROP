@@ -115,10 +115,10 @@ package org.drip.spaces.iterator;
 
 public class SequenceIndexIterator
 {
-	private int _indexCursor = -1;
 	private boolean _cycle = false;
-	private int _sequenceCursor = -1;
-	private int[] _maximumEntriesPerIndexArray = null;
+	private int _sequenceIndexCursor = -1;
+	private int[] _sequenceIndexArray = null;
+	private int[] _entriesPerSequenceArray = null;
 
 	/**
 	 * Create a Standard Sequence/Index Iterator
@@ -139,8 +139,8 @@ public class SequenceIndexIterator
 
 		int[] maximumEntriesPerIndexArray = new int[sequenceCount];
 
-		for (int i = 0; i < sequenceCount; ++i) {
-			maximumEntriesPerIndexArray[i] = indexPerVariableSequence - 1;
+		for (int sequenceIndex = 0; sequenceIndex < sequenceCount; ++sequenceIndex) {
+			maximumEntriesPerIndexArray[sequenceIndex] = indexPerVariableSequence - 1;
 		}
 
 		try {
@@ -152,56 +152,48 @@ public class SequenceIndexIterator
 		return null;
 	}
 
-	private int[] setFromCursor()
-	{
-		int sequenceCount = _maximumEntriesPerIndexArray.length;
-		int[] currentIndexArray = new int[sequenceCount];
-
-		for (int sequenceIndex = 0; sequenceIndex < sequenceCount; ++sequenceIndex) {
-			if (sequenceIndex < _sequenceCursor) {
-				currentIndexArray[sequenceIndex] = _maximumEntriesPerIndexArray[sequenceIndex];
-			} else if (sequenceIndex > _sequenceCursor) {
-				currentIndexArray[sequenceIndex] = 0;
-			} else {
-				currentIndexArray[sequenceIndex] = _indexCursor;
-			}
-		}
-
-		return currentIndexArray;
-	}
-
 	/**
 	 * <i>SequenceIndexIterator</i> Constructor
 	 * 
-	 * @param maximumEntriesPerIndexArray Maximum Entries per Index
+	 * @param entriesPerSequenceArray Maximum Entries per Sequence
 	 * @param cycle TRUE - Cycle around the Index Entries
 	 * 
 	 * @throws Exception Thrown if Inputs are invalid
 	 */
 
 	public SequenceIndexIterator (
-		final int[] maximumEntriesPerIndexArray,
+		final int[] entriesPerSequenceArray,
 		final boolean cycle)
 		throws Exception
 	{
-		if (null == (_maximumEntriesPerIndexArray = maximumEntriesPerIndexArray)) {
+		if (null == (_entriesPerSequenceArray = entriesPerSequenceArray) ||
+			0 == _entriesPerSequenceArray.length)
+		{
 			throw new Exception ("SequenceIndexIterator ctr => Invalid Inputs");
 		}
 
 		_cycle = cycle;
-		_indexCursor = 0;
-		_sequenceCursor = 0;
-		int sequenceCount = _maximumEntriesPerIndexArray.length;
+		_sequenceIndexCursor = 0;
+		_sequenceIndexArray = new int[_entriesPerSequenceArray.length];
 
-		if (0 == sequenceCount) {
-			throw new Exception ("SequenceIndexIterator ctr => Invalid Inputs");
-		}
-
-		for (int i = 0; i < sequenceCount; ++i) {
-			if (0 > _maximumEntriesPerIndexArray[i]) {
+		for (int sequenceIndex = 0; sequenceIndex < _entriesPerSequenceArray.length; ++sequenceIndex) {
+			if (0 >= _entriesPerSequenceArray[sequenceIndex]) {
 				throw new Exception ("SequenceIndexIterator ctr => Invalid Inputs");
 			}
+
+			_sequenceIndexArray[sequenceIndex] = 0;
 		}
+	}
+
+	/**
+	 * Retrieve the Dimension of the Sequences
+	 * 
+	 * @return Dimension of the Sequences
+	 */
+
+	public int dimension()
+	{
+		return _entriesPerSequenceArray.length;
 	}
 
 	/**
@@ -212,10 +204,13 @@ public class SequenceIndexIterator
 
 	public int[] first()
 	{
-		_indexCursor = 0;
-		_sequenceCursor = 0;
+		_sequenceIndexCursor = 0;
 
-		return setFromCursor();
+		for (int sequenceIndex = 0; sequenceIndex < _entriesPerSequenceArray.length; ++sequenceIndex) {
+			_sequenceIndexArray[sequenceIndex] = 0;
+		}
+
+		return _sequenceIndexArray;
 	}
 
 	/**
@@ -226,14 +221,28 @@ public class SequenceIndexIterator
 
 	public int[] next()
 	{
-		if (++_indexCursor <= _maximumEntriesPerIndexArray[_sequenceCursor]) {
-			return setFromCursor();
+		if (++_sequenceIndexCursor <= _entriesPerSequenceArray[_entriesPerSequenceArray.length - 1]) {
+			_sequenceIndexArray[_entriesPerSequenceArray.length - 1] = _sequenceIndexCursor;
+			return _sequenceIndexArray;
 		}
 
-		_indexCursor = 0;
+		_sequenceIndexCursor = 0;
+		int sequenceIndex = _entriesPerSequenceArray.length - 2;
 
-		if (++_sequenceCursor < _maximumEntriesPerIndexArray.length) {
-			return setFromCursor();
+		while (sequenceIndex >= 0 &&
+			_sequenceIndexArray[sequenceIndex] >= _entriesPerSequenceArray[sequenceIndex])
+		{
+			--sequenceIndex;
+		}
+
+		if (0 <= sequenceIndex) {
+			_sequenceIndexArray[sequenceIndex] = _sequenceIndexArray[sequenceIndex] + 1;
+
+			for (int i = sequenceIndex + 1; i < _entriesPerSequenceArray.length; ++i) {
+				_sequenceIndexArray[i] = 0;
+			}
+
+			return _sequenceIndexArray;
 		}
 
 		return _cycle ? first() : null;
@@ -248,10 +257,10 @@ public class SequenceIndexIterator
 	public int size()
 	{
 		int size = 0;
-		int sequenceCount = _maximumEntriesPerIndexArray.length;
+		int sequenceCount = _entriesPerSequenceArray.length;
 
 		for (int sequenceIndex = 0; sequenceIndex < sequenceCount; ++sequenceIndex) {
-			size += _maximumEntriesPerIndexArray[sequenceIndex] + 1;
+			size += _entriesPerSequenceArray[sequenceIndex] + 1;
 		}
 
 		return size;

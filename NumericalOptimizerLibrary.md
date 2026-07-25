@@ -11,7 +11,7 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer/NumericalOptimizer_v7.14.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer/NumericalOptimizer_v7.80.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -72,22 +72,6 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 	* Motivation, Background, and Literature Survey
 	* Interior Point Methodology and Algorithm
 	* References
- * Portfolio Selection with Cardinality and Bound Constraints
-	* Synposys
-	* Introduction
-	* Problem Formulation
-	* Analysis of the Problem
-	* Bender’s Decomposition
-	* A Greedy Heuristic
-	* Cutting Planes Algorithm and PROXACCPM – Concept and Tool
-	* PROXACCPM Performance on the Generic Problem
-	* Chvatal-Gomory Cuts and Variants
-	* Chvatal-Gomory Cuts
-	* Deriving the Cuts for the Setup
-	* Branching Rule and Node Selection
-	* Computational Results
-	* Conclusion
-	* References
  * Simplex Algorithm
 	* Introduction
 	* Overview
@@ -105,6 +89,31 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 	* Efficiency
 	* Other Algorithms
 	* Linear-Fractional Programming
+	* References
+ * Practical Guide to the Simplex Method of Linear Programming
+	* Basic Steps of Simplex Algorithm
+		* Write the Linear Programming Problem in Standard Form
+		* Write the Coefficients of the Problem into a Simplex Tableau
+		* Gaussian Elimination
+		* Choose New Basic Variables
+		* Read off the Solution
+	* Initialization
+	* References
+ * Nelder-Mead Method
+	* Introduction
+	* Overview
+	* One Variation of the Nelder-Mead Algorithm
+	* Initial Simplex
+	* Termination
+	* References
+ * Himmelblau’s Function
+	* References
+ * Rosenbrock Function
+	* Overview
+	* Multidimensional Generalizations
+	* Stationary Points
+	* Optimization Examples
+	* Use in other Fields
 	* References
  * Optimal Control
 	* Introduction
@@ -149,6 +158,22 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 	* Policy Iteration
 	* Value Iteration
 	* Greedy Policy from an Optimal Value Function is an Optimal Policy
+ * Portfolio Selection with Cardinality and Bound Constraints
+	* Synposys
+	* Introduction
+	* Problem Formulation
+	* Analysis of the Problem
+	* Bender’s Decomposition
+	* A Greedy Heuristic
+	* Cutting Planes Algorithm and PROXACCPM – Concept and Tool
+	* PROXACCPM Performance on the Generic Problem
+	* Chvatal-Gomory Cuts and Variants
+	* Chvatal-Gomory Cuts
+	* Deriving the Cuts for the Setup
+	* Branching Rule and Node Selection
+	* Computational Results
+	* Conclusion
+	* References
 
 
 ## DROP Specifications

@@ -189,3 +189,13 @@
 		- Increasing Monotonocity of Reward
 		- Bellman Operator Contractibility
  --------------------------
+
+ --------------------------
+ #6 - Bellman Equation
+ --------------------------
+ --------------------------
+ 6.1) Introduction
+	- Also downhill simplex method, amoeba method, or polytope method – numerical method to find a local minimum in a multi-dimensional space
+ 6.2) Markov Decision Process
+	- Discrete Time Version of the above is the Bellman Optimality Equation, V(.) is called the Reward R(.)
+ --------------------------

@@ -859,6 +859,43 @@ public class NumberUtil {
 	}
 
 	/**
+	 * Print the contents of the 1D array as a Row
+	 * 
+	 * @param integerArray The 1D array
+	 * @param preDecimalPlaces Number of Decimal Places to Display
+	 * @param bailOnNaN TRUE - Bail on encountering an NaN
+	 * 
+	 * @return Contents of the 1D array as a Row
+	 */
+
+	public static final String ArrayRow (
+		final int[] integerArray,
+		final int preDecimalPlaces,
+		final boolean bailOnNaN)
+	{
+		if (null == integerArray || 0 == integerArray.length) {
+			return "";
+		}
+
+		int size = integerArray.length;
+		String row = "";
+
+		for (int i = 0; i < size; ++i) {
+			if (!IsValid (integerArray[i]) && bailOnNaN) {
+				return "";
+			}
+
+			if (0 != i) {
+				row = row + " |";
+			}
+
+			row = row + FormatUtil.FormatDouble (integerArray[i], preDecimalPlaces, 0, 1.);
+		}
+
+		return row;
+	}
+
+	/**
 	 * Print the contents of the 1D array to the Specified Decimal Location as a Row
 	 * 
 	 * @param doubleArray The 1D array
