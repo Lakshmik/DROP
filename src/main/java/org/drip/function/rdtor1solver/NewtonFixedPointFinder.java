@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1solver;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.function.rdtor1descent.LineStepEvolutionControl;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,109 +93,112 @@ package org.drip.function.rdtor1solver;
 
 /**
  * <i>NewtonFixedPointFinder</i> generates the Iterators for solving R<sup>d</sup> To R<sup>1</sup>
- * Convex/Non-Convex Functions Using the Multivariate Newton Method.
+ * 	Convex/Non-Convex Functions Using the Multivariate Newton Method. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalCore.md">Numerical Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/README.md">Function</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></li>
+ * 		<li><i>NewtonFixedPointFinder</i> Constructor</li>
+ * 		<li>Produce the Incremental Variate-Constraint Multiplier</li>
+ * 		<li>Iterate Over to the Next Variate-Constraint Multiplier Tuple</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class NewtonFixedPointFinder
-	extends org.drip.function.rdtor1solver.FixedRdFinder
+	extends FixedRdFinder
 {
 
 	/**
-	 * NewtonFixedPointFinder Constructor
+	 * <i>NewtonFixedPointFinder</i> Constructor
 	 * 
 	 * @param objectiveFunction The Objective Function
 	 * @param lineStepEvolutionControl The Line Step Evolution Control
 	 * @param convergenceControl Convergence Control Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public NewtonFixedPointFinder (
-		final org.drip.function.definition.RdToR1 objectiveFunction,
-		final org.drip.function.rdtor1descent.LineStepEvolutionControl lineStepEvolutionControl,
-		final org.drip.function.rdtor1solver.ConvergenceControl convergenceControl)
-		throws java.lang.Exception
+		final RdToR1 objectiveFunction,
+		final LineStepEvolutionControl lineStepEvolutionControl,
+		final ConvergenceControl convergenceControl)
+		throws Exception
 	{
-		super (
-			objectiveFunction,
-			lineStepEvolutionControl,
-			convergenceControl
-		);
+		super (objectiveFunction, lineStepEvolutionControl, convergenceControl);
 	}
 
-	@Override public org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier increment (
-		final org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier curentVariateConstraint)
+	/**
+	 * Produce the Incremental Variate-Constraint Multiplier
+	 * 
+	 * @param currentVariateInequalityConstraintMultiplier The Current Variate-Constraint Multiplier Tuple
+	 * 
+	 * @return The Incremental Variate-Constraint Multiplier
+	 */
+
+	@Override public VariateInequalityConstraintMultiplier increment (
+		final VariateInequalityConstraintMultiplier currentVariateInequalityConstraintMultiplier)
 	{
-		if (null == curentVariateConstraint)
-		{
+		if (null == currentVariateInequalityConstraintMultiplier) {
 			return null;
 		}
 
-		double[] variateArray = curentVariateConstraint.variateArray();
+		RdToR1 objectiveFunction = objectiveFunction();
 
-		org.drip.function.definition.RdToR1 objectiveFunction = objectiveFunction();
+		double[] problemVariableArray = currentVariateInequalityConstraintMultiplier.problemVariableArray();
 
-		double[] variateIncrementArray = org.drip.numerical.linearalgebra.R1MatrixUtil.Product (
-			org.drip.numerical.linearalgebra.R1MatrixUtil.InvertUsingGaussianElimination (
-				objectiveFunction.hessian (
-					variateArray
-				)
-			),
-			objectiveFunction.jacobian (
-				variateArray
-			)
+		double[] problemVariableIncrementArray = R1MatrixUtil.Product (
+			R1MatrixUtil.InvertUsingGaussianElimination (objectiveFunction.hessian (problemVariableArray)),
+			objectiveFunction.jacobian (problemVariableArray)
 		);
 
-		if (null == variateIncrementArray)
-		{
+		if (null == problemVariableIncrementArray) {
 			return null;
 		}
 
-		int variateDimension = variateIncrementArray.length;
-
-		for (int variateDimensionIndex = 0;
-			variateDimensionIndex < variateDimension;
-			++variateDimensionIndex)
+		for (int problemVariableDimensionIndex = 0;
+			problemVariableDimensionIndex < problemVariableIncrementArray.length;
+			++problemVariableDimensionIndex)
 		{
-			variateIncrementArray[variateDimensionIndex] =
-				-1. * variateIncrementArray[variateDimensionIndex];
+			problemVariableIncrementArray[problemVariableDimensionIndex] =
+				-1. * problemVariableIncrementArray[problemVariableDimensionIndex];
 		}
 
-		try
-		{
-			return new org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier (
-				true,
-				variateIncrementArray,
-				null
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new VariateInequalityConstraintMultiplier (true, problemVariableIncrementArray, null);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier next (
-		final org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier curentVariateConstraint,
-		final org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier
-			incrementalVariateConstraint,
+	/**
+	 * Iterate Over to the Next Variate-Constraint Multiplier Tuple
+	 * 
+	 * @param currentVariateInequalityConstraintMultiplier Current Variate-Constraint Multiplier Tuple
+	 * @param incrementVariateInequalityConstraintMultiplier Incremental Variate-Constraint Multiplier Tuple
+	 * @param incrementFraction The Incremental Fraction to be applied
+	 * 
+	 * @return The Next Variate-Constraint Multiplier Set
+	 */
+
+	@Override public VariateInequalityConstraintMultiplier next (
+		final VariateInequalityConstraintMultiplier currentVariateInequalityConstraintMultiplier,
+		final VariateInequalityConstraintMultiplier incrementVariateInequalityConstraintMultiplier,
 		final double incrementFraction)
 	{
-		return org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier.Add (
-			curentVariateConstraint,
-			incrementalVariateConstraint,
+		return VariateInequalityConstraintMultiplier.Add (
+			currentVariateInequalityConstraintMultiplier,
+			incrementVariateInequalityConstraintMultiplier,
 			incrementFraction,
 			null
 		);

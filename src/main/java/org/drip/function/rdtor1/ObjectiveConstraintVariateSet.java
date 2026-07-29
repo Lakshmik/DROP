@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,130 +91,170 @@ package org.drip.function.rdtor1;
 
 /**
  * <i>ObjectiveConstraintVariateSet</i> holds a R<sup>d</sup> To R<sup>1</sup> Variates corresponding to the
- * Objective Function and the Constraint Function respectively.
+ * 	Objective Function and the Constraint Function respectively. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li>Make a Unitary Variate Set</li>
+ * 		<li>Make a Variate Set with/without Constraint</li>
+ * 		<li>Make a Variate Set using a Pre-set Objective Variate Array with/without Constraint</li>
+ * 		<li>Partition the Variate Array into the Objective Function Input Variates and the Constraint Variate</li>
+ * 		<li><i>ObjectiveConstraintVariateSet</i> Constructor</li>
+ * 		<li>Retrieve the Array of the Objective Function Variates</li>
+ * 		<li>Retrieve the Array of the Constraint Function Variates</li>
+ * 		<li>Unify the Objective Function and the Constraint Function Input Variate Set</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ObjectiveConstraintVariateSet {
-	private double[] _adblObjectiveVariate = null;
-	private double[] _adblConstraintVariate = null;
+public class ObjectiveConstraintVariateSet
+{
+	private double[] _kktCoefficientArray = null;
+	private double[] _problemVariableArray = null;
 
 	/**
 	 * Make a Unitary Variate Set
 	 * 
-	 * @param iNumVariate Number of Variates
+	 * @param variateCount Number of Variates
 	 * 
 	 * @return Unitary Variate Set
 	 */
 
 	public static final double[] Unitary (
-		final int iNumVariate)
+		final int variateCount)
 	{
-		if (0 >= iNumVariate) return null;
+		if (0 >= variateCount) {
+			return null;
+		}
 
-		double[] adblVariate = new double[iNumVariate];
+		double[] variateArray = new double[variateCount];
 
-		for (int i = 0; i < iNumVariate; ++i)
-			adblVariate[i] = 1.;
+		for (int variateIndex = 0; variateIndex < variateCount; ++variateIndex) {
+			variateArray[variateIndex] = 1.;
+		}
 
-		return adblVariate;
+		return variateArray;
 	}
 
 	/**
 	 * Make a Variate Set with/without Constraint
 	 * 
-	 * @param iNumObjectiveFunctionVariate Number of the Objective Function Variates
-	 * @param iNumConstraintFunctionVariate Number of the Constraint Function Variates
+	 * @param problemVariableCount Number of the Objective Function Variables
+	 * @param kktCoefficientCount Number of the Constraint Function Variates
 	 * 
 	 * @return Variate Set with/without Constraint
 	 */
 
 	public static final double[] Uniform (
-		final int iNumObjectiveFunctionVariate,
-		final int iNumConstraintFunctionVariate)
+		final int problemVariableCount,
+		final int kktCoefficientCount)
 	{
-		if (0 >= iNumObjectiveFunctionVariate) return null;
+		if (0 >= problemVariableCount) {
+			return null;
+		}
 
-		double[] adblVariate = new double[iNumObjectiveFunctionVariate + iNumConstraintFunctionVariate];
+		double[] variateArray = new double[problemVariableCount + kktCoefficientCount];
 
-		for (int i = 0; i < iNumObjectiveFunctionVariate; ++i)
-			adblVariate[i] = 1. / iNumObjectiveFunctionVariate;
+		for (int problemVariableIndex = 0;
+			problemVariableIndex < problemVariableCount;
+			++problemVariableIndex)
+		{
+			variateArray[problemVariableIndex] = 1. / problemVariableCount;
+		}
 
-		for (int i = 0; i < iNumConstraintFunctionVariate; ++i)
-			adblVariate[i + iNumObjectiveFunctionVariate] = 0.;
+		for (int kktCoefficientIndex = 0; kktCoefficientIndex < kktCoefficientCount; ++kktCoefficientIndex) {
+			variateArray[kktCoefficientIndex + problemVariableCount] = 0.;
+		}
 
-		return adblVariate;
+		return variateArray;
 	}
 
 	/**
 	 * Make a Variate Set using a Pre-set Objective Variate Array with/without Constraint
 	 * 
-	 * @param adblObjectiveFunctionVariate Array of Pre-set Objective Variates
-	 * @param iNumConstraintFunctionVariate Number of the Constraint Function Variates
+	 * @param problemVariableArray Array of Pre-set Objective Variates
+	 * @param kktCoefficientArray Number of the Constraint Function Variates
 	 * 
 	 * @return Variate Set using a Pre-set Objective Variate Array with/without Constraint
 	 */
 
 	public static final double[] Preset (
-		final double[] adblObjectiveFunctionVariate,
-		final int iNumConstraintFunctionVariate)
+		final double[] problemVariableArray,
+		final int kktCoefficientArray)
 	{
-		if (null == adblObjectiveFunctionVariate) return null;
+		if (null == problemVariableArray) {
+			return null;
+		}
 
-		int iNumObjectiveFunctionVariate = adblObjectiveFunctionVariate.length;
+		int problemVariableCount = problemVariableArray.length;
 
-		if (0 >= iNumObjectiveFunctionVariate) return null;
+		if (0 >= problemVariableCount) {
+			return null;
+		}
 
-		double[] adblVariate = new double[iNumObjectiveFunctionVariate + iNumConstraintFunctionVariate];
+		double[] variateArray = new double[problemVariableCount + kktCoefficientArray];
 
-		for (int i = 0; i < iNumObjectiveFunctionVariate; ++i)
-			adblVariate[i] = adblObjectiveFunctionVariate[i];
+		for (int problemVariableIndex = 0;
+			problemVariableIndex < problemVariableCount;
+			++problemVariableIndex)
+		{
+			variateArray[problemVariableIndex] = problemVariableArray[problemVariableIndex];
+		}
 
-		for (int i = 0; i < iNumConstraintFunctionVariate; ++i)
-			adblVariate[i + iNumObjectiveFunctionVariate] = 0.;
+		for (int kktCoefficientIndex = 0; kktCoefficientIndex < kktCoefficientArray; ++kktCoefficientIndex) {
+			variateArray[kktCoefficientIndex + problemVariableCount] = 0.;
+		}
 
-		return adblVariate;
+		return variateArray;
 	}
 
 	/**
 	 * Partition the Variate Array into the Objective Function Input Variates and the Constraint Variate
 	 * 
-	 * @param adblVariate The Input Variate Array
-	 * @param iNumObjectiveFunctionVariate Number of the Objective Function Variates
+	 * @param variateArray The Input Variate Array
+	 * @param problemVariableCount Number of the Objective Function Variates
 	 * 
 	 * @return The ObjectiveConstraintVariateSet Instance
 	 */
 
 	public static final ObjectiveConstraintVariateSet Partition (
-		final double[] adblVariate,
-		final int iNumObjectiveFunctionVariate)
+		final double[] variateArray,
+		final int problemVariableCount)
 	{
-		if (null == adblVariate || 0 == iNumObjectiveFunctionVariate) return null;
+		if (null == variateArray || 0 == problemVariableCount) {
+			return null;
+		}
 
-		int iNumVariate = adblVariate.length;
-		double[] adblObjectiveVariate = new double[iNumObjectiveFunctionVariate];
-		double[] adblConstraintVariate = new double[iNumVariate - iNumObjectiveFunctionVariate];
+		double[] problemVariableArray = new double[problemVariableCount];
+		double[] kktCoefficientArray = new double[variateArray.length - problemVariableCount];
 
-		if (iNumObjectiveFunctionVariate >= iNumVariate) return null;
+		if (problemVariableCount >= variateArray.length) {
+			return null;
+		}
 
-		for (int i = 0; i < iNumObjectiveFunctionVariate; ++i)
-			adblObjectiveVariate[i] = adblVariate[i];
+		for (int problemVariableIndex = 0;
+			problemVariableIndex < problemVariableCount;
+			++problemVariableIndex)
+		{
+			problemVariableArray[problemVariableIndex] = variateArray[problemVariableIndex];
+		}
 
-		for (int i = iNumObjectiveFunctionVariate; i < iNumVariate; ++i)
-			adblConstraintVariate[i - iNumObjectiveFunctionVariate] = adblVariate[i];
+		for (int variateIndex = problemVariableCount; variateIndex < variateArray.length; ++variateIndex) {
+			kktCoefficientArray[variateIndex - problemVariableCount] = variateArray[variateIndex];
+		}
 
 		try {
-			return new ObjectiveConstraintVariateSet (adblObjectiveVariate, adblConstraintVariate);
-		} catch (java.lang.Exception e) {
+			return new ObjectiveConstraintVariateSet (problemVariableArray, kktCoefficientArray);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -212,24 +262,26 @@ public class ObjectiveConstraintVariateSet {
 	}
 
 	/**
-	 * ObjectiveConstraintVariate Constructor
+	 * <i>ObjectiveConstraintVariateSet</i> Constructor
 	 * 
-	 * @param adblObjectiveVariate Array of the Objective Function Variates
-	 * @param adblConstraintVariate Array of the Constraint Function Variates
+	 * @param problemVariableArray Array of the Objective Function Variates
+	 * @param kktCoefficientArray Array of the Constraint Function Variates
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ObjectiveConstraintVariateSet (
-		final double[] adblObjectiveVariate,
-		final double[] adblConstraintVariate)
-		throws java.lang.Exception
+		final double[] problemVariableArray,
+		final double[] kktCoefficientArray)
+		throws Exception
 	{
-		if (null == (_adblObjectiveVariate = adblObjectiveVariate) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_adblObjectiveVariate) || null ==
-				(_adblConstraintVariate = adblConstraintVariate) || !org.drip.numerical.common.NumberUtil.IsValid
-					(adblConstraintVariate))
-			throw new java.lang.Exception ("ObjectiveConstraintVariateSet Constructor => Invalid Inputs!");
+		if (null == (_problemVariableArray = problemVariableArray) ||
+				!NumberUtil.IsValid (_problemVariableArray) ||
+			null == (_kktCoefficientArray = kktCoefficientArray) ||
+				!NumberUtil.IsValid (kktCoefficientArray))
+		{
+			throw new Exception ("ObjectiveConstraintVariateSet Constructor => Invalid Inputs!");
+		}
 	}
 
 	/**
@@ -238,9 +290,9 @@ public class ObjectiveConstraintVariateSet {
 	 * @return The Array of the Objective Function Variates
 	 */
 
-	public double[] objectiveVariates()
+	public double[] problemVariableArray()
 	{
-		return _adblObjectiveVariate;
+		return _problemVariableArray;
 	}
 
 	/**
@@ -249,9 +301,9 @@ public class ObjectiveConstraintVariateSet {
 	 * @return The Array of the Constraint Function Variates
 	 */
 
-	public double[] constraintVariates()
+	public double[] kktCoefficientArray()
 	{
-		return _adblConstraintVariate;
+		return _kktCoefficientArray;
 	}
 
 	/**
@@ -262,17 +314,23 @@ public class ObjectiveConstraintVariateSet {
 
 	public double[] unify()
 	{
-		int iNumObjectiveFunctionVariate = _adblObjectiveVariate.length;
-		int iNumConstraintFunctionVariate = _adblConstraintVariate.length;
-		int iNumVariate = iNumObjectiveFunctionVariate + iNumConstraintFunctionVariate;
-		double[] adblVariate = new double[iNumVariate];
+		double[] variateArray = new double[_problemVariableArray.length + _kktCoefficientArray.length];
 
-		for (int i = 0; i < iNumObjectiveFunctionVariate; ++i)
-			adblVariate[i] = _adblObjectiveVariate[i];
+		for (int problemVariableIndex = 0;
+			problemVariableIndex < _problemVariableArray.length;
+			++problemVariableIndex)
+		{
+			variateArray[problemVariableIndex] = _problemVariableArray[problemVariableIndex];
+		}
 
-		for (int i = 0; i < iNumConstraintFunctionVariate; ++i)
-			adblVariate[iNumObjectiveFunctionVariate + i] = _adblConstraintVariate[i];
+		for (int kktCoefficientIndex = 0;
+			kktCoefficientIndex < _kktCoefficientArray.length;
+			++kktCoefficientIndex)
+		{
+			variateArray[_problemVariableArray.length + kktCoefficientIndex] =
+				_kktCoefficientArray[kktCoefficientIndex];
+		}
 
-		return adblVariate;
+		return variateArray;
 	}
 }

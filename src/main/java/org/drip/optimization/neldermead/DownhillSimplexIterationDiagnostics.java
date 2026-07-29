@@ -1,6 +1,8 @@
 
 package org.drip.optimization.neldermead;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -115,42 +117,48 @@ package org.drip.optimization.neldermead;
 
 public class DownhillSimplexIterationDiagnostics
 {
+	private double[] _centroidVertex = null;
+	private DownhillSimplexVertexes _vertexes = null;
 	private ObjectiveFunctionCoordinate _lowestObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _highestObjectiveFunctionCoordinate = null;
-	private ObjectiveFunctionCoordinate _centroidObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _expandedObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _reflectedObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _contractedObjectiveFunctionCoordinate = null;
+	private ObjectiveFunctionCoordinate _shrinkCentroidObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _penultimateHighestObjectiveFunctionCoordinate = null;
 
+	protected DownhillSimplexIterationDiagnostics()
+	{
+	}
+
 	/**
-	 * Set the Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * Set the Centroid Vertex
 	 * 
-	 * @param centroidObjectiveFunctionCoordinate Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * @param centroidVertex Centroid Vertex
 	 * 
-	 * @return TRUE - Centroid <i>ObjectiveFunctionCoordinate</i> successfully set
+	 * @return TRUE - Centroid Vertex successfully set
 	 */
 
-	public boolean setCentroidObjectiveFunctionCoordinate (
-		final ObjectiveFunctionCoordinate centroidObjectiveFunctionCoordinate)
+	public boolean setCentroidVertex (
+		final double[] centroidVertex)
 	{
-		if (null == centroidObjectiveFunctionCoordinate) {
+		if (null == centroidVertex) {
 			return false;
 		}
 
-		_centroidObjectiveFunctionCoordinate = centroidObjectiveFunctionCoordinate;
+		_centroidVertex = centroidVertex;
 		return true;
 	}
 
 	/**
-	 * Retrieve Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * Retrieve the Centroid Vertex
 	 * 
-	 * @return Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * @return Centroid Vertex
 	 */
 
-	public ObjectiveFunctionCoordinate centroidObjectiveFunctionCoordinate()
+	public double[] centroidVertex()
 	{
-		return _centroidObjectiveFunctionCoordinate;
+		return _centroidVertex;
 	}
 
 	/**
@@ -247,7 +255,7 @@ public class DownhillSimplexIterationDiagnostics
 	 * Set the Penultimate Highest <i>ObjectiveFunctionCoordinate</i>
 	 * 
 	 * @param penultimateHighestObjectiveFunctionCoordinate
-	 * 		Penultimate Highest <i>ObjectiveFunctionCoordinate</i>
+	 * 	Penultimate Highest <i>ObjectiveFunctionCoordinate</i>
 	 * 
 	 * @return TRUE - Penultimate Highest <i>ObjectiveFunctionCoordinate</i> successfully set
 	 */
@@ -332,5 +340,128 @@ public class DownhillSimplexIterationDiagnostics
 	public ObjectiveFunctionCoordinate contractedObjectiveFunctionCoordinate()
 	{
 		return _contractedObjectiveFunctionCoordinate;
+	}
+
+	/**
+	 * Set the Shrink Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * 
+	 * @param shrinkCentroidObjectiveFunctionCoordinate Shrink Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * 
+	 * @return TRUE - Shrink Centroid <i>ObjectiveFunctionCoordinate</i> successfully set
+	 */
+
+	public boolean setShrinkCentroidObjectiveFunctionCoordinate (
+		final ObjectiveFunctionCoordinate shrinkCentroidObjectiveFunctionCoordinate)
+	{
+		if (null == shrinkCentroidObjectiveFunctionCoordinate) {
+			return false;
+		}
+
+		_shrinkCentroidObjectiveFunctionCoordinate = shrinkCentroidObjectiveFunctionCoordinate;
+		return true;
+	}
+
+	/**
+	 * Retrieve Shrink Centroid <i>ObjectiveFunctionCoordinate</i>
+	 * 
+	 * @return Shrink Centroid <i>ObjectiveFunctionCoordinate</i>
+	 */
+
+	public ObjectiveFunctionCoordinate shrinkCentroidObjectiveFunctionCoordinate()
+	{
+		return _shrinkCentroidObjectiveFunctionCoordinate;
+	}
+
+	/**
+	 * Set the Downhill Simplex Vertexes Instance
+	 * 
+	 * @param vertexes Downhill Simplex Vertexes Instance
+	 * 
+	 * @return TRUE - The Downhill Simplex Vertexes Instance successfully set
+	 */
+
+	public boolean setVertexes (
+		final DownhillSimplexVertexes vertexes)
+	{
+		if (null == vertexes) {
+			return false;
+		}
+
+		_vertexes = vertexes;
+		return true;
+	}
+
+	/**
+	 * Retrieve Downhill Simplex Vertexes Instance
+	 * 
+	 * @return Downhill Simplex Vertexes Instance
+	 */
+
+	public DownhillSimplexVertexes vertexes()
+	{
+		return _vertexes;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		String dump = prefix + "{";
+
+		if (null != _centroidVertex) {
+			dump += "(" + NumberUtil.ArrayRow (_centroidVertex, 1, 4, false) + "); ";
+		}
+
+		if (null != _highestObjectiveFunctionCoordinate) {
+			dump += "(" + _highestObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _reflectedObjectiveFunctionCoordinate) {
+			dump += "(" + _reflectedObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _expandedObjectiveFunctionCoordinate) {
+			dump += "(" + _expandedObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _penultimateHighestObjectiveFunctionCoordinate) {
+			dump += "(" + _penultimateHighestObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _lowestObjectiveFunctionCoordinate) {
+			dump += "(" + _lowestObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _contractedObjectiveFunctionCoordinate) {
+			dump += "(" + _contractedObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _shrinkCentroidObjectiveFunctionCoordinate) {
+			dump += "(" + _shrinkCentroidObjectiveFunctionCoordinate + "); ";
+		}
+
+		if (null != _vertexes) {
+			dump += "(" + _vertexes + "); ";
+		}
+
+		return dump + "}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

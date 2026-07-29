@@ -18,6 +18,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,16 +101,16 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>LongOnlyMarkovitzBullet</i> demonstrates the Construction of the Efficient Frontier using the
- * Constrained Mean Variance Optimizer for a Long-Only Portfolio.
+ * 	Constrained Mean Variance Optimizer for a Long-Only Portfolio.
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/efficientfrontier/README.md">Efficient Frontier Markovitz Bullet Variants</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/efficientfrontier/README.md">Efficient Frontier Markovitz Bullet Variants</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -111,23 +119,17 @@ public class LongOnlyMarkovitzBullet
 {
 
 	private static void DisplayPortfolioMetrics (
-		final HoldingsAllocation optimizationOutput)
+		final HoldingsAllocation holdingsAllocation)
 		throws Exception
 	{
-		AssetComponent[] globalMinimumAssetComponentArray =
-			optimizationOutput.optimalPortfolio().assetComponentArray();
+		PortfolioMetrics portfolioMetrics = holdingsAllocation.optimalMetrics();
 
-		String dump = "\t|" + FormatUtil.FormatDouble (
-				optimizationOutput.optimalMetrics().excessReturnsMean(), 1, 4, 100.
-			) + "% |" + FormatUtil.FormatDouble (
-				optimizationOutput.optimalMetrics().excessReturnsStandardDeviation(), 1, 4, 100.
-			) + " |";
+		String dump = "\t|" + FormatUtil.FormatDouble (portfolioMetrics.excessReturnsMean(), 1, 4, 100) +
+			"% |" +
+			FormatUtil.FormatDouble (portfolioMetrics.excessReturnsStandardDeviation(), 1, 4, 100) + " |";
 
-		for (AssetComponent assetComponent : globalMinimumAssetComponentArray)
-		{
-			dump += " " + FormatUtil.FormatDouble (
-				assetComponent.amount(), 3, 2, 100.
-			) + "% |";
+		for (AssetComponent assetComponent : holdingsAllocation.optimalPortfolio().assetComponentArray()) {
+			dump += " " + FormatUtil.FormatDouble (assetComponent.amount(), 3, 2, 100.) + "% |";
 		}
 
 		System.out.println (dump + "|");
@@ -200,56 +202,55 @@ public class LongOnlyMarkovitzBullet
 		};
 		int frontierSampleUnits = 20;
 
-		AssetUniverseStatisticalProperties ausp = AssetUniverseStatisticalProperties.FromMultivariateMetrics (
-			MultivariateMoments.Standard (
-				assetNameArray,
-				expectedAssetReturnsArray,
-				assetReturnsCovarianceMatrix
-			)
+		AssetUniverseStatisticalProperties assetUniverseStatisticalProperties =
+			AssetUniverseStatisticalProperties.FromMultivariateMetrics (
+				MultivariateMoments.Standard (
+					assetNameArray,
+					expectedAssetReturnsArray,
+					assetReturnsCovarianceMatrix
+				)
+			);
+
+		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (assetNameArray);
+
+		System.out.println (
+			"\n\n\t|------------------------------------------------------------------------------------------------||"
 		);
 
-		double[][] aadblCovarianceMatrix = ausp.covariance (
-			assetNameArray
+		System.out.println (
+			"\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||"
 		);
 
-		System.out.println ("\n\n\t|------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||");
-
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		String header = "\t|     |";
 
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
 			header += "    " + assetNameArray[assetIndex] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetNameArray.length;
-			++assetIndexI)
-		{
-			String strDump = "\t| " + assetNameArray[assetIndexI] + " ";
+		for (int assetIndexI = 0; assetIndexI < assetNameArray.length; ++assetIndexI) {
+			String dump = "\t| " + assetNameArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetNameArray.length;
-				++assetIndexJ)
-			{
-				strDump += "|" + FormatUtil.FormatDouble (
-					aadblCovarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.
-				) + " ";
+			for (int assetIndexJ = 0; assetIndexJ < assetNameArray.length; ++assetIndexJ) {
+				dump += "|" +
+					FormatUtil.FormatDouble (covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.) + " ";
 			}
 
-			System.out.println (strDump + "||");
+			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||\n\n");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||\n\n"
+		);
 
 		System.out.println ("\t|-------------------||");
 
@@ -257,17 +258,11 @@ public class LongOnlyMarkovitzBullet
 
 		System.out.println ("\t|-------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
 			System.out.println (
 				"\t| " + assetNameArray[assetIndex] + " | " +
-				FormatUtil.FormatDouble (
-					assetHoldingsLowerBoundArray[assetIndex], 2, 0, 100.
-				) + "% | " + FormatUtil.FormatDouble (
-					assetHoldingsUpperBoundArray[assetIndex], 2, 0, 100.
-				) + "% ||"
+				FormatUtil.FormatDouble (assetHoldingsLowerBoundArray[assetIndex], 2, 0, 100.) + "% | " +
+				FormatUtil.FormatDouble (assetHoldingsUpperBoundArray[assetIndex], 2, 0, 100.) + "% ||"
 			);
 		}
 
@@ -299,7 +294,7 @@ public class LongOnlyMarkovitzBullet
 
 		System.out.println ("\t|--------------------------------------------||\n\n");
 
-		BoundedHoldingsAllocationControl boundedPortfolioConstructionParameters =
+		BoundedHoldingsAllocationControl boundedHoldingsAllocationControl =
 			new BoundedHoldingsAllocationControl (
 				assetNameArray,
 				CustomRiskUtilitySettings.VarianceMinimizer(),
@@ -309,11 +304,8 @@ public class LongOnlyMarkovitzBullet
 				)
 			);
 
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
-			boundedPortfolioConstructionParameters.addBound (
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
+			boundedHoldingsAllocationControl.addBound (
 				assetNameArray[assetIndex],
 				assetHoldingsLowerBoundArray[assetIndex],
 				assetHoldingsUpperBoundArray[assetIndex]
@@ -322,64 +314,72 @@ public class LongOnlyMarkovitzBullet
 
 		MarkovitzBullet markovitzBullet = new ConstrainedMeanVarianceOptimizer (
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).efficientFrontier (
-			boundedPortfolioConstructionParameters,
-			ausp,
+			boundedHoldingsAllocationControl,
+			assetUniverseStatisticalProperties,
 			frontierSampleUnits
 		);
 
-		System.out.println ("\n\n\t|-----------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\n\t|-----------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                     GLOBAL MINIMUM VARIANCE AND MAXIMUM RETURNS PORTFOLIOS                    ||");
+		System.out.println (
+			"\t|                     GLOBAL MINIMUM VARIANCE AND MAXIMUM RETURNS PORTFOLIOS                    ||"
+		);
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||"
+		);
 
 		header = "\t| RETURNS | RISK % |";
 
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
 			header += "   " + assetNameArray[assetIndex] + "    |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||");
-
-		DisplayPortfolioMetrics (
-			markovitzBullet.globalMinimumVariance()
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||"
 		);
 
-		DisplayPortfolioMetrics (
-			markovitzBullet.longOnlyMaximumReturns()
-		);
+		DisplayPortfolioMetrics (markovitzBullet.globalMinimumVariance());
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||\n\n\n");
+		DisplayPortfolioMetrics (markovitzBullet.longOnlyMaximumReturns());
+
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||\n\n\n"
+		);
 
 		TreeMap<Double, HoldingsAllocation> frontierPortfolioMap = markovitzBullet.optimalPortfolioMap();
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|         EFFICIENT FRONTIER: PORTFOLIO RISK & RETURNS + CORRESPONDING ASSET ALLOCATION         ||");
+		System.out.println (
+			"\t|         EFFICIENT FRONTIER: PORTFOLIO RISK & RETURNS + CORRESPONDING ASSET ALLOCATION         ||"
+		);
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||"
+		);
 
-		for (Map.Entry<Double, HoldingsAllocation> me : frontierPortfolioMap.entrySet())
-		{
-			DisplayPortfolioMetrics (
-				me.getValue()
-			);
+		for (Map.Entry<Double, HoldingsAllocation> mapEntry : frontierPortfolioMap.entrySet()) {
+			DisplayPortfolioMetrics (mapEntry.getValue());
 		}
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------------------||\n\n");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------------------||\n\n"
+		);
 
 		EnvManager.TerminateEnv();
 	}

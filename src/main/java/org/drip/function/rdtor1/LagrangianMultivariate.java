@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1;
 
+import org.drip.function.definition.RdToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,66 +90,82 @@ package org.drip.function.rdtor1;
  */
 
 /**
- * <i>LagrangianMultivariate</i> implements a R<sup>d</sup> To R<sup>1</sup> Multivariate Function along
- * with the specified Set of Equality Constraints.
+ * <i>LagrangianMultivariate</i> implements a R<sup>d</sup> To R<sup>1</sup> Multivariate Function along with
+ * 	the specified Set of Equality Constraints. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>LagrangianMultivariate</i> Constructor</li>
+ * 		<li>Retrieve the Objective R<sup>d</sup> To R<sup>1</sup> Function Instance</li>
+ * 		<li>Retrieve the Array of the Constraint R<sup>d</sup> To R<sup>1</sup> Function Instances</li>
+ * 		<li>Retrieve the Objective Function Dimension</li>
+ * 		<li>Retrieve the Constraint Count</li>
+ * 		<li>Retrieve the Input Variate Dimension</li>
+ * 		<li>Evaluate for the given Input Variate Array</li>
+ * 		<li>Evaluate the Jacobian for the given Input Variate Array</li>
+ * 		<li>Evaluate The Hessian for the given Input Variate Array</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LagrangianMultivariate extends org.drip.function.definition.RdToR1 {
-	private org.drip.function.definition.RdToR1 _RdToR1Objective = null;
-	private org.drip.function.definition.RdToR1[] _aRdToR1EqualityConstraint = null;
+public class LagrangianMultivariate
+	extends RdToR1
+{
+	private RdToR1 _objectiveFunction = null;
+	private RdToR1[] _equalityConstraintFunctionArray = null;
 
 	/**
-	 * LagrangianMultivariate Constructor
+	 * <i>LagrangianMultivariate</i> Constructor
 	 * 
-	 * @param RdToR1Objective The Objective Function
-	 * @param aRdToR1EqualityConstraint Array of Equality Constraint Functions
+	 * @param objectiveFunction The Objective Function
+	 * @param equalityConstraintFunctionArray Array of Equality Constraint Functions
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public LagrangianMultivariate (
-		final org.drip.function.definition.RdToR1 RdToR1Objective,
-		final org.drip.function.definition.RdToR1[] aRdToR1EqualityConstraint)
-		throws java.lang.Exception
+		final RdToR1 objectiveFunction,
+		final RdToR1[] equalityConstraintFunctionArray)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_RdToR1Objective = RdToR1Objective))
-			throw new java.lang.Exception ("LagrangianMultivariate Constructor => Invalid Inputs");
+		if (null == (_objectiveFunction = objectiveFunction)) {
+			throw new Exception ("LagrangianMultivariate Constructor => Invalid Inputs");
+		}
 
-		_aRdToR1EqualityConstraint = aRdToR1EqualityConstraint;
+		_equalityConstraintFunctionArray = equalityConstraintFunctionArray;
 	}
 
 	/**
-	 * Retrieve the Objective R^d To R^1 Function Instance
+	 * Retrieve the Objective R<sup>d</sup> To R<sup>1</sup> Function Instance
 	 * 
-	 * @return The Objective R^d To R^1 Function Instance
+	 * @return The Objective R<sup>d</sup> To R<sup>1</sup> Function Instance
 	 */
 
-	public org.drip.function.definition.RdToR1 objectiveFunction()
+	public RdToR1 objectiveFunction()
 	{
-		return _RdToR1Objective;
+		return _objectiveFunction;
 	}
 
 	/**
-	 * Retrieve the Array of the Constraint R^d To R^1 Function Instances
+	 * Retrieve the Array of the Constraint R<sup>d</sup> To R<sup>1</sup> Function Instances
 	 * 
-	 * @return The Array of Constraint R^d To R^1 Function Instances
+	 * @return The Array of Constraint R<sup>d</sup> To R<sup>1</sup> Function Instances
 	 */
 
-	public org.drip.function.definition.RdToR1[] constraintFunctions()
+	public RdToR1[] equalityConstraintFunctionArray()
 	{
-		return _aRdToR1EqualityConstraint;
+		return _equalityConstraintFunctionArray;
 	}
 
 	/**
@@ -148,177 +174,253 @@ public class LagrangianMultivariate extends org.drip.function.definition.RdToR1 
 	 * @return The Objective Function Dimension
 	 */
 
-	public int objectiveFunctionDimension()
+	public int problemVariableCount()
 	{
-		return _RdToR1Objective.dimension();
+		return _objectiveFunction.dimension();
 	}
 
 	/**
-	 * Retrieve the Constraint Function Dimension
+	 * Retrieve the Constraint Count
 	 * 
-	 * @return The Constraint Function Dimension
+	 * @return The Constraint Count
 	 */
 
-	public int constraintFunctionDimension()
+	public int constraintCount()
 	{
-		return null == _aRdToR1EqualityConstraint ? 0 : _aRdToR1EqualityConstraint.length;
+		return null == _equalityConstraintFunctionArray ? 0 : _equalityConstraintFunctionArray.length;
 	}
+
+	/**
+	 * Retrieve the Input Variate Dimension
+	 * 
+	 * @return The Input Variate Dimension
+	 */
 
 	@Override public int dimension()
 	{
-		return objectiveFunctionDimension() + constraintFunctionDimension();
+		return problemVariableCount() + constraintCount();
 	}
+
+	/**
+	 * Evaluate for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variates
+	 *  
+	 * @return The Calculated Value
+	 * 
+	 * @throws Exception Thrown if the Evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double[] adblVariate)
-		throws java.lang.Exception
+		final double[] variateArray)
+		throws Exception
 	{
-		org.drip.function.rdtor1.ObjectiveConstraintVariateSet ocvs =
-			org.drip.function.rdtor1.ObjectiveConstraintVariateSet.Partition (adblVariate,
-				objectiveFunctionDimension());
+		ObjectiveConstraintVariateSet objectiveConstraintVariateSet =
+			ObjectiveConstraintVariateSet.Partition (variateArray, problemVariableCount());
 
-		if (null == ocvs)
-			throw new java.lang.Exception ("LagrangianMultivariate::evaluate => Invalid Inputs");
-
-		double[] adblConstraintVariate = ocvs.constraintVariates();
-
-		double[] adblObjectiveVariate = ocvs.objectiveVariates();
-
-		int iNumConstraint = adblConstraintVariate.length;
-
-		double dblValue = _RdToR1Objective.evaluate (adblObjectiveVariate);
-
-		for (int i = 0; i < iNumConstraint; ++i)
-			dblValue += adblConstraintVariate[i] * _aRdToR1EqualityConstraint[i].evaluate
-				(adblObjectiveVariate);
-
-		return dblValue;
-	}
-
-	@Override public double[] jacobian (
-		final double[] adblVariate)
-	{
-		int iObjectiveDimension = objectiveFunctionDimension();
-
-		int iConstraintDimension = constraintFunctionDimension();
-
-		double[] adblObjectiveVariate = null;
-		double[] adblConstraintVariate = null;
-		double[][] aadblConstraintJacobian = null;
-		double[] adblJacobian = new double[iObjectiveDimension + iConstraintDimension];
-
-		if (0 == iConstraintDimension)
-			adblObjectiveVariate = adblVariate;
-		else {
-			org.drip.function.rdtor1.ObjectiveConstraintVariateSet ocvs =
-				org.drip.function.rdtor1.ObjectiveConstraintVariateSet.Partition (adblVariate,
-					iObjectiveDimension);
-
-			if (null == ocvs) return null;
-
-			adblObjectiveVariate = ocvs.objectiveVariates();
-
-			adblConstraintVariate = ocvs.constraintVariates();
+		if (null == objectiveConstraintVariateSet) {
+			throw new Exception ("LagrangianMultivariate::evaluate => Invalid Inputs");
 		}
 
-		double[] adblObjectiveJacobian = _RdToR1Objective.jacobian (adblObjectiveVariate);
+		double[] problemVariableArray = objectiveConstraintVariateSet.problemVariableArray();
 
-		if (null == adblObjectiveJacobian) return null;
+		double[] kktCoefficientArray = objectiveConstraintVariateSet.kktCoefficientArray();
 
-		if (0 != iConstraintDimension) aadblConstraintJacobian = new double[iConstraintDimension][];
+		double objectiveFunctionValue = _objectiveFunction.evaluate (problemVariableArray);
 
-		for (int i = 0; i < iConstraintDimension; ++i) {
-			if (null == (aadblConstraintJacobian[i] = _aRdToR1EqualityConstraint[i].jacobian
-				(adblObjectiveVariate)))
+		for (int kktCoefficientIndex = 0;
+			kktCoefficientIndex < kktCoefficientArray.length;
+			++kktCoefficientIndex)
+		{
+			objectiveFunctionValue += kktCoefficientArray[kktCoefficientIndex] *
+				_equalityConstraintFunctionArray[kktCoefficientIndex].evaluate (problemVariableArray);
+		}
+
+		return objectiveFunctionValue;
+	}
+
+	/**
+	 * Evaluate the Jacobian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Jacobian Array
+	 */
+
+	@Override public double[] jacobian (
+		final double[] variateArray)
+	{
+		int problemVariableCount = problemVariableCount();
+
+		int constraintCount = constraintCount();
+
+		double[] objectiveVariateArray = null;
+		double[][] constraintJacobianGrid = null;
+		double[] constraintCoefficientArray = null;
+		double[] jacobianArray = new double[problemVariableCount + constraintCount];
+
+		if (0 == constraintCount) {
+			objectiveVariateArray = variateArray;
+		} else {
+			ObjectiveConstraintVariateSet objectiveConstraintVariateSet =
+				ObjectiveConstraintVariateSet.Partition (variateArray, problemVariableCount);
+
+			if (null == objectiveConstraintVariateSet) {
 				return null;
+			}
+
+			objectiveVariateArray = objectiveConstraintVariateSet.problemVariableArray();
+
+			constraintCoefficientArray = objectiveConstraintVariateSet.kktCoefficientArray();
+		}
+
+		double[] objectiveFunctionJacobianArray = _objectiveFunction.jacobian (objectiveVariateArray);
+
+		if (null == objectiveFunctionJacobianArray) {
+			return null;
+		}
+
+		if (0 != constraintCount) {
+			constraintJacobianGrid = new double[constraintCount][];
+		}
+
+		for (int constraintIndex = 0; constraintIndex < constraintCount; ++constraintIndex) {
+			if (null == (
+				constraintJacobianGrid[constraintIndex] =
+					_equalityConstraintFunctionArray[constraintIndex].jacobian (objectiveVariateArray)
+			))
+			{
+				return null;
+			}
 
 			try {
-				adblJacobian[iObjectiveDimension + i] = _aRdToR1EqualityConstraint[i].evaluate
-					(adblObjectiveVariate);
-			} catch (java.lang.Exception e) {
+				jacobianArray[problemVariableCount + constraintIndex] =
+					_equalityConstraintFunctionArray[constraintIndex].evaluate (objectiveVariateArray);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		for (int i = 0; i < iObjectiveDimension; ++i) {
-			adblJacobian[i] = adblObjectiveJacobian[i];
+		for (int variateIndex = 0; variateIndex < problemVariableCount; ++variateIndex) {
+			jacobianArray[variateIndex] = objectiveFunctionJacobianArray[variateIndex];
 
-			for (int j = 0; j < iConstraintDimension; ++j)
-				adblJacobian[i] += adblConstraintVariate[j] * aadblConstraintJacobian[j][i];
+			for (int constraintIndex = 0; constraintIndex < constraintCount; ++constraintIndex) {
+				jacobianArray[variateIndex] +=
+					constraintCoefficientArray[constraintIndex] *
+					constraintJacobianGrid[constraintIndex][variateIndex];
+			}
 		}
 
-		return adblJacobian;
+		return jacobianArray;
 	}
 
+	/**
+	 * Evaluate The Hessian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Hessian Matrix
+	 */
+
 	@Override public double[][] hessian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		int iObjectiveDimension = objectiveFunctionDimension();
+		int problemVariableCount = problemVariableCount();
 
-		int iConstraintDimension = constraintFunctionDimension();
+		int constraintCount = constraintCount();
 
-		double[] adblObjectiveVariate = null;
-		double[] adblConstraintVariate = null;
+		double[] problemVariableArray = null;
+		double[] kktCoefficientArray = null;
 
-		if (0 == iConstraintDimension)
-			adblObjectiveVariate = adblVariate;
-		else {
-			org.drip.function.rdtor1.ObjectiveConstraintVariateSet ocvs =
-				org.drip.function.rdtor1.ObjectiveConstraintVariateSet.Partition (adblVariate,
-					iObjectiveDimension);
+		if (0 == constraintCount) {
+			problemVariableArray = variateArray;
+		} else {
+			ObjectiveConstraintVariateSet objectiveConstraintVariateSet =
+				ObjectiveConstraintVariateSet.Partition (variateArray, problemVariableCount);
 
-			if (null == ocvs) return null;
-
-			adblObjectiveVariate = ocvs.objectiveVariates();
-
-			adblConstraintVariate = ocvs.constraintVariates();
-		}
-
-		double[][] aadblObjectiveHessian = _RdToR1Objective.hessian (adblObjectiveVariate);
-
-		double[][] aadblConstraintJacobian = null;
-		double[][][] aaadblConstraintHessian = null;
-		int iDimension = iObjectiveDimension + iConstraintDimension;
-		double[][] aadblHessian = new double[iDimension][iDimension];
-
-		if (0 != iConstraintDimension) {
-			aadblConstraintJacobian = new double[iConstraintDimension][];
-			aaadblConstraintHessian = new double[iConstraintDimension][][];
-		}
-
-		for (int i = 0; i < iConstraintDimension; ++i) {
-			if (null == (aaadblConstraintHessian[i] = _aRdToR1EqualityConstraint[i].hessian
-				(adblObjectiveVariate)))
+			if (null == objectiveConstraintVariateSet) {
 				return null;
+			}
+
+			problemVariableArray = objectiveConstraintVariateSet.problemVariableArray();
+
+			kktCoefficientArray = objectiveConstraintVariateSet.kktCoefficientArray();
 		}
 
-		for (int i = 0; i < iObjectiveDimension; ++i) {
-			for (int j = 0; j < iObjectiveDimension; ++j) {
-				aadblHessian[i][j] = aadblObjectiveHessian[i][j];
+		double[][] objectiveFunctionHessian = _objectiveFunction.hessian (problemVariableArray);
 
-				for (int k = 0; k < iConstraintDimension; ++k)
-					aadblHessian[i][j] += adblConstraintVariate[k] * aaadblConstraintHessian[k][i][j];
+		double[][] constraintJacobianGrid = null;
+		double[][][] constraintHessianGridArray = null;
+		int constrainedOptimizationDimension = problemVariableCount + constraintCount;
+		double[][] hessianGrid =
+			new double[constrainedOptimizationDimension][constrainedOptimizationDimension];
+
+		if (0 != constraintCount) {
+			constraintJacobianGrid = new double[constraintCount][];
+			constraintHessianGridArray = new double[constraintCount][][];
+		}
+
+		for (int constraintIndex = 0; constraintIndex < constraintCount; ++constraintIndex) {
+			if (null == (
+				constraintHessianGridArray[constraintIndex] =
+					_equalityConstraintFunctionArray[constraintIndex].hessian (problemVariableArray)
+			))
+			{
+				return null;
 			}
 		}
 
-		for (int i = 0; i < iConstraintDimension; ++i) {
-			for (int j = 0; j < iConstraintDimension; ++j)
-				aadblHessian[i + iObjectiveDimension][j + iObjectiveDimension] = 0.;
+		for (int innerProblemVariableIndex = 0;
+			innerProblemVariableIndex < problemVariableCount;
+			++innerProblemVariableIndex)
+		{
+			for (int outerProblemVariableIndex = 0;
+				outerProblemVariableIndex < problemVariableCount;
+				++outerProblemVariableIndex)
+			{
+				hessianGrid[innerProblemVariableIndex][outerProblemVariableIndex] =
+					objectiveFunctionHessian[innerProblemVariableIndex][outerProblemVariableIndex];
 
-			if (null == (aadblConstraintJacobian[i] = _aRdToR1EqualityConstraint[i].jacobian
-				(adblObjectiveVariate)))
-				return null;
-		}
-
-		for (int i = 0; i < iConstraintDimension; ++i) {
-			for (int j = 0; j < iObjectiveDimension; ++j) {
-				aadblHessian[iObjectiveDimension + i][j] = aadblConstraintJacobian[i][j];
-				aadblHessian[j][iObjectiveDimension + i] = aadblConstraintJacobian[i][j];
+				for (int constraintIndex = 0; constraintIndex < constraintCount; ++constraintIndex) {
+					hessianGrid[innerProblemVariableIndex][outerProblemVariableIndex] +=
+						kktCoefficientArray[constraintIndex] *
+						constraintHessianGridArray[constraintIndex][innerProblemVariableIndex][outerProblemVariableIndex];
+				}
 			}
 		}
 
-		return aadblHessian;
+		for (int innerConstraintIndex = 0; innerConstraintIndex < constraintCount; ++innerConstraintIndex) {
+			for (int outerConstraintIndex = 0;
+				outerConstraintIndex < constraintCount;
+				++outerConstraintIndex)
+			{
+				hessianGrid[innerConstraintIndex + problemVariableCount][outerConstraintIndex + problemVariableCount]
+					= 0.;
+			}
+
+			if (null == (
+				constraintJacobianGrid[innerConstraintIndex] =
+					_equalityConstraintFunctionArray[innerConstraintIndex].jacobian (problemVariableArray)
+			))
+			{
+				return null;
+			}
+		}
+
+		for (int constraintIndex = 0; constraintIndex < constraintCount; ++constraintIndex) {
+			for (int problemVariableIndex = 0;
+				problemVariableIndex < problemVariableCount;
+				++problemVariableIndex)
+			{
+				hessianGrid[problemVariableCount + constraintIndex][problemVariableIndex] =
+					constraintJacobianGrid[constraintIndex][problemVariableIndex];
+				hessianGrid[problemVariableIndex][problemVariableCount + constraintIndex] =
+					constraintJacobianGrid[constraintIndex][problemVariableIndex];
+			}
+		}
+
+		return hessianGrid;
 	}
 }

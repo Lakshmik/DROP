@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +94,8 @@ package org.drip.function.rdtor1descent;
 /**
  * <i>LineEvolutionVerifier</i> implements the Step Length Verification Criterion used for the Inexact Line
  * Search Increment Generation. The References are:
- * <br><br>
+ * 
+ * <br>
  * 	<ul>
  * 		<li>
  * 			Armijo, L. (1966): Minimization of Functions having Lipschitz-Continuous First Partial
@@ -101,13 +114,21 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li>Verify if the specified Inputs satisfy the Criterion</li>
+ * 		<li>Generate the Verifier Metrics for the Specified Inputs</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -116,37 +137,30 @@ public abstract class LineEvolutionVerifier
 {
 
 	protected static final double[] NextVariateArray (
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
 		final double stepLength)
 	{
-		if (null == currentVariateArray ||
-			!org.drip.numerical.common.NumberUtil.IsValid (stepLength))
-		{
+		if (null == currentVariateArray || !NumberUtil.IsValid (stepLength)) {
 			return null;
 		}
 
-		int dimension = currentVariateArray.length;
-		double[] nextVariateArray = 0 == dimension ? null : new double[dimension];
+		double[] nextVariateArray = 0 == currentVariateArray.length ?
+			null : new double[currentVariateArray.length];
 
-		if (null == nextVariateArray || null == targetDirectionUnitVector)
-		{
+		if (null == nextVariateArray || null == targetDirectionUnitVector) {
 			return null;
 		}
 
 		double[] targetDirectionVector = targetDirectionUnitVector.component();
 
-		if (null == targetDirectionVector || dimension != targetDirectionVector.length)
-		{
+		if (null == targetDirectionVector || currentVariateArray.length != targetDirectionVector.length) {
 			return null;
 		}
 
-		for (int dimensionIndex = 0;
-			dimensionIndex < dimension;
-			++dimensionIndex)
-		{
-			if (!org.drip.numerical.common.NumberUtil.IsValid (currentVariateArray[dimensionIndex]) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (targetDirectionVector[dimensionIndex]))
+		for (int dimensionIndex = 0; dimensionIndex < currentVariateArray.length; ++dimensionIndex) {
+			if (!NumberUtil.IsValid (currentVariateArray[dimensionIndex]) ||
+				!NumberUtil.IsValid (targetDirectionVector[dimensionIndex]))
 			{
 				return null;
 			}
@@ -168,26 +182,25 @@ public abstract class LineEvolutionVerifier
 	 * 
 	 * @return TRUE - The Specified Inputs satisfy the Criterion
 	 * 
-	 * @throws java.lang.Exception Thrown if the Verification cannot be performed
+	 * @throws Exception Thrown if the Verification cannot be performed
 	 */
 
 	public boolean verify (
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
-		final org.drip.function.definition.RdToR1 multivariateFunction,
+		final RdToR1 multivariateFunction,
 		final double stepLength)
-		throws java.lang.Exception
+		throws Exception
 	{
-		org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics lineEvolutionVerifierMetrics = metrics (
+		LineEvolutionVerifierMetrics lineEvolutionVerifierMetrics = metrics (
 			targetDirectionUnitVector,
 			currentVariateArray,
 			multivariateFunction,
 			stepLength
 		);
 
-		if (null == lineEvolutionVerifierMetrics)
-		{
-			throw new java.lang.Exception ("LineEvolutionVerifier::verify => Cannot Verify");
+		if (null == lineEvolutionVerifierMetrics) {
+			throw new Exception ("LineEvolutionVerifier::verify => Cannot Verify");
 		}
 
 		return lineEvolutionVerifierMetrics.verify();
@@ -204,9 +217,10 @@ public abstract class LineEvolutionVerifier
 	 * @return The Verifier Metrics
 	 */
 
-	public abstract org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics metrics (
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+	public abstract LineEvolutionVerifierMetrics metrics (
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
-		final org.drip.function.definition.RdToR1 multivariateFunction,
-		final double stepLength);
+		final RdToR1 multivariateFunction,
+		final double stepLength
+	);
 }

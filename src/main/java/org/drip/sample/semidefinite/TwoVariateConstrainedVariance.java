@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -109,13 +117,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/semidefinite/README.md">Semi-Definite Constrained Ellipsoid Variance</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/semidefinite/README.md">Semi-Definite Constrained Ellipsoid Variance</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -135,9 +144,7 @@ public class TwoVariateConstrainedVariance
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		double[][] covarianceMatrix = new double[][]
 		{
@@ -152,43 +159,39 @@ public class TwoVariateConstrainedVariance
 		};
 
 		double equalityConstraintConstant = -1.;
-		int objectiveDimension = covarianceMatrix.length;
 
 		RdToR1[] equalityConstraintMultivariateFunctionArray = new AffineMultivariate[]
 		{
-			new AffineMultivariate (
-				equalityConstraintRHSArray,
-				equalityConstraintConstant
-			)
+			new AffineMultivariate (equalityConstraintRHSArray, equalityConstraintConstant)
 		};
 
-		int equalityConstraintCount = equalityConstraintMultivariateFunctionArray.length;
+		int totalVariateCount = equalityConstraintMultivariateFunctionArray.length + 2;
 
 		AffineBoundMultivariate affineBoundMultivariateFunction1 = new AffineBoundMultivariate (
 			true,
 			0,
-			2 + equalityConstraintCount,
+			totalVariateCount,
 			0.65
 		);
 
 		AffineBoundMultivariate affineBoundMultivariateFunction2 = new AffineBoundMultivariate (
 			true,
 			1,
-			2 + equalityConstraintCount,
+			totalVariateCount,
 			0.65
 		);
 
 		AffineBoundMultivariate affineBoundMultivariateFunction3 = new AffineBoundMultivariate (
 			false,
 			0,
-			2 + equalityConstraintCount,
+			totalVariateCount,
 			0.15
 		);
 
 		AffineBoundMultivariate affineBoundMultivariateFunction4 = new AffineBoundMultivariate (
 			false,
 			1,
-			2 + equalityConstraintCount,
+			totalVariateCount,
 			0.15
 		);
 
@@ -203,35 +206,36 @@ public class TwoVariateConstrainedVariance
 		double barrierStrength = 1.;
 
 		LagrangianMultivariate lagrangianMultivariate = new LagrangianMultivariate (
-			new CovarianceEllipsoidMultivariate (
-				covarianceMatrix
-			),
+			new CovarianceEllipsoidMultivariate (covarianceMatrix),
 			equalityConstraintMultivariateFunctionArray
 		);
 
-		double[] startingVariateArray = ObjectiveConstraintVariateSet.Uniform (
-			objectiveDimension,
-			1
-		);
+		double[] startingVariateArray = ObjectiveConstraintVariateSet.Uniform (covarianceMatrix.length, 1);
 
 		VariateInequalityConstraintMultiplier variateInequalityConstraintMultiplier =
 			new BarrierFixedPointFinder (
 				lagrangianMultivariate,
 				inequalityConstraintFunctionArray,
 				InteriorPointBarrierControl.Standard(),
-				LineStepEvolutionControl.NocedalWrightStrongWolfe (
-					false
-				)
+				LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 			).solve (
 				startingVariateArray
 			);
 
 		System.out.println ("\n\n\t|----------------------------------------------------||");
 
+		double[] optimalVariateArray = variateInequalityConstraintMultiplier.problemVariableArray();
+
 		System.out.println (
-			"\t| OPTIMAL VARIATES => " + FormatUtil.FormatDouble (variateInequalityConstraintMultiplier.variateArray()[0], 1, 5, 1.) +
-			" | " + FormatUtil.FormatDouble (variateInequalityConstraintMultiplier.variateArray()[1], 1, 5, 1.) +
-			" | " + FormatUtil.FormatDouble (lagrangianMultivariate.evaluate (variateInequalityConstraintMultiplier.variateArray()), 1, 5, 1.) + " ||"
+			"\t| OPTIMAL VARIATES => " +
+				FormatUtil.FormatDouble (optimalVariateArray[0], 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (optimalVariateArray[1], 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (
+					lagrangianMultivariate.evaluate (variateInequalityConstraintMultiplier.problemVariableArray()),
+					1,
+					5,
+					1.
+				) + " ||"
 		);
 
 		System.out.println ("\t|----------------------------------------------------||\n\n");
@@ -269,34 +273,28 @@ public class TwoVariateConstrainedVariance
 
 		System.out.println ("\t|-------------------------------------------------||");
 
-		while (--stepDown > 0)
-		{
+		while (--stepDown > 0) {
 			variateInequalityConstraintMultiplier = new InteriorFixedPointFinder (
 				lagrangianMultivariate,
 				inequalityConstraintFunctionArray,
-				LineStepEvolutionControl.NocedalWrightStrongWolfe (
-					false
-				),
+				LineStepEvolutionControl.NocedalWrightStrongWolfe (false),
 				convergenceControl,
 				barrierStrength
 			).find (
 				variateInequalityConstraintMultiplier
 			);
 
-			startingVariateArray = variateInequalityConstraintMultiplier.variateArray();
+			startingVariateArray = variateInequalityConstraintMultiplier.problemVariableArray();
 
 			System.out.println (
 				"\t| " + FormatUtil.FormatDouble (barrierStrength, 1, 10, 1.) +
-				" => " + FormatUtil.FormatDouble (
-					variateInequalityConstraintMultiplier.variateArray()[0], 1, 5, 1.
-				) +
+				" => " + FormatUtil.FormatDouble (startingVariateArray[0], 1, 5, 1.) +
+				" | " + FormatUtil.FormatDouble (startingVariateArray[1], 1, 5, 1.) +
 				" | " + FormatUtil.FormatDouble (
-					variateInequalityConstraintMultiplier.variateArray()[1], 1, 5, 1.
-				) +
-				" | " + FormatUtil.FormatDouble (
-					lagrangianMultivariate.evaluate (
-						variateInequalityConstraintMultiplier.variateArray()
-					), 1, 5, 1.
+					lagrangianMultivariate.evaluate (startingVariateArray),
+					1,
+					5,
+					1.
 				) + " ||"
 			);
 

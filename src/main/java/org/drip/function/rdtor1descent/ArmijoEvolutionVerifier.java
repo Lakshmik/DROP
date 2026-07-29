@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,8 +93,9 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>ArmijoEvolutionVerifier</i> implements the Armijo Criterion used for the Inexact Line Search Increment
- * Generation to ascertain that the Function has reduced sufficiently. The Reference is:
- * <br><br>
+ * 	Generation to ascertain that the Function has reduced sufficiently. The Reference is:
+ * 
+ * 	<br>
  * 	<ul>
  * 		<li>
  * 			Armijo, L. (1966): Minimization of Functions having Lipschitz-Continuous First Partial
@@ -90,19 +103,30 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li>Construct the Nocedal-Wright <i>ArmijoEvolutionVerifier</i> Instance</li>
+ * 		<li><i>ArmijoEvolutionVerifier</i> Constructor</li>
+ * 		<li>Indicate if the Check is for Minimizer/Maximizer</li>
+ * 		<li>Retrieve the Armijo Parameter</li>
+ * 		<li>Generate the Verifier Metrics for the Specified Inputs</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class ArmijoEvolutionVerifier
-	extends org.drip.function.rdtor1descent.LineEvolutionVerifier
+	extends LineEvolutionVerifier
 {
 
 	/**
@@ -112,28 +136,22 @@ public class ArmijoEvolutionVerifier
 	public static final double NOCEDAL_WRIGHT_ARMIJO_PARAMETER = 0.0001;
 
 	private boolean _maximizerCheck = false;
-	private double _armijoParameter = java.lang.Double.NaN;
+	private double _armijoParameter = Double.NaN;
 
 	/**
-	 * Construct the Nocedal-Wright Armijo Evolution Verifier
+	 * Construct the Nocedal-Wright <i>ArmijoEvolutionVerifier</i> Instance
 	 * 
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
 	 * 
-	 * @return The Nocedal-Wright Armijo Evolution Verifier Instance
+	 * @return The Nocedal-Wright <i>ArmijoEvolutionVerifier</i> Instance
 	 */
 
 	public static final ArmijoEvolutionVerifier NocedalWrightStandard (
 		final boolean maximizerCheck)
 	{
-		try
-		{
-			return new ArmijoEvolutionVerifier (
-				NOCEDAL_WRIGHT_ARMIJO_PARAMETER,
-				maximizerCheck
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new ArmijoEvolutionVerifier (NOCEDAL_WRIGHT_ARMIJO_PARAMETER, maximizerCheck);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -141,22 +159,21 @@ public class ArmijoEvolutionVerifier
 	}
 
 	/**
-	 * ArmijoEvolutionVerifier Constructor
+	 * <i>ArmijoEvolutionVerifier</i> Constructor
 	 * 
 	 * @param armijoParameter The Armijo Parameter
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ArmijoEvolutionVerifier (
 		final double armijoParameter,
 		final boolean maximizerCheck)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_armijoParameter = armijoParameter))
-		{
-			throw new java.lang.Exception ("ArmijoEvolutionVerifier Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_armijoParameter = armijoParameter)) {
+			throw new Exception ("ArmijoEvolutionVerifier Constructor => Invalid Inputs");
 		}
 
 		_maximizerCheck = maximizerCheck;
@@ -184,38 +201,38 @@ public class ArmijoEvolutionVerifier
 		return _armijoParameter;
 	}
 
-	@Override public org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics metrics (
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+	/**
+	 * Generate the Verifier Metrics for the Specified Inputs
+	 * 
+	 * @param targetDirectionUnitVector The Target Direction Unit Vector
+	 * @param currentVariateArray The Current Variate
+	 * @param multivariateFunction The R<sup>d</sup> To R<sup>1</sup> Function
+	 * @param stepLength The Incremental Step Length
+	 * 
+	 * @return The Verifier Metrics
+	 */
+
+	@Override public LineEvolutionVerifierMetrics metrics (
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
-		final org.drip.function.definition.RdToR1 multivariateFunction,
+		final RdToR1 multivariateFunction,
 		final double stepLength)
 	{
-		try
-		{
+		try {
 			return null == multivariateFunction ? null :
-				new org.drip.function.rdtor1descent.ArmijoEvolutionVerifierMetrics (
+				new ArmijoEvolutionVerifierMetrics (
 					_armijoParameter,
 					_maximizerCheck,
 					targetDirectionUnitVector,
 					currentVariateArray,
 					stepLength,
+					multivariateFunction.evaluate (currentVariateArray),
 					multivariateFunction.evaluate (
-						currentVariateArray
+						NextVariateArray (targetDirectionUnitVector, currentVariateArray, stepLength)
 					),
-					multivariateFunction.evaluate (
-						NextVariateArray (
-							targetDirectionUnitVector,
-							currentVariateArray,
-							stepLength
-						)
-					),
-					multivariateFunction.jacobian (
-						currentVariateArray
-					)
+					multivariateFunction.jacobian (currentVariateArray)
 				);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

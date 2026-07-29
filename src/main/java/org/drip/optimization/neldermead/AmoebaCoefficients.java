@@ -2,6 +2,7 @@
 package org.drip.optimization.neldermead;
 
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -252,5 +253,35 @@ public class AmoebaCoefficients
 	public double sigma()
 	{
 		return _shrink;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + "[" +
+			"Reflection: " + FormatUtil.FormatDouble (_reflection, 1, 4, 1.) + "; " +
+			"Expansion: " + FormatUtil.FormatDouble (_expansion, 1, 4, 1.) + "; " +
+			"Contraction: " + FormatUtil.FormatDouble (_contraction, 1, 4, 1.) + "; " +
+			"Shrink: " + FormatUtil.FormatDouble (_shrink, 1, 4, 1.) +
+		"]";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

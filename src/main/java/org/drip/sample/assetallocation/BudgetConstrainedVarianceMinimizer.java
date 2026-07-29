@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,16 +99,16 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>BudgetConstrainedVarianceMinimizer</i> demonstrates the Construction of an Optimal Portfolio using the
- * Variance Minimizing Allocator with Budget/Weight Constraints.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/assetallocation/README.md">MVO Based Constrained Optimal Allocator</a></li>
- *  </ul>
- * <br><br>
+ * 	Variance Minimizing Allocator with Budget/Weight Constraints.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/assetallocation/README.md">MVO Based Constrained Optimal Allocator</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -120,16 +128,11 @@ public class BudgetConstrainedVarianceMinimizer
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
 		String seriesPath = "C:\\DROP\\Daemons\\Feeds\\MeanVarianceOptimizer\\FormattedSeries1.csv";
 
-		CSVGrid csvGrid = CSVParser.NamedStringGrid (
-			seriesPath
-		);
+		CSVGrid csvGrid = CSVParser.NamedStringGrid (seriesPath);
 
 		String[] variateHeaderArray = csvGrid.headers();
 
@@ -138,67 +141,57 @@ public class BudgetConstrainedVarianceMinimizer
 		String[] assetIDArray = new String[variateHeaderArray.length - 1];
 		double[][] variateSampleGrid = new double[variateHeaderArray.length - 1][];
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			assetIDArray[assetIndex] = variateHeaderArray[assetIndex + 1];
 
-			variateSampleGrid[assetIndex] = csvGrid.doubleArrayAtColumn (
-				assetIndex + 1
-			);
+			variateSampleGrid[assetIndex] = csvGrid.doubleArrayAtColumn (assetIndex + 1);
 		}
 
 		AssetUniverseStatisticalProperties assetUniverseStatisticalProperties =
 			AssetUniverseStatisticalProperties.FromMultivariateMetrics (
-				MultivariateMoments.Standard (
-					assetIDArray,
-					variateSampleGrid
-				)
+				MultivariateMoments.Standard (assetIDArray, variateSampleGrid)
 			);
 
-		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (
-			assetIDArray
+		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (assetIDArray);
+
+		System.out.println (
+			"\n\n\t|------------------------------------------------------------------------------------------------||"
 		);
 
-		System.out.println ("\n\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||"
+		);
 
-		System.out.println ("\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||");
-
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		String header = "\t|     |";
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			header += "    " + assetIDArray[assetIndex] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetIDArray.length;
-			++assetIndexI)
-		{
+		for (int assetIndexI = 0; assetIndexI < assetIDArray.length; ++assetIndexI) {
 			String dump = "\t| " + assetIDArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetIDArray.length;
-				++assetIndexJ)
-			{
-				dump += "|" + FormatUtil.FormatDouble (
-					covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.
-				) + " ";
+			for (int assetIndexJ = 0; assetIndexJ < assetIDArray.length; ++assetIndexJ) {
+				dump += "|" + FormatUtil.FormatDouble (covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.)
+					+ " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||\n\n");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||\n\n"
+		);
 
 		System.out.println ("\t|------------------||");
 
@@ -206,10 +199,7 @@ public class BudgetConstrainedVarianceMinimizer
 
 		System.out.println ("\t|------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			System.out.println (
 				"\t| " + assetIDArray[assetIndex] + " | " +
 				FormatUtil.FormatDouble (assetHoldingLowerBound, 1, 0, 100.) + "% | " +
@@ -255,10 +245,7 @@ public class BudgetConstrainedVarianceMinimizer
 				)
 			);
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			boundedPortfolioConstructionParameters.addBound (
 				assetIDArray[assetIndex],
 				assetHoldingLowerBound,
@@ -268,9 +255,7 @@ public class BudgetConstrainedVarianceMinimizer
 
 		HoldingsAllocation optimizationOutput = new ConstrainedMeanVarianceOptimizer (
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).allocate (
 			boundedPortfolioConstructionParameters,
 			assetUniverseStatisticalProperties
@@ -282,11 +267,13 @@ public class BudgetConstrainedVarianceMinimizer
 
 		System.out.println ("\t|---------------||");
 
-		for (AssetComponent assetComponent : optimizationOutput.optimalPortfolio().assetComponentArray())
-		{
+		for (AssetComponent assetComponent : optimizationOutput.optimalPortfolio().assetComponentArray()) {
 			System.out.println (
 				"\t| " + assetComponent.id() + " | " + FormatUtil.FormatDouble (
-					assetComponent.amount(), 2, 2, 100.
+					assetComponent.amount(),
+					2,
+					2,
+					100.
 				) + "% ||"
 			);
 		}
@@ -297,19 +284,28 @@ public class BudgetConstrainedVarianceMinimizer
 
 		System.out.println (
 			"\t| Portfolio Notional           : " + FormatUtil.FormatDouble (
-				optimizationOutput.optimalPortfolio().notional(), 1, 4, 1.
+				optimizationOutput.optimalPortfolio().notional(),
+				1,
+				4,
+				1.
 			) + "  ||"
 		);
 
 		System.out.println (
 			"\t| Portfolio Expected Return    : " + FormatUtil.FormatDouble (
-				optimizationOutput.optimalMetrics().excessReturnsMean(), 1, 4, 100.
+				optimizationOutput.optimalMetrics().excessReturnsMean(),
+				1,
+				4,
+				100.
 			) + "% ||"
 		);
 
 		System.out.println (
 			"\t| Portfolio Standard Deviation : " + FormatUtil.FormatDouble (
-				optimizationOutput.optimalMetrics().excessReturnsStandardDeviation(), 1, 4, 100.
+				optimizationOutput.optimalMetrics().excessReturnsStandardDeviation(),
+				1,
+				4,
+				100.
 			) + "% ||"
 		);
 

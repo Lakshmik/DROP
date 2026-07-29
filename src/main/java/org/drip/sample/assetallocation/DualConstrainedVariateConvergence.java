@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,16 +97,16 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>DualConstrainedVariateConvergence</i> demonstrates the Sequential Convergence of the Constrained
- * Optimal R<sup>d</sup> Space.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/assetallocation/README.md">MVO Based Constrained Optimal Allocator</a></li>
- *  </ul>
- * <br><br>
+ * 	Optimal R<sup>d</sup> Space.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/assetallocation/README.md">MVO Based Constrained Optimal Allocator</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -118,10 +126,7 @@ public class DualConstrainedVariateConvergence
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
 		VariateInequalityConstraintMultiplier.s_preBoundBlog = true;
 		VariateInequalityConstraintMultiplier.s_postBoundBlog = true;
@@ -187,48 +192,46 @@ public class DualConstrainedVariateConvergence
 				)
 			);
 
-		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (
-			assetIDArray
+		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (assetIDArray);
+
+		System.out.println (
+			"\n\n\t|------------------------------------------------------------------------------------------------||"
 		);
 
-		System.out.println ("\n\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||"
+		);
 
-		System.out.println ("\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||");
-
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		String header = "\t|     |";
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			header += "    " + assetIDArray[assetIndex] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetIDArray.length;
-			++assetIndexI)
-		{
+		for (int assetIndexI = 0; assetIndexI < assetIDArray.length; ++assetIndexI) {
 			String dump = "\t| " + assetIDArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetIDArray.length;
-				++assetIndexJ)
-			{
-				dump += "|" + FormatUtil.FormatDouble (
-					covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.
-				) + " ";
+			for (int assetIndexJ = 0; assetIndexJ < assetIDArray.length; ++assetIndexJ) {
+				dump += "|" + FormatUtil.FormatDouble ( covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.)
+					+ " ";
 			}
 
 			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||\n\n");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||\n\n"
+		);
 
 		System.out.println ("\t|-------------------||");
 
@@ -236,10 +239,7 @@ public class DualConstrainedVariateConvergence
 
 		System.out.println ("\t|-------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			System.out.println (
 				"\t| " + assetIDArray[assetIndex] + " | " +
 				FormatUtil.FormatDouble (assetHoldingsLowerBoundArray[assetIndex], 2, 0, 100.) + "% | " +
@@ -286,10 +286,7 @@ public class DualConstrainedVariateConvergence
 				)
 			);
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			boundedPortfolioConstructionParameters.addBound (
 				assetIDArray[assetIndex],
 				assetHoldingsLowerBoundArray[assetIndex],
@@ -299,9 +296,7 @@ public class DualConstrainedVariateConvergence
 
 		new ConstrainedMeanVarianceOptimizer (
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).allocate (
 			boundedPortfolioConstructionParameters,
 			assetUniverseStatisticalProperties

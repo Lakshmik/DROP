@@ -1,11 +1,22 @@
 
 package org.drip.function.rdtor1;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,67 +92,86 @@ package org.drip.function.rdtor1;
 
 /**
  * <i>RiskObjectiveUtilityMultivariate</i> implements the Risk Objective R<sup>d</sup> To R<sup>1</sup>
- * Multivariate Function used in Portfolio Allocation. It accommodates both the Risk Tolerance and Risk
- * Aversion Variants.
+ * 	Multivariate Function used in Portfolio Allocation. It accommodates both the Risk Tolerance and Risk
+ * 	Aversion Variants. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>RiskObjectiveUtilityMultivariate</i> Constructor</li>
+ * 		<li>Retrieve the Input Variate Dimension</li>
+ * 		<li>Retrieve the Co-variance Matrix</li>
+ * 		<li>Retrieve the Array of Expected Returns</li>
+ * 		<li>Retrieve the Risk Aversion Factor</li>
+ * 		<li>Retrieve the Risk Tolerance Factor</li>
+ * 		<li>Retrieve the Risk Free Rate</li>
+ * 		<li>Evaluate for the given Input Variates</li>
+ * 		<li>Evaluate the Jacobian for the given Input Variate Array</li>
+ * 		<li>Evaluate The Hessian for the given Input Variate Array</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class RiskObjectiveUtilityMultivariate extends org.drip.function.definition.RdToR1 {
-	private double[] _adblExpectedReturns = null;
-	private double[][] _aadblCovarianceMatrix = null;
-	private double _dblRiskFreeRate = java.lang.Double.NaN;
-	private double _dblRiskAversion = java.lang.Double.NaN;
-	private double _dblRiskTolerance = java.lang.Double.NaN;
+public class RiskObjectiveUtilityMultivariate
+	extends RdToR1
+{
+	private double _riskAversion = Double.NaN;
+	private double _riskFreeRate = Double.NaN;
+	private double _riskTolerance = Double.NaN;
+	private double[][] _covarianceMatrix = null;
+	private double[] _expectedReturnsArray = null;
 
 	/**
-	 * RiskObjectiveUtilityMultivariate Constructor
+	 * <i>RiskObjectiveUtilityMultivariate</i> Constructor
 	 * 
-	 * @param aadblCovarianceMatrix The Co-variance Matrix Double Array
-	 * @param adblExpectedReturns Array of Expected Returns
-	 * @param dblRiskAversion The Risk Aversion Parameter
-	 * @param dblRiskTolerance The Risk Tolerance Parameter
-	 * @param dblRiskFreeRate The Risk Free Rate
+	 * @param covarianceMatrix The Co-variance Matrix Double Array
+	 * @param expectedReturnsArray Array of Expected Returns
+	 * @param riskAversion The Risk Aversion Parameter
+	 * @param riskTolerance The Risk Tolerance Parameter
+	 * @param riskFreeRate The Risk Free Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public RiskObjectiveUtilityMultivariate (
-		final double[][] aadblCovarianceMatrix,
-		final double[] adblExpectedReturns,
-		final double dblRiskAversion,
-		final double dblRiskTolerance,
-		final double dblRiskFreeRate)
-		throws java.lang.Exception
+		final double[][] covarianceMatrix,
+		final double[] expectedReturnsArray,
+		final double riskAversion,
+		final double riskTolerance,
+		final double riskFreeRate)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_aadblCovarianceMatrix = aadblCovarianceMatrix) || null == (_adblExpectedReturns =
-			adblExpectedReturns) || !org.drip.numerical.common.NumberUtil.IsValid (_dblRiskAversion =
-				dblRiskAversion) || !org.drip.numerical.common.NumberUtil.IsValid (_dblRiskTolerance =
-					dblRiskTolerance) || !org.drip.numerical.common.NumberUtil.IsValid (_dblRiskFreeRate =
-						dblRiskFreeRate))
-			throw new java.lang.Exception ("RiskObjectiveUtilityMultivariate Constructor => Invalid Inputs");
+		if (null == (_covarianceMatrix = covarianceMatrix) ||
+			null == (_expectedReturnsArray = expectedReturnsArray) ||
+			!NumberUtil.IsValid (_riskAversion = riskAversion) ||
+			!NumberUtil.IsValid (_riskTolerance = riskTolerance) ||
+			!NumberUtil.IsValid (_riskFreeRate = riskFreeRate))
+		{
+			throw new Exception ("RiskObjectiveUtilityMultivariate Constructor => Invalid Inputs");
+		}
 
-		int iSize = _aadblCovarianceMatrix.length;
+		if (0 == _covarianceMatrix.length || _covarianceMatrix.length != _expectedReturnsArray.length) {
+			throw new Exception ("RiskObjectiveUtilityMultivariate Constructor => Invalid Inputs");
+		}
 
-		if (0 == iSize || iSize != _adblExpectedReturns.length)
-			throw new java.lang.Exception ("RiskObjectiveUtilityMultivariate Constructor => Invalid Inputs");
-
-		for (int i = 0; i < iSize; ++i) {
-			if (null == _aadblCovarianceMatrix[i] || iSize != _aadblCovarianceMatrix[i].length ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_aadblCovarianceMatrix[i]) ||
-					!org.drip.numerical.common.NumberUtil.IsValid (_adblExpectedReturns[i]))
-				throw new java.lang.Exception
-					("RiskObjectiveUtilityMultivariate Constructor => Invalid Inputs");
+		for (int index = 0; index < _covarianceMatrix.length; ++index) {
+			if (null == _covarianceMatrix[index] ||
+				_covarianceMatrix.length != _covarianceMatrix[index].length ||
+				!NumberUtil.IsValid (_covarianceMatrix[index]) ||
+				!NumberUtil.IsValid (_expectedReturnsArray[index]))
+			{
+				throw new Exception ("RiskObjectiveUtilityMultivariate Constructor => Invalid Inputs");
+			}
 		}
 	}
 
@@ -153,7 +183,7 @@ public class RiskObjectiveUtilityMultivariate extends org.drip.function.definiti
 
 	public int dimension()
 	{
-		return _aadblCovarianceMatrix.length;
+		return _covarianceMatrix.length;
 	}
 
 	/**
@@ -162,9 +192,9 @@ public class RiskObjectiveUtilityMultivariate extends org.drip.function.definiti
 	 * @return The Co-variance Matrix
 	 */
 
-	public double[][] covariance()
+	public double[][] covarianceMatrix()
 	{
-		return _aadblCovarianceMatrix;
+		return _covarianceMatrix;
 	}
 
 	/**
@@ -175,7 +205,7 @@ public class RiskObjectiveUtilityMultivariate extends org.drip.function.definiti
 
 	public double[] expectedReturns()
 	{
-		return _adblExpectedReturns;
+		return _expectedReturnsArray;
 	}
 
 	/**
@@ -186,7 +216,7 @@ public class RiskObjectiveUtilityMultivariate extends org.drip.function.definiti
 
 	public double riskAversion()
 	{
-		return _dblRiskAversion;
+		return _riskAversion;
 	}
 
 	/**
@@ -197,7 +227,7 @@ public class RiskObjectiveUtilityMultivariate extends org.drip.function.definiti
 
 	public double riskTolerance()
 	{
-		return _dblRiskTolerance;
+		return _riskTolerance;
 	}
 
 	/**
@@ -208,65 +238,105 @@ public class RiskObjectiveUtilityMultivariate extends org.drip.function.definiti
 
 	public double riskFreeRate()
 	{
-		return _dblRiskFreeRate;
+		return _riskFreeRate;
 	}
+
+	/**
+	 * Evaluate for the given Input Variates
+	 * 
+	 * @param variateArray Array of Input Variates
+	 *  
+	 * @return The Calculated Value
+	 * 
+	 * @throws Exception Thrown if the Evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double[] adblVariate)
-		throws java.lang.Exception
+		final double[] variateArray)
+		throws Exception
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (adblVariate))
-			throw new java.lang.Exception ("RiskObjectiveUtilityMultivariate::evaluate => Invalid Inputs");
-
-		double dblValue = 0.;
-		int iDimension = adblVariate.length;
-
-		if (iDimension != dimension())
-			throw new java.lang.Exception ("RiskObjectiveUtilityMultivariate::evaluate => Invalid Inputs");
-
-		for (int i = 0; i < iDimension; ++i) {
-			dblValue -= _dblRiskTolerance * adblVariate[i] * (_adblExpectedReturns[i] - _dblRiskFreeRate);
-
-			for (int j = 0; j < iDimension; ++j)
-				dblValue += 0.5 * _dblRiskAversion * adblVariate[i] * _aadblCovarianceMatrix[i][j] *
-					adblVariate[j];
+		if (null == variateArray || !NumberUtil.IsValid (variateArray)) {
+			throw new Exception ("RiskObjectiveUtilityMultivariate::evaluate => Invalid Inputs");
 		}
 
-		return dblValue;
+		double value = 0.;
+
+		if (variateArray.length != dimension()) {
+			throw new Exception ("RiskObjectiveUtilityMultivariate::evaluate => Invalid Inputs");
+		}
+
+		for (int variateIndexI = 0; variateIndexI < variateArray.length; ++variateIndexI) {
+			value -=
+				_riskTolerance * variateArray[variateIndexI] *
+				(_expectedReturnsArray[variateIndexI] - _riskFreeRate);
+
+			for (int variateIndexJ = 0; variateIndexJ < variateArray.length; ++variateIndexJ) {
+				value +=
+					0.5 * _riskAversion * variateArray[variateIndexI] *
+					_covarianceMatrix[variateIndexI][variateIndexJ] * variateArray[variateIndexJ];
+			}
+		}
+
+		return value;
 	}
+
+	/**
+	 * Evaluate the Jacobian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Jacobian Array
+	 */
 
 	@Override public double[] jacobian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (adblVariate)) return null;
-
-		int iDimension = adblVariate.length;
-		double[] adblJacobian = new double[iDimension];
-
-		if (iDimension != dimension()) return null;
-
-		for (int i = 0; i < iDimension; ++i) {
-			adblJacobian[i] = -1. * _dblRiskTolerance * (_adblExpectedReturns[i] - _dblRiskFreeRate);
-
-			for (int j = 0; j < iDimension; ++j)
-				adblJacobian[i] += _dblRiskAversion * _aadblCovarianceMatrix[i][j] * adblVariate[j];
+		if (null == variateArray || !NumberUtil.IsValid (variateArray)) {
+			return null;
 		}
 
-		return adblJacobian;
+		double[] jacobian = new double[variateArray.length];
+
+		if (variateArray.length != dimension()) {
+			return null;
+		}
+
+		for (int variateIndexI = 0; variateIndexI < variateArray.length; ++variateIndexI) {
+			jacobian[variateIndexI] =
+				-1. * _riskTolerance * (_expectedReturnsArray[variateIndexI] - _riskFreeRate);
+
+			for (int variateIndexJ = 0; variateIndexJ < variateArray.length; ++variateIndexJ) {
+				jacobian[variateIndexI] +=
+					_riskAversion * _covarianceMatrix[variateIndexI][variateIndexJ] *
+					variateArray[variateIndexJ];
+			}
+		}
+
+		return jacobian;
 	}
 
+	/**
+	 * Evaluate The Hessian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Hessian Matrix
+	 */
+
 	@Override public double[][] hessian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		int iDimension = dimension();
+		int dimension = dimension();
 
-		double[][] aadblHessian = new double[iDimension][iDimension];
+		double[][] hessian = new double[dimension][dimension];
 
-		for (int i = 0; i < iDimension; ++i) {
-			for (int j = 0; j < iDimension; ++j)
-				aadblHessian[i][j] += _dblRiskAversion * _aadblCovarianceMatrix[i][j];
+		for (int variateIndexI = 0; variateIndexI < dimension; ++variateIndexI) {
+			for (int variateIndexJ = 0; variateIndexJ < dimension; ++variateIndexJ) {
+				hessian[variateIndexI][variateIndexJ] +=
+					_riskAversion * _covarianceMatrix[variateIndexI][variateIndexJ];
+			}
 		}
 
-		return aadblHessian;
+		return hessian;
 	}
 }

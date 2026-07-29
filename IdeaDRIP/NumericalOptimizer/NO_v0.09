@@ -1,0 +1,302 @@
+
+ --------------------------
+ #1 - Simplex Algorithm
+ --------------------------
+ --------------------------
+ 1.1) Overview
+	- Canonical Form - minimize c^Tx subject to Ax <= b and x >= 0
+	- Feasible Region and basic Feasible Solution
+	- Convex Polytope
+	- Simplex Polyhedron navigation
+ 1.2) Standard Form
+	- Handling x >= a
+	- Slack Variables for less than inequalities
+	- Surplus Variables for greater than inequalities
+	- Handling Unrestricted Variables
+	- Feasible region as the Canonical Form
+	- Rank of A is the number of rows
+ 1.3) Simplex Tableau
+	- Canonical Form of A
+	- Basic Variables
+	- Non-basic/Free Variables
+	- Pricing Out
+	- Updated Objective Function - Relative Cost Coefficients
+ 1.4) Pivot Operations
+	- Entering and Leaving Variables
+ 1.5) Algorithm
+	- Linear Program as a Canonical Tableau - Basic Feasible Solution improved by successive iteration
+	- Choice of pivot column
+		- Entry in the objective row of the tableau is positive
+		- Entrering Variable Choice Rules/Devex Algorithm
+		- Objective Function Relative Cost Coefficients all negative
+	- Leaving variable selection
+		- Choosing the corresponding Pivot Row
+		- Minimum Ratio Test
+		- Dropping Variable Choice Rule
+ 1.6) Finding an initial canonical tableau
+	- Artificial Variables for Equality Constraints
+ --------------------------
+
+ --------------------------
+ #2 - Optimal Control
+ --------------------------
+ --------------------------
+ 2.1) Overview
+	- Continuous-time Cost Functional to be minimized
+		- J(x, u, t0, tf) = E(x(t0), t0, x(tf), tf) + Integrate F(x, u, t) over t0, tf
+	- First Order Dynamic Constraints - State Equations
+		- xdot(t) = f(x, u, t)
+	- Algebraic Path Constraints
+		- h(x, u, t) <= 0
+	- Endpoint Conditions
+		- e(t0, x(t0), tf, x(tf)) = 0
+ 2.2) Linear Quadratic Control
+	- Quadratic Continuous-time Cost Functional to be minimized
+		- J = 1/2.xTranspose(tf).Sf.x(tf) + 1/2.Integrate {xTranspose(t).Q(t).x(t) + uTranspose(t).R.u(t)} over t0, tf
+	- First Order Dynamic Constraints - State Equations
+		- xdot(t) = A(t).x(t)+B(t).u(t)
+	- Initial Conditions
+		- x(t0) = x0
+	- Linear Quadratic Regulator - LQR
+		- A, B, Q, R are constant
+		- tf -> Infinity
+		- Quadratic Continuous-time Cost Functional to be minimized
+			- J = 1/2.Integrate {xTranspose(t).Q(t).x(t) + uTranspose(t).R.u(t)} over t0, Infinity
+		- First Order Dynamic Constraints - State Equations
+			- xdot(t) = A(t).x(t)+B(t).u(t)
+		- Initial Conditions
+			- x(t0) = x0
+	- Q => PSD and R => PD for finite-horizon
+		- Infinite Horizon; Q/R also constant for positive cost
+	- Optimal Feedback for LQ/LQR:
+		- u(t) = -K(t).x(t)
+		- K(t) = RInverse.BTranspose.S(t)
+		- S(t) solution to differential Riccati equation:
+			- Sdot(t) = -S.A-ATranspose.S+S.B.RInverse.BTranspose.S-Q
+			- S(tf) = Sf
+		- Infinite Horizon - Algebraic Riccati Equation ARE:
+			- 0 = -S.A-ATranspose.S+S.B.RInverse.BTranspose.S-Q
+ 2.3) Numerical Methods for Optimal Control
+	- Indirect Cost based Solution
+		- Hamiltonian H = F + lambdaTranspose.f - muTranspose.h (lambda, mu => Lagrange multipliers)
+		- xdot = dH/dlambda
+		- lamdadot = -dH/dx
+ --------------------------
+
+ --------------------------
+ #3 - Hamilton-Jacobi-Bellman Equation
+ --------------------------
+ --------------------------
+ 3.1) Optimal Control Problems
+	- Expression for Deterministic Optimal Control Path-based Cost Function
+	- xdot as a Function of x and u (the control vector)
+ 3.2) PDE
+	- Deterministic Optimal Control Path-based Cost Function PDE
+	- Deterministic Optimal Control Path-based Cost Function Terminal Condition
+ 3.3) Intuition behind Deterministic Optimal Control Path-based Cost Function
+	- Deterministic Optimal Control Path-based Cost Function in terms of optimal incremental subsequent Cost and adjacent Value Function
+		- Taylor expansion of Value Function
+		- Incorporation of xdot
+ 3.3) Extension to Stochastic Problems
+	- Cost Function Adaptation to the Stochastic State Vector
+		- xdot is implicitly a Function of x and u (the control vector) through the stochastic evolver
+	- Stochastic Version of the HJB Equation
+	- Terminal Cost Function remains the same
+ 3.4) Extension to Stochastic Problems - LCQ Control
+	- Evolution of x in terms of x, u, and Brownian
+	- Explicit Form for the Cost Accumulation
+	- Formulation of HJB for Quadratic Control
+	- Expression for Optimal Action
+ --------------------------
+
+ --------------------------
+ #4 - Bellman Equation
+ --------------------------
+ --------------------------
+ 4.1) Derivation
+	- A Dynamic Decision Problem
+		- Infinite-horizon Decision Problem: V(x_0) = Max across all a_t Sum over t (MDF^t . Payoff(x_t, a_t))
+		- Constraints:
+			- Action choice set a_t in {Action Set (x_t)}
+			- Next state = T(x_t, a_t)
+	- Bellman's Principle of Optimality
+		- Infinite-horizon Decision Problem: V(x_0) = Max across all a_0 (Payoff(x_0, a_0) + Sum over t not t_0 MDF . (MDF^(t-1) . Payoff(x_t, a_t)))
+		- Eventual Constraints:
+			- Action choice set a_t in {Action Set (x_t)}
+			- Next state = T(x_t, a_t)
+		- Initial Constraints:
+			- Action choice set a_0 in {Action Set (x_0)}
+			- Next state = T(x_0, a_0)
+	- The Bellman Equation
+		- Infinite-horizon Decision Problem: V(x_0) = Max across all a_0 (Payoff(x_0, a_0) + MDF . V(x_1)
+		- Eventual Constraints:
+			- Action choice set a_t in {Action Set (x_t)}
+			- Next state = T(x_t, a_t)
+		- Initial Constraints:
+			- Action choice set a_0 in {Action Set (x_0)}
+			- Next state = T(x_0, a_0)
+		- Generalized Form: V(x_0) = Max across all a_t in {Action Set (x_t)} (Payoff(x_t, a_t) + MDF . V(T(x_t, a_t))
+	- In a Stochastic Problem
+		- Infinite-horizon Decision Problem: V(c_0) = Max across all a_t Sum over t (MDF^t . Payoff(c_t, a_t))
+			- Current Endowment is a_t - Initial is a_0
+			- State is Consumption c_t
+			- MDF = 1 / (1 + r) => r being the Stochastic Interest Rate
+		- a_(t+1) = (1 + r).(a_t - c_t)
+		- Stochastic Interest Rate implies that V(x) will be a quadrature over the future interest rate paths
+			- Quadrature Measure Q over the filtration adapted over the realized interest rate trajectory
+		- Stochastic Sequential Optimization Problem - Ex-post over stochastic path evolution
+			- V(x, z) = max over {Action choice set a in {Action Set (x)}} {Payoff(x, a, z) + MDF.Integral over z' {V(T(x, a), z')}}
+ 4.2) Markov Decision Process
+	- Discrete Time Version of the above is the Bellman Optimality Equation, V(.) is called the Reward R(.)
+ --------------------------
+
+ --------------------------
+ #5 - Understanding Exact Dynamic Programming through Bellman Operators
+ --------------------------
+ --------------------------
+ 5.1) Value Functions as Vectors
+	- State space made up of n R^1 states s_1 through s_n
+	- Action space made up of m actions a_1 through a_m
+	- Stochastic Action Policy (probability of action a at state s)
+		- Deterministic Action Policy: Policy at state s is a
+	- Value Function v as function of policy pi given a starting state s => v_pi(s)
+	- Optimal Value Function v_*(s) = max over pi v_pi(s)
+ 5.2) Reward and Probabilities
+	- R_(s, a) => Expected Reward on action a in state s
+	- P_(s, s', a) => Probability of Transition s -> s' on action a
+	- R_pi(s) = sum over a pi (a given s).R_(s, a)
+	- P_pi(s, s') = sum over a pi (a given s).P_(s, s', a)
+	- Gamma - MDP Discount Factor
+ 5.3) Bellman Operators B_pi and B_star
+	- Bellman Policy Operator B_pi: B_pi(v) = R_pi + Gamma.B_pi(v)
+		- B_pi is a linear operator with a fixed point v_pi
+	- Bellman Optimality Operator B_pi: B_star(v)(s) = max over a {R_(s, a) + Gamma.sum over (s' element of S) [P_(s, s', a)(v)(s')]}
+		- B_pi is a non-linear operator with a fixed point v_pi
+	- Deterministic Greedy Policy G(v): G(v)(s) = arg max of a {R_(s, a) + Gamma.sum over (s' element of S) [P_(s, s', a)(v)(s')]}
+		- B_G(v).v = B_star.v
+ 5.4) Contraction and Monotonicity of Operators
+	- B_pi and B_star are gamma contraction under L_infinity norm, i.e.,
+		- ||B_pi(v1) - B_pi(v2)||_infinity <= gamma.||v1 - v2||_infinity
+		- ||B_star(v1) - B_pi(star)||_infinity <= gamma.||v1 - v2||_infinity
+	- B_pi and B_star are monotonic, i.e.,
+		- v1 <= v2 => B_pi(v1) <= B_pi(v2)
+		- v1 <= v2 => B_star(v1) <= B_star(v2)
+ 5.5) Policy Evaluation
+	- Bellman Expectation Equation => B_pi(v_pi) = v_pi
+	- Policy Evaluation Algorithm => Repeatedly applying B_pi on v => lim (N -> Infinity) B_pi (Iteration N) (v) = v_pi
+ 5.6) Policy Improvement
+	- Proof that Policy Evaluation Iteration Scheme above results in locating the Fixed Point - Consequence of:
+		- Increasing Monotonocity of Reward
+		- Bellman Operator Contractibility
+ --------------------------
+
+ --------------------------
+ #6 - Nelder-Mead Method
+ --------------------------
+ 6.1) Introduction
+	- Also downhill simplex method, amoeba method, or polytope method – numerical method to find a local minimum in a multi-dimensional space
+ 6.2) Implementing a new Variant of the Scheme
+	- Minimize f(x) where x∈R^n The current test points are x_1,⋯,x_(n+1)
+	- Vertex Ordering Step #1:
+		- Order according to the values at the vertices f(x_1 )≤f(x_2 )≤⋯≤f(x_(n+1) )
+	- Centroid Estimation Step #2: Calculate x_0, the centroid of all points except x_(n+1)
+	- Reflection Step #3:
+		- x_r=x_0+α(x_0-x_(n+1) ) with α>0
+		- If f(x_1 )≤f(x_r )≤f(x_n ) => new simplex by replacing the worst point x_(n+1) with x_r and go to step #1
+	- Reflection Step #4:
+		- If f(x_r )<f(x_1 ) compute x_e=x_0+γ(x_r-x_0 ) with γ>1
+		- If f(x_e )<f(x_r ):
+			- new simplex by replacing the worst point x_(n+1) by the expanded point x_e and go to step #1
+			- otherwise, obtain a new simplex by replacing the worst point x_(n+1) with the reflected point x_r and go to step #1
+	- Contraction Step #5: Now f(x_r )<f(x_n )
+		- If f(x_r )<f(x_(n+1) ) compute x_c=x_0+ρ(x_r-x_0 ) with 0<ρ≤0.5
+		- If f(x_c )<f(x_r ) new simplex by replacing x_(n+1) with the contracted point x_c and go to step #1. Otherwise, go to step #6
+		- If f(x_r )≥f(x_(n+1) ) compute x_c=x_0+ρ(x_(n+1)-x_0 ) with 0<ρ≤0.5
+		- If f(x_c )<f(x_(n+1) ) new simplex by replacing x_(n+1) with the contracted point x_c and go to step #1. Otherwise, go to step #6
+	- Shrink Step #6: Replace all points except the best x_1 with x_i=x_1+σ(x_i-x_1 ) and go to step #1
+	- Standard Values for the Coefficients: α=1; γ=2; ρ=1/2; σ=1/2
+ 6.3) Initial Simplex
+	- Nelder-Mead’s Scheme: Given x_1, others are generated with a fixed step along each dimension in turn
+ 6.4) Termination
+	- Nelder-Mead Criterion:
+		- Standard deviation of function values to current simplex below a threshold - stop
+		- Flat function may have almost equal function values over a large domain, so Nash adds the shrinkage criterion
+ --------------------------
+
+ --------------------------
+ #7 - Himmelblau’s Function
+ --------------------------
+ 7.1) Test Function for Optimization Algorithms: f(x,y)=(x^2+y-11)^2+(x+y^2-7)^2
+ 7.2) Local Extrema:
+	- Maximum at: (x=-0.270845, y=-0.923039) with value 181.617 
+	- Minima:
+		- f(3.0,2.0)=0.0
+		- f(-2.805118,3.131312)=0.0
+		- f(-3.779310,-3.283186)=0.0
+		- f(3.584428,-1.848126)=0.0
+ --------------------------
+
+ --------------------------
+ #8 - Rosenbrock’s Function
+ --------------------------
+ 8.1) Overview: f(x,y)=(a-x)^2+b(y-x^2 )^2
+	- Characteristics:
+		- (x,y)=(a,a^2 ) where f(x,y)=0
+		- Typical Parameters: a=1 and b=100
+		- Only in the trivial case where a=0 the function is symmetric and the minimum is at the origin
+ 8.2) Multidimensional Generalizations:
+	- First R^N Variant: Sum of N/2 uncoupled in 2D Rosenbrock problems, defined only for even N‘s - has predictably simple solutions
+		- f(x)=f(x_1,x_2,⋯,x_N )=∑_(i=1)^(N/2)▒[100(〖x_(2i-1)〗^2-x_2i )^2+(x_(2i-1)-1)^2 ] 
+	- Second R^N Variant:
+		- f(x)=f(x_1,x_2,⋯,x_N )=∑_(i=1)^(N-1)▒[100(x_(i+1)-x_i^2 )^2+(1-x_i )^2 ] 
+		- N=3 => One min at (1,1,⋯,1)
+		- 4≤N<7 => Global min at (1,1,⋯,1), local near (-1,1,⋯,1)
+		- Small N: 	Roots bounded in the region |x_i |<2.4
+ --------------------------
+
+ --------------------------
+ #9 - Levenberg-Marquardt Algorithm
+ --------------------------
+ 9.1) Problem:
+	- Inputs: of m empirical pairs (x_i,y_i ) of independent and dependent variables
+	- Minimize Sum of the squares of the deviations S(β) β ̂∈■(arg⁡min@β) S(β)=■(arg⁡min@β) ∑_(i=1)^m▒[y_i-S(x_i,β)]^2 
+ 9.2) Solution:
+	- Replacing β by β+δ: In each iteration step, the β is replaced by a new estimate β+δ
+	- Linearizing f(x_i,β+δ): To determine δ, f(x_i,β+δ) is approximated by f(x_i,β+δ)≈f(x_i,β+δ)+J_i δ where J_i=∂f(x_i,β)/∂β
+	- Minima of S(β):
+		- S(β) has its minimum at a zero gradient with respect to β
+		- Using first-order approximation gives S(β+δ)≈∑_(i=1)^m▒[y_i-f(x_i,β)-Jδ]^2 
+			- f(x_i,β+δ)≈‖y-f(β)-Jδ‖^2
+				=[y-f(β)-Jδ]^T [y-f(β)-Jδ]=[y-f(β)]^T [y-f(β)]-[y-f(β)]^T Jδ-(Jδ)^T [y-f(β)]+δ^T J^T Jδ
+				=[y-f(β)]^T [y-f(β)]-2[y-f(β)]^T Jδ+δ^T J^T Jδ
+	- Gauss-Newton Method: Taking the derivative of this approximation of S(β+δ) with respect to δ and setting to zero gives:
+		- (J^T J)δ=J^T [y-f(β)]
+	- Levenberg replaced this equation by a “damped version” (J^T J+λI)δ=J^T [y-f(β)]
+	- Non-negative damping factor λ is adjusted at each iteration.
+		- Rapid reduction of S, a smaller λ used => bringing the algorithm closer to the Gauss-Newton algorithm
+		- If an iteration gives insufficient reduction in the residual, λ can be increased => closer to the gradient-descent direction
+	- Impact of Parameter Size λ: Gradient of S with respect to β equals 〖-2(J^T [y-f(β)])〗^T
+		- Large values of λ, the step will be taken approximately in the direction opposite to the gradient
+	- When λ is large relative to ‖J^T J‖, inverting J^T J+λI is not necessary
+		- Update is well-approximated by the small gradient step λ^(-1) J^T [y-f(β)]
+	- Scale-Invariant Marquardt’s Algorithm:
+		- Marquardt’s algorithm solved a modified problem with each component of the gradient scaled according to the curvature
+		- Larger movement along the directions where the gradient is smaller, which avoids slow convergence in the direction of small gradients
+	- Fletcher’s Modification to the Marquardt’s Algorithm => [J^T J+λ Diag(J^T J)]δ=J^T [y-f(β)]
+ 9.3) Choice of Damping Parameters
+	- Marquardt’s Choice for λ_0/ν: Initial λ_0 and ν>1
+	- Iterative Approach for λ:
+		- Compute the starting S(λ_0, β) and S(λ_0/ν, β)
+		- If S(λ_0, β) < S(λ_0/ν, β), new λ=λ_0 ν^k until the corresponding S is smaller.
+	- Delayed Gratification Strategy:
+		- Increasing the parameter by a small amount for each uphill step, and decreasing by a large for each downhill step
+		- This avoids moving downhill too fast in the beginning of optimization
+			- This restricting future steps available and therefore slowing down convergence
+		- Typical Case - Increase Factor 2 and Decrease Factor 3; Large Problems - Increase 1.5 and Decrease 5
+	- Geodesic Acceleration
+		- Adding a Geodesic Acceleration Term: v_k+1/2 a_k where J_k a_k=-f_vv
+		- Dependence only on the directional derivative f_vv=v_μ v_v  (∂^2 f(x))/(∂v_μ ∂v_v )
+		- f_(vv,i)≈(f_i (x+hδ)-2f_i (x)+f_i (x-hδ))/h^2 =2/h [(f_i (x+hδ)-f_i (x))/h-Jδ]
+			- h=0.1 suggested by Transtrum and Sethna (2011)
+		- Transtrum and Sethna (2011) Anti-stall Criterion - Prevents "small" damping 2‖a_k ‖/‖v_k ‖ ≤α wher α<=1
+ --------------------------

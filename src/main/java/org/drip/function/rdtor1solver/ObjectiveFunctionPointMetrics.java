@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,15 +91,23 @@ package org.drip.function.rdtor1solver;
 
 /**
  * <i>ObjectiveFunctionPointMetrics</i> holds the R<sup>d</sup> Point Base and Sensitivity Metrics of the
- * Objective Function.
+ * 	Objective Function. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalCore.md">Numerical Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/README.md">Function</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></li>
+ * 		<li><i>ObjectiveFunctionPointMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Dimension</li>
+ * 		<li>Retrieve the Jacobian Array</li>
+ * 		<li>Retrieve the Hessian Matrix</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -100,46 +118,34 @@ public class ObjectiveFunctionPointMetrics
 	private double[][] _hessian = null;
 
 	/**
-	 * ObjectiveFunctionPointMetrics Constructor
+	 * <i>ObjectiveFunctionPointMetrics</i> Constructor
 	 * 
 	 * @param jacobian The Jacobian Array
 	 * @param hessian The Hessian Matrix
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public ObjectiveFunctionPointMetrics (
 		final double[] jacobian,
 		final double[][] hessian)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (null == (_jacobian = jacobian) ||
-			null == (_hessian = hessian))
-		{
-			throw new java.lang.Exception ("ObjectiveFunctionPointMetrics Constructor => Invalid Inputs");
+		if (null == (_jacobian = jacobian) || null == (_hessian = hessian)) {
+			throw new Exception ("ObjectiveFunctionPointMetrics Constructor => Invalid Inputs");
 		}
 
-		int dimensionCount = _jacobian.length;
-
-		if (0 == dimensionCount || dimensionCount != _hessian.length)
-		{
-			throw new java.lang.Exception ("ObjectiveFunctionPointMetrics Constructor => Invalid Inputs");
+		if (0 == _jacobian.length || _jacobian.length != _hessian.length) {
+			throw new Exception ("ObjectiveFunctionPointMetrics Constructor => Invalid Inputs");
 		}
 
-		for (int dimensionIndex = 0;
-			dimensionIndex < dimensionCount;
-			++dimensionIndex)
-		{
-			if (!org.drip.numerical.common.NumberUtil.IsValid (
-				_jacobian[dimensionIndex]
-			) || null == _hessian[dimensionIndex] ||
-				dimensionCount != _hessian[dimensionIndex].length ||
-				!org.drip.numerical.common.NumberUtil.IsValid (
-					_hessian[dimensionIndex]
-			))
+		for (int dimensionIndex = 0; dimensionIndex < _jacobian.length; ++dimensionIndex) {
+			if (!NumberUtil.IsValid (_jacobian[dimensionIndex]) ||
+				null == _hessian[dimensionIndex] ||
+				_jacobian.length != _hessian[dimensionIndex].length ||
+				!NumberUtil.IsValid (_hessian[dimensionIndex]))
 			{
-				throw new java.lang.Exception
-					("ObjectiveFunctionPointMetrics Constructor => Invalid Inputs");
+				throw new Exception ("ObjectiveFunctionPointMetrics Constructor => Invalid Inputs");
 			}
 		}
 	}

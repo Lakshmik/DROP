@@ -1,11 +1,25 @@
 
 package org.drip.function.rdtor1solver;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.function.rdtor1.BoundMultivariate;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.linearalgebra.LinearizationOutput;
+import org.drip.numerical.linearsolver.LinearSystem;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,34 +95,41 @@ package org.drip.function.rdtor1solver;
 
 /**
  * <i>InteriorFixedPointFinder</i> generates the Iterators for solving R<sup>d</sup> To R<sup>1</sup>
- * Convex/Non-Convex Functions Under Inequality Constraints loaded using a Barrier Coefficient.
+ * 	Convex/Non-Convex Functions Under Inequality Constraints loaded using a Barrier Coefficient. It exposes
+ * 	the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalCore.md">Numerical Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/README.md">Function</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></li>
+ * 		<li><i>InteriorFixedPointFinder</i> Constructor
+ * 		<li>Retrieve the Array of Inequality Constraint Function
+ * 		<li>Retrieve the Barrier Strength
+ * 		<li>Produce the Incremental Variate-Constraint Multiplier
+ * 		<li>Iterate Over to the Next Variate-Constraint Multiplier Tuple
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class InteriorFixedPointFinder
-	extends org.drip.function.rdtor1solver.FixedRdFinder
+	extends FixedRdFinder
 {
-	private double _barrierStrength = java.lang.Double.NaN;
-	private org.drip.function.rdtor1.BoundMultivariate[] _boundMultivariateFunctionArray = null;
-	private org.drip.function.definition.RdToR1[] _inequalityConstraintMultivariateFunctionArray = null;
+	private double _barrierStrength = Double.NaN;
+	private BoundMultivariate[] _boundMultivariateFunctionArray = null;
+	private RdToR1[] _inequalityConstraintMultivariateFunctionArray = null;
 
-	private org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier incremental (
-		final org.drip.function.rdtor1solver.ObjectiveFunctionPointMetrics objectiveFunctionPointMetrics,
-		final org.drip.function.rdtor1solver.ConstraintFunctionPointMetrics
-			inequalityConstraintFunctionPointMetrics)
+	private VariateInequalityConstraintMultiplier incremental (
+		final ObjectiveFunctionPointMetrics objectiveFunctionPointMetrics,
+		final ConstraintFunctionPointMetrics inequalityConstraintFunctionPointMetrics)
 	{
-		if (null == objectiveFunctionPointMetrics ||
-			null == inequalityConstraintFunctionPointMetrics)
-		{
+		if (null == objectiveFunctionPointMetrics || null == inequalityConstraintFunctionPointMetrics) {
 			return null;
 		}
 
@@ -120,12 +141,12 @@ public class InteriorFixedPointFinder
 
 		int inequalityConstraintCount = inequalityConstraintFunctionPointMetrics.count();
 
-		double[] variateIncrementArray = new double[objectiveFunctionDimension];
-		double[] inequalityConstraintIncrementCount = new double[inequalityConstraintCount];
-		int constrainedObjectiveFunctionDimension = objectiveFunctionDimension + inequalityConstraintCount;
-		double[][] constrainedObjectiveFunctionJacobianArray =
-			new double[constrainedObjectiveFunctionDimension][constrainedObjectiveFunctionDimension];
-		double[] constrainedObjectiveFunctionRHSArray = new double[constrainedObjectiveFunctionDimension];
+		double[] problemVariableIncrementArray = new double[objectiveFunctionDimension];
+		double[] inequalityConstraintIncrementArray = new double[inequalityConstraintCount];
+		int problemVariableKKTCoefficientDimension = objectiveFunctionDimension + inequalityConstraintCount;
+		double[][] problemVariableKKTCoefficientJacobianArray =
+			new double[problemVariableKKTCoefficientDimension][problemVariableKKTCoefficientDimension];
+		double[] problemVariableKKTCoefficientRHSArray = new double[problemVariableKKTCoefficientDimension];
 
 		if (0 == objectiveFunctionDimension ||
 			objectiveFunctionDimension != inequalityConstraintFunctionPointMetrics.dimension())
@@ -150,7 +171,7 @@ public class InteriorFixedPointFinder
 				objectiveFunctionDimensionIndexJ < objectiveFunctionDimension;
 				++objectiveFunctionDimensionIndexJ)
 			{
-				constrainedObjectiveFunctionJacobianArray[objectiveFunctionDimensionIndexI][objectiveFunctionDimensionIndexJ]
+				problemVariableKKTCoefficientJacobianArray[objectiveFunctionDimensionIndexI][objectiveFunctionDimensionIndexJ]
 					= objectiveFunctionHessian[objectiveFunctionDimensionIndexI][objectiveFunctionDimensionIndexJ];
 			}
 
@@ -158,8 +179,9 @@ public class InteriorFixedPointFinder
 				inequalityConstraintIndex < inequalityConstraintCount;
 				++inequalityConstraintIndex)
 			{
-				constrainedObjectiveFunctionJacobianArray[objectiveFunctionDimensionIndexI][inequalityConstraintIndex + objectiveFunctionDimension] =
-					-1. * inequalityConstraintFunctionJacobianArray[objectiveFunctionDimensionIndexI][inequalityConstraintIndex];
+				problemVariableKKTCoefficientJacobianArray[objectiveFunctionDimensionIndexI][inequalityConstraintIndex + objectiveFunctionDimension]
+					= -1. *
+						inequalityConstraintFunctionJacobianArray[objectiveFunctionDimensionIndexI][inequalityConstraintIndex];
 			}
 		}
 
@@ -171,92 +193,83 @@ public class InteriorFixedPointFinder
 				inequalityConstraintIndexJ < inequalityConstraintCount;
 				++inequalityConstraintIndexJ)
 			{
-				constrainedObjectiveFunctionJacobianArray[inequalityConstraintIndexI + objectiveFunctionDimension][inequalityConstraintIndexJ + objectiveFunctionDimension]
-					= inequalityConstraintIndexI == inequalityConstraintIndexJ ? inequalityConstraintFunctionValueArray[inequalityConstraintIndexI] : 0.;
+				problemVariableKKTCoefficientJacobianArray[inequalityConstraintIndexI + objectiveFunctionDimension][inequalityConstraintIndexJ + objectiveFunctionDimension]
+					= inequalityConstraintIndexI == inequalityConstraintIndexJ ?
+						inequalityConstraintFunctionValueArray[inequalityConstraintIndexI] : 0.;
 			}
 
 			for (int objectiveFunctionIndex = 0;
 				objectiveFunctionIndex < objectiveFunctionDimension;
 				++objectiveFunctionIndex)
 			{
-				constrainedObjectiveFunctionJacobianArray[inequalityConstraintIndexI + objectiveFunctionDimension][objectiveFunctionIndex] =
+				problemVariableKKTCoefficientJacobianArray[inequalityConstraintIndexI + objectiveFunctionDimension][objectiveFunctionIndex] =
 					inequalityConstraintFunctionMultiplierArray[inequalityConstraintIndexI] *
 					inequalityConstraintFunctionJacobianArray[objectiveFunctionIndex][inequalityConstraintIndexI];
 			}
 		}
 
 		for (int constrainedObjectiveFunctionIndex = 0;
-			constrainedObjectiveFunctionIndex < constrainedObjectiveFunctionDimension;
+			constrainedObjectiveFunctionIndex < problemVariableKKTCoefficientDimension;
 			++constrainedObjectiveFunctionIndex)
 		{
 			if (constrainedObjectiveFunctionIndex < objectiveFunctionDimension)
 			{
-				constrainedObjectiveFunctionRHSArray[constrainedObjectiveFunctionIndex] =
+				problemVariableKKTCoefficientRHSArray[constrainedObjectiveFunctionIndex] =
 					-1. * objectiveFunctionJacobian[constrainedObjectiveFunctionIndex];
 
 				for (int inequalityConstraintIndex = 0;
 					inequalityConstraintIndex < inequalityConstraintCount;
 					++inequalityConstraintIndex)
 				{
-					constrainedObjectiveFunctionRHSArray[constrainedObjectiveFunctionIndex] +=
+					problemVariableKKTCoefficientRHSArray[constrainedObjectiveFunctionIndex] +=
 						inequalityConstraintFunctionJacobianArray[constrainedObjectiveFunctionIndex][inequalityConstraintIndex]
 						* inequalityConstraintFunctionMultiplierArray[inequalityConstraintIndex];
 				}
-			}
-			else
-			{
+			} else {
 				int constraintIndex = constrainedObjectiveFunctionIndex - objectiveFunctionDimension;
-				constrainedObjectiveFunctionRHSArray[constrainedObjectiveFunctionIndex] =
+				problemVariableKKTCoefficientRHSArray[constrainedObjectiveFunctionIndex] =
 					_barrierStrength - inequalityConstraintFunctionValueArray[constraintIndex] *
 					inequalityConstraintFunctionMultiplierArray[constraintIndex];
 			}
 		}
 
-		org.drip.numerical.linearalgebra.LinearizationOutput linearizationOutput =
-			org.drip.numerical.linearsolver.LinearSystem.SolveUsingMatrixInversion (
-				constrainedObjectiveFunctionJacobianArray,
-				constrainedObjectiveFunctionRHSArray
-			);
+		LinearizationOutput linearizationOutput = LinearSystem.SolveUsingMatrixInversion (
+			problemVariableKKTCoefficientJacobianArray,
+			problemVariableKKTCoefficientRHSArray
+		);
 
-		if (null == linearizationOutput)
+		if (null == linearizationOutput) {
+			return null;
+		}
+
+		double[] problemVariableKKTCoefficientIncrementArray = linearizationOutput.getTransformedRHS();
+
+		if (null == problemVariableKKTCoefficientIncrementArray ||
+			problemVariableKKTCoefficientIncrementArray.length != problemVariableKKTCoefficientDimension)
 		{
 			return null;
 		}
 
-		double[] variateConstraintIncrementArray = linearizationOutput.getTransformedRHS();
-
-		if (null == variateConstraintIncrementArray ||
-			variateConstraintIncrementArray.length != constrainedObjectiveFunctionDimension)
+		for (int problemVariableKKTCoefficientIndex = 0;
+			problemVariableKKTCoefficientIndex < problemVariableKKTCoefficientDimension;
+			++problemVariableKKTCoefficientIndex)
 		{
-			return null;
-		}
-
-		for (int constrainedObjectiveFunctionIndex = 0;
-			constrainedObjectiveFunctionIndex < constrainedObjectiveFunctionDimension;
-			++constrainedObjectiveFunctionIndex)
-		{
-			if (constrainedObjectiveFunctionIndex < objectiveFunctionDimension)
-			{
-				variateIncrementArray[constrainedObjectiveFunctionIndex] =
-					variateConstraintIncrementArray[constrainedObjectiveFunctionIndex];
-			}
-			else
-			{
-				inequalityConstraintIncrementCount[constrainedObjectiveFunctionIndex - objectiveFunctionDimension]
-					= variateConstraintIncrementArray[constrainedObjectiveFunctionIndex];
+			if (problemVariableKKTCoefficientIndex < objectiveFunctionDimension) {
+				problemVariableIncrementArray[problemVariableKKTCoefficientIndex] =
+					problemVariableKKTCoefficientIncrementArray[problemVariableKKTCoefficientIndex];
+			} else {
+				inequalityConstraintIncrementArray[problemVariableKKTCoefficientIndex - objectiveFunctionDimension]
+					= problemVariableKKTCoefficientIncrementArray[problemVariableKKTCoefficientIndex];
 			}
 		}
 
-		try
-		{
-			return new org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier (
+		try {
+			return new VariateInequalityConstraintMultiplier (
 				true,
-				variateIncrementArray,
-				inequalityConstraintIncrementCount
+				problemVariableIncrementArray,
+				inequalityConstraintIncrementArray
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -264,60 +277,55 @@ public class InteriorFixedPointFinder
 	}
 
 	/**
-	 * InteriorFixedPointFinder Constructor
+	 * <i>InteriorFixedPointFinder</i> Constructor
 	 * 
 	 * @param rdToR1ObjectiveFunction The Objective Function
 	 * @param inequalityConstraintMultivariateFunctionArray Array of Inequality Constraints
-	 * @param lsec The Line Step Evolution Control
-	 * @param cc Convergence Control Parameters
+	 * @param lineStepEvolutionControl The Line Step Evolution Control
+	 * @param convergenceControl Convergence Control Parameters
 	 * @param barrierStrength Barrier Strength
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public InteriorFixedPointFinder (
-		final org.drip.function.definition.RdToR1 rdToR1ObjectiveFunction,
-		final org.drip.function.definition.RdToR1[] inequalityConstraintMultivariateFunctionArray,
-		final org.drip.function.rdtor1descent.LineStepEvolutionControl lsec,
-		final org.drip.function.rdtor1solver.ConvergenceControl cc,
+		final RdToR1 rdToR1ObjectiveFunction,
+		final RdToR1[] inequalityConstraintMultivariateFunctionArray,
+		final org.drip.function.rdtor1descent.LineStepEvolutionControl lineStepEvolutionControl,
+		final ConvergenceControl convergenceControl,
 		final double barrierStrength)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (
-			rdToR1ObjectiveFunction,
-			lsec,
-			cc
-		);
+		super (rdToR1ObjectiveFunction, lineStepEvolutionControl, convergenceControl);
 
-		if (null == (_inequalityConstraintMultivariateFunctionArray = inequalityConstraintMultivariateFunctionArray) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_barrierStrength = barrierStrength))
+		if (null == (
+			_inequalityConstraintMultivariateFunctionArray = inequalityConstraintMultivariateFunctionArray
+			) || !NumberUtil.IsValid (_barrierStrength = barrierStrength)
+		)
 		{
-			throw new java.lang.Exception ("InteriorFixedPointFinder Constructor => Invalid Inputs");
+			throw new Exception ("InteriorFixedPointFinder Constructor => Invalid Inputs");
 		}
 
-		int inequalityConstraintCount = _inequalityConstraintMultivariateFunctionArray.length;
-		_boundMultivariateFunctionArray = 0 == inequalityConstraintCount ? null : new
-			org.drip.function.rdtor1.BoundMultivariate[inequalityConstraintCount];
+		_boundMultivariateFunctionArray =
+			0 == _inequalityConstraintMultivariateFunctionArray.length ?
+			null : new BoundMultivariate[_inequalityConstraintMultivariateFunctionArray.length];
 
-		if (0 == inequalityConstraintCount)
-		{
-			throw new java.lang.Exception ("InteriorFixedPointFinder Constructor => Invalid Inputs");
+		if (0 == _inequalityConstraintMultivariateFunctionArray.length) {
+			throw new Exception ("InteriorFixedPointFinder Constructor => Invalid Inputs");
 		}
 
 		for (int inequalityConstraintIndex = 0;
-			inequalityConstraintIndex < inequalityConstraintCount;
+			inequalityConstraintIndex < _inequalityConstraintMultivariateFunctionArray.length;
 			++inequalityConstraintIndex)
 		{
-			if (null == _inequalityConstraintMultivariateFunctionArray[inequalityConstraintIndex])
-			{
-				throw new java.lang.Exception ("InteriorFixedPointFinder Constructor => Invalid Inputs");
+			if (null == _inequalityConstraintMultivariateFunctionArray[inequalityConstraintIndex]) {
+				throw new Exception ("InteriorFixedPointFinder Constructor => Invalid Inputs");
 			}
 
 			if (_inequalityConstraintMultivariateFunctionArray[inequalityConstraintIndex] instanceof
-				org.drip.function.rdtor1.BoundMultivariate)
+				BoundMultivariate)
 			{
-				_boundMultivariateFunctionArray[inequalityConstraintIndex] =
-					(org.drip.function.rdtor1.BoundMultivariate)
+				_boundMultivariateFunctionArray[inequalityConstraintIndex] = (BoundMultivariate)
 					_inequalityConstraintMultivariateFunctionArray[inequalityConstraintIndex];
 			}
 		}
@@ -329,7 +337,7 @@ public class InteriorFixedPointFinder
 	 * @return The Array of Inequality Constraint Function
 	 */
 
-	public org.drip.function.definition.RdToR1[] inequalityConstraintMultivariateFunctionArray()
+	public RdToR1[] inequalityConstraintMultivariateFunctionArray()
 	{
 		return _inequalityConstraintMultivariateFunctionArray;
 	}
@@ -345,39 +353,39 @@ public class InteriorFixedPointFinder
 		return _barrierStrength;
 	}
 
-	@Override public org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier increment (
-		final org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier currentVariateConstraint)
+	/**
+	 * Produce the Incremental Variate-Constraint Multiplier
+	 * 
+	 * @param currentVariateInequalityConstraintMultiplier The Current Variate-Constraint Multiplier Tuple
+	 * 
+	 * @return The Incremental Variate-Constraint Multiplier
+	 */
+
+	@Override public VariateInequalityConstraintMultiplier increment (
+		final VariateInequalityConstraintMultiplier currentVariateInequalityConstraintMultiplier)
 	{
-		if (null == currentVariateConstraint)
+		if (null == currentVariateInequalityConstraintMultiplier ||
+			0 == _inequalityConstraintMultivariateFunctionArray.length)
 		{
 			return null;
 		}
 
-		double[] variateArray = currentVariateConstraint.variateArray();
+		double[] problemVariableArray = currentVariateInequalityConstraintMultiplier.problemVariableArray();
 
-		int variateCount = variateArray.length;
-		int constraintCount = _inequalityConstraintMultivariateFunctionArray.length;
-		double[][] constraintJacobianArray = new double[variateCount][constraintCount];
-		double[] constraintValueArray = new double[constraintCount];
-
-		if (0 == constraintCount)
-		{
-			return null;
-		}
+		double[] constraintValueArray = new double[_inequalityConstraintMultivariateFunctionArray.length];
+		double[][] constraintJacobianArray =
+			new double[problemVariableArray.length][_inequalityConstraintMultivariateFunctionArray.length];
 
 		for (int constraintIndex = 0;
-			constraintIndex < constraintCount;
+			constraintIndex < _inequalityConstraintMultivariateFunctionArray.length;
 			++constraintIndex)
 		{
-			try
-			{
+			try {
 				constraintValueArray[constraintIndex] =
 					_inequalityConstraintMultivariateFunctionArray[constraintIndex].evaluate (
-						variateArray
+						problemVariableArray
 					);
-			}
-			catch (java.lang.Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
@@ -385,59 +393,61 @@ public class InteriorFixedPointFinder
 
 			double[] constraintJacobian =
 				_inequalityConstraintMultivariateFunctionArray[constraintIndex].jacobian (
-					variateArray
+					problemVariableArray
 				);
 
-			if (null == constraintJacobian)
-			{
+			if (null == constraintJacobian) {
 				return null;
 			}
 
-			for (int variateIndex = 0;
-				variateIndex < variateCount;
-				++variateIndex)
+			for (int problemVariableIndex = 0;
+				problemVariableIndex < problemVariableArray.length;
+				++problemVariableIndex)
 			{
-				constraintJacobianArray[variateIndex][constraintIndex] = constraintJacobian[variateIndex];
+				constraintJacobianArray[problemVariableIndex][constraintIndex] =
+					constraintJacobian[problemVariableIndex];
 			}
 		}
 
-		org.drip.function.definition.RdToR1 objectiveFunction = objectiveFunction();
+		RdToR1 objectiveFunction = objectiveFunction();
 
-		try
-		{
+		try {
 			return incremental (
-				new org.drip.function.rdtor1solver.ObjectiveFunctionPointMetrics (
-					objectiveFunction.jacobian (
-						variateArray
-					),
-					objectiveFunction.hessian (
-						variateArray
-					)
+				new ObjectiveFunctionPointMetrics (
+					objectiveFunction.jacobian (problemVariableArray),
+					objectiveFunction.hessian (problemVariableArray)
 				),
-				new org.drip.function.rdtor1solver.ConstraintFunctionPointMetrics (
+				new ConstraintFunctionPointMetrics (
 					constraintValueArray,
 					constraintJacobianArray,
-					currentVariateConstraint.constraintMultiplierArray()
+					currentVariateInequalityConstraintMultiplier.kktCoefficientArray()
 				)
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier next (
-		final org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier currentVariateConstraint,
-		final org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier
-			incrementalVariateConstraint,
+	/**
+	 * Iterate Over to the Next Variate-Constraint Multiplier Tuple
+	 * 
+	 * @param currentVariateInequalityConstraintMultiplier Current Variate-Constraint Multiplier Tuple
+	 * @param incrementVariateInequalityConstraintMultiplier Incremental Variate-Constraint Multiplier Tuple
+	 * @param incrementFraction The Incremental Fraction to be applied
+	 * 
+	 * @return The Next Variate-Constraint Multiplier Set
+	 */
+
+	@Override public VariateInequalityConstraintMultiplier next (
+		final VariateInequalityConstraintMultiplier currentVariateInequalityConstraintMultiplier,
+		final VariateInequalityConstraintMultiplier incrementVariateInequalityConstraintMultiplier,
 		final double incrementFraction)
 	{
-		return org.drip.function.rdtor1solver.VariateInequalityConstraintMultiplier.Add (
-			currentVariateConstraint,
-			incrementalVariateConstraint,
+		return VariateInequalityConstraintMultiplier.Add (
+			currentVariateInequalityConstraintMultiplier,
+			incrementVariateInequalityConstraintMultiplier,
 			incrementFraction,
 			_boundMultivariateFunctionArray
 		);

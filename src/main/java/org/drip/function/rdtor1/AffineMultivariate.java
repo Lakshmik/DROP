@@ -1,11 +1,22 @@
 
 package org.drip.function.rdtor1;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,44 +92,59 @@ package org.drip.function.rdtor1;
 
 /**
  * <i>AffineMultivariate</i> implements a Planar Linear R<sup>d</sup> To R<sup>1</sup> Function using a
- * Multivariate Vector.
+ * 	Multivariate Vector. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>AffineMultivariate</i> Constructor</li>
+ * 		<li>Retrieve the Array of the Coefficients</li>
+ * 		<li>Retrieve the Constant</li>
+ * 		<li>Retrieve the Dimension of the Input Variate</li>
+ * 		<li>Evaluate for the given Input Variate Array</li>
+ * 		<li>Evaluate the Jacobian for the given Input Variate Array</li>
+ * 		<li>Evaluate The Hessian for the given Input Variate Array</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class AffineMultivariate extends org.drip.function.definition.RdToR1 implements
-	org.drip.function.rdtor1.ConvexMultivariate {
-	private double[] _adblCoefficient = null;
-	private double _dblConstant = java.lang.Double.NaN;
+public class AffineMultivariate
+	extends RdToR1
+	implements ConvexMultivariate
+{
+	private double _constant = Double.NaN;
+	private double[] _coefficientArray = null;
 
 	/**
-	 * AffineMultivariate Constructor
+	 * <i>AffineMultivariate</i> Constructor
 	 * 
-	 * @param adblCoefficient Array of Variate Coefficients
-	 * @param dblConstant The Constant Offset
+	 * @param coefficientArray Array of Variate Coefficients
+	 * @param constant The Constant Offset
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public AffineMultivariate (
-		final double[] adblCoefficient,
-		final double dblConstant)
-		throws java.lang.Exception
+		final double[] coefficientArray,
+		final double constant)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_adblCoefficient = adblCoefficient) || 0 == _adblCoefficient.length ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_adblCoefficient) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblConstant = dblConstant))
-			throw new java.lang.Exception ("AffineMultivariate Constructor => Invalid Inputs");
+		if (null == (_coefficientArray = coefficientArray) || 0 == _coefficientArray.length ||
+			!NumberUtil.IsValid (_coefficientArray) ||
+			!NumberUtil.IsValid (_constant = constant))
+		{
+			throw new Exception ("AffineMultivariate Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -127,9 +153,9 @@ public class AffineMultivariate extends org.drip.function.definition.RdToR1 impl
 	 * @return The Array of the Coefficients
 	 */
 
-	public double[] coefficients()
+	public double[] coefficientArray()
 	{
-		return _adblCoefficient;
+		return _coefficientArray;
 	}
 
 	/**
@@ -140,51 +166,87 @@ public class AffineMultivariate extends org.drip.function.definition.RdToR1 impl
 
 	public double constant()
 	{
-		return _dblConstant;
+		return _constant;
 	}
+
+	/**
+	 * Retrieve the Dimension of the Input Variate
+	 * 
+	 * @return The Dimension of the Input Variate
+	 */
 
 	@Override public int dimension()
 	{
-		return _adblCoefficient.length;
+		return _coefficientArray.length;
 	}
+
+	/**
+	 * Evaluate for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variates
+	 *  
+	 * @return The Calculated Value
+	 * 
+	 * @throws Exception Thrown if the Evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double[] adblVariate)
-		throws java.lang.Exception
+		final double[] variateArray)
+		throws Exception
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (adblVariate))
-			throw new java.lang.Exception ("AffineMultivariate::evaluate => Invalid Inputs");
-
-		double dblValue = 0.;
-		int iDimension = adblVariate.length;
-
-		if (iDimension != dimension())
-			throw new java.lang.Exception ("AffineMultivariate::evaluate => Invalid Inputs");
-
-		for (int i = 0; i < iDimension; ++i)
-			dblValue += adblVariate[i] * _adblCoefficient[i];
-
-		return dblValue + _dblConstant;
-	}
-
-	@Override public double[] jacobian (
-		final double[] adblVariate)
-	{
-		return _adblCoefficient;
-	}
-
-	@Override public double[][] hessian (
-		final double[] adblVariate)
-	{
-		int iDimension = dimension();
-
-		double[][] aadblHessian = new double[iDimension][iDimension];
-
-		for (int i = 0; i < iDimension; ++i) {
-			for (int j = 0; j < iDimension; ++j)
-				aadblHessian[i][j] = 0.;
+		if (null == variateArray || !NumberUtil.IsValid (variateArray)) {
+			throw new Exception ("AffineMultivariate::evaluate => Invalid Inputs");
 		}
 
-		return aadblHessian;
+		double value = 0.;
+		int dimension = variateArray.length;
+
+		if (dimension != dimension()) {
+			throw new Exception ("AffineMultivariate::evaluate => Invalid Inputs");
+		}
+
+		for (int dimensionIndex = 0; dimensionIndex < dimension; ++dimensionIndex) {
+			value += variateArray[dimensionIndex] * _coefficientArray[dimensionIndex];
+		}
+
+		return value + _constant;
+	}
+
+	/**
+	 * Evaluate the Jacobian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Jacobian Array
+	 */
+
+	@Override public double[] jacobian (
+		final double[] variateArray)
+	{
+		return _coefficientArray;
+	}
+
+	/**
+	 * Evaluate The Hessian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Hessian Matrix
+	 */
+
+	@Override public double[][] hessian (
+		final double[] variateArray)
+	{
+		int dimension = dimension();
+
+		double[][] hessianGrid = new double[dimension][dimension];
+
+		for (int innerDimensionIndex = 0; innerDimensionIndex < dimension; ++innerDimensionIndex) {
+			for (int outerDimensionIndex = 0; outerDimensionIndex < dimension; ++outerDimensionIndex) {
+				hessianGrid[innerDimensionIndex][outerDimensionIndex] = 0.;
+			}
+		}
+
+		return hessianGrid;
 	}
 }

@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,8 +93,8 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>WolfeEvolutionVerifierMetrics</i> implements the Wolfe Criterion used for the Inexact Line Search
- * Increment Generation. The References are:
- * <br><br>
+ * 	Increment Generation. The References are:
+ * 	<br>
  * 	<ul>
  * 		<li>
  * 			Armijo, L. (1966): Minimization of Functions having Lipschitz-Continuous First Partial
@@ -101,30 +113,45 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li><i>WolfeEvolutionVerifierMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Armijo Parameter</li>
+ * 		<li>Indicate if the Check is for Minimizer/Maximizer</li>
+ * 		<li>Retrieve the Curvature Parameter</li>
+ * 		<li>Retrieve Whether of not the "Strong" Curvature Criterion needs to be met</li>
+ * 		<li>Retrieve the Function Value at the Current Variate</li>
+ * 		<li>Retrieve the Function Value at the Next Variate</li>
+ * 		<li>Retrieve the Function Jacobian at the Next Variate</li>
+ * 		<li>Indicate if the Wolfe Criterion has been met</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class WolfeEvolutionVerifierMetrics
-	extends org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics
+	extends LineEvolutionVerifierMetrics
 {
 	private boolean _maximizerCheck = false;
+	private double _armijoParameter = Double.NaN;
+	private double _curvatureParameter = Double.NaN;
 	private boolean _strongCurvatureCriterion = false;
 	private double[] _nextVariateFunctionJacobian = null;
-	private double _armijoParameter = java.lang.Double.NaN;
-	private double _curvatureParameter = java.lang.Double.NaN;
-	private double _nextVariateFunctionValue = java.lang.Double.NaN;
-	private double _currentVariateFunctionValue = java.lang.Double.NaN;
+	private double _nextVariateFunctionValue = Double.NaN;
+	private double _currentVariateFunctionValue = Double.NaN;
 
 	/**
-	 * WolfeEvolutionVerifierMetrics Constructor
+	 * <i>WolfeEvolutionVerifierMetrics</i> Constructor
 	 * 
 	 * @param armijoParameter The Armijo Criterion Parameter
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
@@ -138,7 +165,7 @@ public class WolfeEvolutionVerifierMetrics
 	 * @param currentVariateFunctionJacobian The Function Jacobian at the Current Variate
 	 * @param nextVariateFunctionJacobian The Function Jacobian at the Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public WolfeEvolutionVerifierMetrics (
@@ -146,14 +173,14 @@ public class WolfeEvolutionVerifierMetrics
 		final boolean maximizerCheck,
 		final double curvatureParameter,
 		final boolean strongCurvatureCriterion,
-		final org.drip.function.definition.UnitVector targetDirection,
+		final UnitVector targetDirection,
 		final double[] currentVariateArray,
 		final double stepLength,
 		final double currentVariateFunctionValue,
 		final double nextVariateFunctionValue,
 		final double[] currentVariateFunctionJacobian,
 		final double[] nextVariateFunctionJacobian)
-		throws java.lang.Exception
+		throws Exception
 	{
 		super (
 			targetDirection,
@@ -162,16 +189,14 @@ public class WolfeEvolutionVerifierMetrics
 			currentVariateFunctionJacobian
 		);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_armijoParameter = armijoParameter) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_curvatureParameter = curvatureParameter) ||
+		if (!NumberUtil.IsValid (_armijoParameter = armijoParameter) ||
+			!NumberUtil.IsValid (_curvatureParameter = curvatureParameter) ||
 			null == (_nextVariateFunctionJacobian = nextVariateFunctionJacobian) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_currentVariateFunctionValue =
-				currentVariateFunctionValue) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_nextVariateFunctionValue =
-				nextVariateFunctionValue) ||
+			!NumberUtil.IsValid (_currentVariateFunctionValue = currentVariateFunctionValue) ||
+			!NumberUtil.IsValid (_nextVariateFunctionValue = nextVariateFunctionValue) ||
 			currentVariateArray.length != _nextVariateFunctionJacobian.length)
 		{
-			throw new java.lang.Exception ("WolfeEvolutionVerifierMetrics Constructor => Invalid Inputs");
+			throw new Exception ("WolfeEvolutionVerifierMetrics Constructor => Invalid Inputs");
 		}
 
 		_maximizerCheck = maximizerCheck;
@@ -267,10 +292,9 @@ public class WolfeEvolutionVerifierMetrics
 
 		double[] currentVariateFunctionJacobian = currentVariateFunctionJacobian();
 
-		try
-		{
-			double gradientUpdatedFunctionValue = _currentVariateFunctionValue +
-				_armijoParameter * stepLength() * org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
+		try {
+			double gradientUpdatedFunctionValue =
+				_currentVariateFunctionValue + _armijoParameter * stepLength() * R1MatrixUtil.DotProduct (
 					targetDirectionVector,
 					currentVariateFunctionJacobian
 				);
@@ -281,26 +305,18 @@ public class WolfeEvolutionVerifierMetrics
 				return false;
 			}
 
-			double nextFunctionIncrement = org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
+			double nextFunctionIncrement = R1MatrixUtil.DotProduct (
 				targetDirectionVector,
 				_nextVariateFunctionJacobian
 			);
 
 			double parametrizedCurrentFunctionIncrement = _curvatureParameter *
-				org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
-					targetDirectionVector,
-					currentVariateFunctionJacobian
-				);
+				R1MatrixUtil.DotProduct (targetDirectionVector, currentVariateFunctionJacobian);
 
 			return _strongCurvatureCriterion ?
-				java.lang.Math.abs (
-					nextFunctionIncrement
-				) <= java.lang.Math.abs (
-					parametrizedCurrentFunctionIncrement
-				) : nextFunctionIncrement >= parametrizedCurrentFunctionIncrement;
-		}
-		catch (java.lang.Exception e)
-		{
+				Math.abs (nextFunctionIncrement) <= Math.abs (parametrizedCurrentFunctionIncrement) :
+				nextFunctionIncrement >= parametrizedCurrentFunctionIncrement;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

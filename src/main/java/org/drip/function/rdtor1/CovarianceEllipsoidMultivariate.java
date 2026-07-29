@@ -1,11 +1,22 @@
 
 package org.drip.function.rdtor1;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,49 +92,63 @@ package org.drip.function.rdtor1;
 
 /**
  * <i>CovarianceEllipsoidMultivariate</i> implements a R<sup>d</sup> To R<sup>1</sup> Co-variance Estimate of
- * the specified Distribution.
+ * 	the specified Distribution. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>CovarianceEllipsoidMultivariate</i> Constructor</li>
+ * 		<li>Retrieve the Input Variate Dimension</li>
+ * 		<li>Retrieve the Co-variance Matrix</li>
+ * 		<li>Evaluate for the given Input Variate Array</li>
+ * 		<li>Evaluate the Jacobian for the given Input Variate Array</li>
+ * 		<li>Evaluate The Hessian for the given Input Variate Array</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class CovarianceEllipsoidMultivariate extends org.drip.function.definition.RdToR1 {
-	private double[][] _aadblCovarianceMatrix = null;
+public class CovarianceEllipsoidMultivariate
+	extends RdToR1
+{
+	private double[][] _covarianceMatrix = null;
 
 	/**
-	 * CovarianceEllipsoidMultivariate Constructor
+	 * <i>CovarianceEllipsoidMultivariate</i> Constructor
 	 * 
-	 * @param aadblCovarianceMatrix The Covariance Matrix
+	 * @param covarianceMatrix The Covariance Matrix
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public CovarianceEllipsoidMultivariate (
-		final double[][] aadblCovarianceMatrix)
-		throws java.lang.Exception
+		final double[][] covarianceMatrix)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_aadblCovarianceMatrix = aadblCovarianceMatrix))
-			throw new java.lang.Exception ("CovarianceEllipsoidMultivariate Constructor => Invalid Inputs");
+		if (null == (_covarianceMatrix = covarianceMatrix)) {
+			throw new Exception ("CovarianceEllipsoidMultivariate Constructor => Invalid Inputs");
+		}
 
-		int iSize = _aadblCovarianceMatrix.length;
+		if (0 == _covarianceMatrix.length) {
+			throw new Exception ("CovarianceEllipsoidMultivariate Constructor => Invalid Inputs");
+		}
 
-		if (0 == iSize)
-			throw new java.lang.Exception ("CovarianceEllipsoidMultivariate Constructor => Invalid Inputs");
-
-		for (int i = 0; i < iSize; ++i) {
-			if (null == _aadblCovarianceMatrix[i] || iSize != _aadblCovarianceMatrix[i].length ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_aadblCovarianceMatrix[i]))
-				throw new java.lang.Exception
-					("CovarianceEllipsoidMultivariate Constructor => Invalid Inputs");
+		for (int rowIndex = 0; rowIndex < _covarianceMatrix.length; ++rowIndex) {
+			if (null == _covarianceMatrix[rowIndex] ||
+				_covarianceMatrix.length != _covarianceMatrix[rowIndex].length ||
+				!NumberUtil.IsValid (_covarianceMatrix[rowIndex]))
+			{
+				throw new Exception ("CovarianceEllipsoidMultivariate Constructor => Invalid Inputs");
+			}
 		}
 	}
 
@@ -135,7 +160,7 @@ public class CovarianceEllipsoidMultivariate extends org.drip.function.definitio
 
 	public int dimension()
 	{
-		return _aadblCovarianceMatrix.length;
+		return _covarianceMatrix.length;
 	}
 
 	/**
@@ -144,64 +169,107 @@ public class CovarianceEllipsoidMultivariate extends org.drip.function.definitio
 	 * @return The Co-variance Matrix
 	 */
 
-	public double[][] covariance()
+	public double[][] covarianceMatrix()
 	{
-		return _aadblCovarianceMatrix;
+		return _covarianceMatrix;
 	}
+
+	/**
+	 * Evaluate for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variates
+	 *  
+	 * @return The Calculated Value
+	 * 
+	 * @throws Exception Thrown if the Evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double[] adblVariate)
-		throws java.lang.Exception
+		final double[] variateArray)
+		throws Exception
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (adblVariate))
-			throw new java.lang.Exception ("CovarianceEllipsoidMultivariate::evaluate => Invalid Inputs");
-
-		double dblCovariance = 0.;
-		int iDimension = adblVariate.length;
-
-		if (iDimension != dimension())
-			throw new java.lang.Exception ("CovarianceEllipsoidMultivariate::evaluate => Invalid Inputs");
-
-		for (int i = 0; i < iDimension; ++i) {
-			for (int j = 0; j < iDimension; ++j)
-				dblCovariance += adblVariate[i] * _aadblCovarianceMatrix[i][j] * adblVariate[j];
+		if (null == variateArray || !NumberUtil.IsValid (variateArray)) {
+			throw new Exception ("CovarianceEllipsoidMultivariate::evaluate => Invalid Inputs");
 		}
 
-		return dblCovariance;
+		double covariance = 0.;
+		int dimension = variateArray.length;
+
+		if (dimension != dimension()) {
+			throw new Exception ("CovarianceEllipsoidMultivariate::evaluate => Invalid Inputs");
+		}
+
+		for (int innerDimensionIndex = 0; innerDimensionIndex < dimension; ++innerDimensionIndex) {
+			for (int outerDimensionIndex = 0; outerDimensionIndex < dimension; ++outerDimensionIndex) {
+				covariance +=
+					variateArray[innerDimensionIndex] *
+						_covarianceMatrix[innerDimensionIndex][outerDimensionIndex] *
+						variateArray[outerDimensionIndex];
+			}
+		}
+
+		return covariance;
 	}
+
+	/**
+	 * Evaluate the Jacobian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Jacobian Array
+	 */
 
 	@Override public double[] jacobian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (adblVariate)) return null;
-
-		int iDimension = adblVariate.length;
-		double[] adblJacobian = new double[iDimension];
-
-		if (iDimension != dimension()) return null;
-
-		for (int i = 0; i < iDimension; ++i) {
-			adblJacobian[i] = 0.;
-
-			for (int j = 0; j < iDimension; ++j)
-				adblJacobian[i] += 2. * _aadblCovarianceMatrix[i][j] * adblVariate[j];
+		if (null == variateArray || !NumberUtil.IsValid (variateArray)) {
+			return null;
 		}
 
-		return adblJacobian;
+		double[] jacobianArray = new double[variateArray.length];
+
+		if (variateArray.length != dimension()) {
+			return null;
+		}
+
+		for (int innerDimensionIndex = 0; innerDimensionIndex < variateArray.length; ++innerDimensionIndex) {
+			jacobianArray[innerDimensionIndex] = 0.;
+
+			for (int outerDimensionIndex = 0;
+				outerDimensionIndex < variateArray.length;
+				++outerDimensionIndex)
+			{
+				jacobianArray[innerDimensionIndex] +=
+					2. * _covarianceMatrix[innerDimensionIndex][outerDimensionIndex] *
+						variateArray[outerDimensionIndex];
+			}
+		}
+
+		return jacobianArray;
 	}
 
+	/**
+	 * Evaluate The Hessian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Hessian Matrix
+	 */
+
 	@Override public double[][] hessian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		int iDimension = dimension();
+		int dimension = dimension();
 
-		double[][] aadblHessian = new double[iDimension][iDimension];
+		double[][] hessianGrid = new double[dimension][dimension];
 
-		for (int i = 0; i < iDimension; ++i) {
-			for (int j = 0; j < iDimension; ++j)
-				aadblHessian[i][j] += 2. * _aadblCovarianceMatrix[i][j];
+		for (int innerDimensionIndex = 0; innerDimensionIndex < dimension; ++innerDimensionIndex) {
+			for (int outerDimensionIndex = 0; outerDimensionIndex < dimension; ++outerDimensionIndex) {
+				hessianGrid[innerDimensionIndex][outerDimensionIndex] +=
+					2. * _covarianceMatrix[innerDimensionIndex][outerDimensionIndex];
+			}
 		}
 
-		return aadblHessian;
+		return hessianGrid;
 	}
 }

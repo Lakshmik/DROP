@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -110,13 +118,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/semidefinite/README.md">Semi-Definite Constrained Ellipsoid Variance</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/semidefinite/README.md">Semi-Definite Constrained Ellipsoid Variance</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -175,11 +184,9 @@ public class DualConstrainedEllipsoidVariance
 		System.out.println ("\n\n\t|------------------------------------------------------||");
 
 		String header = "\t|     |";
+		double equalityConstraintConstant = -1.;
 
-		for (int entityIndex = 0;
-			entityIndex < entityNameArray.length;
-			++entityIndex)
-		{
+		for (int entityIndex = 0; entityIndex < entityNameArray.length; ++entityIndex) {
 			header += " " + entityNameArray[entityIndex] + "  |";
 		}
 
@@ -187,16 +194,10 @@ public class DualConstrainedEllipsoidVariance
 
 		System.out.println ("\t|------------------------------------------------------||");
 
-		for (int entityIndexI = 0;
-			entityIndexI < entityNameArray.length;
-			++entityIndexI)
-		{
+		for (int entityIndexI = 0; entityIndexI < entityNameArray.length; ++entityIndexI) {
 			String dump = "\t| " + entityNameArray[entityIndexI] + " ";
 
-			for (int entityIndexJ = 0;
-				entityIndexJ < entityNameArray.length;
-				++entityIndexJ)
-			{
+			for (int entityIndexJ = 0; entityIndexJ < entityNameArray.length; ++entityIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
 					entityCovarianceMatrix[entityIndexI][entityIndexJ], 1, 2, 1.
 				) + " ";
@@ -207,29 +208,20 @@ public class DualConstrainedEllipsoidVariance
 
 		System.out.println ("\t|------------------------------------------------------||\n\n");
 
-		double equalityConstraintConstant = -1.;
-		int entityCount = entityCovarianceMatrix.length;
-
 		RdToR1[] equalityConstraintFunctionArray = new RdToR1[]
 		{
 			new AffineMultivariate (
-				ObjectiveConstraintVariateSet.Unitary (
-					entityCount
-				),
+				ObjectiveConstraintVariateSet.Unitary (entityCovarianceMatrix.length),
 				equalityConstraintConstant
 			),
-			new AffineMultivariate (
-				entityReturnsArray,
-				-1. * entityDesignReturn
-			)
+			new AffineMultivariate (entityReturnsArray, -1. * entityDesignReturn)
 		};
 
-		int equalityConstraintCount = equalityConstraintFunctionArray.length;
+		double expectedReturn = 0.;
+		int totalVariateCount = entityCovarianceMatrix.length + equalityConstraintFunctionArray.length;
 
 		LagrangianMultivariate lagrangianMultivariate = new LagrangianMultivariate (
-			new CovarianceEllipsoidMultivariate (
-				entityCovarianceMatrix
-			),
+			new CovarianceEllipsoidMultivariate (entityCovarianceMatrix),
 			equalityConstraintFunctionArray
 		);
 
@@ -237,41 +229,29 @@ public class DualConstrainedEllipsoidVariance
 			lagrangianMultivariate,
 			new RdToR1[]
 			{
-				new AffineBoundMultivariate (
-					false,
-					0,
-					entityCount + equalityConstraintCount,
-					0.05
-				),
-				new AffineBoundMultivariate (
-					true,
-					0,
-					entityCount + equalityConstraintCount,
-					0.65
-				),
-				new AffineBoundMultivariate (false, 1, entityCount + equalityConstraintCount, 0.05),
-				new AffineBoundMultivariate (true, 1, entityCount + equalityConstraintCount, 0.65),
-				new AffineBoundMultivariate (false, 2, entityCount + equalityConstraintCount, 0.05),
-				new AffineBoundMultivariate (true, 2, entityCount + equalityConstraintCount, 0.65),
-				new AffineBoundMultivariate (false, 3, entityCount + equalityConstraintCount, 0.05),
-				new AffineBoundMultivariate (true, 3, entityCount + equalityConstraintCount, 0.65),
-				new AffineBoundMultivariate (false, 4, entityCount + equalityConstraintCount, 0.05),
-				new AffineBoundMultivariate (true, 4, entityCount + equalityConstraintCount, 0.65),
-				new AffineBoundMultivariate (false, 5, entityCount + equalityConstraintCount, 0.05),
-				new AffineBoundMultivariate (true, 5, entityCount + equalityConstraintCount, 0.65),
-				new AffineBoundMultivariate (false, 6, entityCount + equalityConstraintCount, 0.05),
-				new AffineBoundMultivariate (true, 6, entityCount + equalityConstraintCount, 0.65)
+				new AffineBoundMultivariate (false, 0, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 0, totalVariateCount, 0.65),
+				new AffineBoundMultivariate (false, 1, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 1, totalVariateCount, 0.65),
+				new AffineBoundMultivariate (false, 2, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 2, totalVariateCount, 0.65),
+				new AffineBoundMultivariate (false, 3, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 3, totalVariateCount, 0.65),
+				new AffineBoundMultivariate (false, 4, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 4, totalVariateCount, 0.65),
+				new AffineBoundMultivariate (false, 5, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 5, totalVariateCount, 0.65),
+				new AffineBoundMultivariate (false, 6, totalVariateCount, 0.05),
+				new AffineBoundMultivariate (true, 6, totalVariateCount, 0.65)
 			},
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).solve (
 			ObjectiveConstraintVariateSet.Uniform (
-				entityCount,
-				lagrangianMultivariate.constraintFunctionDimension()
+				entityCovarianceMatrix.length,
+				lagrangianMultivariate.constraintCount()
 			)
-		).variateArray();
+		).problemVariableArray();
 
 		System.out.println ("\t|----------------------||");
 
@@ -279,16 +259,10 @@ public class DualConstrainedEllipsoidVariance
 
 		System.out.println ("\t|----------------------||");
 
-		double expectedReturn = 0.;
-
-		for (int entityIndex = 0;
-			entityIndex < entityCount;
-			++entityIndex)
-		{
+		for (int entityIndex = 0; entityIndex < entityCovarianceMatrix.length; ++entityIndex) {
 			System.out.println (
-				"\t|   " + entityNameArray[entityIndex] + "   =>  " + FormatUtil.FormatDouble (
-					optimalVariateArray[entityIndex], 2, 2, 100.
-				) + "%  ||"
+				"\t|   " + entityNameArray[entityIndex] + "   =>  " +
+					FormatUtil.FormatDouble (optimalVariateArray[entityIndex], 2, 2, 100.) + "%  ||"
 			);
 
 			expectedReturn += optimalVariateArray[entityIndex] * entityReturnsArray[entityIndex];
@@ -299,23 +273,17 @@ public class DualConstrainedEllipsoidVariance
 		System.out.println ("\t|------------------------------||");
 
 		System.out.println (
-			"\t| DESIGN RETURN    => " + FormatUtil.FormatDouble (
-				entityDesignReturn, 1, 5, 1.
-			) + " ||"
+			"\t| DESIGN RETURN    => " + FormatUtil.FormatDouble (entityDesignReturn, 1, 5, 1.) + " ||"
 		);
 
 		System.out.println (
-			"\t| EXPECTED RETURN  => " + FormatUtil.FormatDouble (
-				expectedReturn, 1, 5, 1.
-			) + " ||"
+			"\t| EXPECTED RETURN  => " + FormatUtil.FormatDouble (expectedReturn, 1, 5, 1.) + " ||"
 		);
 
 		System.out.println (
-			"\t| OPTIMAL VARIANCE => " + FormatUtil.FormatDouble (
-				lagrangianMultivariate.evaluate (
-					optimalVariateArray
-				), 1, 5, 1.
-			) + " ||"
+			"\t| OPTIMAL VARIANCE => " +
+				FormatUtil.FormatDouble (lagrangianMultivariate.evaluate (optimalVariateArray), 1, 5, 1.) +
+				" ||"
 		);
 
 		System.out.println ("\t|------------------------------||\n");

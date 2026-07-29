@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,9 +93,9 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>CurvatuveEvolutionVerifier</i> implements the Armijo Criterion used for the Inexact Line Search
- * Increment Generation to ascertain that the Gradient of the Function has reduced sufficiently. The
- * References are:
- * <br><br>
+ * 	Increment Generation to ascertain that the Gradient of the Function has reduced sufficiently. The
+ * 	References are:
+ * 	<br>
  * 	<ul>
  * 		<li>
  * 			Wolfe, P. (1969): Convergence Conditions for Ascent Methods <i>SIAM Review</i> <b>11 (2)</b>
@@ -95,19 +107,31 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li>The Nocedal-Wright Curvature Parameter</li>
+ * 		<li>Construct the Nocedal-Wright Curvature Evolution Verifier</li>
+ * 		<li><i>CurvatuveEvolutionVerifier</i> Constructor</li>
+ * 		<li>Retrieve the Curvature Parameter</li>
+ * 		<li>Retrieve Whether of not the "Strong" Curvature Criterion needs to be met</li>
+ * 		<li>Generate the Verifier Metrics for the Specified Inputs</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class CurvatureEvolutionVerifier
-	extends org.drip.function.rdtor1descent.LineEvolutionVerifier
+	extends LineEvolutionVerifier
 {
 
 	/**
@@ -117,7 +141,7 @@ public class CurvatureEvolutionVerifier
 	public static final double NOCEDAL_WRIGHT_CURVATURE_PARAMETER = 0.9;
 
 	private boolean _strongCurvatureCriterion = false;
-	private double _curvatureParameter = java.lang.Double.NaN;
+	private double _curvatureParameter = Double.NaN;
 
 	/**
 	 * Construct the Nocedal-Wright Curvature Evolution Verifier
@@ -130,15 +154,12 @@ public class CurvatureEvolutionVerifier
 	public static final CurvatureEvolutionVerifier NocedalWrightStandard (
 		final boolean strongCurvatureCriterion)
 	{
-		try
-		{
+		try {
 			return new CurvatureEvolutionVerifier (
 				NOCEDAL_WRIGHT_CURVATURE_PARAMETER,
 				strongCurvatureCriterion
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -146,22 +167,21 @@ public class CurvatureEvolutionVerifier
 	}
 
 	/**
-	 * CurvatureEvolutionVerifier Constructor
+	 * <i>CurvatuveEvolutionVerifier</i> Constructor
 	 * 
 	 * @param curvatureParameter The Curvature Parameter
 	 * @param strongCurvatureCriterion TRUE - Apply the Strong Curvature Criterion
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public CurvatureEvolutionVerifier (
 		final double curvatureParameter,
 		final boolean strongCurvatureCriterion)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_curvatureParameter = curvatureParameter))
-		{
-			throw new java.lang.Exception ("CurvatureEvolutionVerifier Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_curvatureParameter = curvatureParameter)) {
+			throw new Exception ("CurvatureEvolutionVerifier Constructor => Invalid Inputs");
 		}
 
 		_strongCurvatureCriterion = strongCurvatureCriterion;
@@ -189,35 +209,37 @@ public class CurvatureEvolutionVerifier
 		return _strongCurvatureCriterion;
 	}
 
-	@Override public org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics metrics (
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+	/**
+	 * Generate the Verifier Metrics for the Specified Inputs
+	 * 
+	 * @param targetDirectionUnitVector The Target Direction Unit Vector
+	 * @param currentVariateArray The Current Variate
+	 * @param multivariateFunction The R<sup>d</sup> To R<sup>1</sup> Function
+	 * @param stepLength The Incremental Step Length
+	 * 
+	 * @return The Verifier Metrics
+	 */
+
+	@Override public LineEvolutionVerifierMetrics metrics (
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
-		final org.drip.function.definition.RdToR1 multivariateFunction,
+		final RdToR1 multivariateFunction,
 		final double stepLength)
 	{
-		try
-		{
+		try {
 			return null == multivariateFunction ? null :
-				new org.drip.function.rdtor1descent.CurvatureEvolutionVerifierMetrics (
+				new CurvatureEvolutionVerifierMetrics (
 					_curvatureParameter,
 					_strongCurvatureCriterion,
 					targetDirectionUnitVector,
 					currentVariateArray,
 					stepLength,
+					multivariateFunction.jacobian (currentVariateArray),
 					multivariateFunction.jacobian (
-						currentVariateArray
-					),
-					multivariateFunction.jacobian (
-						NextVariateArray (
-							targetDirectionUnitVector,
-							currentVariateArray,
-							stepLength
-						)
+						NextVariateArray (targetDirectionUnitVector, currentVariateArray, stepLength)
 					)
 				);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

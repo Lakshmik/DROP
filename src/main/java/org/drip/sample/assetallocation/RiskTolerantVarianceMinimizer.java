@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,16 +97,16 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>RiskTolerantVarianceMinimizer</i> demonstrates the Construction of an Optimal Portfolio using the
- * Variance Minimization with a Fully Invested Constraint on a Risk Tolerance Objective Function.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/assetallocation/README.md">MVO Based Constrained Optimal Allocator</a></li>
- *  </ul>
- * <br><br>
+ * 	Variance Minimization with a Fully Invested Constraint on a Risk Tolerance Objective Function.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/assetallocation/README.md">MVO Based Constrained Optimal Allocator</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -112,12 +120,10 @@ public class RiskTolerantVarianceMinimizer
 		final double riskTolerance)
 		throws Exception
 	{
-		HoldingsAllocation optimizationOutput = new QuadraticMeanVarianceOptimizer().allocate (
+		HoldingsAllocation holdingsAllocation = new QuadraticMeanVarianceOptimizer().allocate (
 			new HoldingsAllocationControl (
 				assetIDArray,
-				CustomRiskUtilitySettings.RiskTolerant (
-					riskTolerance
-				),
+				CustomRiskUtilitySettings.RiskTolerant (riskTolerance),
 				new EqualityConstraintSettings (
 					EqualityConstraintSettings.FULLY_INVESTED_CONSTRAINT,
 					Double.NaN
@@ -128,12 +134,10 @@ public class RiskTolerantVarianceMinimizer
 
 		System.out.println ("\t|----------------||");
 
-		for (AssetComponent assetComponent : optimizationOutput.optimalPortfolio().assetComponentArray())
-		{
+		for (AssetComponent assetComponent : holdingsAllocation.optimalPortfolio().assetComponentArray()) {
 			System.out.println (
-				"\t| " + assetComponent.id() + " | " + FormatUtil.FormatDouble (
-					assetComponent.amount(), 3, 2, 100.
-				) + "% ||"
+				"\t| " + assetComponent.id() + " | " +
+					FormatUtil.FormatDouble (assetComponent.amount(), 3, 2, 100.) + "% ||"
 			);
 		}
 
@@ -142,20 +146,22 @@ public class RiskTolerantVarianceMinimizer
 		System.out.println ("\t|---------------------------------------||");
 
 		System.out.println (
-			"\t| Portfolio Notional           : " + FormatUtil.FormatDouble (
-				optimizationOutput.optimalPortfolio().notional(), 1, 3, 1.
-			) + " ||"
+			"\t| Portfolio Notional           : " +
+				FormatUtil.FormatDouble (holdingsAllocation.optimalPortfolio().notional(), 1, 3, 1.) + " ||"
 		);
 
 		System.out.println (
-			"\t| Portfolio Expected Return    : " + FormatUtil.FormatDouble (
-				optimizationOutput.optimalMetrics().excessReturnsMean(), 1, 2, 100.
-			) + "% ||"
+			"\t| Portfolio Expected Return    : " +
+				FormatUtil.FormatDouble (holdingsAllocation.optimalMetrics().excessReturnsMean(), 1, 2, 100.)
+				+ "% ||"
 		);
 
 		System.out.println (
 			"\t| Portfolio Standard Deviation : " + FormatUtil.FormatDouble (
-				optimizationOutput.optimalMetrics().excessReturnsStandardDeviation(), 1, 2, 100.
+				holdingsAllocation.optimalMetrics().excessReturnsStandardDeviation(),
+				1,
+				2,
+				100.
 			) + "% ||"
 		);
 
@@ -174,39 +180,26 @@ public class RiskTolerantVarianceMinimizer
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
 		String seriesPath = "C:\\DROP\\Daemons\\Feeds\\MeanVarianceOptimizer\\FormattedSeries1.csv";
 
-		CSVGrid csvGrid = CSVParser.NamedStringGrid (
-			seriesPath
-		);
+		CSVGrid csvGrid = CSVParser.NamedStringGrid (seriesPath);
 
 		String[] variateHeaderArray = csvGrid.headers();
 
 		String[] assetIDArray = new String[variateHeaderArray.length - 1];
 		double[][] variateSampleGrid = new double[variateHeaderArray.length - 1][];
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			assetIDArray[assetIndex] = variateHeaderArray[assetIndex + 1];
 
-			variateSampleGrid[assetIndex] = csvGrid.doubleArrayAtColumn (
-				assetIndex + 1
-			);
+			variateSampleGrid[assetIndex] = csvGrid.doubleArrayAtColumn (assetIndex + 1);
 		}
 
 		AssetUniverseStatisticalProperties assetUniverseStatisticalProperties =
 			AssetUniverseStatisticalProperties.FromMultivariateMetrics (
-				MultivariateMoments.Standard (
-					assetIDArray,
-					variateSampleGrid
-				)
+				MultivariateMoments.Standard (assetIDArray, variateSampleGrid)
 			);
 
 		double[] riskToleranceArray = new double[]
@@ -218,19 +211,14 @@ public class RiskTolerantVarianceMinimizer
 			1.0
 		};
 
-		for (double riskTolerance : riskToleranceArray)
-		{
+		for (double riskTolerance : riskToleranceArray) {
 			System.out.println ("\n\t|---------------------------------------------||");
 
 			System.out.println ("\t| Running Optimization For Risk Tolerance " + riskTolerance + " ||");
 
 			System.out.println ("\t|---------------------------------------------||");
 
-			RiskTolerancePortfolio (
-				assetIDArray,
-				assetUniverseStatisticalProperties,
-				riskTolerance
-			);
+			RiskTolerancePortfolio (assetIDArray, assetUniverseStatisticalProperties, riskTolerance);
 		}
 
 		EnvManager.TerminateEnv();

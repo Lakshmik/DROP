@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.drip.function.definition.RdToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -314,17 +316,6 @@ public class DownhillSimplexVertexes
 	}
 
 	/**
-	 * Retrieve the Vertex with the Lowest Value
-	 * 
-	 * @return Vertex with the Lowest Value
-	 */
-
-	public double[] lowestValueVertex()
-	{
-		return _orderedVertexListMap.firstEntry().getValue().get (0);
-	}
-
-	/**
 	 * Retrieve the Lowest Value
 	 * 
 	 * @return Lowest Value
@@ -333,6 +324,17 @@ public class DownhillSimplexVertexes
 	public double lowestValue()
 	{
 		return _orderedVertexListMap.firstEntry().getKey();
+	}
+
+	/**
+	 * Retrieve the Vertex with the Lowest Value
+	 * 
+	 * @return Vertex with the Lowest Value
+	 */
+
+	public double[] lowestValueVertex()
+	{
+		return _orderedVertexListMap.get (penultimateHighestValue()).get (0);
 	}
 
 	/**
@@ -369,6 +371,17 @@ public class DownhillSimplexVertexes
 	}
 
 	/**
+	 * Retrieve the Vertex with the Penultimate Highest Value
+	 * 
+	 * @return Vertex with the Penultimate Highest Value
+	 */
+
+	public double[] penultimateHighestValueVertex()
+	{
+		return _orderedVertexListMap.get (penultimateHighestValue()).get (0);
+	}
+
+	/**
 	 * Indicate if Convergence was Reached
 	 * 
 	 * @return TRUE - Convergence was Reached
@@ -377,5 +390,70 @@ public class DownhillSimplexVertexes
 	public boolean convergenceReached()
 	{
 		return ABSOLUTE_TOLERANCE >= _objectiveFunctionStandardError;
+	}
+
+	/**
+	 * Clone the <i>DownhillSimplexVertexes</i> Instance
+	 * 
+	 * @return The Cloned Instance
+	 */
+
+	public DownhillSimplexVertexes clone()
+	{
+		DownhillSimplexVertexes clone = null;
+
+		try {
+			clone = new DownhillSimplexVertexes (_orderedVertexListMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		clone._objectiveFunctionStandardError = _objectiveFunctionStandardError;
+		clone._objectiveFunctionMean = _objectiveFunctionMean;
+		clone._centroidVertex = _centroidVertex;
+		return clone;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		String dump = prefix + "Vertex Map => {";
+
+		for (Double valueKey : _orderedVertexListMap.keySet()) {
+			String entryDump = "[" + FormatUtil.FormatDouble (valueKey, 1, 4, 1.) + " => (";
+
+			for (double[] vertex : _orderedVertexListMap.get (valueKey)) {
+				entryDump += NumberUtil.ArrayRow (vertex, 1, 4, false) + ", ";
+			}
+
+			dump += entryDump + ")]; ";
+		}
+
+		return dump +
+			" OF Mean: " + FormatUtil.FormatDouble (_objectiveFunctionMean, 1, 4, 1.) +
+			"; OF Standard Error: " + FormatUtil.FormatDouble (_objectiveFunctionStandardError, 1, 4, 1.) +
+			"; Centroid: " + NumberUtil.ArrayRow (_centroidVertex, 1, 4, false) +
+		"}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

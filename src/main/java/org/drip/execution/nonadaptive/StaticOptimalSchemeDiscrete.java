@@ -269,6 +269,6 @@ public class StaticOptimalSchemeDiscrete extends org.drip.execution.nonadaptive.
 		}
 
 		return org.drip.execution.optimum.EfficientTradingTrajectoryDiscrete.Standard (adblExecutionTimeNode,
-			completeHoldings (vicm.variateArray()), priceEvolutionParameters());
+			completeHoldings (vicm.problemVariableArray()), priceEvolutionParameters());
 	}
 }

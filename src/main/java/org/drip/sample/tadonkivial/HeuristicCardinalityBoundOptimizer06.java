@@ -5,6 +5,7 @@ import org.drip.function.rdtor1descent.LineStepEvolutionControl;
 import org.drip.function.rdtor1solver.InteriorPointBarrierControl;
 import org.drip.measure.statistics.MultivariateMoments;
 import org.drip.portfolioconstruction.allocator.*;
+import org.drip.portfolioconstruction.asset.AssetComponent;
 import org.drip.portfolioconstruction.asset.Portfolio;
 import org.drip.portfolioconstruction.cardinality.UpperBoundHoldingsAllocationControl;
 import org.drip.portfolioconstruction.cardinality.TadonkiVialHoldingsAllocation;
@@ -18,6 +19,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -117,14 +126,14 @@ import org.drip.service.env.EnvManager;
  *  	</li>
  *  </ul>
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/tadonkivial/README.md">Tadonki-Vial Cardinality Bound Allocation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/AssetAllocationAnalyticsLibrary.md">Asset Allocation Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/tadonkivial/README.md">Tadonki-Vial Cardinality Bound Allocation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -136,8 +145,7 @@ public class HeuristicCardinalityBoundOptimizer06
 		final String header,
 		final HoldingsAllocation holdingsAllocation)
 	{
-		if (null == holdingsAllocation)
-		{
+		if (null == holdingsAllocation) {
 			return;
 		}
 
@@ -153,15 +161,12 @@ public class HeuristicCardinalityBoundOptimizer06
 
 		System.out.println ("\t|------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < optimalPortfolio.assetComponentArray().length;
-			++assetIndex)
-		{
+		AssetComponent[] assetComponentArray = optimalPortfolio.assetComponentArray();
+
+		for (int assetIndex = 0; assetIndex < assetComponentArray.length; ++assetIndex) {
 			System.out.println (
-				"\t|  " + optimalPortfolio.assetComponentArray()[assetIndex].id() + "  |" +
-				FormatUtil.FormatDouble (
-					optimalPortfolio.assetComponentArray()[assetIndex].amount(), 2, 4, 100.
-				) + "% ||"
+				"\t|  " + assetComponentArray[assetIndex].id() + "  |" +
+				FormatUtil.FormatDouble (assetComponentArray[assetIndex].amount(), 2, 4, 100.) + "% ||"
 			);
 		}
 
@@ -186,10 +191,7 @@ public class HeuristicCardinalityBoundOptimizer06
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
 		int cardinalityUpperBound = 5;
 		String[] assetIDArray = new String[]
@@ -259,10 +261,7 @@ public class HeuristicCardinalityBoundOptimizer06
 
 		System.out.println ("\t|-------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
 			System.out.println (
 				"\t| " + assetIDArray[assetIndex] + " | " +
 				FormatUtil.FormatDouble (assetHoldingsLowerBoundArray[assetIndex], 2, 0, 100.) + "% | " +
@@ -272,7 +271,7 @@ public class HeuristicCardinalityBoundOptimizer06
 
 		System.out.println ("\t|-------------------||");
 
-		UpperBoundHoldingsAllocationControl boundedCardinalityParameters =
+		UpperBoundHoldingsAllocationControl upperBoundHoldingsAllocationControl =
 			new UpperBoundHoldingsAllocationControl (
 				assetIDArray,
 				CustomRiskUtilitySettings.VarianceMinimizer(),
@@ -284,11 +283,8 @@ public class HeuristicCardinalityBoundOptimizer06
 				cardinalityUpperBound
 			);
 
-		for (int assetIndex = 0;
-			assetIndex < assetIDArray.length;
-			++assetIndex)
-		{
-			boundedCardinalityParameters.addBound (
+		for (int assetIndex = 0; assetIndex < assetIDArray.length; ++assetIndex) {
+			upperBoundHoldingsAllocationControl.addBound (
 				assetIDArray[assetIndex],
 				assetHoldingsLowerBoundArray[assetIndex],
 				assetHoldingsUpperBoundArray[assetIndex]
@@ -297,18 +293,13 @@ public class HeuristicCardinalityBoundOptimizer06
 
 		TadonkiVialHoldingsAllocation tadonkiVialHoldingsAllocation = new TadonkiVialMeanVarianceOptimizer (
 			InteriorPointBarrierControl.Standard(),
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).allocate (
-			boundedCardinalityParameters,
+			upperBoundHoldingsAllocationControl,
 			assetUniverseStatisticalProperties
 		);
 
-		PrintPortfolio (
-			"FLOOR PASS",
-			tadonkiVialHoldingsAllocation.floorPassHoldingsAllocation()
-		);
+		PrintPortfolio ("FLOOR PASS", tadonkiVialHoldingsAllocation.floorPassHoldingsAllocation());
 
 		PrintPortfolio (
 			"FIRST GREEDY PRUNE PASS",

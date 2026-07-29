@@ -8,7 +8,6 @@ import org.drip.function.definition.RdToR1;
 import org.drip.function.rdtor1.MultidimensionalRosenbrockCoupled;
 import org.drip.function.rdtor1.Rosenbrock;
 import org.drip.numerical.common.NumberUtil;
-import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -124,6 +123,7 @@ import org.drip.service.common.FormatUtil;
 
 public class DownhillSimplex
 {
+	private boolean _diagnosticsOn = false;
 	private RdToR1 _objectiveFunction = null;
 	private List<double[]> _vertexList = null;
 	private AmoebaCoefficients _amoebaCoefficients = null;
@@ -133,16 +133,23 @@ public class DownhillSimplex
 	 * 
 	 * @param objectiveFunction Objective Function
 	 * @param vertexList List of Vertexes
+	 * @param diagnosticsOn TRUE - Diagnostics has been Turned On
 	 * 
 	 * @return Standard Instance of <i>DownhillSimplex</i>
 	 */
 
 	public static final DownhillSimplex Standard (
 		final RdToR1 objectiveFunction,
-		final List<double[]> vertexList)
+		final List<double[]> vertexList,
+		final boolean diagnosticsOn)
 	{
 		try {
-			return new DownhillSimplex (objectiveFunction, vertexList, AmoebaCoefficients.Standard());
+			return new DownhillSimplex (
+				objectiveFunction,
+				vertexList,
+				AmoebaCoefficients.Standard(),
+				diagnosticsOn
+			);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -225,6 +232,7 @@ public class DownhillSimplex
 	 * @param objectiveFunction Objective Function
 	 * @param vertexList List of Vertexes
 	 * @param amoebaCoefficients Nelder-Mead Control (i.e., Ameoba) Coefficients
+	 * @param diagnosticsOn TRUE - Diagnostics has been Turned On
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
@@ -232,7 +240,8 @@ public class DownhillSimplex
 	public DownhillSimplex (
 		final RdToR1 objectiveFunction,
 		final List<double[]> vertexList,
-		final AmoebaCoefficients amoebaCoefficients)
+		final AmoebaCoefficients amoebaCoefficients,
+		final boolean diagnosticsOn)
 		throws Exception
 	{
 		if (null == (_objectiveFunction = objectiveFunction) ||
@@ -243,6 +252,7 @@ public class DownhillSimplex
 		}
 
 		int variateDimension = -1;
+		_diagnosticsOn = diagnosticsOn;
 
 		for (double[] vertex : _vertexList) {
 			if (null == vertex) {
@@ -296,42 +306,63 @@ public class DownhillSimplex
 		return _amoebaCoefficients;
 	}
 
-	public ObjectiveFunctionCoordinate controlRun()
+	/**
+	 * Indicate if Diagnostics has been Turned On
+	 * 
+	 * @return TRUE - Diagnostics has been Turned On
+	 */
+
+	public boolean diagnosticsOn()
 	{
-		DownhillSimplexVertexes downhillSimplexVertexes =
+		return _diagnosticsOn;
+	}
+
+	/**
+	 * Run the Nelder-Mead Optimization
+	 * 
+	 * @return Results of the Nelder-Mead Optimization
+	 */
+
+	public DownhillSimplexRun controlRun()
+	{
+		DownhillSimplexVertexes vertexes =
 			DownhillSimplexVertexes.Standard (_vertexList, _objectiveFunction);
 
-		if (null == downhillSimplexVertexes) {
+		if (null == vertexes) {
 			return null;
 		}
 
-		int iterationCount = 0;
+		int iterationIndex = 0;
 		double[] reflectedVertex = null;
 
-		while (!downhillSimplexVertexes.convergenceReached()) {
-			System.out.println ("\t--------#" + (iterationCount++) + " ----");
+		DownhillSimplexRun run = _diagnosticsOn ?
+			new DownhillSimplexRunDiagnostics() : new DownhillSimplexRun();
 
-			double[] centroidVertex = downhillSimplexVertexes.centroidVertex();
+		while (!vertexes.convergenceReached()) {
+			double[] centroidVertex = vertexes.centroidVertex();
 
-			System.out.println (
-				"\t{ CENTROID VERTEX => " + NumberUtil.ArrayRow (centroidVertex, 1, 3, false) + "}"
-			);
+			if (run instanceof DownhillSimplexRunDiagnostics) {
+				((DownhillSimplexRunDiagnostics) run).setCentroidVertex (iterationIndex, centroidVertex);
+			}
 
-			double[] highestValueVertex = downhillSimplexVertexes.highestValueVertex();
+			double[] highestValueVertex = vertexes.highestValueVertex();
 
-			System.out.println (
-				"\t{ HIGHEST VERTEX => " + NumberUtil.ArrayRow (highestValueVertex, 1, 3, false) + "}"
-			);
+			double highestValue = vertexes.highestValue();
+
+			if (run instanceof DownhillSimplexRunDiagnostics) {
+				try {
+					((DownhillSimplexRunDiagnostics) run).setHighestObjectiveFunctionCoordinate (
+						iterationIndex,
+						new ObjectiveFunctionCoordinate (highestValueVertex, highestValue)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 			if (null == (reflectedVertex = reflectedVertex (highestValueVertex, centroidVertex))) {
 				return null;
 			}
-
-			System.out.println (
-				"\t{ REFLECTED VERTEX => " + NumberUtil.ArrayRow (reflectedVertex, 1, 3, false) + "}"
-			);
-
-			double penultimateHighestValue = downhillSimplexVertexes.penultimateHighestValue();
 
 			double reflectedValue = Double.NaN;
 
@@ -343,17 +374,50 @@ public class DownhillSimplex
 				return null;
 			}
 
-			double highestValue = downhillSimplexVertexes.highestValue();
+			if (run instanceof DownhillSimplexRunDiagnostics) {
+				try {
+					((DownhillSimplexRunDiagnostics) run).setReflectedObjectiveFunctionCoordinate (
+						iterationIndex,
+						new ObjectiveFunctionCoordinate (reflectedVertex, reflectedValue)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
-			double lowestValue = downhillSimplexVertexes.lowestValue();
+			double penultimateHighestValue = vertexes.penultimateHighestValue();
 
-			System.out.println (
-				"\t{ f(x_1) =>" + lowestValue + " | f(x_r) =>" + reflectedValue + " | f(x_n) =>" +
-					penultimateHighestValue + " | f(x_n+1) =>" + highestValue + "}"
-			);
+			if (run instanceof DownhillSimplexRunDiagnostics) {
+				try {
+					((DownhillSimplexRunDiagnostics) run).setReflectedObjectiveFunctionCoordinate (
+						iterationIndex,
+						new ObjectiveFunctionCoordinate (
+							vertexes.penultimateHighestValueVertex(),
+							penultimateHighestValue
+						)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			double[] lowestValueVertex = vertexes.lowestValueVertex();
+
+			double lowestValue = vertexes.lowestValue();
+
+			if (run instanceof DownhillSimplexRunDiagnostics) {
+				try {
+					((DownhillSimplexRunDiagnostics) run).setReflectedObjectiveFunctionCoordinate (
+						iterationIndex,
+						new ObjectiveFunctionCoordinate (lowestValueVertex, lowestValue)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 			if (lowestValue <= reflectedValue && reflectedValue < penultimateHighestValue) {
-				if (!downhillSimplexVertexes.swapNodes (highestValue, reflectedValue, reflectedVertex)) {
+				if (!vertexes.swapNodes (highestValue, reflectedValue, reflectedVertex)) {
 					return null;
 				}
 			} else if (reflectedValue < lowestValue) {
@@ -362,10 +426,6 @@ public class DownhillSimplex
 				if (null == expandedVertex) {
 					return null;
 				}
-
-				System.out.println (
-					"\t{ EXPANDED VERTEX => " + NumberUtil.ArrayRow (expandedVertex, 1, 3, false) + "}"
-				);
 
 				double expandedValue = Double.NaN;
 
@@ -377,12 +437,23 @@ public class DownhillSimplex
 					return null;
 				}
 
+				if (run instanceof DownhillSimplexRunDiagnostics) {
+					try {
+						((DownhillSimplexRunDiagnostics) run).setExpandedObjectiveFunctionCoordinate (
+							iterationIndex,
+							new ObjectiveFunctionCoordinate (expandedVertex, expandedValue)
+						);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
 				if (expandedValue < reflectedValue) {
-					if (!downhillSimplexVertexes.swapNodes (highestValue, expandedValue, expandedVertex)) {
+					if (!vertexes.swapNodes (highestValue, expandedValue, expandedVertex)) {
 						return null;
 					}
 				} else {
-					if (!downhillSimplexVertexes.swapNodes (highestValue, reflectedValue, reflectedVertex)) {
+					if (!vertexes.swapNodes (highestValue, reflectedValue, reflectedVertex)) {
 						return null;
 					}
 				}
@@ -394,11 +465,6 @@ public class DownhillSimplex
 						return null;
 					}
 
-					System.out.println (
-						"\t{ CONTRACTED VERTEX => " +
-							NumberUtil.ArrayRow (contractedVertex, 1, 3, false) + "}"
-					);
-
 					double contractedValue = Double.NaN;
 
 					try {
@@ -409,22 +475,25 @@ public class DownhillSimplex
 						return null;
 					}
 
-					System.out.println (
-						"\t{ f(x_c) =>" + contractedValue + " | f(x_r) =>" + reflectedValue +  "}"
-					);
+					if (run instanceof DownhillSimplexRunDiagnostics) {
+						try {
+							((DownhillSimplexRunDiagnostics) run).setContractedObjectiveFunctionCoordinate (
+								iterationIndex,
+								new ObjectiveFunctionCoordinate (contractedVertex, contractedValue)
+							);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 
 					if (contractedValue < reflectedValue) {
-						if (!downhillSimplexVertexes.swapNodes (
-							highestValue,
-							contractedValue,
-							contractedVertex
-						))
-						{
+						if (!vertexes.swapNodes (highestValue, contractedValue, contractedVertex)) {
 							return null;
 						}
 					} else {
-						downhillSimplexVertexes =
-							shrinkVertexes (downhillSimplexVertexes.lowestValueVertex());
+						if (null == (vertexes = shrinkVertexes (lowestValueVertex))) {
+							return null;
+						}
 					}
 				} else {
 					double[] contractedVertex = contractedVertex (highestValueVertex, centroidVertex);
@@ -433,11 +502,6 @@ public class DownhillSimplex
 						return null;
 					}
 
-					System.out.println (
-						"\t{ CONTRACTED VERTEX => " +
-							NumberUtil.ArrayRow (contractedVertex, 1, 3, false) + "}"
-					);
-
 					double contractedValue = Double.NaN;
 
 					try {
@@ -448,39 +512,85 @@ public class DownhillSimplex
 						return null;
 					}
 
-					System.out.println (
-						"\t{ f(x_c) =>" + contractedValue + " | f(x_n+1) =>" + highestValue +  "}"
-					);
+					if (run instanceof DownhillSimplexRunDiagnostics) {
+						try {
+							((DownhillSimplexRunDiagnostics) run).setContractedObjectiveFunctionCoordinate (
+								iterationIndex,
+								new ObjectiveFunctionCoordinate (contractedVertex, contractedValue)
+							);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 
 					if (contractedValue < highestValue) {
-						if (!downhillSimplexVertexes.swapNodes (
-							highestValue,
-							contractedValue,
-							contractedVertex
-						))
-						{
+						if (!vertexes.swapNodes (highestValue, contractedValue, contractedVertex)) {
 							return null;
 						}
 					} else {
-						downhillSimplexVertexes =
-							shrinkVertexes (downhillSimplexVertexes.lowestValueVertex());
+						if (null == (vertexes = shrinkVertexes (lowestValueVertex))) {
+							return null;
+						}
 					}
 				}
 			}
+
+			if (run instanceof DownhillSimplexRunDiagnostics) {
+				try {
+					((DownhillSimplexRunDiagnostics) run).setVertexes (iterationIndex, vertexes);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			++iterationIndex;
 		}
 
-		double[] centroidVertex = downhillSimplexVertexes.centroidVertex();
+		double[] centroidVertex = vertexes.centroidVertex();
 
 		try {
-			return new ObjectiveFunctionCoordinate (
-				centroidVertex,
-				_objectiveFunction.evaluate (centroidVertex)
-			);
+			return run.setOptimalObjectiveFunctionCoordinate (
+				new ObjectiveFunctionCoordinate (
+					centroidVertex,
+					_objectiveFunction.evaluate (centroidVertex)
+				)
+			) ? run : null;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		String dump = prefix + "{Vertex List => (";
+
+		for (double[] vertex : _vertexList) {
+			dump += NumberUtil.ArrayRow (vertex, 1, 4, false) + ", ";
+		}
+
+		return dump + "); OF: " + _objectiveFunction + "; Coefficients: " + _amoebaCoefficients + "}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 
 	public static final void main (
@@ -507,16 +617,18 @@ public class DownhillSimplex
 
 		RdToR1 optimizationFunction = new MultidimensionalRosenbrockCoupled (Rosenbrock.Standard(), 3);
 
-		DownhillSimplex downhillSimplex = DownhillSimplex.Standard (optimizationFunction, vertexList);
+		DownhillSimplex downhillSimplex = DownhillSimplex.Standard (optimizationFunction, vertexList, true);
 
-		ObjectiveFunctionCoordinate optimalCoordinate = downhillSimplex.controlRun();
+		DownhillSimplexRun run = downhillSimplex.controlRun();
 
-		System.out.println (
-			"\tOptimal Coordinate => " + NumberUtil.ArrayRow (optimalCoordinate.vertex(), 1, 4, false)
-		);
+		ObjectiveFunctionCoordinate optimalCoordinate = run.optimalObjectiveFunctionCoordinate();
 
-		System.out.println (
-			"\tOptimal Value      => " + FormatUtil.FormatDouble (optimalCoordinate.value(), 1, 4, 1.)
-		);
+		System.out.println ("\t" + optimalCoordinate);
+
+		if (run instanceof DownhillSimplexRunDiagnostics) {
+			System.out.println (
+				"\t" + ((DownhillSimplexRunDiagnostics) run).downhillSimplexIterationDiagnosticsMap()
+			);
+		}
 	}
 }

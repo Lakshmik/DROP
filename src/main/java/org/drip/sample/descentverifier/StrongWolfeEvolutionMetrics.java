@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,16 +97,16 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>StrongWolfeEvolutionMetrics</i> demonstrates the Impact of applying the Strong Wolfe Criterion on the
- * Evolution of the R<sup>d</sup> Fixed Point of a Constrained Minimization Search.
+ * 	Evolution of the R<sup>d</sup> Fixed Point of a Constrained Minimization Search.
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/descentverifier/README.md">Armijo/Wolfe Strong/Weak Curvature</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/descentverifier/README.md">Armijo/Wolfe Strong/Weak Curvature</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -118,11 +126,9 @@ public class StrongWolfeEvolutionMetrics
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		FixedRdFinder.s_verifierIncrementBlog = true;
+		FixedRdFinder.s_VerifierIncrementBlog = true;
 
 		String[] assetNameArray = new String[]
 		{
@@ -185,48 +191,47 @@ public class StrongWolfeEvolutionMetrics
 				)
 			);
 
-		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (
-			assetNameArray
+		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (assetNameArray);
+
+		System.out.println (
+			"\n\n\t|------------------------------------------------------------------------------------------------||"
 		);
 
-		System.out.println ("\n\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||"
+		);
 
-		System.out.println ("\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||");
-
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
 		String header = "\t|     |";
 
-		for (int assetNameIndex = 0;
-			assetNameIndex < assetNameArray.length;
-			++assetNameIndex)
-		{
+		for (int assetNameIndex = 0; assetNameIndex < assetNameArray.length; ++assetNameIndex) {
 			header += "    " + assetNameArray[assetNameIndex] + "     |";
 		}
 
 		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetNameIndexI = 0;
-			assetNameIndexI < assetNameArray.length;
-			++assetNameIndexI)
-		{
-			String strDump = "\t| " + assetNameArray[assetNameIndexI] + " ";
+		for (int assetNameIndexI = 0; assetNameIndexI < assetNameArray.length; ++assetNameIndexI) {
+			String dump = "\t| " + assetNameArray[assetNameIndexI] + " ";
 
-			for (int assetNameIndexJ = 0;
-				assetNameIndexJ < assetNameArray.length;
-				++assetNameIndexJ)
-			{
-				strDump += "|" + FormatUtil.FormatDouble (
-					covarianceMatrix[assetNameIndexI][assetNameIndexJ], 1, 8, 1.
-				) + " ";
+			for (int assetNameIndexJ = 0; assetNameIndexJ < assetNameArray.length; ++assetNameIndexJ) {
+				dump += "|" +
+					FormatUtil.FormatDouble (covarianceMatrix[assetNameIndexI][assetNameIndexJ], 1, 8, 1.) +
+					" ";
 			}
 
-			System.out.println (strDump + "||");
+			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||\n\n");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||\n\n"
+		);
 
 		System.out.println ("\t|-------------------||");
 
@@ -234,10 +239,7 @@ public class StrongWolfeEvolutionMetrics
 
 		System.out.println ("\t|-------------------||");
 
-		for (int assetNameIndex = 0;
-			assetNameIndex < assetNameArray.length;
-			++assetNameIndex)
-		{
+		for (int assetNameIndex = 0; assetNameIndex < assetNameArray.length; ++assetNameIndex) {
 			System.out.println (
 				"\t| " + assetNameArray[assetNameIndex] + " | " +
 				FormatUtil.FormatDouble (assetLowerBoundArray[assetNameIndex], 2, 0, 100.) + "% | " +
@@ -273,7 +275,7 @@ public class StrongWolfeEvolutionMetrics
 
 		System.out.println ("\t|--------------------------------------------||\n\n");
 
-		BoundedHoldingsAllocationControl boundedPortfolioConstructionParameters =
+		BoundedHoldingsAllocationControl boundedHoldingsAllocationControl =
 			new BoundedHoldingsAllocationControl (
 				assetNameArray,
 				CustomRiskUtilitySettings.VarianceMinimizer(),
@@ -284,11 +286,8 @@ public class StrongWolfeEvolutionMetrics
 				)
 			);
 
-		for (int assetNameIndex = 0;
-			assetNameIndex < assetNameArray.length;
-			++assetNameIndex)
-		{
-			boundedPortfolioConstructionParameters.addBound (
+		for (int assetNameIndex = 0; assetNameIndex < assetNameArray.length; ++assetNameIndex) {
+			boundedHoldingsAllocationControl.addBound (
 				assetNameArray[assetNameIndex],
 				assetLowerBoundArray[assetNameIndex],
 				assetUpperBoundArray[assetNameIndex]
@@ -297,11 +296,9 @@ public class StrongWolfeEvolutionMetrics
 
 		new ConstrainedMeanVarianceOptimizer (
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).allocate (
-			boundedPortfolioConstructionParameters,
+			boundedHoldingsAllocationControl,
 			assetUniverseStatisticalProperties
 		);
 

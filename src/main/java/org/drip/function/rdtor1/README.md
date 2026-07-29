@@ -24,9 +24,21 @@ DROP Function R<sup>d</sup> To R<sup>1</sup> Package contains the Suite of Built
  <i>CovarianceEllipsoidMultivariate</i> implements a R<sup>d</sup> To R<sup>1</sup> Co-variance Estimate of
  the specified Distribution.
 
+ * [***Himmelblau***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/Himmelblau.java)
+ <i>Himmelblau</i> implements the Multi-modal Himmelblau Function.
+
  * [***LagrangianMultivariate***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/LagrangianMultivariate.java)
  <i>LagrangianMultivariate</i> implements a R<sup>d</sup> To R<sup>1</sup> Multivariate Function along with
  the specified Set of Equality Constraints.
+
+ * [***MultidimensionalRosenbrock***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/MultidimensionalRosenbrock.java)
+ <i>MultidimensionalRosenbrock</i> implements the Combination of N 2D <i>Rosenbrock</i> Problems.
+
+ * [***MultidimensionalRosenbrockCoupled***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/MultidimensionalRosenbrockCoupled.java)
+ <i>MultidimensionalRosenbrockCoupled</i> implements the Sum of N Coupled 2D <i>Rosenbrock</i> Problems.
+
+ * [***MultidimensionalRosenbrockUncoupled***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/MultidimensionalRosenbrockUncoupled.java)
+ <i>MultidimensionalRosenbrockUncoupled</i> implements the Sum of N/2 Uncoupled 2D <i>Rosenbrock</i> Problems.
 
  * [***ObjectiveConstraintVariateSet***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/ObjectiveConstraintVariateSet.java)
  <i>ObjectiveConstraintVariateSet</i> holds a R<sup>d</sup> To R<sup>1</sup> Variates corresponding to the
@@ -36,6 +48,9 @@ DROP Function R<sup>d</sup> To R<sup>1</sup> Package contains the Suite of Built
  <i>RiskObjectiveUtilityMultivariate</i> implements the Risk Objective R<sup>d</sup> To R<sup>1</sup>
  Multivariate Function used in Portfolio Allocation. It accommodates both the Risk Tolerance and Risk
  Aversion Variants.
+
+ * [***Rosenbrock***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/Rosenbrock.java)
+ <i>Rosenbrock</i> implements the Multi-modal Rosenbrock Function.
  
  
 ## References
@@ -43,16 +58,30 @@ DROP Function R<sup>d</sup> To R<sup>1</sup> Package contains the Suite of Built
  * Boyd, S., and L. van den Berghe (2009): <i>Convex Optimization</i> <b>Cambridge University Press</b>
  Cambridge UK
 
+ * Dixon, L. C. W., and D. J. Mills (1994): Effect of Rounding Errors on the Variable Metric Method
+ <i>Journal of Optimization Theory and Applications</i> <b>80</b> 175-179
+
  * Eustaquio, R., E. Karas, and A. Ribeiro (2008): <i>Constraint Qualification for Nonlinear Programming</i>
  <b>Federal University of Parana</b>
 
  * Karush, A. (1939): <i>Minima of Functions of Several Variables with Inequalities as Side Constraints</i>
  <b>University of Chicago</b> Chicago IL
 
+ * Kok, S., and C. Sandrock (2009): Locating and Characterizing the Stationary Points of the Extended
+ Rosenbrock Function <i>Evolutionary Computation</i> <b>17 (3)</b> 437-453
+
  * Kuhn, H. W., and A. W. Tucker (1951): Nonlinear Programming <i>Proceedings of the Second Berkeley
  Symposium</i> <b>University of California</b> Berkeley CA 481-492
 
+ * Pagani, F., M. Wiegand, and S. Nadarajah (2022): An n-dimensional Rosenbrock Distribution for Markov Chain
+ Monte-Carlo Testing <i>Scandinavian Journal of Statistics</i> <b>49 (2)</b> 657-680
+
+ * Rosenbrock, H. H. (1960): An Automatic Method for Finding the Greatest or the Least Value of a Function
+ <i>Computer Journal</i> <b>3 (3)</b> 175-184
+
  * Ruszczynski, A. (2006): <i>Nonlinear Optimization</i> <b>Princeton University Press</b> Princeton NJ
+
+ * Wikipedia (2026): Rosenbrock Function https://en.wikipedia.org/wiki/Rosenbrock_function
 
 
 ## DROP Specifications

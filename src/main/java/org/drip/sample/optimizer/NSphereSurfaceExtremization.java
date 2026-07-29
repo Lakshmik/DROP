@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,14 +98,14 @@ import org.drip.service.env.EnvManager;
  * <i>NSphereSurfaceExtremization</i> computes the Equality-Constrained Extrema of the Specified Function
  * 	along the Surface of an N-Sphere using Lagrange Multipliers.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/optimizer/README.md">Lagrangian/KKT Necessary Sufficient Conditions</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/optimizer/README.md">Lagrangian/KKT Necessary Sufficient Conditions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -112,25 +120,21 @@ public class NSphereSurfaceExtremization
 	{
 		System.out.println ("\n\t|------------------------------------||");
 
-		String strDump = "\t| STARTER: [";
+		String dump = "\t| STARTER: [";
 
-		strDump += FormatUtil.FormatDouble (startingVariateArray[0], 1, 4, 1.) + ",";
+		dump += FormatUtil.FormatDouble (startingVariateArray[0], 1, 4, 1.) + ",";
 
-		strDump += FormatUtil.FormatDouble (startingVariateArray[1], 1, 4, 1.) + ",";
+		dump += FormatUtil.FormatDouble (startingVariateArray[1], 1, 4, 1.) + ",";
 
-		strDump += FormatUtil.FormatDouble (startingVariateArray[2], 1, 4, 1.);
+		dump += FormatUtil.FormatDouble (startingVariateArray[2], 1, 4, 1.);
 
-		System.out.println (strDump + "] ||");
+		System.out.println (dump + "] ||");
 
 		System.out.println ("\t|------------------------------------||");
 
 		double[] variateArray = newtonFixedPointFinder.convergeVariate (
-			new VariateInequalityConstraintMultiplier (
-				false,
-				startingVariateArray,
-				null
-			)
-		).variateArray();
+			new VariateInequalityConstraintMultiplier (false, startingVariateArray, null)
+		).problemVariableArray();
 
 		System.out.println (
 			"\t| Optimal X      : " + FormatUtil.FormatDouble (variateArray[0], 1, 4, 1.) + "           ||"
@@ -159,13 +163,9 @@ public class NSphereSurfaceExtremization
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		RdToR1 variateSumObjectiveFunction = new RdToR1 (
-			null
-		)
+		RdToR1 variateSumObjectiveFunction = new RdToR1 (null)
 		{
 			@Override public double evaluate (
 				final double[] variateArray)
@@ -200,9 +200,7 @@ public class NSphereSurfaceExtremization
 			}
 		};
 
-		RdToR1 sphereSurfaceConstraintFunction = new RdToR1 (
-			null
-		)
+		RdToR1 sphereSurfaceConstraintFunction = new RdToR1 (null)
 		{
 			@Override public double evaluate (
 				final double[] variateArray)
@@ -245,9 +243,7 @@ public class NSphereSurfaceExtremization
 					sphereSurfaceConstraintFunction
 				}
 			),
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			),
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false),
 			ConvergenceControl.Standard()
 		);
 

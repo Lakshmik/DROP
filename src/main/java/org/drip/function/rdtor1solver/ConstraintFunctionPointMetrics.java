@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,87 +91,81 @@ package org.drip.function.rdtor1solver;
 
 /**
  * <i>ConstraintFunctionPointMetrics</i> holds the R<sup>d</sup> Point Base and Sensitivity Metrics of the
- * Constraint Function.
+ * 	Constraint Function. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalCore.md">Numerical Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/README.md">Function</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></li>
+ * 		<li><i>ConstraintFunctionPointMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Constraint Count</li>
+ * 		<li>Retrieve the Constraint Dimension</li>
+ * 		<li>Retrieve the Constraint Function Value Array</li>
+ * 		<li>Retrieve the Constraint Function KKR Multiplier Array</li>
+ * 		<li>Retrieve the Constraint Function Jacobian Array</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class ConstraintFunctionPointMetrics
 {
-	private double[] _constraintFunctionValueArray = null;
-	private double[] _constraintFunctionMultiplierArray = null;
-	private double[][] _constraintFunctionJacobianArray = null;
+	private double[] _valueArray = null;
+	private double[][] _jacobianArray = null;
+	private double[] _kktCoefficientArray = null;
 
 	/**
-	 * ConstraintFunctionPointMetrics Constructor
+	 * <i>ConstraintFunctionPointMetrics</i> Constructor
 	 * 
-	 * @param constraintFunctionValueArray Constraint Function Value Array
-	 * @param constraintFunctionJacobianArray Constraint Function Jacobian Array
-	 * @param constraintFunctionMultiplierArray Constraint Function Karush-Kahn-Tucker Multiplier Array
+	 * @param valueArray Constraint Function Value Array
+	 * @param jacobianArray Constraint Function Jacobian Array
+	 * @param kktCoefficientArray Constraint Function Karush-Kahn-Tucker Multiplier Array
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ConstraintFunctionPointMetrics (
-		final double[] constraintFunctionValueArray,
-		final double[][] constraintFunctionJacobianArray,
-		final double[] constraintFunctionMultiplierArray)
-		throws java.lang.Exception
+		final double[] valueArray,
+		final double[][] jacobianArray,
+		final double[] kktCoefficientArray)
+		throws Exception
 	{
-		if (null == (_constraintFunctionValueArray = constraintFunctionValueArray) ||
-			null == (_constraintFunctionJacobianArray = constraintFunctionJacobianArray) ||
-			null == (_constraintFunctionMultiplierArray = constraintFunctionMultiplierArray))
+		if (null == (_valueArray = valueArray) ||
+			null == (_jacobianArray = jacobianArray) ||
+			null == (_kktCoefficientArray = kktCoefficientArray))
 		{
-			throw new java.lang.Exception ("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
+			throw new Exception ("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
 		}
 
-		int constraintCount = _constraintFunctionValueArray.length;
-		int functionDimension = _constraintFunctionJacobianArray.length;
-
-		if (0 == constraintCount || constraintCount != _constraintFunctionMultiplierArray.length ||
-			0 == functionDimension)
+		if (0 == _valueArray.length || _valueArray.length != _kktCoefficientArray.length ||
+			0 == _jacobianArray.length)
 		{
-			throw new java.lang.Exception ("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
+			throw new Exception ("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
 		}
 
-		for (int constraintIndex = 0;
-			constraintIndex < constraintCount;
-			++constraintIndex)
-		{
-			if (!org.drip.numerical.common.NumberUtil.IsValid (
-					_constraintFunctionValueArray[constraintIndex]
-				) || !org.drip.numerical.common.NumberUtil.IsValid (
-					_constraintFunctionMultiplierArray[constraintIndex]
-				)
-			)
+		for (int constraintIndex = 0; constraintIndex < _valueArray.length; ++constraintIndex) {
+			if (!NumberUtil.IsValid (_valueArray[constraintIndex]) ||
+				!NumberUtil.IsValid (_kktCoefficientArray[constraintIndex]))
 			{
-				throw new java.lang.Exception (
-					"ConstraintFunctionPointMetrics Constructor => Invalid Inputs"
-				);
+				throw new Exception ("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
 			}
 		}
 
 		for (int functionDimensionIndex = 0;
-			functionDimensionIndex < functionDimension;
+			functionDimensionIndex < _jacobianArray.length;
 			++functionDimensionIndex)
 		{
-			if (null == _constraintFunctionJacobianArray[functionDimensionIndex] ||
-				constraintCount != _constraintFunctionJacobianArray[functionDimensionIndex].length ||
-				!org.drip.numerical.common.NumberUtil.IsValid (
-					_constraintFunctionJacobianArray[functionDimensionIndex]
-				)
-			)
+			if (null == _jacobianArray[functionDimensionIndex] ||
+				_valueArray.length != _jacobianArray[functionDimensionIndex].length ||
+				!NumberUtil.IsValid (_jacobianArray[functionDimensionIndex]))
 			{
-				throw new java.lang.Exception
-					("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
+				throw new Exception ("ConstraintFunctionPointMetrics Constructor => Invalid Inputs");
 			}
 		}
 	}
@@ -174,7 +178,7 @@ public class ConstraintFunctionPointMetrics
 
 	public int count()
 	{
-		return _constraintFunctionValueArray.length;
+		return _valueArray.length;
 	}
 
 	/**
@@ -185,7 +189,7 @@ public class ConstraintFunctionPointMetrics
 
 	public int dimension()
 	{
-		return _constraintFunctionJacobianArray.length;
+		return _jacobianArray.length;
 	}
 
 	/**
@@ -196,7 +200,7 @@ public class ConstraintFunctionPointMetrics
 
 	public double[] constraintFunctionValueArray()
 	{
-		return _constraintFunctionValueArray;
+		return _valueArray;
 	}
 
 	/**
@@ -207,7 +211,7 @@ public class ConstraintFunctionPointMetrics
 
 	public double[] constraintFunctionMultiplierArray()
 	{
-		return _constraintFunctionMultiplierArray;
+		return _kktCoefficientArray;
 	}
 
 	/**
@@ -218,6 +222,6 @@ public class ConstraintFunctionPointMetrics
 
 	public double[][] constraintFunctionJacobianArray()
 	{
-		return _constraintFunctionJacobianArray;
+		return _jacobianArray;
 	}
 }

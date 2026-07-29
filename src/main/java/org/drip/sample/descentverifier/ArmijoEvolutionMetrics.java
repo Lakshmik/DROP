@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,16 +97,16 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>ArmijoEvolutionMetrics</i> demonstrates the Impact of applying the Armijo Criterion on the Evolution of
- * the R<sup>d</sup> Fixed Point of a Constrained Minimization Search.
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/descentverifier/README.md">Armijo/Wolfe Strong/Weak Curvature</a></li>
- *  </ul>
- * <br><br>
+ * 	the R<sup>d</sup> Fixed Point of a Constrained Minimization Search.
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/descentverifier/README.md">Armijo/Wolfe Strong/Weak Curvature</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -118,11 +126,9 @@ public class ArmijoEvolutionMetrics
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		FixedRdFinder.s_verifierIncrementBlog = true;
+		FixedRdFinder.s_VerifierIncrementBlog = true;
 
 		String[] assetNameArray = new String[]
 		{
@@ -190,48 +196,46 @@ public class ArmijoEvolutionMetrics
 				)
 			);
 
-		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (
-			assetNameArray
+		double[][] covarianceMatrix = assetUniverseStatisticalProperties.covariance (assetNameArray);
+
+		System.out.println (
+			"\n\n\t|------------------------------------------------------------------------------------------------||"
 		);
 
-		System.out.println ("\n\n\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||"
+		);
 
-		System.out.println ("\t|                                  CROSS ASSET COVARIANCE MATRIX                                 ||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		String header = "\t|     |";
 
-		String strHeader = "\t|     |";
-
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
-			strHeader += "    " + assetNameArray[assetIndex] + "     |";
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
+			header += "    " + assetNameArray[assetIndex] + "     |";
 		}
 
-		System.out.println (strHeader + "|");
+		System.out.println (header + "|");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int assetIndexI = 0;
-			assetIndexI < assetNameArray.length;
-			++assetIndexI)
-		{
-			String strDump = "\t| " + assetNameArray[assetIndexI] + " ";
+		for (int assetIndexI = 0; assetIndexI < assetNameArray.length; ++assetIndexI) {
+			String dump = "\t| " + assetNameArray[assetIndexI] + " ";
 
-			for (int assetIndexJ = 0;
-				assetIndexJ < assetNameArray.length;
-				++assetIndexJ)
-			{
-				strDump += "|" + FormatUtil.FormatDouble (
-					covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.
-				) + " ";
+			for (int assetIndexJ = 0; assetIndexJ < assetNameArray.length; ++assetIndexJ) {
+				dump += "|" +
+					FormatUtil.FormatDouble (covarianceMatrix[assetIndexI][assetIndexJ], 1, 8, 1.) + " ";
 			}
 
-			System.out.println (strDump + "||");
+			System.out.println (dump + "||");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------||\n\n");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------||\n\n"
+		);
 
 		System.out.println ("\t|-------------------||");
 
@@ -239,10 +243,7 @@ public class ArmijoEvolutionMetrics
 
 		System.out.println ("\t|-------------------||");
 
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
 			System.out.println (
 				"\t| " + assetNameArray[assetIndex] + " | " +
 				FormatUtil.FormatDouble (assetLowerBoundArray[assetIndex], 2, 0, 100.) + "% | " +
@@ -278,7 +279,7 @@ public class ArmijoEvolutionMetrics
 
 		System.out.println ("\t|--------------------------------------------||\n\n");
 
-		BoundedHoldingsAllocationControl boundedPortfolioConstructionParameters =
+		BoundedHoldingsAllocationControl boundedHoldingsAllocationControl =
 			new BoundedHoldingsAllocationControl (
 				assetNameArray,
 				CustomRiskUtilitySettings.VarianceMinimizer(),
@@ -289,11 +290,8 @@ public class ArmijoEvolutionMetrics
 				)
 			);
 
-		for (int assetIndex = 0;
-			assetIndex < assetNameArray.length;
-			++assetIndex)
-		{
-			boundedPortfolioConstructionParameters.addBound (
+		for (int assetIndex = 0; assetIndex < assetNameArray.length; ++assetIndex) {
+			boundedHoldingsAllocationControl.addBound (
 				assetNameArray[assetIndex],
 				assetLowerBoundArray[assetIndex],
 				assetUpperBoundArray[assetIndex]
@@ -302,11 +300,9 @@ public class ArmijoEvolutionMetrics
 
 		new ConstrainedMeanVarianceOptimizer (
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightArmijo (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightArmijo (false)
 		).allocate (
-			boundedPortfolioConstructionParameters,
+			boundedHoldingsAllocationControl,
 			assetUniverseStatisticalProperties
 		);
 

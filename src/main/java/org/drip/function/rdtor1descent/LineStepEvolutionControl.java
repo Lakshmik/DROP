@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,8 +91,8 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>LineStepEvolutionControl</i> contains the Parameters required to compute the Valid a Line Step. The
- * References are:
- * <br><br>
+ * 	References are:
+ * 	<br>
  * 	<ul>
  * 		<li>
  * 			Armijo, L. (1966): Minimization of Functions having Lipschitz-Continuous First Partial
@@ -101,13 +111,28 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li>Retrieve the Nocedal-Wright-Armijo Verifier Based Standard <i>LineStepEvolutionControl</i> Instance</li>
+ * 		<li>Retrieve the Nocedal-Wright-Weak Curvature Verifier Based Standard <i>LineStepEvolutionControl</i> Instance</li>
+ * 		<li>Retrieve the Nocedal-Wright-Strong Curvature Verifier Based Standard <i>LineStepEvolutionControl</i> Instance</li>
+ * 		<li>Retrieve the Nocedal-Wright-Weak Wolfe Verifier Based Standard <i>LineStepEvolutionControl</i> Instance</li>
+ * 		<li>Retrieve the Nocedal-Wright-Strong Wolfe Verifier Based Standard <i>LineStepEvolutionControl</i> Instance</li>
+ * 		<li><i>LineStepEvolutionControl</i> Constructor</li>
+ * 		<li>Retrieve the Line Evolution Verifier Instance</li>
+ * 		<li>Retrieve the Reduction Factor per Step</li>
+ * 		<li>Retrieve the Count of Reduction Steps</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -115,32 +140,27 @@ package org.drip.function.rdtor1descent;
 public class LineStepEvolutionControl
 {
 	private int _reductionStepCount = -1;
-	private double _reductionFactor = java.lang.Double.NaN;
-	private org.drip.function.rdtor1descent.LineEvolutionVerifier _lineEvolutionVerifier = null;
+	private double _reductionFactor = Double.NaN;
+	private LineEvolutionVerifier _lineEvolutionVerifier = null;
 
 	/**
-	 * Retrieve the Nocedal-Wright-Armijo Verifier Based Standard LineStepEvolutionControl Instance
+	 * Retrieve the Nocedal-Wright-Armijo Verifier Based Standard <i>LineStepEvolutionControl</i> Instance
 	 * 
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
 	 * 
-	 * @return The Nocedal-Wright-Armijo Verifier Based Standard LineStepEvolutionControl Instance
+	 * @return The Nocedal-Wright-Armijo Verifier Based Standard <i>LineStepEvolutionControl</i> Instance
 	 */
 
 	public static final LineStepEvolutionControl NocedalWrightArmijo (
 		final boolean maximizerCheck)
 	{
-		try
-		{
+		try {
 			return new LineStepEvolutionControl (
-				org.drip.function.rdtor1descent.ArmijoEvolutionVerifier.NocedalWrightStandard (
-					maximizerCheck
-				),
+				ArmijoEvolutionVerifier.NocedalWrightStandard (maximizerCheck),
 				0.75,
 				1
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -148,25 +168,22 @@ public class LineStepEvolutionControl
 	}
 
 	/**
-	 * Retrieve the Nocedal-Wright-Weak Curvature Verifier Based Standard LineStepEvolutionControl Instance
+	 * Retrieve the Nocedal-Wright-Weak Curvature Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 * 
-	 * @return The Nocedal-Wright-Weak Curvature Verifier Based Standard LineStepEvolutionControl Instance
+	 * @return The Nocedal-Wright-Weak Curvature Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 */
 
 	public static final LineStepEvolutionControl NocedalWrightWeakCurvature()
 	{
-		try
-		{
+		try {
 			return new LineStepEvolutionControl (
-				org.drip.function.rdtor1descent.CurvatureEvolutionVerifier.NocedalWrightStandard (
-					false
-				),
+				CurvatureEvolutionVerifier.NocedalWrightStandard (false),
 				0.75,
 				1
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -174,25 +191,22 @@ public class LineStepEvolutionControl
 	}
 
 	/**
-	 * Retrieve the Nocedal-Wright-Strong Curvature Verifier Based Standard LineStepEvolutionControl Instance
+	 * Retrieve the Nocedal-Wright-Strong Curvature Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 * 
-	 * @return The Nocedal-Wright-Strong Curvature Verifier Based Standard LineStepEvolutionControl Instance
+	 * @return The Nocedal-Wright-Strong Curvature Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 */
 
 	public static final LineStepEvolutionControl NocedalWrightStrongCurvature()
 	{
-		try
-		{
+		try {
 			return new LineStepEvolutionControl (
-				org.drip.function.rdtor1descent.CurvatureEvolutionVerifier.NocedalWrightStandard (
-					true
-				),
+				CurvatureEvolutionVerifier.NocedalWrightStandard (true),
 				0.75,
 				1
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -200,29 +214,24 @@ public class LineStepEvolutionControl
 	}
 
 	/**
-	 * Retrieve the Nocedal-Wright-Weak Wolfe Verifier Based Standard LineStepEvolutionControl Instance
+	 * Retrieve the Nocedal-Wright-Weak Wolfe Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 * 
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
 	 * 
-	 * @return The Nocedal-Wright-Weak Wolfe Verifier Based Standard LineStepEvolutionControl Instance
+	 * @return The Nocedal-Wright-Weak Wolfe Verifier Based Standard <i>LineStepEvolutionControl</i> Instance
 	 */
 
 	public static final LineStepEvolutionControl NocedalWrightWeakWolfe (
 		final boolean maximizerCheck)
 	{
-		try
-		{
+		try {
 			return new LineStepEvolutionControl (
-				org.drip.function.rdtor1descent.WolfeEvolutionVerifier.NocedalWrightStandard (
-					maximizerCheck,
-					false
-				),
+				WolfeEvolutionVerifier.NocedalWrightStandard (maximizerCheck, false),
 				0.75,
 				1
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -230,29 +239,25 @@ public class LineStepEvolutionControl
 	}
 
 	/**
-	 * Retrieve the Nocedal-Wright-Strong Wolfe Verifier Based Standard LineStepEvolutionControl Instance
+	 * Retrieve the Nocedal-Wright-Strong Wolfe Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 * 
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
 	 * 
-	 * @return The Nocedal-Wright-Strong Wolfe Verifier Based Standard LineStepEvolutionControl Instance
+	 * @return The Nocedal-Wright-Strong Wolfe Verifier Based Standard <i>LineStepEvolutionControl</i>
+	 * 	Instance
 	 */
 
 	public static final LineStepEvolutionControl NocedalWrightStrongWolfe (
 		final boolean maximizerCheck)
 	{
-		try
-		{
+		try {
 			return new LineStepEvolutionControl (
-				org.drip.function.rdtor1descent.WolfeEvolutionVerifier.NocedalWrightStandard (
-					maximizerCheck,
-					true
-				),
+				WolfeEvolutionVerifier.NocedalWrightStandard (maximizerCheck, true),
 				0.75,
 				1
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -260,27 +265,26 @@ public class LineStepEvolutionControl
 	}
 
 	/**
-	 * LineStepEvolutionControl Constructor
+	 * <i>LineStepEvolutionControl</i> Constructor
 	 * 
 	 * @param lineEvolutionVerifier The Line Evolution Verifier Instance
 	 * @param reductionFactor The Per-Step Reduction Factor
 	 * @param reductionStepCount Count of Reduction Steps
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public LineStepEvolutionControl (
-		final org.drip.function.rdtor1descent.LineEvolutionVerifier lineEvolutionVerifier,
+		final LineEvolutionVerifier lineEvolutionVerifier,
 		final double reductionFactor,
 		final int reductionStepCount)
-		throws java.lang.Exception
+		throws Exception
 	{
 		if (null == (_lineEvolutionVerifier = lineEvolutionVerifier) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_reductionFactor = reductionFactor) ||
-				1. <= _reductionFactor ||
+			!NumberUtil.IsValid (_reductionFactor = reductionFactor) || 1. <= _reductionFactor ||
 			0 >= (_reductionStepCount = reductionStepCount))
 		{
-			throw new java.lang.Exception ("LineStepEvolutionControl Constructor => Invalid Inputs");
+			throw new Exception ("LineStepEvolutionControl Constructor => Invalid Inputs");
 		}
 	}
 
@@ -290,7 +294,7 @@ public class LineStepEvolutionControl
 	 * @return The Line Evolution Verifier Instance
 	 */
 
-	public org.drip.function.rdtor1descent.LineEvolutionVerifier lineEvolutionVerifier()
+	public LineEvolutionVerifier lineEvolutionVerifier()
 	{
 		return _lineEvolutionVerifier;
 	}

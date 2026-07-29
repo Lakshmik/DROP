@@ -337,7 +337,7 @@ public class ConstrainedMeanVarianceOptimizer extends
 					new org.drip.function.rdtor1solver.BarrierFixedPointFinder (
 						lagrangianMultivariate,
 						boundedPortfolioConstructionParameters.boundingConstraintsArray (
-							lagrangianMultivariate.constraintFunctionDimension()
+							lagrangianMultivariate.constraintCount()
 						),
 						_interiorPointBarrierControl,
 						_lineStepEvolutionControl
@@ -350,7 +350,7 @@ public class ConstrainedMeanVarianceOptimizer extends
 				return null;
 			}
 
-			double[] optimalWeightArray = variateInequalityConstraintMultiplier.variateArray();
+			double[] optimalWeightArray = variateInequalityConstraintMultiplier.problemVariableArray();
 
 			for (int assetIndex = 0; assetIndex < assetCount; ++assetIndex)
 			{
@@ -422,7 +422,7 @@ public class ConstrainedMeanVarianceOptimizer extends
 					new org.drip.function.rdtor1solver.BarrierFixedPointFinder (
 						lagrangianMultivariate,
 						boundedHoldingsAllocationControl.boundingConstraintsArray (
-							lagrangianMultivariate.constraintFunctionDimension()
+							lagrangianMultivariate.constraintCount()
 						),
 						_interiorPointBarrierControl,
 						_lineStepEvolutionControl
@@ -435,7 +435,7 @@ public class ConstrainedMeanVarianceOptimizer extends
 				return null;
 			}
 
-			double[] optimalWeightArray = variateInequalityConstraintMultiplier.variateArray();
+			double[] optimalWeightArray = variateInequalityConstraintMultiplier.problemVariableArray();
 
 			for (int assetIndex = 0; assetIndex < assetCount; ++assetIndex)
 			{

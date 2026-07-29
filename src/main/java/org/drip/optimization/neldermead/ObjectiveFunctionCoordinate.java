@@ -2,6 +2,7 @@
 package org.drip.optimization.neldermead;
 
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -159,5 +160,31 @@ public class ObjectiveFunctionCoordinate
 	public double value()
 	{
 		return _value;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + "[Value: " + FormatUtil.FormatDouble (_value, 1, 4, 1.) + "; " +
+			"Vertex: " + NumberUtil.ArrayRow (_vertex, 1, 4, false) + "]";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

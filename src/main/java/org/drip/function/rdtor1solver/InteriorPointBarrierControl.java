@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,36 +90,45 @@ package org.drip.function.rdtor1solver;
  */
 
 /**
- * <i>InteriorPointBarrierControl</i> contains the Barrier Iteration Control Parameters.
+ * <i>InteriorPointBarrierControl</i> contains the Barrier Iteration Control Parameters. It exposes the
+ * 	following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalCore.md">Numerical Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/README.md">Function</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></li>
+ * 		<li>Construct a Standard <i>InteriorPointBarrierControl</i> Instance</li>
+ * 		<li><i>InteriorPointBarrierControl</i> Constructor</li>
+ * 		<li>Retrieve the Number of Decay Steps</li>
+ * 		<li>Retrieve the Initial Barrier Strength</li>
+ * 		<li>Retrieve the Decay Velocity</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class InteriorPointBarrierControl
-	extends org.drip.function.rdtor1solver.ConvergenceControl
+	extends ConvergenceControl
 {
 	private int _decayStepCount = -1;
-	private double _decayVelocity = java.lang.Double.NaN;
-	private double _initialStrength = java.lang.Double.NaN;
+	private double _decayVelocity = Double.NaN;
+	private double _initialStrength = Double.NaN;
 
 	/**
-	 * Construct a Standard InteriorPointBarrierControl Instance
+	 * Construct a Standard <i>InteriorPointBarrierControl</i> Instance
 	 * 
-	 * @return The Standard InteriorPointBarrierControl Instance
+	 * @return The Standard <i>InteriorPointBarrierControl</i> Instance
 	 */
 
 	public static InteriorPointBarrierControl Standard()
 	{
-		try
-		{
+		try {
 			return new InteriorPointBarrierControl (
 				VARIATE_CONSTRAINT_SEQUENCE_CONVERGENCE,
 				5.0e-02,
@@ -118,9 +137,7 @@ public class InteriorPointBarrierControl
 				0.5,
 				70
 			);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -128,7 +145,7 @@ public class InteriorPointBarrierControl
 	}
 
 	/**
-	 * InteriorPointBarrierControl Constructor
+	 * <i>InteriorPointBarrierControl</i> Constructor
 	 * 
 	 * @param convergenceType The Convergence Type
 	 * @param relativeTolerance The Objective Function Relative Tolerance
@@ -137,7 +154,7 @@ public class InteriorPointBarrierControl
 	 * @param decayVelocity The Barrier Decay Velocity
 	 * @param decayStepCount The Number Barrier Decay Steps
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public InteriorPointBarrierControl (
@@ -147,20 +164,15 @@ public class InteriorPointBarrierControl
 		final double initialStrength,
 		final double decayVelocity,
 		final int decayStepCount)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (
-			convergenceType,
-			relativeTolerance,
-			absoluteTolerance,
-			100
-		);
+		super (convergenceType, relativeTolerance, absoluteTolerance, 100);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_initialStrength = initialStrength) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_decayVelocity = decayVelocity) ||
-				1 > (_decayStepCount = decayStepCount))
+		if (!NumberUtil.IsValid (_initialStrength = initialStrength) ||
+			!NumberUtil.IsValid (_decayVelocity = decayVelocity) ||
+			1 > (_decayStepCount = decayStepCount))
 		{
-			throw new java.lang.Exception ("InteriorPointBarrierControl Constructor => Invalid Inputs");
+			throw new Exception ("InteriorPointBarrierControl Constructor => Invalid Inputs");
 		}
 	}
 

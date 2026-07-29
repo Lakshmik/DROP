@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -87,42 +95,46 @@ import org.drip.service.env.EnvManager;
  * <i>UnconstrainedCovarianceEllipsoid</i> demonstrates the Construction and Usage of a Co-variance
  * 	Ellipsoid.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/rdtor1/README.md">Constrained/Unconstrained Covariance Ellipsoid Function</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/rdtor1/README.md">Constrained/Unconstrained Covariance Ellipsoid Function</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class UnconstrainedCovarianceEllipsoid {
+public class UnconstrainedCovarianceEllipsoid
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double[][] aadblCovarianceMatrix = new double[][] {
+		double[][] covarianceMatrix = new double[][]
+		{
 			{0.09, 0.12},
 			{0.12, 0.04}
 		};
 
-		CovarianceEllipsoidMultivariate ce = new CovarianceEllipsoidMultivariate (aadblCovarianceMatrix);
+		CovarianceEllipsoidMultivariate covarianceEllipsoidMultivariate =
+			new CovarianceEllipsoidMultivariate (covarianceMatrix);
 
-		double[][] aadblVariate = {
+		double[][] variateArraySequence =
+		{
 			{0.0, 1.0},
 			{0.1, 0.9},
 			{0.2, 0.8},
@@ -142,12 +154,16 @@ public class UnconstrainedCovarianceEllipsoid {
 
 		System.out.println ("\t|------------------------||");
 
-		for (double[] adblVariate : aadblVariate)
+		for (double[] variateArray : variateArraySequence) {
 			System.out.println (
-				"\t|  [" + adblVariate[0] +
-				" | " + adblVariate[1] +
-				"] = " + FormatUtil.FormatDouble (ce.evaluate (adblVariate), 1, 4, 1.) + " ||"
+				"\t|  [" + variateArray[0] + " | " + variateArray[1] + "] = " + FormatUtil.FormatDouble (
+					covarianceEllipsoidMultivariate.evaluate (variateArray),
+					1,
+					4,
+					1.
+				) + " ||"
 			);
+		}
 
 		System.out.println ("\t|------------------------||");
 
@@ -157,25 +173,23 @@ public class UnconstrainedCovarianceEllipsoid {
 
 		System.out.println ("\t|-----------------------------------||");
 
-		for (double[] adblVariate : aadblVariate) {
-			String strJacobian = "";
+		for (double[] variateArray : variateArraySequence) {
+			String jacobianDump = "";
 
-			double[] adblJacobian = ce.jacobian (adblVariate);
-
-			for (double dblJacobian : adblJacobian)
-				strJacobian += FormatUtil.FormatDouble (dblJacobian, 1, 4, 1.) + ",";
+			for (double jacobianEntry : covarianceEllipsoidMultivariate.jacobian (variateArray)) {
+				jacobianDump += FormatUtil.FormatDouble (jacobianEntry, 1, 4, 1.) + ",";
+			}
 
 			System.out.println (
-				"\t|  [" + adblVariate[0] +
-				" | " + adblVariate[1] +
-				"] = {" + strJacobian + "} ||"
+				"\t|  [" + variateArray[0] + " | " + variateArray[1] + "] = {" + jacobianDump + "} ||"
 			);
 		}
 
 		System.out.println ("\t|-----------------------------------||");
 
-		double[][] aadblHessian = ce.hessian (
-			new double[] {
+		double[][] hessian = covarianceEllipsoidMultivariate.hessian (
+			new double[]
+			{
 				0.20,
 				0.80
 			}
@@ -187,13 +201,14 @@ public class UnconstrainedCovarianceEllipsoid {
 
 		System.out.println ("\t|--------------------||");
 
-		for (double[] adblHessian : aadblHessian) {
-			String strHessian = "";
+		for (double[] hessianEntryRow : hessian) {
+			String hessianDump = "";
 
-			for (double dblHessian : adblHessian)
-				strHessian += FormatUtil.FormatDouble (dblHessian, 1, 4, 1.) + ",";
+			for (double hessianEntry : hessianEntryRow) {
+				hessianDump += FormatUtil.FormatDouble (hessianEntry, 1, 4, 1.) + ",";
+			}
 
-			System.out.println ("\t| [" + strHessian + "] ||");
+			System.out.println ("\t| [" + hessianDump + "] ||");
 		}
 
 		System.out.println ("\t|--------------------||");

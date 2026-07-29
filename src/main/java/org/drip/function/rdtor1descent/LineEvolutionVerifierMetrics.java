@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,8 +93,9 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>LineEvolutionVerifierMetrics</i> implements the Step Length Verification Criterion used for the Inexact
- * Line Search Increment Generation. The References are:
- * <br><br>
+ * 	Line Search Increment Generation. The References are:
+ * 
+ * 	<br>
  * 	<ul>
  * 		<li>
  * 			Armijo, L. (1966): Minimization of Functions having Lipschitz-Continuous First Partial
@@ -101,38 +114,50 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li>Retrieve the Current Variate Array</li>
+ * 		<li>Retrieve the Target Direction Unit Vector</li>
+ * 		<li>Retrieve the Step Length</li>
+ * 		<li>Retrieve the Function Jacobian at the Current Variate</li>
+ * 		<li>Generate a String Version of the State</li>
+ * 		<li>Indicate if the Evolution Criterion has been met</li>
  *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public abstract class LineEvolutionVerifierMetrics
 {
+	private double _stepLength = Double.NaN;
+	private UnitVector _targetDirection = null;
 	private double[] _currentVariateArray = null;
-	private double _stepLength = java.lang.Double.NaN;
 	private double[] _currentVariateFunctionJacobian = null;
-	private org.drip.function.definition.UnitVector _targetDirection = null;
 
 	protected LineEvolutionVerifierMetrics (
-		final org.drip.function.definition.UnitVector targetDirection,
+		final UnitVector targetDirection,
 		final double[] currentVariateArray,
 		final double stepLength,
 		final double[] currentVariateFunctionJacobian)
-		throws java.lang.Exception
+		throws Exception
 	{
 		if (null == (_targetDirection = targetDirection) ||
 			null == (_currentVariateArray = currentVariateArray) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_stepLength = stepLength) ||
+			!NumberUtil.IsValid (_stepLength = stepLength) ||
 			null == (_currentVariateFunctionJacobian = currentVariateFunctionJacobian) ||
 			_currentVariateArray.length != _currentVariateFunctionJacobian.length)
 		{
-			throw new java.lang.Exception ("LineEvolutionVerifierMetrics Constructor => Invalid Inputs");
+			throw new Exception ("LineEvolutionVerifierMetrics Constructor => Invalid Inputs");
 		}
 	}
 
@@ -153,7 +178,7 @@ public abstract class LineEvolutionVerifierMetrics
 	 * @return The Target Direction Unit Vector
 	 */
 
-	public org.drip.function.definition.UnitVector targetDirection()
+	public UnitVector targetDirection()
 	{
 		return _targetDirection;
 	}
@@ -180,42 +205,26 @@ public abstract class LineEvolutionVerifierMetrics
 		return _currentVariateFunctionJacobian;
 	}
 
-	@Override public java.lang.String toString()
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @return String Version of the State
+	 */
+
+	@Override public String toString()
 	{
+		String string = "\t[";
+
 		double[] targetDirectionVector = _targetDirection.component();
 
-		java.lang.String string = "\t[";
-		int variateCount = _currentVariateArray.length;
-
-		for (int variateIndex = 0;
-			variateIndex < variateCount;
-			++variateIndex)
-		{
-			string = string + org.drip.service.common.FormatUtil.FormatDouble (
-				_currentVariateArray[variateIndex],
-				2,
-				3,
-				1.
-			) + " |";
+		for (int variateIndex = 0; variateIndex < _currentVariateArray.length; ++variateIndex) {
+			string = string + FormatUtil.FormatDouble (_currentVariateArray[variateIndex], 2, 3, 1) + " |";
 		}
 
-		string = string + "]" + org.drip.service.common.FormatUtil.FormatDouble (
-			_stepLength,
-			1,
-			3,
-			1.
-		) + " || {";
+		string = string + "]" + FormatUtil.FormatDouble (_stepLength, 1, 3, 1) + " || {";
 
-		for (int variateIndex = 0;
-			variateIndex < variateCount;
-			++variateIndex)
-		{
-			string = string + org.drip.service.common.FormatUtil.FormatDouble (
-				targetDirectionVector[variateIndex],
-				1,
-				2,
-				1.
-			) + " |";
+		for (int variateIndex = 0; variateIndex < _currentVariateArray.length; ++variateIndex) {
+			string = string + FormatUtil.FormatDouble (targetDirectionVector[variateIndex], 1, 2, 1.) + " |";
 		}
 
 		return string + " }";

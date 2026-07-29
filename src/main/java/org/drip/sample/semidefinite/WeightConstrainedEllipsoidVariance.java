@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -110,13 +118,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/semidefinite/README.md">Semi-Definite Constrained Ellipsoid Variance</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/semidefinite/README.md">Semi-Definite Constrained Ellipsoid Variance</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -136,9 +145,7 @@ public class WeightConstrainedEllipsoidVariance
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		String[] entityNameArray = new String[]
 		{
@@ -164,14 +171,10 @@ public class WeightConstrainedEllipsoidVariance
 
 		System.out.println ("\n\n\t|------------------------------------------------------||");
 
-		int entityCount = covarianceMatrix.length;
 		double equalityConstraintConstant = -1.;
 		String header = "\t|     |";
 
-		for (int entityIndex = 0;
-			entityIndex < entityCount;
-			++entityIndex)
-		{
+		for (int entityIndex = 0; entityIndex < covarianceMatrix.length; ++entityIndex) {
 			header += " " + entityNameArray[entityIndex] + "  |";
 		}
 
@@ -179,18 +182,15 @@ public class WeightConstrainedEllipsoidVariance
 
 		System.out.println ("\t|------------------------------------------------------||");
 
-		for (int entityIndexI = 0;
-			entityIndexI < entityCount;
-			++entityIndexI)
-		{
+		for (int entityIndexI = 0; entityIndexI < covarianceMatrix.length; ++entityIndexI) {
 			String dump = "\t| " + entityNameArray[entityIndexI] + " ";
 
-			for (int entityIndexJ = 0;
-				entityIndexJ < entityCount;
-				++entityIndexJ)
-			{
+			for (int entityIndexJ = 0; entityIndexJ < covarianceMatrix.length; ++entityIndexJ) {
 				dump += "|" + FormatUtil.FormatDouble (
-					covarianceMatrix[entityIndexI][entityIndexJ], 1, 2, 1.
+					covarianceMatrix[entityIndexI][entityIndexJ],
+					1,
+					2,
+					1.
 				) + " ";
 			}
 
@@ -204,37 +204,33 @@ public class WeightConstrainedEllipsoidVariance
 		RdToR1[] equalityConstraintArray = new RdToR1[]
 		{
 			new AffineMultivariate (
-				ObjectiveConstraintVariateSet.Unitary (
-					entityCount
-				),
+				ObjectiveConstraintVariateSet.Unitary (covarianceMatrix.length),
 				equalityConstraintConstant
 			)
 		};
 
-		int equalityConstraintCount = equalityConstraintArray.length;
+		int totalVariateCount = covarianceMatrix.length + equalityConstraintArray.length;
 
 		RdToR1[] inequalityConstraintArray = new RdToR1[]
 		{
-			new AffineBoundMultivariate (false, 0, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 0, entityCount + equalityConstraintCount, 0.65),
-			new AffineBoundMultivariate (false, 1, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 1, entityCount + equalityConstraintCount, 0.65),
-			new AffineBoundMultivariate (false, 2, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 2, entityCount + equalityConstraintCount, 0.65),
-			new AffineBoundMultivariate (false, 3, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 3, entityCount + equalityConstraintCount, 0.65),
-			new AffineBoundMultivariate (false, 4, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 4, entityCount + equalityConstraintCount, 0.65),
-			new AffineBoundMultivariate (false, 5, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 5, entityCount + equalityConstraintCount, 0.65),
-			new AffineBoundMultivariate (false, 6, entityCount + equalityConstraintCount, 0.05),
-			new AffineBoundMultivariate (true, 6, entityCount + equalityConstraintCount, 0.65)
+			new AffineBoundMultivariate (false, 0, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 0, totalVariateCount, 0.65),
+			new AffineBoundMultivariate (false, 1, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 1, totalVariateCount, 0.65),
+			new AffineBoundMultivariate (false, 2, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 2, totalVariateCount, 0.65),
+			new AffineBoundMultivariate (false, 3, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 3, totalVariateCount, 0.65),
+			new AffineBoundMultivariate (false, 4, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 4, totalVariateCount, 0.65),
+			new AffineBoundMultivariate (false, 5, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 5, totalVariateCount, 0.65),
+			new AffineBoundMultivariate (false, 6, totalVariateCount, 0.05),
+			new AffineBoundMultivariate (true, 6, totalVariateCount, 0.65)
 		};
 
 		LagrangianMultivariate lagrangianMultivariate = new LagrangianMultivariate (
-			new CovarianceEllipsoidMultivariate (
-				covarianceMatrix
-			),
+			new CovarianceEllipsoidMultivariate (covarianceMatrix),
 			equalityConstraintArray
 		);
 
@@ -242,15 +238,10 @@ public class WeightConstrainedEllipsoidVariance
 			lagrangianMultivariate,
 			inequalityConstraintArray,
 			interiorPointBarrierControl,
-			LineStepEvolutionControl.NocedalWrightStrongWolfe (
-				false
-			)
+			LineStepEvolutionControl.NocedalWrightStrongWolfe (false)
 		).solve (
-			ObjectiveConstraintVariateSet.Uniform (
-				entityCount,
-				equalityConstraintCount
-			)
-		).variateArray();
+			ObjectiveConstraintVariateSet.Uniform (covarianceMatrix.length, equalityConstraintArray.length)
+		).problemVariableArray();
 
 		System.out.println ("\t|----------------------||");
 
@@ -259,13 +250,12 @@ public class WeightConstrainedEllipsoidVariance
 		System.out.println ("\t|----------------------||");
 
 		for (int entityIndex = 0;
-			entityIndex < entityCount;
+			entityIndex < covarianceMatrix.length;
 			++entityIndex)
 		{
 			System.out.println (
-				"\t|   " + entityNameArray[entityIndex] + "   =>  " + FormatUtil.FormatDouble (
-					optimalVariateArray[entityIndex], 2, 2, 100.
-				) + "%  ||"
+				"\t|   " + entityNameArray[entityIndex] + "   =>  " +
+					FormatUtil.FormatDouble (optimalVariateArray[entityIndex], 2, 2, 100.) + "%  ||"
 			);
 		}
 
@@ -274,11 +264,9 @@ public class WeightConstrainedEllipsoidVariance
 		System.out.println ("\t|------------------------------||");
 
 		System.out.println (
-			"\t| OPTIMAL VARIANCE => " + FormatUtil.FormatDouble (
-				lagrangianMultivariate.evaluate (
-					optimalVariateArray
-				), 1, 5, 1.
-			) + " ||"
+			"\t| OPTIMAL VARIANCE => " +
+				FormatUtil.FormatDouble (lagrangianMultivariate.evaluate (optimalVariateArray), 1, 5, 1.) +
+				" ||"
 		);
 
 		System.out.println ("\t|------------------------------||\n");

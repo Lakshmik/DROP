@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,8 +93,9 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>ArmijoEvolutionVerifierMetrics</i> implements the Armijo Criterion used for the Inexact Line Search
- * Increment Generation to ascertain that the Function has reduced sufficiently. The Reference is:
- * <br><br>
+ * 	Increment Generation to ascertain that the Function has reduced sufficiently. The Reference is:
+ * 
+ * <br>
  * 	<ul>
  * 		<li>
  * 			Armijo, L. (1966): Minimization of Functions having Lipschitz-Continuous First Partial
@@ -90,27 +103,39 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li><i>ArmijoEvolutionVerifierMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Armijo Parameter</li>
+ * 		<li>Indicate if the Check is for Minimizer/Maximizer</li>
+ * 		<li>Retrieve the Function Value at the Current Variate</li>
+ * 		<li>Retrieve the Function Value at the Next Variate</li>
+ * 		<li>Indicate if the Armijo Criterion has been met</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class ArmijoEvolutionVerifierMetrics
-	extends org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics
+	extends LineEvolutionVerifierMetrics
 {
 	private boolean _maximizerCheck = false;
-	private double _armijoParameter = java.lang.Double.NaN;
-	private double _nextVariateFunctionValue = java.lang.Double.NaN;
-	private double _currentVariateFunctionValue = java.lang.Double.NaN;
+	private double _armijoParameter = Double.NaN;
+	private double _nextVariateFunctionValue = Double.NaN;
+	private double _currentVariateFunctionValue = Double.NaN;
 
 	/**
-	 * ArmijoEvolutionVerifierMetrics Constructor
+	 * <i>ArmijoEvolutionVerifierMetrics</i> Constructor
 	 * 
 	 * @param armijoParameter The Armijo Parameter
 	 * @param maximizerCheck TRUE - Perform a Check for the Function Maxima
@@ -121,34 +146,27 @@ public class ArmijoEvolutionVerifierMetrics
 	 * @param nextVariateFunctionValue The Function Value at the Next Variate
 	 * @param currentVariateFunctionJacobian The Function Jacobian at the Current Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ArmijoEvolutionVerifierMetrics (
 		final double armijoParameter,
 		final boolean maximizerCheck,
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
 		final double stepLength,
 		final double currentVariateFunctionValue,
 		final double nextVariateFunctionValue,
 		final double[] currentVariateFunctionJacobian)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (
-			targetDirectionUnitVector,
-			currentVariateArray,
-			stepLength,
-			currentVariateFunctionJacobian
-		);
+		super (targetDirectionUnitVector, currentVariateArray, stepLength, currentVariateFunctionJacobian);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_armijoParameter = armijoParameter) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_currentVariateFunctionValue =
-				currentVariateFunctionValue) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_nextVariateFunctionValue =
-				nextVariateFunctionValue))
+		if (!NumberUtil.IsValid (_armijoParameter = armijoParameter) ||
+			!NumberUtil.IsValid (_currentVariateFunctionValue = currentVariateFunctionValue) ||
+			!NumberUtil.IsValid (_nextVariateFunctionValue = nextVariateFunctionValue))
 		{
-			throw new java.lang.Exception ("ArmijoEvolutionVerifierMetrics Constructor => Invalid Inputs");
+			throw new Exception ("ArmijoEvolutionVerifierMetrics Constructor => Invalid Inputs");
 		}
 
 		_maximizerCheck = maximizerCheck;
@@ -206,19 +224,16 @@ public class ArmijoEvolutionVerifierMetrics
 
 	public boolean verify()
 	{
-		try
-		{
-			double gradientUpdatedFunctionValue = _currentVariateFunctionValue +
-				_armijoParameter * stepLength() * org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
+		try {
+			double gradientUpdatedFunctionValue =
+				_currentVariateFunctionValue + _armijoParameter * stepLength() * R1MatrixUtil.DotProduct (
 					targetDirection().component(),
 					currentVariateFunctionJacobian()
 				);
 
 			return _maximizerCheck ? _nextVariateFunctionValue >= gradientUpdatedFunctionValue :
 				_nextVariateFunctionValue <= gradientUpdatedFunctionValue;
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

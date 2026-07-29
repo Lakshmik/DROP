@@ -1,11 +1,23 @@
 
 package org.drip.function.rdtor1descent;
 
+import org.drip.function.definition.UnitVector;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,9 +93,10 @@ package org.drip.function.rdtor1descent;
 
 /**
  * <i>CurvatureEvolutionVerifierMetrics</i> implements the Armijo Criterion used for the Inexact Line Search
- * Increment Generation to ascertain that the Gradient of the Function has reduced sufficiently. The
- * References are:
- * <br><br>
+ * 	Increment Generation to ascertain that the Gradient of the Function has reduced sufficiently. The
+ * 	References are:
+ * 
+ * <br>
  * 	<ul>
  * 		<li>
  * 			Wolfe, P. (1969): Convergence Conditions for Ascent Methods <i>SIAM Review</i> <b>11 (2)</b>
@@ -95,26 +108,37 @@ package org.drip.function.rdtor1descent;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></li>
+ * 		<li><i>CurvatureEvolutionVerifierMetrics</i> Constructor</li>
+ * 		<li>Retrieve the Curvature Parameter</li>
+ * 		<li>Retrieve Whether of not the "Strong" Curvature Criterion needs to be met</li>
+ * 		<li>Retrieve the Function Jacobian at the Next Variate</li>
+ * 		<li>Indicate if the Curvature Criterion has been met</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1descent/README.md">R<sup>d</sup> To R<sup>1</sup> Gradient Descent Techniques</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class CurvatureEvolutionVerifierMetrics
-	extends org.drip.function.rdtor1descent.LineEvolutionVerifierMetrics
+	extends LineEvolutionVerifierMetrics
 {
+	private double _curvatureParameter = Double.NaN;
 	private boolean _strongCurvatureCriterion = false;
 	private double[] _nextVariateFunctionJacobian = null;
-	private double _curvatureParameter = java.lang.Double.NaN;
 
 	/**
-	 * CurvatureEvolutionVerifierMetrics Constructor
+	 * <i>CurvatureEvolutionVerifierMetrics</i> Constructor
 	 * 
 	 * @param curvatureParameter The Curvature Criterion Parameter
 	 * @param strongCurvatureCriterion TRUE - Apply the "Strong" Curvature Criterion
@@ -124,32 +148,26 @@ public class CurvatureEvolutionVerifierMetrics
 	 * @param currentVariateFunctionJacobian The Function Jacobian at the Current Variate
 	 * @param nextVariateFunctionJacobian The Function Jacobian at the Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public CurvatureEvolutionVerifierMetrics (
 		final double curvatureParameter,
 		final boolean strongCurvatureCriterion,
-		final org.drip.function.definition.UnitVector targetDirectionUnitVector,
+		final UnitVector targetDirectionUnitVector,
 		final double[] currentVariateArray,
 		final double stepLength,
 		final double[] currentVariateFunctionJacobian,
 		final double[] nextVariateFunctionJacobian)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (
-			targetDirectionUnitVector,
-			currentVariateArray,
-			stepLength,
-			currentVariateFunctionJacobian
-		);
+		super (targetDirectionUnitVector, currentVariateArray, stepLength, currentVariateFunctionJacobian);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_curvatureParameter = curvatureParameter) ||
+		if (!NumberUtil.IsValid (_curvatureParameter = curvatureParameter) ||
 			null == (_nextVariateFunctionJacobian = nextVariateFunctionJacobian) ||
 			currentVariateArray.length != _nextVariateFunctionJacobian.length)
 		{
-			throw new java.lang.Exception
-				("CurvatureEvolutionVerifierMetrics Constructor => Invalid Inputs");
+			throw new Exception ("CurvatureEvolutionVerifierMetrics Constructor => Invalid Inputs");
 		}
 
 		_strongCurvatureCriterion = strongCurvatureCriterion;
@@ -198,28 +216,21 @@ public class CurvatureEvolutionVerifierMetrics
 	{
 		double[] targetDirectionVector = targetDirection().component();
 
-		try
-		{
-			double nextFunctionIncrement = org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
+		try {
+			double nextFunctionIncrement = R1MatrixUtil.DotProduct (
 				targetDirectionVector,
 				_nextVariateFunctionJacobian
 			);
 
-			double parametrizedCurrentFunctionIncrement =
-				_curvatureParameter * org.drip.numerical.linearalgebra.R1MatrixUtil.DotProduct (
-					targetDirectionVector,
-					currentVariateFunctionJacobian()
-				);
+			double parametrizedCurrentFunctionIncrement = _curvatureParameter * R1MatrixUtil.DotProduct (
+				targetDirectionVector,
+				currentVariateFunctionJacobian()
+			);
 
 			return _strongCurvatureCriterion ?
-				java.lang.Math.abs (
-					nextFunctionIncrement
-				) <= java.lang.Math.abs (
-					parametrizedCurrentFunctionIncrement
-				) : nextFunctionIncrement >= parametrizedCurrentFunctionIncrement;
-		}
-		catch (java.lang.Exception e)
-		{
+				Math.abs (nextFunctionIncrement) <= Math.abs (parametrizedCurrentFunctionIncrement) :
+				nextFunctionIncrement >= parametrizedCurrentFunctionIncrement;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

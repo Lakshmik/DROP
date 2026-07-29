@@ -1,11 +1,21 @@
 
 package org.drip.function.rdtor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,15 +91,25 @@ package org.drip.function.rdtor1solver;
 
 /**
  * <i>ConvergenceControl</i> contains the R<sup>d</sup> To R<sup>1</sup> Convergence Control/Tuning
- * Parameters.
+ * 	Parameters. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalCore.md">Numerical Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/README.md">Function</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></li>
+ * 		<li>Construct a Standard <i>ConvergenceControl</i> Instance</li>
+ * 		<li><i>ConvergenceControl</i> Constructor</li>
+ * 		<li>Retrieve the Convergence Type</li>
+ * 		<li>Retrieve the Number of Finder Steps</li>
+ * 		<li>Retrieve the Relative Tolerance</li>
+ * 		<li>Retrieve the Absolute Tolerance</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1solver/README.md">R<sup>d</sup> To R<sup>1</sup> Solver</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -110,29 +130,21 @@ public class ConvergenceControl
 	public static final int VARIATE_CONSTRAINT_SEQUENCE_CONVERGENCE = 2;
 
 	private int _finderStepCount = -1;
-	private double _absoluteTolerance = java.lang.Double.NaN;
-	private double _relativeTolerance = java.lang.Double.NaN;
+	private double _absoluteTolerance = Double.NaN;
+	private double _relativeTolerance = Double.NaN;
 	private int _convergenceType = VARIATE_CONSTRAINT_SEQUENCE_CONVERGENCE;
 
 	/**
-	 * Construct a Standard ConvergenceControl Instance
+	 * Construct a Standard <i>ConvergenceControl</i> Instance
 	 * 
-	 * @return The Standard ConvergenceControl Instance
+	 * @return The Standard <i>ConvergenceControl</i> Instance
 	 */
 
 	public static ConvergenceControl Standard()
 	{
-		try
-		{
-			return new ConvergenceControl (
-				VARIATE_CONSTRAINT_SEQUENCE_CONVERGENCE,
-				5.0e-02,
-				1.0e-06,
-				70
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new ConvergenceControl (VARIATE_CONSTRAINT_SEQUENCE_CONVERGENCE, 5.e-02, 1.e-06, 70);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -140,14 +152,14 @@ public class ConvergenceControl
 	}
 
 	/**
-	 * ConvergenceControl Constructor
+	 * <i>ConvergenceControl</i> Constructor
 	 * 
 	 * @param convergenceType The Convergence Type
 	 * @param relativeTolerance The Objective Function Relative Tolerance
 	 * @param absoluteTolerance The Objective Function Absolute Tolerance
 	 * @param finderStepCount The Number of the Fixed Point Finder Steps
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ConvergenceControl (
@@ -155,13 +167,13 @@ public class ConvergenceControl
 		final double relativeTolerance,
 		final double absoluteTolerance,
 		final int finderStepCount)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_relativeTolerance = relativeTolerance) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_absoluteTolerance = absoluteTolerance) ||
+		if (!NumberUtil.IsValid (_relativeTolerance = relativeTolerance) ||
+			!NumberUtil.IsValid (_absoluteTolerance = absoluteTolerance) ||
 			1 > (_finderStepCount = finderStepCount))
 		{
-			throw new java.lang.Exception ("ConvergenceControl Constructor => Invalid Inputs");
+			throw new Exception ("ConvergenceControl Constructor => Invalid Inputs");
 		}
 
 		_convergenceType = convergenceType;

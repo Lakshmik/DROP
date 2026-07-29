@@ -1,11 +1,22 @@
 
 package org.drip.function.rdtor1;
 
+import org.drip.function.definition.RdToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,122 +92,208 @@ package org.drip.function.rdtor1;
 
 /**
  * <i>AffineBoundMultivariate</i> implements a Bounded Planar Linear R<sup>d</sup> To R<sup>1</sup> Function.
+ * 	It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>AffineBoundMultivariate</i> Constructor</li>
+ * 		<li>Retrieve the Bound Type Indicator Flag</li>
+ * 		<li>Retrieve the Bound Variate Index</li>
+ * 		<li>Retrieve the Bound Value</li>
+ * 		<li>Indicate if the Specified Bound has been violated by the Variate</li>
+ * 		<li>Retrieve the Dimension of the Input Variate</li>
+ * 		<li>Evaluate for the given Input Variate Array</li>
+ * 		<li>Evaluate the Jacobian for the given Input Variate Array</li>
+ * 		<li>Evaluate The Hessian for the given Input Variate Array</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/rdtor1/README.md">Built-in R<sup>d</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class AffineBoundMultivariate extends org.drip.function.definition.RdToR1 implements
-	org.drip.function.rdtor1.BoundMultivariate, org.drip.function.rdtor1.ConvexMultivariate {
-	private boolean _bIsUpper = false;
-	private int _iNumTotalVariate = -1;
-	private int _iBoundVariateIndex = -1;
-	private double _dblBoundValue = java.lang.Double.NaN;
+public class AffineBoundMultivariate
+	extends RdToR1
+	implements BoundMultivariate, ConvexMultivariate
+{
+	private boolean _isUpper = false;
+	private int _boundVariateIndex = -1;
+	private int _totalVariateCount = -1;
+	private double _boundValue = Double.NaN;
 
 	/**
-	 * AffineBoundMultivariate Constructor
+	 * <i>AffineBoundMultivariate</i> Constructor
 	 * 
-	 * @param bIsUpper TRUE To The Bound is an Upper Bound
-	 * @param iBoundVariateIndex The Bound Variate Index
-	 * @param iNumTotalVariate The Total Number of Variates
-	 * @param dblBoundValue The Bounding Value
+	 * @param isUpper TRUE To The Bound is an Upper Bound
+	 * @param boundVariateIndex The Bound Variate Index
+	 * @param totalVariateCount The Total Number of Variates
+	 * @param boundValue The Bounding Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public AffineBoundMultivariate (
-		final boolean bIsUpper,
-		final int iBoundVariateIndex,
-		final int iNumTotalVariate,
-		final double dblBoundValue)
-		throws java.lang.Exception
+		final boolean isUpper,
+		final int boundVariateIndex,
+		final int totalVariateCount,
+		final double boundValue)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblBoundValue = dblBoundValue) || 0 ==
-			(_iNumTotalVariate = iNumTotalVariate) || _iNumTotalVariate <= (_iBoundVariateIndex =
-				iBoundVariateIndex))
-			throw new java.lang.Exception ("AffineBoundMultivariate Constructor => Invalid Inputs");
+		if (!org.drip.numerical.common.NumberUtil.IsValid (_boundValue = boundValue) ||
+			0 == (_totalVariateCount = totalVariateCount) ||
+			_totalVariateCount <= (_boundVariateIndex = boundVariateIndex))
+		{
+			throw new Exception ("AffineBoundMultivariate Constructor => Invalid Inputs");
+		}
 
-		_bIsUpper = bIsUpper;
+		_isUpper = isUpper;
 	}
+
+	/**
+	 * Retrieve the Bound Type Indicator Flag
+	 * 
+	 * @return TRUE - Bound is Upper Type
+	 */
 
 	@Override public boolean isUpper()
 	{
-		return _bIsUpper;
+		return _isUpper;
 	}
+
+	/**
+	 * Retrieve the Bound Variate Index
+	 * 
+	 * @return The Bound Variate Index
+	 */
 
 	@Override public int boundVariateIndex()
 	{
-		return _iBoundVariateIndex;
+		return _boundVariateIndex;
 	}
+
+	/**
+	 * Retrieve the Bound Value
+	 * 
+	 * @return The Bound Value
+	 */
 
 	@Override public double boundValue()
 	{
-		return _dblBoundValue;
+		return _boundValue;
 	}
 
+	/**
+	 * Indicate if the Specified Bound has been violated by the Variate
+	 * 
+	 * @param variate The Variate
+	 * 
+	 * @return TRUE - The Bound has been violated
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
 	@Override public boolean violated (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("AffineBoundMultivariate::violated => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("AffineBoundMultivariate::violated => Invalid Inputs");
+		}
 
-		if (_bIsUpper && dblVariate > _dblBoundValue) return true;
+		if (_isUpper && variate > _boundValue) {
+			return true;
+		}
 
-		if (!_bIsUpper && dblVariate < _dblBoundValue) return true;
+		if (!_isUpper && variate < _boundValue) {
+			return true;
+		}
 
 		return false;
 	}
 
+	/**
+	 * Retrieve the Dimension of the Input Variate
+	 * 
+	 * @return The Dimension of the Input Variate
+	 */
+
 	@Override public int dimension()
 	{
-		return _iNumTotalVariate;
+		return _totalVariateCount;
 	}
+
+	/**
+	 * Evaluate for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variates
+	 *  
+	 * @return The Calculated Value
+	 * 
+	 * @throws Exception Thrown if the Evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double[] adblVariate)
-		throws java.lang.Exception
+		final double[] variateArray)
+		throws Exception
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (adblVariate) ||
-			adblVariate.length != dimension())
-			throw new java.lang.Exception ("AffineBoundMultivariate::evaluate => Invalid Inputs");
-
-		return _bIsUpper ? _dblBoundValue - adblVariate[_iBoundVariateIndex] :
-			adblVariate[_iBoundVariateIndex] - _dblBoundValue;
-	}
-
-	@Override public double[] jacobian (
-		final double[] adblVariate)
-	{
-		double[] adblJacobian = new double[_iNumTotalVariate];
-
-		for (int i = 0; i < _iNumTotalVariate; ++i)
-			adblJacobian[i] = i == _iBoundVariateIndex ? (_bIsUpper ? -1. : 1.) : 0.;
-
-		return adblJacobian;
-	}
-
-	@Override public double[][] hessian (
-		final double[] adblVariate)
-	{
-		int iDimension = dimension();
-
-		double[][] aadblHessian = new double[iDimension][iDimension];
-
-		for (int i = 0; i < iDimension; ++i) {
-			for (int j = 0; j < iDimension; ++j)
-				aadblHessian[i][j] = 0.;
+		if (null == variateArray || !NumberUtil.IsValid (variateArray) || variateArray.length != dimension())
+		{
+			throw new Exception ("AffineBoundMultivariate::evaluate => Invalid Inputs");
 		}
 
-		return aadblHessian;
+		return _isUpper ?
+			_boundValue - variateArray[_boundVariateIndex] : variateArray[_boundVariateIndex] - _boundValue;
+	}
+
+	/**
+	 * Evaluate the Jacobian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Jacobian Array
+	 */
+
+	@Override public double[] jacobian (
+		final double[] variateArray)
+	{
+		double[] jacobianArray = new double[_totalVariateCount];
+
+		for (int variateIndex = 0; variateIndex < _totalVariateCount; ++variateIndex) {
+			jacobianArray[variateIndex] = variateIndex == _boundVariateIndex ? (_isUpper ? -1. : 1.) : 0.;
+		}
+
+		return jacobianArray;
+	}
+
+	/**
+	 * Evaluate The Hessian for the given Input Variate Array
+	 * 
+	 * @param variateArray Array of Input Variate Array
+	 *  
+	 * @return The Hessian Matrix
+	 */
+
+	@Override public double[][] hessian (
+		final double[] variateArray)
+	{
+		int dimension = dimension();
+
+		double[][] hessianGrid = new double[dimension][dimension];
+
+		for (int innerDimensionIndex = 0; innerDimensionIndex < dimension; ++innerDimensionIndex) {
+			for (int outerDimensionIndex = 0; outerDimensionIndex < dimension; ++outerDimensionIndex) {
+				hessianGrid[innerDimensionIndex][outerDimensionIndex] = 0.;
+			}
+		}
+
+		return hessianGrid;
 	}
 }

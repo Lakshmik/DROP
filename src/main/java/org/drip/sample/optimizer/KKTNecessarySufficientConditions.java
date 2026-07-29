@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -112,14 +120,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalOptimizerLibrary.md">Numerical Optimizer Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/optimizer/README.md">Lagrangian/KKT Necessary Sufficient Conditions</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/optimizer/README.md">Lagrangian/KKT Necessary Sufficient Conditions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -133,10 +141,7 @@ public class KKTNecessarySufficientConditions
 		final double x2)
 		throws Exception
 	{
-		return new RdToR1 (
-			null
-		)
-		{
+		return new RdToR1 (null) {
 			@Override public int dimension()
 			{
 				return 3;
@@ -182,10 +187,7 @@ public class KKTNecessarySufficientConditions
 		final boolean signFlip)
 		throws Exception
 	{
-		return new RdToR1 (
-			null
-		)
-		{
+		return new RdToR1 (null) {
 			@Override public int dimension()
 			{
 				return 3;
@@ -229,10 +231,7 @@ public class KKTNecessarySufficientConditions
 		final boolean signFlip)
 		throws Exception
 	{
-		return new RdToR1 (
-			null
-		)
-		{
+		return new RdToR1 (null) {
 			@Override public int dimension()
 			{
 				return 3;
@@ -277,43 +276,14 @@ public class KKTNecessarySufficientConditions
 		final boolean signFlip)
 		throws Exception
 	{
-		return new RdToR1[] {
-			LeftConstraintFunction (
-				x0,
-				0,
-				halfWidth,
-				signFlip
-			),
-			RightConstraintFunction (
-				x0,
-				0,
-				halfWidth,
-				signFlip
-			),
-			LeftConstraintFunction (
-				x1,
-				1,
-				halfWidth,
-				signFlip
-			),
-			RightConstraintFunction (
-				x1,
-				1,
-				halfWidth,
-				signFlip
-			),
-			LeftConstraintFunction (
-				x2,
-				2,
-				halfWidth,
-				signFlip
-			),
-			RightConstraintFunction (
-				x2,
-				2,
-				halfWidth,
-				signFlip
-			)
+		return new RdToR1[]
+		{
+			LeftConstraintFunction (x0, 0, halfWidth, signFlip),
+			RightConstraintFunction (x0, 0, halfWidth, signFlip),
+			LeftConstraintFunction (x1, 1, halfWidth, signFlip),
+			RightConstraintFunction (x1, 1, halfWidth, signFlip),
+			LeftConstraintFunction (x2, 2, halfWidth, signFlip),
+			RightConstraintFunction (x2, 2, halfWidth, signFlip)
 		};
 	}
 
@@ -329,20 +299,14 @@ public class KKTNecessarySufficientConditions
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		double x0 = 1.;
 		double x1 = 2.;
 		double x2 = 3.;
 		double halfWidth = 1.;
 
-		RdToR1 objectiveFunction = ObjectiveFunction (
-			x0,
-			x1,
-			x2
-		);
+		RdToR1 objectiveFunction = ObjectiveFunction (x0, x1, x2);
 
 		double[] variateArray = new double[]
 		{
@@ -355,13 +319,7 @@ public class KKTNecessarySufficientConditions
 			null,
 			new BarrierFixedPointFinder (
 				objectiveFunction,
-				ConstraintFunctionArray (
-					x0,
-					x1,
-					x2,
-					halfWidth,
-					false
-				),
+				ConstraintFunctionArray (x0, x1, x2, halfWidth, false),
 				new InteriorPointBarrierControl (
 					InteriorPointBarrierControl.VARIATE_CONSTRAINT_SEQUENCE_CONVERGENCE,
 					5.0e-06,
@@ -378,19 +336,13 @@ public class KKTNecessarySufficientConditions
 					x1 + 0.25 * halfWidth,
 					x2 + 0.25 * halfWidth
 				}
-			).constraintMultiplierArray()
+			).kktCoefficientArray()
 		);
 
 		OptimizerFramework optimizationFramework = new OptimizerFramework (
 			objectiveFunction,
 			null,
-			ConstraintFunctionArray (
-				x0,
-				x1,
-				x2,
-				halfWidth,
-				true
-			)
+			ConstraintFunctionArray (x0, x1, x2, halfWidth, true)
 		);
 
 		System.out.println();
@@ -401,53 +353,52 @@ public class KKTNecessarySufficientConditions
 
 		System.out.println ("\t||---------------------------------------------------||");
 
-		System.out.println ("\t|| KKT Multiplier Compatibility             : " +
-			optimizationFramework.isCompatible (
-				karushKuhnTuckerMultipliers
-			) + "   ||"
+		System.out.println (
+			"\t|| KKT Multiplier Compatibility             : " +
+			optimizationFramework.isCompatible (karushKuhnTuckerMultipliers) + "   ||"
 		);
 
-		System.out.println ("\t|| Dual Feasibility Check                   : " +
+		System.out.println (
+			"\t|| Dual Feasibility Check                   : " +
 			karushKuhnTuckerMultipliers.dualFeasibilityCheck() + "   ||"
 		);
 
-		System.out.println ("\t|| Primal Feasibility Check                 : " +
-			optimizationFramework.primalFeasibilityCheck (
-				variateArray
-			) + "   ||"
+		System.out.println (
+			"\t|| Primal Feasibility Check                 : " +
+			optimizationFramework.primalFeasibilityCheck (variateArray) + "   ||"
 		);
 
-		System.out.println ("\t|| Complementary Slackness Check            : " +
-			optimizationFramework.complementarySlacknessCheck (
-				karushKuhnTuckerMultipliers,
-				variateArray
-			) + "  ||"
+		System.out.println (
+			"\t|| Complementary Slackness Check            : " +
+			optimizationFramework.complementarySlacknessCheck (karushKuhnTuckerMultipliers, variateArray) +
+				"  ||"
 		);
 
-		System.out.println ("\t|| First Order Necessary Condition Check    : " +
-			optimizationFramework.isFONC (
-				karushKuhnTuckerMultipliers,
-				variateArray
-			) + "   ||"
+		System.out.println (
+			"\t|| First Order Necessary Condition Check    : " +
+			optimizationFramework.isFONC (karushKuhnTuckerMultipliers, variateArray) + "   ||"
 		);
 
-		System.out.println ("\t|| Second Order Sufficiency Condition Check : " +
-			optimizationFramework.isSOSC (
-				karushKuhnTuckerMultipliers,
-				variateArray,
-				true
-			) + "   ||"
+		System.out.println (
+			"\t|| Second Order Sufficiency Condition Check : " +
+			optimizationFramework.isSOSC (karushKuhnTuckerMultipliers, variateArray, true) + "   ||"
 		);
 
 		System.out.println ("\t||---------------------------------------------------||");
 
 		System.out.println();
 
-		System.out.println ("\t||------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||                 KKT NECESSARY & SUFFICIENT CONSTIONS - ZERO, FIRST, & SECOND ORDERS                  ||");
+		System.out.println (
+			"\t||                 KKT NECESSARY & SUFFICIENT CONSTIONS - ZERO, FIRST, & SECOND ORDERS                  ||"
+		);
 
-		System.out.println ("\t||------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||------------------------------------------------------------------------------------------------------||"
+		);
 
 		String[] necessarySufficientConditionOrderArray =
 			optimizationFramework.necessarySufficientQualifier (
@@ -461,8 +412,7 @@ public class KKTNecessarySufficientConditions
 			++necessarySufficientConditionOrderIndex)
 		{
 			System.out.println (
-				"\t|| " +
-				necessarySufficientConditionOrderArray[necessarySufficientConditionOrderIndex]
+				"\t|| " + necessarySufficientConditionOrderArray[necessarySufficientConditionOrderIndex]
 			);
 		}
 
