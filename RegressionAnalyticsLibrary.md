@@ -11,7 +11,7 @@ Regression Analytics Library maintains various Variants of Regression Analytics,
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics/RegressionAnalytics_v5.70.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics/RegressionAnalytics_v7.85.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/RegressionAnalytics) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -21,6 +21,28 @@ Regression Analytics Library maintains various Variants of Regression Analytics,
 
 ## Coverage
 
+ * Gauss-Newton Algorithm
+	* Overview
+	* Description
+	* Notes
+	* Convergence Properties
+	* Solving Over-determined Systems of Equations
+	* Derivation from Newton’s Method
+	* Improved Versions
+	* Large Scale Optimization
+	* Related Algorithms
+	* References
+ * Trust Region
+	* Overview
+	* Example
+	* References
+ * Levenberg-Marquardt Algorithm
+	* Overview
+	* The Problem
+	* The Solution
+	* Choice of Damping Parameters
+	* Geodesic Acceleration
+	* References
  * Tikhonov Regularization
 	* Overview
 	* Tikhonov Regularization
@@ -32,7 +54,6 @@ Regression Analytics Library maintains various Variants of Regression Analytics,
 	* Relation to Proabilistic Formulation
 	* Bayesian Interpretation
 	* References
-
  * Lasso
 	* Overview
 	* Basic Form
@@ -56,7 +77,6 @@ Regression Analytics Library maintains various Variants of Regression Analytics,
 	* Choice of Regularization Parameter
 	* Selected Applications
 	* References
-
  * Regularization Paths for Generalized Linear Models via Coordinate Descent
 	* Abstract
 	* Introduction

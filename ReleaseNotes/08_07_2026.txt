@@ -1,0 +1,51 @@
+
+Features:
+
+Bug Fixes/Re-organization:
+
+Samples:
+
+	- XVA Basel Uncollateralized Funding Neutral Stochastic #1 (1, 2, 3)
+	- XVA Basel Uncollateralized Funding Neutral Stochastic #2 (4, 5, 6)
+	- XVA Basel Uncollateralized Funding Neutral Stochastic #3 (7, 8, 9)
+	- XVA Basel Uncollateralized Funding Neutral Stochastic #4 (10, 11)
+	- XVA Basel Uncollateralized Funding Neutral Stochastic #5 (12, 13)
+	- XVA Basel Uncollateralized Funding Payable #1 (14, 15)
+	- XVA Basel Uncollateralized Funding Payable #2 (16, 17, 18)
+	- XVA Basel Uncollateralized Funding Payable #3 (19, 20, 21)
+	- XVA Basel Uncollateralized Funding Payable #4 (22, 23, 24)
+	- XVA Basel Uncollateralized Funding Payable #5 (25, 26, 27)
+	- XVA Basel Uncollateralized Funding Payable #6 (28, 29, 30)
+	- XVA Basel Uncollateralized Funding Payable #7 (31, 32, 33)
+	- XVA Basel Uncollateralized Funding Payable #8 (34, 35, 36)
+	- XVA Basel Uncollateralized Funding Payable #9 (37, 38, 39)
+	- XVA Basel Uncollateralized Funding Payable #10 (40, 41, 42)
+	- XVA Basel Uncollateralized Funding Payable #11 (43, 44, 45)
+	- XVA Basel Uncollateralized Funding Payable #12 (46, 47, 48)
+	- XVA Basel Uncollateralized Funding Payable #13 (49, 50, 51)
+	- XVA Basel Uncollateralized Funding Payable #14 (52, 53, 54)
+	- XVA Basel Uncollateralized Funding Payable #15 (55, 56, 57)
+	- XVA Basel Uncollateralized Funding Payable #16 (58, 59, 60)
+	- XVA Basel Uncollateralized Funding Payable #17 (61, 62, 63)
+	- XVA Basel Uncollateralized Funding Payable #18 (64, 65, 66)
+	- XVA Basel Uncollateralized Funding Payable #19 (67, 68, 69)
+	- XVA Basel Uncollateralized Funding Payable #20 (70, 71, 72)
+	- XVA Basel Uncollateralized Funding Payable #21 (73, 74, 75)
+	- XVA Basel Uncollateralized Funding Payable #22 (76, 77, 78)
+	- XVA Basel Uncollateralized Funding Payable #23 (79, 80, 81)
+	- XVA Basel Uncollateralized Funding Payable #24 (82, 83, 84)
+	- XVA Basel Uncollateralized Funding Payable #25 (85, 86, 87)
+	- XVA Basel Uncollateralized Funding Payable #26 (88, 89, 90)
+	- XVA Basel Uncollateralized Funding Payable #27 (91, 92, 93)
+	- XVA Basel Uncollateralized Funding Payable #28 (94, 95, 96)
+	- XVA Basel Uncollateralized Funding Payable #29 (97, 98, 99)
+	- XVA Basel Uncollateralized Funding Payable #30 (100, 101, 102)
+	- XVA Basel Uncollateralized Funding Payable #31 (103, 104, 105)
+	- XVA Basel Uncollateralized Funding Payable #32 (106, 107, 108)
+	- XVA Basel Uncollateralized Funding Payable #33 (109, 110, 111)
+	- XVA Basel Uncollateralized Funding Payable #34 (112, 113, 114)
+	- XVA Basel Uncollateralized Funding Payable #35 (115, 116, 117)
+	- XVA Basel Uncollateralized Funding Payable #36 (118, 119, 120)
+
+
+IdeaDRIP:

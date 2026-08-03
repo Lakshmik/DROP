@@ -206,6 +206,7 @@ org.drip.regression.core
 org.drip.regression.curve
 org.drip.regression.curvejacobian
 org.drip.regression.fixedpointfinder
+org.drip.regression.nonlinear
 org.drip.regression.spline
 org.drip.sample.agency
 org.drip.sample.algo

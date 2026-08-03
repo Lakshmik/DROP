@@ -11,7 +11,7 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer/NumericalOptimizer_v7.81.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer/NumericalOptimizer_v7.82.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/NumericalOptimizer) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -173,13 +173,6 @@ Numerical Optimizer Library contains the supporting Functionality for Numerical 
 	* Branching Rule and Node Selection
 	* Computational Results
 	* Conclusion
-	* References
- * Levenberg-Marquardt Algorithm
-	* Overview
-	* The Problem
-	* The Solution
-	* Choice of Damping Parameters
-	* Geodesic Acceleration
 	* References
 
 

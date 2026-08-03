@@ -1,0 +1,115 @@
+
+ --------------------------
+ #1 - Newton's method in Optimization
+ --------------------------
+ 1.1) 1D: x_(n+1)=x_n-f'(x_n )/f''(x_n ) 
+ 1.2) Higher Dimensions:
+	- x ⃗_(n+1)=x ⃗_n+[Hf(x ⃗ )]^(-1) ∇ ⃗f(x ⃗ )
+	- x ⃗_(n+1)=x ⃗_n+〖γ[Hf(x ⃗ )]〗^(-1) ∇ ⃗f(x ⃗ ) γ∈(0,1) satisfies Wolfe's condition
+		- Hessian be invertible, and it be a Lipschitz-continuous function of x ⃗ in that neighborhood
+	- By-passing Explicit Hessian Computation:
+		- Calculate ∆x ⃗_n=x ⃗_(n+1)-x ⃗_n using the linear system [Hf(x ⃗_n )] ∇ ⃗f(x ⃗_(n+1) )=-∇ ⃗f(x ⃗_n )
+	- Converting Hessian to Positive Definite:
+		- One can modify the Hessian by adding a correction matrix B_n so as to make Hf(x ⃗_n )+B_n positive definite.
+		- One approach is to diagonalize Hf(x ⃗_n ) and choose B_n so that:
+			- Hf(x ⃗_n )+B_n has the same eigenvectors as Hf(x ⃗_n ) but with each negative eigenvalue replaced by ϵ>0
+		- Levenberg-Marquardt algorithm – which uses an approximate Hessian – is to add a scaled identity matrix μI to the Hessian
+			- Scale adjusted at every iteration as needed
+			- Large μ and small Hessian, the iterations behave like gradient descent with a step size 1/μ
+				- Slower but more reliable convergence
+ --------------------------
+
+ --------------------------
+ #9 - Levenberg-Marquardt Algorithm
+ --------------------------
+ 9.1) Problem:
+	- Inputs: of m empirical pairs (x_i,y_i ) of independent and dependent variables
+	- Minimize Sum of the squares of the deviations S(β) β ̂∈■(arg⁡min@β) S(β)=■(arg⁡min@β) ∑_(i=1)^m▒[y_i-S(x_i,β)]^2 
+ 9.2) Solution:
+	- Replacing β by β+δ: In each iteration step, the β is replaced by a new estimate β+δ
+	- Linearizing f(x_i,β+δ): To determine δ, f(x_i,β+δ) is approximated by f(x_i,β+δ)≈f(x_i,β+δ)+J_i δ where J_i=∂f(x_i,β)/∂β
+	- Minima of S(β):
+		- S(β) has its minimum at a zero gradient with respect to β
+		- Using first-order approximation gives S(β+δ)≈∑_(i=1)^m▒[y_i-f(x_i,β)-Jδ]^2 
+			- f(x_i,β+δ)≈‖y-f(β)-Jδ‖^2
+				=[y-f(β)-Jδ]^T [y-f(β)-Jδ]=[y-f(β)]^T [y-f(β)]-[y-f(β)]^T Jδ-(Jδ)^T [y-f(β)]+δ^T J^T Jδ
+				=[y-f(β)]^T [y-f(β)]-2[y-f(β)]^T Jδ+δ^T J^T Jδ
+	- Gauss-Newton Method: Taking the derivative of this approximation of S(β+δ) with respect to δ and setting to zero gives:
+		- (J^T J)δ=J^T [y-f(β)]
+	- Levenberg replaced this equation by a “damped version” (J^T J+λI)δ=J^T [y-f(β)]
+	- Non-negative damping factor λ is adjusted at each iteration.
+		- Rapid reduction of S, a smaller λ used => bringing the algorithm closer to the Gauss-Newton algorithm
+		- If an iteration gives insufficient reduction in the residual, λ can be increased => closer to the gradient-descent direction
+	- Impact of Parameter Size λ: Gradient of S with respect to β equals 〖-2(J^T [y-f(β)])〗^T
+		- Large values of λ, the step will be taken approximately in the direction opposite to the gradient
+	- When λ is large relative to ‖J^T J‖, inverting J^T J+λI is not necessary
+		- Update is well-approximated by the small gradient step λ^(-1) J^T [y-f(β)]
+	- Scale-Invariant Marquardt’s Algorithm:
+		- Marquardt’s algorithm solved a modified problem with each component of the gradient scaled according to the curvature
+		- Larger movement along the directions where the gradient is smaller, which avoids slow convergence in the direction of small gradients
+	- Fletcher’s Modification to the Marquardt’s Algorithm => [J^T J+λ Diag(J^T J)]δ=J^T [y-f(β)]
+ 9.3) Choice of Damping Parameters
+	- Marquardt’s Choice for λ_0/ν: Initial λ_0 and ν>1
+	- Iterative Approach for λ:
+		- Compute the starting S(λ_0, β) and S(λ_0/ν, β)
+		- If S(λ_0, β) < S(λ_0/ν, β), new λ=λ_0 ν^k until the corresponding S is smaller.
+	- Delayed Gratification Strategy:
+		- Increasing the parameter by a small amount for each uphill step, and decreasing by a large for each downhill step
+		- This avoids moving downhill too fast in the beginning of optimization
+			- This restricting future steps available and therefore slowing down convergence
+		- Typical Case - Increase Factor 2 and Decrease Factor 3; Large Problems - Increase 1.5 and Decrease 5
+	- Geodesic Acceleration
+		- Adding a Geodesic Acceleration Term: v_k+1/2 a_k where J_k a_k=-f_vv
+		- Dependence only on the directional derivative f_vv=v_μ v_v  (∂^2 f(x))/(∂v_μ ∂v_v )
+		- f_(vv,i)≈(f_i (x+hδ)-2f_i (x)+f_i (x-hδ))/h^2 =2/h [(f_i (x+hδ)-f_i (x))/h-Jδ]
+			- h=0.1 suggested by Transtrum and Sethna (2011)
+		- Transtrum and Sethna (2011) Anti-stall Criterion - Prevents "small" damping 2‖a_k ‖/‖v_k ‖ ≤α wher α<=1
+ --------------------------
+
+ --------------------------
+ #10 - Gauss-Newton Algorithm
+ --------------------------
+ 10.1) Description:
+	- Iterative Solution for β: S(β)=∑_(i=1)^m▒〖r_i (β)^2 〗 where r=(r_1,⋯,r_m ) and β=(β_1,⋯,β_n ) and m≥n
+	- β_(s+1)=β_s-(J_r^T J_r )^(-1) J_r^T r(β_s )
+	- ∆=β_(s+1)-β_s; ∆=-(J_r^T J_r )^(-1) J_r^T r(β_s ) => J_r^T J_r ∆=-J_r^T r(β_s )
+	- Setting A=J_r^T J_r, b=-J_r^T r(β_s ), and x=∆ produces Ax=b
+	- 1D Newton: If m=n then β_(s+1)=β_s-J_r^(-1) r(β_s )
+	- Model Function f(x,β): r_i (β)=y_i-f(x_i,β)
+		- J_f=-J_r => β_(s+1)=β_s+(J_f^T J_f )^(-1) J_f^T r(β_s )
+ 10.2) Notes:
+	- Linear Approximation of r_i => r(β)≈r(β_s )+J_r (β_s )∆ with ∆=β-β_s
+	- Linear Least-Squares Problem: min⁡(‖r(β_s )+J_r (β_s )∆‖_2^2 )
+ 10.3) Convergence to a Local Minimum - COnditions:
+	- r_1,⋯,r_m are twice continuously differentiable in an open convex set β ̂∈D
+	- J_r (β ̂ ) is of full column rank
+	- Initial iterate β_0 is near β ̂
+	- Local minimum value |S(β ̂ )| is small
+	- The convergence is quadratic if |S(β ̂ )|=0
+ 10.4) Derivation from Newton’s Method:
+	- β_(s+1)=β_s-H^(-1) g
+	- g_j=∑_(i=1)^m▒〖r_i  (∂r_i)/(∂β_j )〗
+	- H_jk=2∑_(i=1)^m▒((∂r_i)/(∂β_j )  (∂r_i)/(∂β_k )+r_i  (∂^2 r_i)/(∂β_j ∂β_k )) 
+	- Approximating the Hessian => H_jk=2∑_(i=1)^m▒〖J_ij J_ik 〗
+	- Matrix Form of the Approximation: g=2J_r r H≈2J_r^T J_r
+	- Matrix Based Recurrence Equations: β_(s+1)=β_s+∆ results in ∆=-(J_r^T J_r )^(-1) J_r^T r(β_s )
+	- Approximation Validity: |(∂r_i)/(∂β_j )  (∂r_i)/(∂β_k )|≫|r_i  (∂^2 r_i)/(∂β_j ∂β_k )|
+		- r_i are small in magnitude
+		- Mildly non-linear, that is (∂^2 r_i)/(∂β_j ∂β_k ) is small
+ 10.5) Improved Versions:
+	- With the Gauss-Newton method, S may not decrease at every iteration
+	- Since ∆ is descent direction, unless S(β_s ) is a stationary point, it holds that S(β_s+α)<S(β_s ) for small α>0
+		- β_(s+1)=β_s+α∆
+	- Optimal value for α found by using a line search algorithm; 0<α<1 that minimizes S or back-tracking line-search such as Armijo
+		- α should satisfy Wolfe or Goldstein conditions
+	- α is close to zero => Use Levenberg-Marquardt algorithm, a trust region method
+	- Biasing ∆ Towards Steepest Descent: [J^T J+λD]∆=-J^T r => D is a positive diagonal matrix
+	- When D is I and λ→+∞  λ∆→-J^T r
+	- Choosing λ: Line-search is inefficient. So increase λ until S decreases; retain this λ till S -> 0
+ 10.6) Large Scale Optimization:
+	- Sparse Matrix of J_r => Efficxient storage of rows of J_r in a compressed form - makes transposition complicated
+	- c_i => row i of the J_r used in J_r^T J_r p=∑_i▒〖c_i (c_i∙p) 〗
+ 10.7) Quasi-Newton Schemes:
+	- Estimate of the full Hessian (∂^2 S)/(∂β_j ∂β_k ) is built up numerically using the first derivatives (∂r_i)/(∂β_j )
+		- After n refinement cycles the method closely approximates Newton’s method in performance
+ --------------------------
