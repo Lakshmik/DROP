@@ -1,0 +1,113 @@
+
+
+	-----------------
+	1) US Agency MBS Pricing Model
+	-----------------
+	1.1) Product/Portfolio Overview
+		- Limited to TBA and specified pools only in this chapter – Fannie, Freddie, and Ginnie Mae backed MBS
+		- PnL=PnL(Rates)+PnL(Vega)+PnL(Credit)+PnL(OAS)
+	1.2) Convergence Requirements
+		- 256 paths; 25 bp for convexity Convergence
+		- Partial Vol Durations Convergence => shift size of 50 bp for the Black vol (points) and bp vols (annual), 0.5% for Black vol (%)
+	1.3) Model Input
+		- Ref Date from Bloomberg
+			- Standard assumptions of WALA, WAC, and WAM applied if a newly created security missing  information during the first month
+		- Primary Mortgage Rate => 30Y from Freddie Mac, 15Y from BBG
+		- Current Coupon Rate => Linearly Interpolated from first 2 months using the appropriate daycount
+	1.4) Model Output
+		- Key Rate Duration: 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 15Y, 20Y, 30Y. Price change from 100 bp shift specified key rate.
+			- KRDur=(PV_down-PV_Up)/(2×PV)×10,000/shift
+			= KR DP/DY=KRDur×PV/100
+		- Key Rate Convexity: 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 15Y, 20Y, 30Y. Partial convexity, percentage MV change per 100 bp2.
+			- KRCvx=((PV_down-PV)-(PV_Up-PV))/(PV×(shift/10,000)^2×100)
+			- KR Dlr Cvx=(KRCvx×PV×Holding)/10,000
+		- Key Rate DV01: 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 15Y, 20Y, 30Y. Partial DV01, percentage MV change per 100 bp.
+			- KR DV01=(KRCur×PV×Holding)/1,000,000
+			- KR Dlr Dur=KR DV01×100
+		- Volatility Dollar Duration: Market value change given a percentage point shift in volatility.
+		- Volatility Duration: Percentage change in market value given a percentage point shift in volatility.
+		- Vega: Dollar change in price of an option given a percentage point shift in volatility.
+		- Mortgage Spread Duration: MV change for a 100 bp change in mortgage spread. Mtge Sprd Dur=(PV_down-PV_Up)/(2×PV)×10,000/shift
+		- Mortgage Spread DV01: Price Changefor 1 bp change in mortgage spread. Mtge Sprd DV01=(Mtge Sprd×PV)/1,000,000
+		- Mortgage Spread Dollar Duration: MV change for 100 bp change in mortgage spread. Mtge Sprd Dlr Dur=Mtge Sprd DV01×Holding
+		- Mortgage Spread Convexity: Mtge Sprd Cvx=((PV_down-PV)-(PV_Up-PV))/(PV×(shift/10,000)^2×100)
+		- Mortgage Spread Convexity 01: Cvx Mtge Sprd 01=(Mtge Sprd Cvx×PV)/10,000
+		- Mortgage Spread Dollar Convexity: MV change for 100 bp change in mortgage spread. Mtge Sprd Dlr Cvx=Mtge Sprd Cvx 01×Holding×100
+		- ZVol OAS: Zero volatility OAS
+		- Option Cost: Difference between OAS and Zero Volatility OAS - ZVolOAS-OAS
+		- Option Adjusted Average Life: The average of the Path Average Life’s generated within the OAS framework
+		- ZVol Average Life: Zero Volatility Average Life
+		- ZVol Yield: Zero volatility yield
+		- OAS Duration: Percentage change in market value for 100 bp change in OAS per par
+			- OA Sprd Dur=(PV_down-PV_Up)/(2×PV)×10,000/shift
+		- OAS DV01: Dollar value change for 1 bp change in OAS per par DV OAS01=(OA Sprd Dur×PV)/10,000
+		- Total OAS01: Market value change for 1 bp change in OAS Total OAS01=(DVOAS01×Holding)/100
+		- Spread Dollar Duration: Market value change given a 100 bp change in OAS Sprd Dlr Dur=Total OAS01×100
+		- OAS Convexity: Percentage change in market value due to convexity given a 100 bp2 change in OAS
+			- OA Sprd Cvx=((PV_down-PV)-(PV_Up-PV))/(PV×(shift/10,000)^2×100)
+		- OA Spread Convexity 01: Dollar value change in price due to convexity given a 1 bp2 change in OAS per par
+			- Cvx OAS01=(OA Sprd Cvx×PV)/1,000,000
+		- Total OAS Convexity 01: Dollar value change in market value convexity for a 1 bp2 change in OAS.
+			- Total Cvx OAS01=(Cvx OAS01×Holding)/100
+		- Spread Dollar Convexity: Market value change given a 100 bp2 change in mortgage spread Sprd Dlr Cvx=Total Cvx OAS01×100^2
+		- Prepay Duration Calculation: Percentage change in MV for a 10% change in prepayment speed under constant OAS
+			- Prepay Dur=100×0.1/shift×(PV_down-PV_Up)/(2×PV)
+		- Prepay Dollar Duration Calculation: MV Change for 10% change in prepayment speed under constant OAS
+			- Prepay Dlr Dur=(Prepay Dur×Market Value)/100
+		- Prepay Convexity Calculation: Prepay Cvx=((PV_down-PV)-(PV_Up-PV))/(PV×(shift/0.1)^2 ) shift is 5% up down
+	1.5) Model Design and Assumptions:
+		- Forward Rate Volatility Function Specification: σ_FWD (t,T)=A(T-t)B(T)C(t)
+			- A(x) is the homogenous volatility that only depends on time-to-maturity
+			- Leverage B(x) and the time volatility C(x) are elastic corrections used to smooth out volatility structure
+		- A(x) when x≤15: A(x) is a piece-wise linear function with 9 parameters positioned at x=0,0.5,1,2,3,5,7,10,15
+		- A(x) when x>15: A(x)=A(15) e^(-const(x-15) )
+	1.6 ) Pricing – Mathematical Background
+		- MBS Price P:
+			- ∆P=(∂P/∂t+μ ∂P/∂x+1/2 σ^2  (∂^2 P)/(∂x^2 ))∆t+σ ∂P/∂x ∆z  
+			- V=PB => E[∆V]=E[∆(PB)]=E[P∆B+B∆P]=B(∂P/∂t+μ ∂P/∂x+1/2 σ^2  (∂^2 P)/(∂x^2 ))∆t-λPB∆t
+		- Interest and Principal Flows: Accrue interest cash cB∆t and principal cash λB∆t and it is assumed that the latter is paid back
+		- The Annualized Return: Adding the two terms to the equation and dividing by PB∆t, one obtains the expected annualized return
+		- Composite Portfolio Return: This gives RP=∂P/∂t+μ ∂P/∂x+1/2 σ^2  (∂^2 P)/(∂x^2 )+c+λ-λP
+		- Composite IO Portfolio Return: For IO, principal term remove: RP=∂P/∂t+μ ∂P/∂x+1/2 σ^2  (∂^2 P)/(∂x^2 )+c-λP
+		- SDE for the OAS: (r+OAS)P=∂P/∂t+μ ∂P/∂x+1/2 σ^2  (∂^2 P)/(∂x^2 )+c-λP
+	1.6 ) Interest Rate Dynamics:
+		- Displaced Diffusion LIBOR Market Model Forward Rate Dynamics:
+			- ∆F_κ (t)=[F_κ (t)+α] ∑_(i=m(t))^κ▒(δ_i [F_i (t)+α] ∑_(q=1)^(p=3)▒〖σ_iq (t) σ_κq (t) 〗)/(1+F_i (t) σ_i ) Δt+
+				∑_(q=1)^3▒〖σ_κq (t)[F_κ (t)+α] 〗 Δz_q
+		- With α=0 the above equation is the lognormal model; large α, such as 100%, it behaves like a normal model
+		- Crossing the Zero Forward-Rate Barrier: If the initial rate is above -α, the projected rate always above -α
+			- Just like interest rates are always above 0 in the lognormal model
+		- Normal LMM Forward Rate Dynamics:
+			- ΔF_κ (t)=∑_(i=m(t))^κ▒(δ_i ∑_(q=1)^(p=3)▒〖σ_iq (t) σ_κq (t) 〗)/(1+F_i (t) δ_i ) Δt+∑_(q=1)^3▒〖σ_κq (t) 〗 Δz_q; p=3
+		- Displaced Diffusion Option Pricer Setup:
+			- European swaption that lasts from t_n to t_(N+1) with a swap rate S_(n,N) (t).
+			- Strike is R_S and σ_(n,N) is the standard deviation in the corresponding model
+		- Swap Annuity: A_(n,N) (t)=∑_(i=n)^N▒〖δ_i P(t,t_(i+1) ) 〗
+		- Swap Rate: S_(n,N) (t)=(P(t,t_n )-P(t,t_(N+1) ))/(A_(n,N) (t) )
+		- Displaced Diffusion Swap Rate Dynamics: ΔS_(n,N) (t)=[S_(n,N) (t)+α] σ_(n,N) Δz
+		- Displaced Diffusion European Swaption Price:
+			- f(0)=L_s A_(n,N) (0){[S_(n,N) (0)+α]N(d_1 )-(R_s+α)N(d_2 )}
+			- d_1=(ln⁡〖(S_(n,N) (0)+α)/(R_s+α)〗+(σ_(n,N)^2 t_n)/2)/(σ_(n,N) √(t_n )) and d_2=d_1-σ_(n,N) √(t_n )
+		- Normal Mode Swap Rate Dynamics: ΔS_(n,N) (t)=σ_(n,N) Δz
+		- Normal Model European Swaption Price:
+			- f(0)=L_s A_(n,N) (0){[S_(n,N) (0)-R_s ]N(d_1 )-(σ_(n,N) √(t_n ))/√2π e^(-(d_1^2)/2) }
+			- d_1=(S_(n,N) (0)-R_s)/(σ_(n,N) √(t_n ))
+		- Monte Carlo of Forward Rates:
+			- ∆F_κ (t)=[F_κ (t)+α] ∑_(i=m(t))^κ▒(δ_i [F_i (t)+α] ∑_(q=1)^(p=3)▒〖σ_iq (t) σ_κq (t) 〗)/(1+F_i (t) σ_i ) Δt+
+				∑_(q=1)^3▒〖σ_κq (t)[F_κ (t)+α] 〗 Δz_q
+			- F_i (t_(κ+1) )+α=[F_i (t_κ )+α] e^(
+				{∑_(i=m(t))^κ▒〖(δ_i [F_i(t)+α] ∑_(q=1)^(p=3)▒〖σ_iq(t_κ ) σ_κq(t_κ ) 〗)/(1+F_i(t) σ_i )-1/2 ∑_(q=1)^(p=3)▒〖σ_iq^2(t_κ ) 〗〗} δ_κ+
+					[∑_(q=1)^(p=3)▒〖σ_iq (t_κ ) 〗 ϵ_i ] √(δ_κ ))
+			- ϵ_i is the random sample from the standard normal distribution
+		- σ_i (t) => Forward-rate Displaced Diffusion Volatility
+		- Displaced Diffusion Swaption Vol Expression:
+			- V_(N,M)^2 (t)=1/T_N  ∑_(i,j=N+1)^M▒〖(ρ_ij w_i (0) w_j (0)[F_i (0)+α][F_j (0)+α])/[S_(N,M) (0)+α]^2  ∫_0^(T_N)▒〖σ_i (t) σ_j (t)dt〗〗
+			- S_(N,M) (t)=∑_(i=N+1)^M▒〖w_i (t) F_i (t) 〗
+			- w_i (t)=(δ_i ∏_(j=N+1)^i▒1/(1+δ_j F_j (t) ))/(∑_(κ=N+1)^M▒〖δ_κ ∏_(j=N+1)^κ▒1/(1+δ_j F_j (t) )〗)
+		- Adjustment of the Forward Vols:
+			- Forward rate Displaced Diffusion volatility σ_i (t) adjusted to min errors between the Model and market Displaced Diffusion vols
+		- Expression for Normal Swaption Volatility:
+			- V_(N,M)^2 (t)=1/T_N  ∑_(i,j=N+1)^M▒〖(ρ_ij w_i (0) w_j (0)[F_i (0)+α][F_j (0)+α])/[S_(N,M) (0)+α]^2  ∫_0^(T_N)▒〖σ_i (t) σ_j (t)dt〗〗
+			- V_(N,M)^2 (t)=1/T_N  ∑_(i,j=N+1)^M▒〖ρ_ij w_i (0) w_j (0) ∫_0^(T_N)▒〖σ_i (t) σ_j (t)dt〗〗
+		- Truncated Newton Algorithm for optimization
+	-----------------

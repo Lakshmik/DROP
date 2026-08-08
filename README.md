@@ -1,6 +1,6 @@
 # DROP
 
-**v7.93**  *29 July 2026*
+**v7.95**  *8 August 2026*
 
 <p align="center"><img src="https://github.com/lakshmik/DROP/blob/master/DRIP_Logo.gif?raw=true" width="100"></p>
 

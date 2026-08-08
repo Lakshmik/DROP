@@ -11,7 +11,7 @@ Loan Analytics Library contains the Valuation and Risk Functionality for Asset B
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/LoanAnalytics/LoanAnalytics_v5.87.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/LoanAnalytics) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/LoanAnalytics/LoanAnalytics_v7.94.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/LoanAnalytics) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -69,6 +69,18 @@ Loan Analytics Library contains the Valuation and Risk Functionality for Asset B
 	* Offerings
 	* What-if Analysis – Scratch Pads
 	* Non-Agency RMBS/Agency RMBS Pass-through
+ * US Agency MBS Pricing Model
+	* Summary
+	* Product/Portfolio Overview
+	* Model Requirements
+	* Model Input
+	* Model Output
+	* Mortgage Spread Duration
+	* Option-Adjusted Spread Duration
+	* Prepay Duration
+	* Model Design and Assumptions
+	* Pricing – Mathematical Background
+	* References
 
 
 ## DROP Specifications
