@@ -12,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,80 +100,92 @@ import org.drip.service.env.EnvManager;
  * 	convolution of the terminal payoff - the original Heston (1993) method, and the Albrecher, Mayer,
  * 	Schoutens, and Tistaert tweak (2007).
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stochasticvolatility/README.md">Heston AMST Stochastic Volatility Pricing</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stochasticvolatility/README.md">Heston AMST Stochastic Volatility Pricing</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class HestonAMSTPayoffTransform {
+public class HestonAMSTPayoffTransform
+{
 
 	private static final double TestPayoffScheme (
-		final double dblTimeToExpiry,
-		final int iPayoffTransformScheme,
-		final boolean bProb1)
+		final double timeToExpiry,
+		final int payoffTransformScheme,
+		final boolean prob1)
 		throws Exception
 	{
-		double dblRho = 0.3;
-		double dblKappa = 1.;
-		double dblSigma = 0.5;
-		double dblTheta = 0.2;
-		double dblLambda = 0.;
+		double rho = 0.3;
+		double kappa = 1.;
+		double sigma = 0.5;
+		double theta = 0.2;
+		double lambda = 0.;
 
-		HestonOptionPricerParams fphp = new HestonOptionPricerParams (
-			iPayoffTransformScheme,
-			dblRho,
-			dblKappa,
-			dblSigma,
-			dblTheta,
-			dblLambda,
+		HestonOptionPricerParams hestonOptionPricerParams = new HestonOptionPricerParams (
+			payoffTransformScheme,
+			rho,
+			kappa,
+			sigma,
+			theta,
+			lambda,
 			PhaseAdjuster.MULTI_VALUE_BRANCH_POWER_PHASE_TRACKER_KAHL_JACKEL
 		);
 
-		HestonStochasticVolatilityAlgorithm hsva = new HestonStochasticVolatilityAlgorithm (fphp);
+		double spot = 1.;
+		double strike = 1.;
+		double riskFreeRate = 0.;
+		double spotVolatility = 0.1;
 
-		double dblStrike = 1.;
-		double dblRiskFreeRate = 0.0;
-		double dblSpot = 1.;
-		double dblSpotVolatility = 0.1;
-
-		Greeks greeks = hsva.greeks (
-			dblStrike,
-			dblTimeToExpiry,
-			dblRiskFreeRate,
-			dblSpot,
+		Greeks greeks = new HestonStochasticVolatilityAlgorithm (
+			hestonOptionPricerParams
+		).greeks (
+			strike,
+			timeToExpiry,
+			riskFreeRate,
+			spot,
 			false,
 			false,
-			dblSpotVolatility
+			spotVolatility
 		);
 
-		return bProb1 ? greeks.prob1() : greeks.prob2();
+		return prob1 ? greeks.prob1() : greeks.prob2();
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		double[] adblTTE = new double[] {
-			0.5, 1., 2., 3., 4., 5., 7., 10., 12., 15., 20., 25., 30.
+		double[] timeToExpiryArray =
+		{
+			0.5,
+			1.,
+			2.,
+			3.,
+			4.,
+			5.,
+			7.,
+			10.,
+			12.,
+			15.,
+			20.,
+			25.,
+			30.
 		};
 
 		System.out.println ("\n\t|---------------------------|");
@@ -178,12 +198,28 @@ public class HestonAMSTPayoffTransform {
 
 		System.out.println ("\t|---------------------------|");
 
-		for (double dblTTE : adblTTE) {
-			System.out.println ("\t|" + FormatUtil.FormatDouble (dblTTE, 2, 2, 1.) + " = " +
-				FormatUtil.FormatDouble (TestPayoffScheme (dblTTE,
-					HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993, true), 1, 4, 1.) + " | "  +
-				FormatUtil.FormatDouble (TestPayoffScheme (dblTTE,
-					HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_AMST_2007, true), 1, 4, 1.) + " |");
+		for (double timeToExpiry : timeToExpiryArray) {
+			System.out.println (
+				"\t|" + FormatUtil.FormatDouble (timeToExpiry, 2, 2, 1.) + " = " + FormatUtil.FormatDouble (
+					TestPayoffScheme (
+						timeToExpiry,
+						HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993,
+						true
+					),
+					1,
+					4,
+					1.
+				) + " | "  + FormatUtil.FormatDouble (
+					TestPayoffScheme (
+						timeToExpiry,
+						HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_AMST_2007,
+						true
+					),
+					1,
+					4,
+					1.
+				) + " |"
+			);
 		}
 
 		System.out.println ("\t|---------------------------|");
@@ -198,12 +234,28 @@ public class HestonAMSTPayoffTransform {
 
 		System.out.println ("\t|---------------------------|");
 
-		for (double dblTTE : adblTTE) {
-			System.out.println ("\t|" + FormatUtil.FormatDouble (dblTTE, 2, 2, 1.) + " = " +
-				FormatUtil.FormatDouble (TestPayoffScheme (dblTTE,
-					HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993, false), 1, 4, 1.) + " | "  +
-				FormatUtil.FormatDouble (TestPayoffScheme (dblTTE,
-					HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_AMST_2007, false), 1, 4, 1.) + " |");
+		for (double timeToExpiry : timeToExpiryArray) {
+			System.out.println (
+				"\t|" + FormatUtil.FormatDouble (timeToExpiry, 2, 2, 1.) + " = " + FormatUtil.FormatDouble (
+					TestPayoffScheme (
+						timeToExpiry,
+						HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993,
+						false
+					),
+					1,
+					4,
+					1.
+				) + " | "  + FormatUtil.FormatDouble (
+					TestPayoffScheme (
+						timeToExpiry,
+						HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_AMST_2007,
+						false
+					),
+					1,
+					4,
+					1.
+				) + " |"
+			);
 		}
 
 		System.out.println ("\t|---------------------------|");

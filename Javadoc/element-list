@@ -24,8 +24,8 @@ org.drip.dynamics.evolution
 org.drip.dynamics.hjm
 org.drip.dynamics.hullwhite
 org.drip.dynamics.ito
-org.drip.dynamics.kalotay
 org.drip.dynamics.kolmogorov
+org.drip.dynamics.kwf1993
 org.drip.dynamics.lmm
 org.drip.dynamics.meanreverting
 org.drip.dynamics.physical
@@ -206,6 +206,7 @@ org.drip.regression.core
 org.drip.regression.curve
 org.drip.regression.curvejacobian
 org.drip.regression.fixedpointfinder
+org.drip.regression.function
 org.drip.regression.nonlinear
 org.drip.regression.spline
 org.drip.sample.agency
@@ -294,6 +295,7 @@ org.drip.sample.gamma
 org.drip.sample.gammadistribution
 org.drip.sample.gammaincomplete
 org.drip.sample.gausskronrod
+org.drip.sample.gaussnewton
 org.drip.sample.gaussquadrature
 org.drip.sample.govvie
 org.drip.sample.govviemc
@@ -308,9 +310,11 @@ org.drip.sample.hypothesistest
 org.drip.sample.idzorek
 org.drip.sample.intexfeed
 org.drip.sample.json
+org.drip.sample.kalotaywilliamsfabozzi
 org.drip.sample.kolmogorov
 org.drip.sample.lanczos
 org.drip.sample.leanallocator
+org.drip.sample.leastsquareshessian
 org.drip.sample.lmm
 org.drip.sample.loan
 org.drip.sample.lvar
@@ -344,7 +348,6 @@ org.drip.sample.quantile
 org.drip.sample.r1pdfmetrics
 org.drip.sample.randomdiscrete
 org.drip.sample.rdtor1
-org.drip.sample.regression
 org.drip.sample.rng
 org.drip.sample.rolledstate
 org.drip.sample.sabr

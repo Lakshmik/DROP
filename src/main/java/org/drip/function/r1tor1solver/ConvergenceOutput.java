@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,25 +95,33 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>ConvergenceOutput</i> extends the ExecutionInitializationOutput by retaining the starting variate that
- * results from the convergence zone search.
- * <br><br>
- * ConvergenceOutput does not add any new field to ExecutionInitializationOutput.
+ * 	results from the convergence zone search. <i>ConvergenceOutput</i> does not add any new field to
+ *  <i>ExecutionInitializationOutput</li>. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Default <i>ConvergenceOutput</i> Constructor: Initializes the Output Object</li>
+ * 		<li>Initialize off of an existing <i>ExecutionInitializationOutput</i> Instance</li>
+ * 		<li>Indicate that Initialization is Completed</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ConvergenceOutput extends org.drip.function.r1tor1solver.ExecutionInitializationOutput {
+public class ConvergenceOutput
+	extends ExecutionInitializationOutput
+{
 
 	/**
-	 * Default ConvergenceOutput constructor: Initializes the output object
+	 * Default <i>ConvergenceOutput</i> Constructor: Initializes the Output Object
 	 */
 
 	public ConvergenceOutput()
@@ -112,33 +130,31 @@ public class ConvergenceOutput extends org.drip.function.r1tor1solver.ExecutionI
 	}
 
 	/**
-	 * Initialize off of an existing EIOP
+	 * Initialize off of an existing <i>ExecutionInitializationOutput</i> Instance
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @param executionInitializationOutput <i>ExecutionInitializationOutput</i> Instance
 	 * 
-	 * @param eiop EIOP
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public ConvergenceOutput (
-		final org.drip.function.r1tor1solver.ExecutionInitializationOutput eiop)
-		throws java.lang.Exception
+		final ExecutionInitializationOutput executionInitializationOutput)
+		throws Exception
 	{
-		super (eiop);
+		super (executionInitializationOutput);
 	}
 
 	/**
-	 * Indicate that the initialization is completed
+	 * Indicate that Initialization is Completed
 	 * 
-	 * @param dblStartingVariate Starting Variate
+	 * @param startingVariate Starting Variate
 	 * 
-	 * @return TRUE - Initialization successfully completed
+	 * @return TRUE - Initialization Successfully Completed
 	 */
 
 	public boolean done (
-		final double dblStartingVariate)
+		final double startingVariate)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblStartingVariate)) return false;
-
-		return setStartingVariate (dblStartingVariate) && done();
+		return NumberUtil.IsValid (startingVariate) && setStartingVariate (startingVariate) && done();
 	}
 }

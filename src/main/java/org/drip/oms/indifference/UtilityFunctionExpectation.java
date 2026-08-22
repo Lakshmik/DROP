@@ -303,7 +303,7 @@ public class UtilityFunctionExpectation
 			return null == fixedPointFinderOutput || !fixedPointFinderOutput.containsRoot() ? null :
 				new ClaimsUtilityExpectationInferenceRun (
 					targetUtilityExpectationValue,
-					fixedPointFinderOutput.getRoot()
+					fixedPointFinderOutput.root()
 				);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -393,7 +393,7 @@ public class UtilityFunctionExpectation
 			return null == fixedPointFinderOutput || !fixedPointFinderOutput.containsRoot() ? null :
 				new ClaimsUtilityExpectationInferenceRun (
 					targetUtilityExpectationValue,
-					fixedPointFinderOutput.getRoot()
+					fixedPointFinderOutput.root()
 				);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -386,7 +386,7 @@ public abstract class FokkerPlanckGenerator implements org.drip.param.pricer.Gen
 			throw new java.lang.Exception
 				("FokkerPlanckGenerator::impliedVolatilityFromPrice => Cannot imply Volatility");
 
-		return java.lang.Math.abs (fpop.getRoot());
+		return java.lang.Math.abs (fpop.root());
 	}
 
 	/**
@@ -434,7 +434,7 @@ public abstract class FokkerPlanckGenerator implements org.drip.param.pricer.Gen
 			throw new java.lang.Exception
 				("FokkerPlanckGenerator::impliedVolatilityFromPrice => Cannot imply Volatility");
 
-		return java.lang.Math.abs (fpop.getRoot());
+		return java.lang.Math.abs (fpop.root());
 	}
 
 	/**

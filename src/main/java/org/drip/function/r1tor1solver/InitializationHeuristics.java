@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,48 +95,64 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>InitializationHeuristics</i> implements several heuristics used to kick off the fixed point
- * bracketing/search process.
- * <br><br>
- * The following custom heuristics are implemented as part of the heuristics based kick-off:
- * <br>
- * <ul>
- * 	<li>
- * 		Custom Bracketing Control Parameters: Any of the standard bracketing control parameters can be
- * 			customized to kick-off the bracketing search.
- * 	</li>
- * 	<li>
- * 		Soft Left/Right Bracketing Hints: The left/right starting bracket edges are used as soft bracketing
- * 			initialization hints.
- * 	</li>
- * 	<li>
- * 		Soft Mid Bracketing Hint: A mid bracketing level is specified to indicate the soft bracketing
- * 			kick-off.
- * 	</li>
- * 	<li>
- * 		Hard Bracketing Floor/Ceiling: A pair of hard floor and ceiling limits are specified as a constraint
- * 			to the bracketing.
- * 	</li>
- * 	<li>
- * 		Hard Search Boundaries: A pair of hard left and right boundaries are specified to kick-off the final
- * 			fixed point search.
- * 	</li>
- * </ul>
- * <br><br>
- * These heuristics are further interpreted and developed inside the ExecutionInitializer and the
- * 	ExecutionControl implementations.
+ * 	bracketing/search process. The following custom heuristics are implemented as part of the heuristics
+ *  based kick-off:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Custom Bracketing Control Parameters: Any of the standard bracketing control parameters can be
+ * 			customized to kick-off the bracketing search.</li>
+ * 		<li>Soft Left/Right Bracketing Hints: The left/right starting bracket edges are used as soft
+ * 			bracketing initialization hints.</li>
+ * 		<li>Soft Mid Bracketing Hint: A mid bracketing level is specified to indicate the soft bracketing
+ * 			kick-off.</li>
+ * 		<li>Hard Bracketing Floor/Ceiling: A pair of hard floor and ceiling limits are specified as a
+ * 			constraint to the bracketing.</li>
+ * 		<li>Hard Search Boundaries: A pair of hard left and right boundaries are specified to kick-off the
+ * 			final fixed point search.</li>
+ * 	</ul>
+ * 	<br>
+ * 	These heuristics are further interpreted and developed inside the ExecutionInitializer and the
+ * 		<i>ExecutionControl</i> implementations. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Start bracket initialization from the Generic Bracket Initializer</li>
+ * 		<li>Start bracket initialization from Pre-specified left/right edge hints</li>
+ * 		<li>Start bracket initialization from Pre-specified Starting Mid Bracketing Variate</li>
+ * 		<li>Restrict the bracket initialization to within the specified Floor and Ceiling</li>
+ * 		<li>Start search from Pre-specified Hard Search Brackets</li>
+ * 		<li>Start search from Custom Bracketing Control Parameters</li>
+ * 		<li>Construct an <i>InitializationHeuristics</i> Instance from the hard search edges
+ * 		<li>Construct an <i>InitializationHeuristics</i> Instance from the bracketing edge soft hints</li>
+ * 		<li>Construct an <i>InitializationHeuristics</i> Instance from the bracketing mid hint</li>
+ * 		<li>Construct an <i>InitializationHeuristics</i> Instance from the bracketing hard floor/ceiling</li>
+ * 		<li>Construct an <i>InitializationHeuristics</i> Instance from Custom Bracketing Control Parameters</li>
+ * 		<li>Construct an <i>InitializationHeuristics</i> Instance from the set of Heuristics Parameters</li>
+ * 		<li>Retrieve the Determinant</li>
+ * 		<li>Retrieve the Hard Left Search Start</li>
+ * 		<li>Retrieve the Hard Right Search Start</li>
+ * 		<li>Retrieve the Soft Bracket Start Mid</li>
+ * 		<li>Retrieve the Soft Bracket Start Left</li>
+ * 		<li>Retrieve the Hard Bracket Floor</li>
+ * 		<li>Retrieve the Soft Bracket Start Right</li>
+ * 		<li>Retrieve the Hard Bracket Ceiling</li>
+ * 		<li>Retrieve the Custom <i>BracketingControlParams</i></li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
+
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class InitializationHeuristics {
+public class InitializationHeuristics
+{
 
 	/**
 	 * Start bracket initialization from the Generic Bracket Initializer
@@ -164,34 +190,42 @@ public class InitializationHeuristics {
 
 	public static final int BRACKETING_CUSTOM_BCP = 16;
 
-	private int _iDeterminant = BRACKETING_GENERIC_BCP;
-	private double _dblBracketFloor = java.lang.Double.NaN;
-	private double _dblBracketCeiling = java.lang.Double.NaN;
-	private double _dblSearchStartLeft = java.lang.Double.NaN;
-	private double _dblSearchStartRight = java.lang.Double.NaN;
-	private double _dblStartingBracketMid = java.lang.Double.NaN;
-	private double _dblStartingBracketLeft = java.lang.Double.NaN;
-	private double _dblStartingBracketRight = java.lang.Double.NaN;
-	private org.drip.function.r1tor1solver.BracketingControlParams _bcpCustom = null;
+	private double _bracketFloor = Double.NaN;
+	private double _bracketCeiling = Double.NaN;
+	private double _searchStartLeft = Double.NaN;
+	private double _searchStartRight = Double.NaN;
+	private double _startingBracketMid = Double.NaN;
+	private double _startingBracketLeft = Double.NaN;
+	private double _startingBracketRight = Double.NaN;
+	private int _determinant = BRACKETING_GENERIC_BCP;
+	private BracketingControlParams _customBracketingControlParams = null;
 
 	/**
-	 * Construct an Initialization Heuristics Instance from the hard search edges
+	 * Construct an <i>InitializationHeuristics</i> Instance from the hard search edges
 	 * 
-	 * @param dblSearchStartLeft Search Start Left Edge
-	 * @param dblSearchStartRight Search Start Right Edge
+	 * @param searchStartLeft Search Start Left Edge
+	 * @param searchStartRight Search Start Right Edge
 	 * 
-	 * @return InitializationHeuristics instance
+	 * @return <i>InitializationHeuristics</i> instance
 	 */
 
 	public static final InitializationHeuristics FromHardSearchEdges (
-		final double dblSearchStartLeft,
-		final double dblSearchStartRight)
+		final double searchStartLeft,
+		final double searchStartRight)
 	{
 		try {
-			return new InitializationHeuristics (SEARCH_HARD_BRACKETS, dblSearchStartLeft,
-				dblSearchStartRight, java.lang.Double.NaN, java.lang.Double.NaN, java.lang.Double.NaN,
-					java.lang.Double.NaN, java.lang.Double.NaN, null);
-		} catch (java.lang.Exception e) {
+			return new InitializationHeuristics (
+				SEARCH_HARD_BRACKETS,
+				searchStartLeft,
+				searchStartRight,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				null
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -199,23 +233,31 @@ public class InitializationHeuristics {
 	}
 
 	/**
-	 * Construct an Initialization Heuristics Instance from the bracketing edge soft hints
+	 * Construct an <i>InitializationHeuristics</i> Instance from the bracketing edge soft hints
 	 * 
-	 * @param dblStartingBracketLeft Starting Soft Left Bracketing Edge Hint
-	 * @param dblStartingBracketRight Starting Soft Right Bracketing Edge Hint
+	 * @param startingBracketLeft Starting Soft Left Bracketing Edge Hint
+	 * @param startingBracketRight Starting Soft Right Bracketing Edge Hint
 	 * 
-	 * @return InitializationHeuristics instance
+	 * @return <i>InitializationHeuristics</i> instance
 	 */
 
 	public static final InitializationHeuristics FromBracketingEdgeHints (
-		final double dblStartingBracketLeft,
-		final double dblStartingBracketRight)
+		final double startingBracketLeft,
+		final double startingBracketRight)
 	{
 		try {
-			return new InitializationHeuristics (BRACKETING_EDGE_HINTS, java.lang.Double.NaN,
-				java.lang.Double.NaN, dblStartingBracketLeft, dblStartingBracketRight, java.lang.Double.NaN,
-					java.lang.Double.NaN, java.lang.Double.NaN, null);
-		} catch (java.lang.Exception e) {
+			return new InitializationHeuristics (
+				BRACKETING_EDGE_HINTS,
+				Double.NaN,
+				Double.NaN,
+				startingBracketLeft,
+				startingBracketRight,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				null
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -223,21 +265,29 @@ public class InitializationHeuristics {
 	}
 
 	/**
-	 * Construct an Initialization Heuristics Instance from the bracketing mid hint
+	 * Construct an <i>InitializationHeuristics</i> Instance from the bracketing mid hint
 	 * 
-	 * @param dblStartingBracketMid Starting Soft Right Bracketing Mid Hint
+	 * @param startingBracketMid Starting Soft Right Bracketing Mid Hint
 	 * 
-	 * @return InitializationHeuristics instance
+	 * @return <i>InitializationHeuristics</i> instance
 	 */
 
 	public static final InitializationHeuristics FromBracketingMidHint (
-		final double dblStartingBracketMid)
+		final double startingBracketMid)
 	{
 		try {
-			return new InitializationHeuristics (BRACKETING_MID_HINT, java.lang.Double.NaN,
-				java.lang.Double.NaN, java.lang.Double.NaN, java.lang.Double.NaN, dblStartingBracketMid,
-					java.lang.Double.NaN, java.lang.Double.NaN, null);
-		} catch (java.lang.Exception e) {
+			return new InitializationHeuristics (
+				BRACKETING_MID_HINT,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				startingBracketMid,
+				Double.NaN,
+				Double.NaN,
+				null
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -245,23 +295,31 @@ public class InitializationHeuristics {
 	}
 
 	/**
-	 * Construct an Initialization Heuristics Instance from the bracketing hard floor/ceiling
+	 * Construct an <i>InitializationHeuristics</i> Instance from the bracketing hard floor/ceiling
 	 * 
-	 * @param dblBracketFloor Starting Hard Left Bracketing Floor
-	 * @param dblBracketCeiling Starting Hard Right Bracketing Ceiling
+	 * @param bracketFloor Starting Hard Left Bracketing Floor
+	 * @param bracketCeiling Starting Hard Right Bracketing Ceiling
 	 * 
-	 * @return InitializationHeuristics instance
+	 * @return <i>InitializationHeuristics</i> instance
 	 */
 
 	public static final InitializationHeuristics FromBracketingFloorCeiling (
-		final double dblBracketFloor,
-		final double dblBracketCeiling)
+		final double bracketFloor,
+		final double bracketCeiling)
 	{
 		try {
-			return new InitializationHeuristics (BRACKETING_FLOOR_CEILING, java.lang.Double.NaN,
-				java.lang.Double.NaN, java.lang.Double.NaN, java.lang.Double.NaN, java.lang.Double.NaN,
-					dblBracketFloor, dblBracketCeiling, null);
-		} catch (java.lang.Exception e) {
+			return new InitializationHeuristics (
+				BRACKETING_FLOOR_CEILING,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				bracketFloor,
+				bracketCeiling,
+				null
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -269,21 +327,29 @@ public class InitializationHeuristics {
 	}
 
 	/**
-	 * Construct an Initialization Heuristics Instance from Custom Bracketing Control Parameters
+	 * Construct an <i>InitializationHeuristics</i> Instance from Custom Bracketing Control Parameters
 	 * 
-	 * @param bcpCustom Custom Bracketing Control Parameters
+	 * @param customBracketingControlParams Custom Bracketing Control Parameters
 	 * 
-	 * @return InitializationHeuristics instance
+	 * @return <i>InitializationHeuristics</i> instance
 	 */
 
 	public static final InitializationHeuristics FromBracketingCustomBCP (
-		final org.drip.function.r1tor1solver.BracketingControlParams bcpCustom)
+		final BracketingControlParams customBracketingControlParams)
 	{
 		try {
-			return new InitializationHeuristics (BRACKETING_CUSTOM_BCP, java.lang.Double.NaN,
-				java.lang.Double.NaN, java.lang.Double.NaN, java.lang.Double.NaN, java.lang.Double.NaN,
-					java.lang.Double.NaN, java.lang.Double.NaN, bcpCustom);
-		} catch (java.lang.Exception e) {
+			return new InitializationHeuristics (
+				BRACKETING_CUSTOM_BCP,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				Double.NaN,
+				customBracketingControlParams
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -291,60 +357,74 @@ public class InitializationHeuristics {
 	}
 
 	/**
-	 * Construct an Initialization Heuristics Instance from the set of Heuristics Parameters
+	 * Construct an <i>InitializationHeuristics</i> Instance from the set of Heuristics Parameters
 	 * 
-	 * @param iDeterminant Initialization Heuristics Instance Type
-	 * @param dblSearchStartLeft Hard Search Start Left Edge
-	 * @param dblSearchStartRight Hard Search Start Right Edge
-	 * @param dblStartingBracketLeft Starting Soft Left Bracketing Edge Hint
-	 * @param dblStartingBracketRight Starting Soft Right Bracketing Edge Hint
-	 * @param dblStartingBracketMid Starting Soft Right Bracketing Mid Hint
-	 * @param dblBracketFloor Starting Hard Left Bracketing Floor
-	 * @param dblBracketCeiling Starting Hard Right Bracketing Ceiling
-	 * @param bcpCustom Custom Bracketing Control Parameters
+	 * @param determinant Initialization Heuristics Instance Type
+	 * @param searchStartLeft Hard Search Start Left Edge
+	 * @param searchStartRight Hard Search Start Right Edge
+	 * @param startingBracketLeft Starting Soft Left Bracketing Edge Hint
+	 * @param startingBracketRight Starting Soft Right Bracketing Edge Hint
+	 * @param startingBracketMid Starting Soft Right Bracketing Mid Hint
+	 * @param bracketFloor Starting Hard Left Bracketing Floor
+	 * @param bracketCeiling Starting Hard Right Bracketing Ceiling
+	 * @param customBracketingControlParams Custom Bracketing Control Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if the Input Determinant/parameters are unknown/invalid
+	 * @throws Exception Thrown if the Input Determinant/parameters are unknown/invalid
 	 */
 
 	public InitializationHeuristics (
-		final int iDeterminant,
-		final double dblSearchStartLeft,
-		final double dblSearchStartRight,
-		final double dblStartingBracketLeft,
-		final double dblStartingBracketRight,
-		final double dblStartingBracketMid,
-		final double dblBracketFloor,
-		final double dblBracketCeiling,
-		final org.drip.function.r1tor1solver.BracketingControlParams bcpCustom)
-		throws java.lang.Exception
+		final int determinant,
+		final double searchStartLeft,
+		final double searchStartRight,
+		final double startingBracketLeft,
+		final double startingBracketRight,
+		final double startingBracketMid,
+		final double bracketFloor,
+		final double bracketCeiling,
+		final BracketingControlParams customBracketingControlParams)
+		throws Exception
 	{
-		if (BRACKETING_EDGE_HINTS == (_iDeterminant = iDeterminant)) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (_dblStartingBracketLeft = dblStartingBracketLeft)
-				|| !org.drip.numerical.common.NumberUtil.IsValid (_dblStartingBracketRight =
-					dblStartingBracketRight))
-				throw new java.lang.Exception
-					("InitializationHeuristics constructor: Invalid BRACKETING_EDGE_HINTS params!");
-		} else if (BRACKETING_MID_HINT == _iDeterminant) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (_dblStartingBracketMid = dblStartingBracketMid))
-				throw new java.lang.Exception
-					("InitializationHeuristics constructor: Invalid BRACKETING_MID_HINT params!");
-		} else if (BRACKETING_FLOOR_CEILING == _iDeterminant) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (_dblBracketFloor = dblBracketFloor) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblBracketCeiling = dblBracketCeiling))
-				throw new java.lang.Exception
-					("InitializationHeuristics constructor: Invalid BRACKETING_FLOOR_CEILING params!");
-		} else if (SEARCH_HARD_BRACKETS == _iDeterminant) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (_dblSearchStartLeft = dblSearchStartLeft) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblSearchStartRight = dblSearchStartRight))
-				throw new java.lang.Exception
-					("InitializationHeuristics constructor: Invalid SEARCH_HARD_BRACKETS params!");
-		} else if (BRACKETING_CUSTOM_BCP == _iDeterminant) {
-			if (null == (_bcpCustom = bcpCustom))
-				throw new java.lang.Exception
-					("InitializationHeuristics constructor: Invalid BRACKETING_CUSTOM_BCP params!");
-		} else if (BRACKETING_GENERIC_BCP != _iDeterminant)
-			throw new java.lang.Exception
-				("InitializationHeuristics constructor: Invalid BRACKETING_GENERIC_BCP params!");
+		if (BRACKETING_EDGE_HINTS == (_determinant = determinant)) {
+			if (!NumberUtil.IsValid (_startingBracketLeft = startingBracketLeft) ||
+				!NumberUtil.IsValid (_startingBracketRight = startingBracketRight))
+			{
+				throw new Exception (
+					"InitializationHeuristics constructor: Invalid BRACKETING_EDGE_HINTS params!"
+				);
+			}
+		} else if (BRACKETING_MID_HINT == _determinant) {
+			if (!NumberUtil.IsValid (_startingBracketMid = startingBracketMid)) {
+				throw new Exception (
+					"InitializationHeuristics constructor: Invalid BRACKETING_MID_HINT params!"
+				);
+			}
+		} else if (BRACKETING_FLOOR_CEILING == _determinant) {
+			if (!NumberUtil.IsValid (_bracketFloor = bracketFloor) ||
+				!NumberUtil.IsValid (_bracketCeiling = bracketCeiling))
+			{
+				throw new Exception (
+					"InitializationHeuristics constructor: Invalid BRACKETING_FLOOR_CEILING params!"
+				);
+			}
+		} else if (SEARCH_HARD_BRACKETS == _determinant) {
+			if (!NumberUtil.IsValid (_searchStartLeft = searchStartLeft) ||
+				!NumberUtil.IsValid (_searchStartRight = searchStartRight))
+			{
+				throw new Exception (
+					"InitializationHeuristics constructor: Invalid SEARCH_HARD_BRACKETS params!"
+				);
+			}
+		} else if (BRACKETING_CUSTOM_BCP == _determinant) {
+			if (null == (_customBracketingControlParams = customBracketingControlParams)) {
+				throw new Exception (
+					"InitializationHeuristics constructor: Invalid BRACKETING_CUSTOM_BCP params!"
+				);
+			}
+		} else if (BRACKETING_GENERIC_BCP != _determinant) {
+			throw new Exception (
+				"InitializationHeuristics constructor: Invalid BRACKETING_GENERIC_BCP params!"
+			);
+		}
 	}
 
 	/**
@@ -353,9 +433,9 @@ public class InitializationHeuristics {
 	 * @return The Determinant
 	 */
 
-	public int getDeterminant()
+	public int determinant()
 	{
-		return _iDeterminant;
+		return _determinant;
 	}
 
 	/**
@@ -364,9 +444,9 @@ public class InitializationHeuristics {
 	 * @return The Hard Left Search Start
 	 */
 
-	public double getSearchStartLeft()
+	public double searchStartLeft()
 	{
-		return _dblSearchStartLeft;
+		return _searchStartLeft;
 	}
 
 	/**
@@ -375,9 +455,9 @@ public class InitializationHeuristics {
 	 * @return The Hard Right Search Start
 	 */
 
-	public double getSearchStartRight()
+	public double searchStartRight()
 	{
-		return _dblSearchStartRight;
+		return _searchStartRight;
 	}
 
 	/**
@@ -386,9 +466,9 @@ public class InitializationHeuristics {
 	 * @return The Soft Bracket Start Mid
 	 */
 
-	public double getStartingBracketMid()
+	public double startingBracketMid()
 	{
-		return _dblStartingBracketMid;
+		return _startingBracketMid;
 	}
 
 	/**
@@ -397,9 +477,9 @@ public class InitializationHeuristics {
 	 * @return The Soft Bracket Start Left
 	 */
 
-	public double getStartingBracketLeft()
+	public double startingBracketLeft()
 	{
-		return _dblStartingBracketLeft;
+		return _startingBracketLeft;
 	}
 
 	/**
@@ -408,9 +488,9 @@ public class InitializationHeuristics {
 	 * @return The Hard Bracket Floor
 	 */
 
-	public double getBracketFloor()
+	public double bracketFloor()
 	{
-		return _dblBracketFloor;
+		return _bracketFloor;
 	}
 
 	/**
@@ -419,9 +499,9 @@ public class InitializationHeuristics {
 	 * @return The Soft Bracket Start Right
 	 */
 
-	public double getStartingBracketRight()
+	public double startingBracketRight()
 	{
-		return _dblStartingBracketRight;
+		return _startingBracketRight;
 	}
 
 	/**
@@ -430,19 +510,19 @@ public class InitializationHeuristics {
 	 * @return The Hard Bracket Ceiling
 	 */
 
-	public double getBracketCeiling()
+	public double bracketCeiling()
 	{
-		return _dblBracketCeiling;
+		return _bracketCeiling;
 	}
 
 	/**
-	 * Retrieve the Custom BCP
+	 * Retrieve the Custom <i>BracketingControlParams</i>
 	 * 
-	 * @return The Custom BCP
+	 * @return The Custom <i>BracketingControlParams</i>
 	 */
 
-	public org.drip.function.r1tor1solver.BracketingControlParams getCustomBCP()
+	public BracketingControlParams customBracketingControlParams()
 	{
-		return _bcpCustom;
+		return _customBracketingControlParams;
 	}
 }

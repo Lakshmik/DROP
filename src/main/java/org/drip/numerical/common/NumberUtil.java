@@ -1,6 +1,8 @@
 
 package org.drip.numerical.common;
 
+import java.util.List;
+
 import org.drip.service.common.FormatUtil;
 
 /*
@@ -550,6 +552,30 @@ public class NumberUtil {
 	}
 
 	/**
+	 * Check if the Input Double List contains an Infinite or an NaN
+	 * 
+	 * @param doubleList Input Double List
+	 * 
+	 * @return TRUE - Input Double List contains an Infinite or an NaN
+	 */
+
+	public static final boolean IsValid (
+		final List<Double> doubleList)
+	{
+		if (null == doubleList) {
+			return true;
+		}
+
+		for (int i = 0; i < doubleList.size(); ++i) {
+			if (!IsValid (doubleList.get (i))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Checks if the Input Matrix contains an Infinite or an NaN
 	 * 
 	 * @param r1Grid Input Matrix
@@ -929,6 +955,50 @@ public class NumberUtil {
 			}
 
 			row = row + FormatUtil.FormatDouble (doubleArray[i], preDecimalPlaces, postDecimalPlaces, 1.);
+		}
+
+		return row;
+	}
+
+	/**
+	 * Print the Contents of the List to the Specified Decimal Location as a Row
+	 * 
+	 * @param doubleList The Double List
+	 * @param preDecimalPlaces Number of Decimal Places to Display
+	 * @param postDecimalPlaces Number of Post Decimal Places to Display
+	 * @param multiplier Scale on the Value to be applied
+	 * @param bailOnNaN TRUE - Bail on encountering an NaN
+	 * 
+	 * @return Contents of the List to the Specified Decimal Location as a Row
+	 */
+
+	public static final String ListRow (
+		final List<Double> doubleList,
+		final int preDecimalPlaces,
+		final int postDecimalPlaces,
+		final double multiplier,
+		final boolean bailOnNaN)
+	{
+		int size = null == doubleList ? 0 : doubleList.size();
+
+		if (0 == size) {
+			return "";
+		}
+
+		String row = "";
+
+		for (int i = 0; i < size; ++i) {
+			double doubleValue = doubleList.get (i);
+
+			if (!IsValid (doubleValue) && bailOnNaN) {
+				return "";
+			}
+
+			if (0 != i) {
+				row = row + " |";
+			}
+
+			row += FormatUtil.FormatDouble (doubleValue, preDecimalPlaces, postDecimalPlaces, multiplier);
 		}
 
 		return row;

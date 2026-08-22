@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1operator;
 
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -83,69 +93,108 @@ package org.drip.function.r1tor1operator;
  */
 
 /**
- * <i>Reflection</i> provides the evaluation f(1-x) instead of f(x) for a given f.
+ * <i>Reflection</i> provides the evaluation f(1-x) instead of f(x) for a given f. It exposes the following
+ * 	Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li><i>Reflection</i> constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class Reflection extends org.drip.function.definition.R1ToR1 {
-	private org.drip.function.definition.R1ToR1 _au = null;
+public class Reflection
+	extends R1ToR1
+{
+	private R1ToR1 _function = null;
 
 	/**
-	 * Reflection constructor
+	 * <i>Reflection</i> constructor
 	 * 
-	 * @param au Univariate Function
+	 * @param function Univariate Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the input is invalid
+	 * @throws Exception Thrown if the input is invalid
 	 */
 
 	public Reflection (
-		final org.drip.function.definition.R1ToR1 au)
-		throws java.lang.Exception
+		final R1ToR1 function)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_au = au)) throw new java.lang.Exception ("Reflection ctr: Invalid Inputs");
+		if (null == (_function = function)) {
+			throw new Exception ("Reflection Constructor: Invalid Inputs");
+		}
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("Reflection::evaluate => Invalid Inputs");
-
-		return _au.evaluate (1. - dblVariate);
+		return _function.evaluate (1. - variate);
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 >= iOrder)
-			throw new java.lang.Exception ("Reflection::derivative => Invalid Inputs");
+		if (0 >= order) {
+			throw new Exception ("Reflection::derivative => Invalid Inputs");
+		}
 
-		return java.lang.Math.pow (-1., iOrder) * _au.derivative (1. - dblVariate, iOrder);
+		return Math.pow (-1., order) * _function.derivative (1. - variate, order);
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("Reflection::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return -1. * _au.integrate (1. - dblBegin, 1. - dblEnd);
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		return -1. * _function.integrate (1. - begin, 1. - end);
 	}
 }

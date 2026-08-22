@@ -13,6 +13,14 @@ import org.drip.state.discount.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -114,76 +122,78 @@ import org.drip.state.discount.*;
  *  	</li>
  *  </ul>
  *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2010/README.md">Piterbarg (2010) CSA Measure Extraction</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2010/README.md">Piterbarg (2010) CSA Measure Extraction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ForwardContract {
+public class ForwardContract
+{
 
 	private static final DiscountCurve CSACurve (
-		final String strCurrency,
-		final JulianDate dtSpot)
+		final String currency,
+		final JulianDate spotDate)
 		throws Exception
 	{
-		String[] astrDepositMaturityTenor = new String[] {
+		String[] depositMaturityTenorArray =
+		{
 			"1D",
 			// "2D",
 			// "3D"
 		};
-
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray =
+		{
 			0.0004,		// 1D
 			// 0.0004,		// 2D
 			// 0.0004		// 3D
 		};
-
-		String[] astrShortEndOISMaturityTenor = new String[] {
+		String[] shortEndOISMaturityTenorArray =
+		{
 			"1W",
 			"2W",
 			"3W",
 			"1M"
 		};
-
-		double[] adblShortEndOISQuote = new double[] {
+		double[] shortEndOISQuoteArray =
+		{
 			0.00070,    //   1W
 			0.00069,    //   2W
 			0.00078,    //   3W
 			0.00074     //   1M
 		};
-
-		String[] astrOISFuturesEffectiveTenor = new String[] {
+		String[] oisFuturesEffectiveTenorArray = 
+		{
 			"1M",
 			"2M",
 			"3M",
 			"4M",
 			"5M"
 		};
-
-		String[] astrOISFuturesMaturityTenor = new String[] {
+		String[] oisFuturesMaturityTenorArray =
+		{
 			"1M",
 			"1M",
 			"1M",
 			"1M",
 			"1M"
 		};
-
-		double[] adblOISFuturesQuote = new double[] {
+		double[] oisFuturesQuoteArray =
+		{
 			 0.00046,    //   1M x 1M
 			 0.00016,    //   2M x 1M
 			-0.00007,    //   3M x 1M
 			-0.00013,    //   4M x 1M
 			-0.00014     //   5M x 1M
 		};
-
-		String[] astrLongEndOISMaturityTenor = new String[] {
+		String[] longEndOISMaturityTenorArray =
+		{
 			"15M",
 			"18M",
 			"21M",
@@ -203,8 +213,8 @@ public class ForwardContract {
 			"25Y",
 			"30Y"
 		};
-
-		double[] adblLongEndOISQuote = new double[] {
+		double[] longEndOISQuoteArray =
+		{
 			0.00002,    //  15M
 			0.00008,    //  18M
 			0.00021,    //  21M
@@ -226,30 +236,31 @@ public class ForwardContract {
 		};
 
 		return LatentMarketStateBuilder.SmoothOvernightCurve (
-			dtSpot,
-			strCurrency,
-			astrDepositMaturityTenor,
-			adblDepositQuote,
+			spotDate,
+			currency,
+			depositMaturityTenorArray,
+			depositQuoteArray,
 			"Rate",
-			astrShortEndOISMaturityTenor,
-			adblShortEndOISQuote,
+			shortEndOISMaturityTenorArray,
+			shortEndOISQuoteArray,
 			"SwapRate",
-			astrOISFuturesEffectiveTenor,
-			astrOISFuturesMaturityTenor,
-			adblOISFuturesQuote,
+			oisFuturesEffectiveTenorArray,
+			oisFuturesMaturityTenorArray,
+			oisFuturesQuoteArray,
 			"SwapRate",
-			astrLongEndOISMaturityTenor,
-			adblLongEndOISQuote,
+			longEndOISMaturityTenorArray,
+			longEndOISQuoteArray,
 			"SwapRate"
 		);
 	}
 
 	private static final DiscountCurve NonCSACurve (
-		final String strCurrency,
-		final JulianDate dtSpot)
+		final String currency,
+		final JulianDate spotDate)
 		throws Exception
 	{
-		String[] astrDepositMaturityTenor = new String[] {
+		String[] depositMaturityTenorArray =
+		{
 			"01D",
 			"04D",
 			"07D",
@@ -257,8 +268,8 @@ public class ForwardContract {
 			"30D",
 			"60D"
 		};
-
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray =
+		{
 			0.0013,		//  1D
 			0.0017,		//  2D
 			0.0017,		//  7D
@@ -266,8 +277,8 @@ public class ForwardContract {
 			0.0020,		// 30D
 			0.0023		// 60D
 		};
-
-		double[] adblFuturesQuote = new double[] {
+		double[] futuresQuoteArray =
+		{
 			0.0027,
 			0.0032,
 			0.0041,
@@ -277,8 +288,8 @@ public class ForwardContract {
 			0.0134,
 			0.0160
 		};
-
-		String[] astrFixFloatMaturityTenor = new String[] {
+		String[] fixFloatMaturityTenorArray =
+		{
 			"04Y",
 			"05Y",
 			"06Y",
@@ -295,8 +306,8 @@ public class ForwardContract {
 			"40Y",
 			"50Y"
 		};
-
-		double[] adblFixFloatQuote = new double[] {
+		double[] fixFloatQuoteArray =
+		{
 			0.0166,		//   4Y
 			0.0206,		//   5Y
 			0.0241,		//   6Y
@@ -315,15 +326,15 @@ public class ForwardContract {
 		};
 
 		return LatentMarketStateBuilder.SmoothFundingCurve (
-			dtSpot,
-			strCurrency,
-			astrDepositMaturityTenor,
-			adblDepositQuote,
+			spotDate,
+			currency,
+			depositMaturityTenorArray,
+			depositQuoteArray,
 			"ForwardRate",
-			adblFuturesQuote,
+			futuresQuoteArray,
 			"ForwardRate",
-			astrFixFloatMaturityTenor,
-			adblFixFloatQuote,
+			fixFloatMaturityTenorArray,
+			fixFloatQuoteArray,
 			"SwapRate"
 		);
 	}
@@ -331,29 +342,27 @@ public class ForwardContract {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
-		double dblATMForward = 50.;
-		double dblCSAVolatility = 0.1;
-		double dblCSANonCSASpreadVolatility = 0.2;
-		double dblCSANonCSASpreadCorrelation = 0.2;
+		String currency = "USD";
+		double atmForward = 50.;
+		double csaVolatility = 0.1;
+		double csaNonCSASpreadVolatility = 0.2;
+		double csaNonCSASpreadCorrelation = 0.2;
 
-		JulianDate dtSpot = DateUtil.Today().addBusDays (
-			0,
-			strCurrency
-		);
+		JulianDate spotDate = DateUtil.Today().addBusDays (0, currency);
 
-		String[] astrTenor = new String[] {
+		String[] tenorArray =
+		{
 			 "1W",
 			 "2W",
 			 "3W",
@@ -379,15 +388,9 @@ public class ForwardContract {
 			"50Y"
 		};
 
-		DiscountCurve dcOvernight = CSACurve (
-			strCurrency,
-			dtSpot
-		);
+		DiscountCurve overnightCurve = CSACurve (currency, spotDate);
 
-		DiscountCurve dcFunding = NonCSACurve (
-			strCurrency,
-			dtSpot
-		);
+		DiscountCurve fundingCurve = NonCSACurve (currency, spotDate);
 
 		System.out.println();
 
@@ -409,19 +412,33 @@ public class ForwardContract {
 
 		System.out.println ("\t||-----------------------------------------------||");
 
-		for (String strTenor : astrTenor) {
-			JulianDate dt = dtSpot.addTenor (strTenor);
+		for (String tenor : tenorArray) {
+			JulianDate date = spotDate.addTenor (tenor);
 
-			double dblTenorToYF = Helper.TenorToYearFraction (strTenor);
+			double tenorToYearFraction = Helper.TenorToYearFraction (tenor);
 
-			double dblSpreadNumeraire = dcFunding.df (dt) / dcOvernight.df (dt);
+			double spreadNumeraire = fundingCurve.df (date) / overnightCurve.df (date);
 
-			double dblConvexityAdjustment = dblCSANonCSASpreadCorrelation * dblCSANonCSASpreadVolatility * dblCSAVolatility;
+			double convexityAdjustment =
+				csaNonCSASpreadCorrelation * csaNonCSASpreadVolatility * csaVolatility;
 
-			System.out.println ("\t|| " + dt + " | " +
-				FormatUtil.FormatDouble (dblSpreadNumeraire, 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (dblConvexityAdjustment * dblTenorToYF, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblConvexityAdjustment * dblATMForward * dblSpreadNumeraire * dblTenorToYF, 1, 6, 1.) + " ||"
+			System.out.println (
+				"\t|| " + date + " | " + FormatUtil.FormatDouble (
+					spreadNumeraire,
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					convexityAdjustment * tenorToYearFraction,
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					convexityAdjustment * atmForward * spreadNumeraire * tenorToYearFraction,
+					1,
+					6,
+					1.
+				) + " ||"
 			);
 		}
 

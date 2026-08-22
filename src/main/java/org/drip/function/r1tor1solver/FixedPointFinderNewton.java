@@ -1,11 +1,23 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.Differential;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,94 +97,107 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>FixedPointFinderNewton</i> customizes the FixedPointFinder for Open (Newton's) fixed point finder
- * 	functionality.
- * <br><br>
- * FixedPointFinderNewton applies the following customization:
- * <br>
- * <ul>
- * 	<li>
- * 		Initializes the fixed point finder by computing a starting variate in the convergence zone
- * 	</li>
- * 	<li>
- * 		Iterating the next search variate using the Newton's method.
- * 	</li>
+ * 	functionality. It applies the following customization:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Initializes the fixed point finder by computing a starting variate in the convergence zone</li>
+ * 		<li>Iterating the next search variate using the Newton's method.</li>
  * </ul>
  *
- *	<br><br>
+ *  It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>FixedPointFinderNewton</i> Constructor</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixedPointFinderNewton extends org.drip.function.r1tor1solver.FixedPointFinder {
-	private org.drip.function.r1tor1solver.ExecutionInitializer _ei = null;
+public class FixedPointFinderNewton
+	extends FixedPointFinder
+{
+	private ExecutionInitializer _executionInitializer = null;
 
-	private double calcVariateOFSlope (
-		final double dblVariate)
-		throws java.lang.Exception
+	private double variateObjectiveFunctionValueSlope (
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("FixedPointFinderNewton::calcVariateOFSlope => Invalid input!");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception (
+				"FixedPointFinderNewton::variateObjectiveFunctionValueSlope => Invalid input!"
+			);
+		}
 
-		org.drip.numerical.differentiation.Differential diff = _of.differential (dblVariate, 1);
+		Differential differential = _objectiveFunction.differential (variate, 1);
 
-		if (null == diff)
-			throw new java.lang.Exception
-				("FixedPointFinderNewton::calcVariateTargetSlope => Cannot evaluate Derivative for variate "
-					+ dblVariate);
+		if (null == differential) {
+			throw new Exception (
+				"FixedPointFinderNewton::variateObjectiveFunctionValueSlope => Cannot evaluate Derivative for variate "
+					+ variate
+			);
+		}
 
-		return diff.calcSlope (false);
+		return differential.calcSlope (false);
 	}
 
 	@Override protected boolean iterateVariate (
-		final org.drip.function.r1tor1solver.IteratedVariate vi,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
+		final IteratedVariate iteratedVariate,
+		final FixedPointFinderOutput fixedPointFinderOutput)
 	{
-		if (null == vi || null == rfop) return false;
+		if (null == iteratedVariate || null == fixedPointFinderOutput) {
+			return false;
+		}
 
-		double dblVariate = vi.getVariate();
+		double variate = iteratedVariate.x();
 
 		try {
-			double dblVariateNext = dblVariate - calcVariateOFSlope (dblVariate) * vi.getOF();
+			double nextVariate = variate -
+				variateObjectiveFunctionValueSlope (variate) * iteratedVariate.objectiveFunctionValue();
 
-			return vi.setVariate (dblVariateNext) && vi.setOF (_of.evaluate (dblVariateNext)) &&
-				rfop.incrOFDerivCalcs() && rfop.incrOFCalcs();
-		} catch (java.lang.Exception e) {
+			return iteratedVariate.setX (nextVariate) &&
+				iteratedVariate.setObjectiveFunctionValue (_objectiveFunction.evaluate (nextVariate)) &&
+				fixedPointFinderOutput.incrementNumberOfObjectiveFunctionDerivativesCalculations() &&
+				fixedPointFinderOutput.incrementObjectiveFunctionCalculations();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return false;
 	}
 
-	@Override protected org.drip.function.r1tor1solver.ExecutionInitializationOutput initializeVariateZone (
-		final org.drip.function.r1tor1solver.InitializationHeuristics ih)
+	@Override protected ExecutionInitializationOutput initializeVariateZone (
+		final InitializationHeuristics iInitializationHeuristics)
 	{
-		return _ei.initializeBracket (ih, _dblOFGoal);
+		return _executionInitializer.initializeBracket (iInitializationHeuristics, _objectiveFunctionValueGoal);
 	}
 
 	/**
-	 * FixedPointFinderNewton constructor
+	 * <i>FixedPointFinderNewton</i> constructor
 	 * 
-	 * @param dblOFGoal OF Goal
-	 * @param of Objective Function
-	 * @param bWhine TRUE - Balk on Encountering Exception
+	 * @param objectiveFunctionValueGoal Objective Function Value Goal
+	 * @param objectiveFunction Objective Function
+	 * @param whine TRUE - Balk on Encountering Exception
 	 * 
-	 * @throws java.lang.Exception Propogated from underneath
+	 * @throws Exception Propagated from underneath
 	 */
 
 	public FixedPointFinderNewton (
-		final double dblOFGoal,
-		final org.drip.function.definition.R1ToR1 of,
-		final boolean bWhine)
-		throws java.lang.Exception
+		final double objectiveFunctionValueGoal,
+		final R1ToR1 objectiveFunction,
+		final boolean whine)
+		throws Exception
 	{
-		super (dblOFGoal, of, null, bWhine);
+		super (objectiveFunctionValueGoal, objectiveFunction, null, whine);
 
-		_ei = new org.drip.function.r1tor1solver.ExecutionInitializer (_of, null, true);
+		_executionInitializer = new ExecutionInitializer (_objectiveFunction, null, true);
 	}
 }

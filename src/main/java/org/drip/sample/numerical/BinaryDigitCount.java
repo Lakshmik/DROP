@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,14 +88,15 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>BinaryDigitCount</i> illustrates the Estimation of the Binary Digit Count for the Set of Integers.
- * 
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -107,65 +116,34 @@ public class BinaryDigitCount
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		int start = 1;
 		int finish = 99;
 
-		System.out.println (
-			"\t|--------------------------------------------------||"
-		);
+		System.out.println ("\t|--------------------------------------------------||");
 
-		System.out.println (
-			"\t|              PRIME FACTOR ESTIMATOR              ||"
-		);
+		System.out.println ("\t|              PRIME FACTOR ESTIMATOR              ||");
 
-		System.out.println (
-			"\t|--------------------------------------------------||"
-		);
+		System.out.println ("\t|--------------------------------------------------||");
 
-		System.out.println (
-			"\t|    L -> R:                                       ||"
-		);
+		System.out.println ("\t|    L -> R:                                       ||");
 
-		System.out.println (
-			"\t|          - n                                     ||"
-		);
+		System.out.println ("\t|          - n                                     ||");
 
-		System.out.println (
-			"\t|          - Prime Factorization                   ||"
-		);
+		System.out.println ("\t|          - Prime Factorization                   ||");
 
-		System.out.println (
-			"\t|          - Prime Factorization Exponent          ||"
-		);
+		System.out.println ("\t|          - Prime Factorization Exponent          ||");
 
-		System.out.println (
-			"\t|          - Prime Factor Map                      ||"
-		);
+		System.out.println ("\t|          - Prime Factor Map                      ||");
 
-		System.out.println (
-			"\t|--------------------------------------------------||"
-		);
+		System.out.println ("\t|--------------------------------------------------||");
 
-		for (int number = start;
-			number <= finish;
-			++number
-		)
-		{
-			System.out.println (
-				"\t| [" + number + "] = " +
-				NumberUtil.BinaryDigitCount (
-					number
-				)
-			);
+		for (int number = start; number <= finish; ++number) {
+			System.out.println ("\t| [" + number + "] = " + NumberUtil.BinaryDigitCount (number));
 		}
 
-		System.out.println (
-			"\t|--------------------------------------------------||"
-		);
+		System.out.println ("\t|--------------------------------------------------||");
 
 		EnvManager.TerminateEnv();
 	}

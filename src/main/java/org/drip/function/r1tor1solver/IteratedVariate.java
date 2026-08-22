@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,68 +95,83 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>IteratedVariate</i> holds the variate and the corresponding value for the objective function during
- * each iteration.
+ * 	each iteration. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>IteratedVariate</i> Constructor</li>
+ * 		<li>Retrieve the Variate</li>
+ * 		<li>Set the Variate</li>
+ * 		<li>Retrieve the Objective Function Value</li>
+ * 		<li>Set the Objective Function Value</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class IteratedVariate {
-	private double _dblOF = java.lang.Double.NaN;
-	private double _dblVariate = java.lang.Double.NaN;
+public class IteratedVariate
+{
+	private double _x = Double.NaN;
+	private double _objectiveFunctionValue = Double.NaN;
 
 	/**
-	 * IteratedVariate constructor
+	 * <i>IteratedVariate</i> Constructor
 	 * 
-	 * @param eiop Execution Initialization Output
-	 * @param dblOF Objective Function Value
+	 * @param executionInitializationOutput Execution Initialization Output
+	 * @param objectiveFunctionValue Objective Function Value
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public IteratedVariate (
-		final org.drip.function.r1tor1solver.ExecutionInitializationOutput eiop,
-		final double dblOF)
-		throws java.lang.Exception
+		final ExecutionInitializationOutput executionInitializationOutput,
+		final double objectiveFunctionValue)
+		throws Exception
 	{
-		if (null == eiop || !org.drip.numerical.common.NumberUtil.IsValid (_dblOF = dblOF))
-			throw new java.lang.Exception ("IteratedVariate constructor: Invalid Inputs");
+		if (null == executionInitializationOutput ||
+			!NumberUtil.IsValid (_objectiveFunctionValue = objectiveFunctionValue))
+		{
+			throw new Exception ("IteratedVariate Constructor: Invalid Inputs");
+		}
 
-		_dblVariate = eiop.getStartingVariate();
+		_x = executionInitializationOutput.startingVariate();
 	}
 
 	/**
-	 * Retrieve the variate
+	 * Retrieve the Variate
 	 * 
 	 * @return Variate
 	 */
 
-	public double getVariate()
+	public double x()
 	{
-		return _dblVariate;
+		return _x;
 	}
 
 	/**
-	 * Set the variate
+	 * Set the Variate
 	 * 
-	 * @param dblVariate Variate
+	 * @param x Variate
 	 * 
 	 * @return TRUE - Variate set successfully
 	 */
 
-	public boolean setVariate (
-		final double dblVariate)
+	public boolean setX (
+		final double x)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate)) return false;
+		if (!NumberUtil.IsValid (x)) {
+			return false;
+		}
 
-		_dblVariate = dblVariate;
+		_x = x;
 		return true;
 	}
 
@@ -156,25 +181,27 @@ public class IteratedVariate {
 	 * @return The Objective Function Value
 	 */
 
-	public double getOF()
+	public double objectiveFunctionValue()
 	{
-		return _dblOF;
+		return _objectiveFunctionValue;
 	}
 
 	/**
 	 * Set the Objective Function Value
 	 * 
-	 * @param dblOF Objective Function Value
+	 * @param objectiveFunctionValue Objective Function Value
 	 * 
 	 * @return TRUE - Objective Function Value set successfully
 	 */
 
-	public boolean setOF (
-		final double dblOF)
+	public boolean setObjectiveFunctionValue (
+		final double objectiveFunctionValue)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblOF)) return false;
+		if (!NumberUtil.IsValid (objectiveFunctionValue)) {
+			return false;
+		}
 
-		_dblOF = dblOF;
+		_objectiveFunctionValue = objectiveFunctionValue;
 		return true;
 	}
 }

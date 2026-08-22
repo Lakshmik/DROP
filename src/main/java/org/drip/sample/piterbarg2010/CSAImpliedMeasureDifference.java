@@ -20,6 +20,14 @@ import org.drip.state.discount.MergedDiscountForwardCurve;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -121,76 +129,78 @@ import org.drip.state.discount.MergedDiscountForwardCurve;
  *  	</li>
  *  </ul>
  *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2010/README.md">Piterbarg (2010) CSA Measure Extraction</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2010/README.md">Piterbarg (2010) CSA Measure Extraction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CSAImpliedMeasureDifference {
+public class CSAImpliedMeasureDifference
+{
 
 	private static final MergedDiscountForwardCurve OvernightCurve (
-		final String strCurrency,
+		final String currency,
 		final JulianDate dtSpot)
 		throws Exception
 	{
-		String[] astrDepositMaturityTenor = new String[] {
+		String[] depositMaturityTenorArray =
+		{
 			"1D",
 			// "2D",
 			"3D"
 		};
-
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray =
+		{
 			0.0004,		// 1D
 			// 0.0004,		// 2D
 			0.0004		// 3D
 		};
-
-		String[] astrShortEndOISMaturityTenor = new String[] {
+		String[] shortEndOISMaturityTenorArray =
+		{
 			"1W",
 			"2W",
 			"3W",
 			"1M"
 		};
-
-		double[] adblShortEndOISQuote = new double[] {
+		double[] shortEndOISQuoteArray =
+		{
 			0.00070,    //   1W
 			0.00069,    //   2W
 			0.00078,    //   3W
 			0.00074     //   1M
 		};
-
-		String[] astrOISFuturesEffectiveTenor = new String[] {
+		String[] oisFuturesEffectiveTenorArray =
+		{
 			"1M",
 			"2M",
 			"3M",
 			"4M",
 			"5M"
 		};
-
-		String[] astrOISFuturesMaturityTenor = new String[] {
+		String[] oisFuturesMaturityTenorArray =
+		{
 			"1M",
 			"1M",
 			"1M",
 			"1M",
 			"1M"
 		};
-
-		double[] adblOISFuturesQuote = new double[] {
+		double[] oisFuturesQuoteArray =
+		{
 			 0.00046,    //   1M x 1M
 			 0.00016,    //   2M x 1M
 			-0.00007,    //   3M x 1M
 			-0.00013,    //   4M x 1M
 			-0.00014     //   5M x 1M
 		};
-
-		String[] astrLongEndOISMaturityTenor = new String[] {
+		String[] longEndOISMaturityTenorArray =
+		{
 			"15M",
 			"18M",
 			"21M",
@@ -210,8 +220,8 @@ public class CSAImpliedMeasureDifference {
 			"25Y",
 			"30Y"
 		};
-
-		double[] adblLongEndOISQuote = new double[] {
+		double[] longEndOISQuoteArray =
+		{
 			0.00002,    //  15M
 			0.00008,    //  18M
 			0.00021,    //  21M
@@ -234,19 +244,19 @@ public class CSAImpliedMeasureDifference {
 
 		return LatentMarketStateBuilder.SmoothOvernightCurve (
 			dtSpot,
-			strCurrency,
-			astrDepositMaturityTenor,
-			adblDepositQuote,
+			currency,
+			depositMaturityTenorArray,
+			depositQuoteArray,
 			"Rate",
-			astrShortEndOISMaturityTenor,
-			adblShortEndOISQuote,
+			shortEndOISMaturityTenorArray,
+			shortEndOISQuoteArray,
 			"SwapRate",
-			astrOISFuturesEffectiveTenor,
-			astrOISFuturesMaturityTenor,
-			adblOISFuturesQuote,
+			oisFuturesEffectiveTenorArray,
+			oisFuturesMaturityTenorArray,
+			oisFuturesQuoteArray,
 			"SwapRate",
-			astrLongEndOISMaturityTenor,
-			adblLongEndOISQuote,
+			longEndOISMaturityTenorArray,
+			longEndOISQuoteArray,
 			"SwapRate"
 		);
 	}
@@ -254,37 +264,34 @@ public class CSAImpliedMeasureDifference {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strTenor = "10Y";
-		double dblCSAForward = 100.;
-		double dblFundingSpreadVolatility = 0.015;
-		double dblFundingSpreadMeanReversionRate = 0.05;
-		String strCurrency = "USD";
+		String tenor = "10Y";
+		String currency = "USD";
+		double csaForward = 100.;
+		double fundingSpreadVolatility = 0.015;
+		double fundingSpreadMeanReversionRate = 0.05;
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.DECEMBER,
-			21
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.DECEMBER, 21);
 
-		double[] adblCorrelation = new double[] {
-			-0.30,
-			-0.10,
-			 0.00,
-			 0.10
+		double[] correlationArray =
+		{
+			-0.3,
+			-0.1,
+			 0.0,
+			 0.1
 		};
-
-		double[] adblStrike = new double[] {
+		double[] strikeArray =
+		{
 			 50.,
 			 60.,
 			 70.,
@@ -297,160 +304,189 @@ public class CSAImpliedMeasureDifference {
 			140.,
 			150.
 		};
-
-		double[] adblCSAImpliedVolatility = new double[] {
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30,
-			 0.30
+		double[] csaImpliedVolatilityArray =
+		{
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3,
+			 0.3
 		};
 
-		double[][] aadblNoCSAForward = new double[adblCorrelation.length][adblStrike.length];
-		double[][] aadblMeasureShiftScale = new double[adblCorrelation.length][adblStrike.length];
+		double[][] noCSAForwardGrid = new double[correlationArray.length][strikeArray.length];
+		double[][] measureShiftScaleGrid = new double[correlationArray.length][strikeArray.length];
 
-		DiffusionEvaluatorMeanReversion demrFundingSpread = DiffusionEvaluatorMeanReversion.Standard (
-			dblFundingSpreadMeanReversionRate,
-			0.,
-			dblFundingSpreadVolatility
-		);
-
-		System.out.println ();
-
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t||                                        PROBABILITY MEASURE DISTRIBUTION SHIFT                                        ||");
-
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ("\t||  L -> R :                                                                                                            ||");
-
-		System.out.println ("\t||           - Correlation                                                                                              ||");
-
-		System.out.println ("\t||           - Adjustments for Strikes in unit of 10, from 50 to 150                                                    ||");
-
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
-
-		for (int j = 0; j < adblCorrelation.length; ++j) {
-			String strDump = "\t|| " + FormatUtil.FormatDouble (adblCorrelation[j], 2, 0, 100.) + "% => ";
-
-			for (int i = 0; i < adblStrike.length; ++i) {
-				DiffusionEvaluatorLogarithmic delUnderlying = DiffusionEvaluatorLogarithmic.Standard (
-					0.,
-					adblCSAImpliedVolatility[i]
-				);
-
-				FundingBasisEvolver fbe = new FundingBasisEvolver (
-					delUnderlying,
-					demrFundingSpread,
-					adblCorrelation[j]
-				);
-
-				aadblNoCSAForward[j][i] = dblCSAForward * fbe.CSANoCSARatio (strTenor);
-
-				NumeraireInducedMeasureShift nims = new NumeraireInducedMeasureShift (
-					dblCSAForward,
-					aadblNoCSAForward[j][i],
-					dblCSAForward * dblCSAForward * adblCSAImpliedVolatility[i] * adblCSAImpliedVolatility[i]
-				);
-
-				aadblMeasureShiftScale[j][i] = nims.densityRescale (adblStrike[i]);
-
-				strDump = strDump + " " + FormatUtil.FormatDouble (aadblMeasureShiftScale[j][i], 1, 4, 1.) + " |";
-			}
-
-			System.out.println (strDump + "|");;
-		}
-
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
-
-		System.out.println ();
-
-		MergedDiscountForwardCurve dcOvernight = OvernightCurve (
-			strCurrency,
-			dtSpot
-		);
-
-		JulianDate dtMaturity = dtSpot.addTenor (strTenor);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		double[] adblPrice = new double[adblStrike.length];
-		EuropeanCallPut[] aECP = new EuropeanCallPut[adblStrike.length];
-
-		System.out.println ("\t||---------------------------------------------------------------------------------------------------------------------------||");
-
-		String strDump = "\t|| CSA ATM Option Price => ";
-
-		for (int i = 0; i < adblStrike.length; ++i) {
-			aECP[i] = new EuropeanCallPut (
-				dtMaturity,
-				adblStrike[i]
+		DiffusionEvaluatorMeanReversion fundingSpreadDiffusionEvaluatorMeanReversion =
+			DiffusionEvaluatorMeanReversion.Standard (
+				fundingSpreadMeanReversionRate,
+				0.,
+				fundingSpreadVolatility
 			);
 
-			Map<String, Double> mapOptionCalc = aECP[i].value (
-				valParams,
-				dblCSAForward,
+		System.out.println ();
+
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println (
+			"\t||                                        PROBABILITY MEASURE DISTRIBUTION SHIFT                                        ||"
+		);
+
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println (
+			"\t||  L -> R :                                                                                                            ||"
+		);
+
+		System.out.println (
+			"\t||           - Correlation                                                                                              ||"
+		);
+
+		System.out.println (
+			"\t||           - Adjustments for Strikes in unit of 10, from 50 to 150                                                    ||"
+		);
+
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		for (int correlationIndex = 0; correlationIndex < correlationArray.length; ++correlationIndex) {
+			String dump = "\t|| " + FormatUtil.FormatDouble (correlationArray[correlationIndex], 2, 0, 100.)
+				+ "% => ";
+
+			for (int strikeIndex = 0; strikeIndex < strikeArray.length; ++strikeIndex) {
+				measureShiftScaleGrid[correlationIndex][strikeIndex] = new NumeraireInducedMeasureShift (
+					csaForward,
+					noCSAForwardGrid[correlationIndex][strikeIndex] = csaForward * new FundingBasisEvolver (
+						DiffusionEvaluatorLogarithmic.Standard (0., csaImpliedVolatilityArray[strikeIndex]),
+						fundingSpreadDiffusionEvaluatorMeanReversion,
+						correlationArray[correlationIndex]
+					).CSANoCSARatio (
+						tenor
+					),
+					csaForward * csaForward * csaImpliedVolatilityArray[strikeIndex] *
+						csaImpliedVolatilityArray[strikeIndex]
+				).densityRescale (
+					strikeArray[strikeIndex]
+				);
+
+				dump += " " + FormatUtil.FormatDouble (
+					measureShiftScaleGrid[correlationIndex][strikeIndex],
+					1,
+					4,
+					1.
+				) + " |";
+			}
+
+			System.out.println (dump + "|");;
+		}
+
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println ();
+
+		JulianDate maturityDate = spotDate.addTenor (tenor);
+
+		MergedDiscountForwardCurve overnightCurve = OvernightCurve (currency, spotDate);
+
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
+
+		EuropeanCallPut[] europeanCallPutArray = new EuropeanCallPut[strikeArray.length];
+		double[] priceArray = new double[strikeArray.length];
+
+		System.out.println (
+			"\t||---------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		String dump = "\t|| CSA ATM Option Price => ";
+
+		for (int strikeIndex = 0; strikeIndex < strikeArray.length; ++strikeIndex) {
+			Map<String, Double> mapOptionCalc = (
+				europeanCallPutArray[strikeIndex] =
+					new EuropeanCallPut (maturityDate, strikeArray[strikeIndex])
+			).value (
+				valuationParams,
+				csaForward,
 				true,
-				dcOvernight,
-				new Flat (adblCSAImpliedVolatility[i]),
+				overnightCurve,
+				new Flat (csaImpliedVolatilityArray[strikeIndex]),
 				new BlackScholesAlgorithm()
 			);
 
-			adblPrice[i] = mapOptionCalc.get ("CallPrice");
+			priceArray[strikeIndex] = mapOptionCalc.get ("CallPrice");
 
-			strDump = strDump + FormatUtil.FormatDouble (adblPrice[i], 2, 2, 1.) + "  |";
+			dump += FormatUtil.FormatDouble (priceArray[strikeIndex], 2, 2, 1.) + "  |";
 		}
 
-		System.out.println (strDump + "|");
+		System.out.println (dump + "|");
 
-		System.out.println ("\t||---------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||---------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println ();
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||                                CSA CONVEXITY ADJUSTMENT IMPLIED VOLATILITY                                ||");
+		System.out.println (
+			"\t||                                CSA CONVEXITY ADJUSTMENT IMPLIED VOLATILITY                                ||"
+		);
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||  L -> R :                                                                                                 ||");
+		System.out.println (
+			"\t||  L -> R :                                                                                                 ||"
+		);
 
-		System.out.println ("\t||           - Implied Volatility (%)                                                                        ||");
+		System.out.println (
+			"\t||           - Implied Volatility (%)                                                                        ||"
+		);
 
-		System.out.println ("\t||           - Adjustments for Strikes in unit of 10, from 50 to 150                                         ||");
+		System.out.println (
+			"\t||           - Adjustments for Strikes in unit of 10, from 50 to 150                                         ||"
+		);
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int j = 0; j < adblCorrelation.length; ++j) {
-			strDump = "\t|| " + FormatUtil.FormatDouble (adblCorrelation[j], 2, 0, 100.) + "% => ";
+		for (int correlationIndex = 0; correlationIndex < correlationArray.length; ++correlationIndex) {
+			dump = "\t|| " + FormatUtil.FormatDouble (correlationArray[correlationIndex], 2, 0, 100.) +
+				"% => ";
 
-			for (int i = 0; i < adblStrike.length; ++i) {
-				double dblReimpliedVolatility = aECP[i].implyVolatilityFromCallPrice (
-					valParams,
-					aadblNoCSAForward[j][i],
+			for (int strikeIndex = 0; strikeIndex < strikeArray.length; ++strikeIndex) {
+				double reimpliedVolatility = europeanCallPutArray[strikeIndex].implyVolatilityFromCallPrice (
+					valuationParams,
+					noCSAForwardGrid[correlationIndex][strikeIndex],
 					true,
-					dcOvernight,
-					adblPrice[i]
+					overnightCurve,
+					priceArray[strikeIndex]
 				);
 
-				strDump = strDump + FormatUtil.FormatDouble (dblReimpliedVolatility, 2, 2, 100.) + "% |";
+				dump += FormatUtil.FormatDouble (reimpliedVolatility, 2, 2, 100.) + "% |";
 			}
 
-			System.out.println (strDump + "|");
+			System.out.println (dump + "|");
 		}
 
-		System.out.println ("\t||-----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println ();
 

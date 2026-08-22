@@ -4,7 +4,6 @@ package org.drip.sample.piterbarg2012;
 import java.util.Map;
 
 import org.drip.analytics.date.*;
-import org.drip.analytics.support.CaseInsensitiveTreeMap;
 import org.drip.function.r1tor1operator.Flat;
 import org.drip.param.creator.*;
 import org.drip.param.market.CurveSurfaceQuoteContainer;
@@ -15,16 +14,22 @@ import org.drip.service.env.EnvManager;
 import org.drip.state.creator.*;
 import org.drip.state.curve.ForeignCollateralizedDiscountCurve;
 import org.drip.state.discount.MergedDiscountForwardCurve;
-import org.drip.state.fx.FXCurve;
 import org.drip.state.identifier.*;
 import org.drip.state.nonlinear.*;
-import org.drip.state.volatility.VolatilityCurve;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -128,92 +133,62 @@ import org.drip.state.volatility.VolatilityCurve;
  *  	</li>
  *  </ul>
  *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2012/README.md">Piterbarg (2012) Domestic Foreign Collateral</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2012/README.md">Piterbarg (2012) Domestic Foreign Collateral</a></td></tr>
+ *  </table>
+ *	<br>
  *  
  * @author Lakshmi Krishnamurthy
  */
 
-public class DomesticCollateralForeignForex {
+public class DomesticCollateralForeignForex
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		String strDomesticCurrency = "USD";
-		String strForeignCurrency = "EUR";
-		String strMaturity = "1Y";
-		double dblFXFwdStrike = 0.984;
-		double dblForeignCollateralRate = 0.02;
-		double dblCollateralizedFXRate = 1.10;
-		double dblForeignRatesVolatility = 0.30;
-		double dblFXVolatility = 0.20;
-		double dblFXForeignRatesCorrelation = 0.50;
+		String maturity = "1Y";
+		double fxVolatility = 0.2;
+		String foreignCurrency = "EUR";
+		double fxForwardStrike = 0.984;
+		String domesticCurrency = "USD";
+		double collateralizedFXRate = 1.1;
+		double foreignCollateralRate = 0.02;
+		double foreignRatesVolatility = 0.3;
+		double fxForeignRatesCorrelation = 0.5;
 
-		CurrencyPair cp = CurrencyPair.FromCode (strForeignCurrency + "/" + strDomesticCurrency);
+		int[] dateArray =
+		{
+			today.julian()
+		};
 
-		MergedDiscountForwardCurve dcCcyDomesticCollatDomestic = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			strForeignCurrency,
-			dblForeignCollateralRate
-		);
+		CurrencyPair currencyPair = CurrencyPair.FromCode (foreignCurrency + "/" + domesticCurrency);
 
-		FXCurve fxCurve = new FlatForwardFXCurve (
-			dtToday.julian(),
-			cp,
-			dblCollateralizedFXRate,
-			new int[] {dtToday.julian()},
-			new double[] {dblCollateralizedFXRate}
-		);
+		MergedDiscountForwardCurve domesticCollateralizedDomesticDiscountCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
+				today,
+				foreignCurrency,
+				foreignCollateralRate
+			);
 
-		VolatilityCurve vcForeignFunding = new FlatForwardVolatilityCurve (
-			dtToday.julian(),
-			VolatilityLabel.Standard (CollateralLabel.Standard (strForeignCurrency)),
-			strDomesticCurrency,
-			new int[] {dtToday.julian()},
-			new double[] {dblForeignRatesVolatility}
-		);
-
-		VolatilityCurve vcFX = new FlatForwardVolatilityCurve (
-			dtToday.julian(),
-			VolatilityLabel.Standard (FXLabel.Standard (cp)),
-			strDomesticCurrency,
-			new int[] {dtToday.julian()},
-			new double[] {dblFXVolatility}
-		);
-
-		MergedDiscountForwardCurve dcCcyForeignCollatDomestic = new ForeignCollateralizedDiscountCurve (
-			strForeignCurrency,
-			dcCcyDomesticCollatDomestic,
-			fxCurve,
-			vcForeignFunding,
-			vcFX,
-			new Flat (dblFXForeignRatesCorrelation)
-		);
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
 			null,
 			null,
 			null,
@@ -223,48 +198,78 @@ public class DomesticCollateralForeignForex {
 			null
 		);
 
-		mktParams.setPayCurrencyCollateralCurrencyCurve (
-			strForeignCurrency,
-			strDomesticCurrency,
-			dcCcyForeignCollatDomestic
-		);
-
-		mktParams.setPayCurrencyCollateralCurrencyCurve (
-			strDomesticCurrency,
-			strDomesticCurrency,
-			dcCcyDomesticCollatDomestic
-		);
-
-		mktParams.setFXState (
-			ScenarioFXCurveBuilder.CubicPolynomialCurve (
-				"FX::" + cp.code(),
-				dtToday,
-				cp,
-				new String[] {"10Y"},
-				new double[] {dblCollateralizedFXRate},
-				dblCollateralizedFXRate
+		curveSurfaceQuoteContainer.setPayCurrencyCollateralCurrencyCurve (
+			foreignCurrency,
+			domesticCurrency,
+			new ForeignCollateralizedDiscountCurve (
+				foreignCurrency,
+				domesticCollateralizedDomesticDiscountCurve,
+				new FlatForwardFXCurve (
+					today.julian(),
+					currencyPair,
+					collateralizedFXRate,
+					dateArray,
+					new double[] {collateralizedFXRate}
+				),
+				new FlatForwardVolatilityCurve (
+					today.julian(),
+					VolatilityLabel.Standard (CollateralLabel.Standard (foreignCurrency)),
+					domesticCurrency,
+					dateArray,
+					new double[] {foreignRatesVolatility}
+				),
+				new FlatForwardVolatilityCurve (
+					today.julian(),
+					VolatilityLabel.Standard (FXLabel.Standard (currencyPair)),
+					domesticCurrency,
+					dateArray,
+					new double[] {fxVolatility}
+				),
+				new Flat (
+					fxForeignRatesCorrelation
+				)
 			)
 		);
 
-		DomesticCollateralizedForeignForward dcff = new DomesticCollateralizedForeignForward (
-			cp,
-			dblFXFwdStrike,
-			dtToday.addTenor (strMaturity)
+		curveSurfaceQuoteContainer.setPayCurrencyCollateralCurrencyCurve (
+			domesticCurrency,
+			domesticCurrency,
+			domesticCollateralizedDomesticDiscountCurve
 		);
 
-		CaseInsensitiveTreeMap<Double> mapDCFF = dcff.value (
-			new ValuationParams (
-				dtToday,
-				dtToday,
-				strDomesticCurrency
-			),
-			null,
-			mktParams,
-			null
+		curveSurfaceQuoteContainer.setFXState (
+			ScenarioFXCurveBuilder.CubicPolynomialCurve (
+				"FX::" + currencyPair.code(),
+				today,
+				currencyPair,
+				new String[] {"10Y"},
+				new double[] {collateralizedFXRate},
+				collateralizedFXRate
+			)
 		);
 
-		for (Map.Entry<String, Double> me : mapDCFF.entrySet())
-			System.out.println ("\t" + me.getKey() + " => " + me.getValue());
+		System.out.println ("\t|--------------------------------------------------------------|");
+
+		System.out.println ("\t|                DOMESTIC COLLATERAL FOREIGN FX                |");
+
+		System.out.println ("\t|--------------------------------------------------------------|");
+
+		for (Map.Entry<String, Double> mapEntry : new DomesticCollateralizedForeignForward (
+				currencyPair,
+				fxForwardStrike,
+				today.addTenor (maturity)
+			).value (
+				new ValuationParams (today, today, domesticCurrency),
+				null,
+				curveSurfaceQuoteContainer,
+				null
+			).entrySet()
+		)
+		{
+			System.out.println ("\t| " + mapEntry.getKey() + " => " + mapEntry.getValue());
+		}
+
+		System.out.println ("\t|--------------------------------------------------------------|");
 
 		EnvManager.TerminateEnv();
 	}

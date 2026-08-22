@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,148 +95,152 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>ExecutionControl</i> implements the core fixed point search execution control and customization
- * functionality.
- * <br><br>
- * ExecutionControl is used for a) calculating the absolute tolerance, and b) determining whether the OF has
- * reached the goal.
- * <br><br>
- * ExecutionControl determines the execution termination using its ExecutionControlParams instance. 
+ * 	functionality. <i>ExecutionControl</i> is used for a) calculating the absolute tolerance, and b)
+ *  determining whether the OF has reached the goal. <i>ExecutionControl</i> determines the execution
+ *  termination using its ExecutionControlParams instance. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>ExecutionControl</i> Constructor</li>
+ * 		<li>Retrieve the Number of Iterations</li>
+ * 		<li>Calculate the Absolute Objective Function Tolerance using the Initial Objective Function Value</li>
+ * 		<li>Calculate the Absolute Variate Convergence Amount using the Initial Variate</li>
+ * 		<li>Check to see if the Objective Function has reached the Goal</li>
+ * 		<li>Indicate if the Variate Convergence Check has been Turned On</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ExecutionControl {
-	private org.drip.function.r1tor1solver.ExecutionControlParams _ecp = null;
-
-	protected org.drip.function.definition.R1ToR1 _of = null;
+public class ExecutionControl
+{
+	private ExecutionControlParams _params = null;
 
 	/**
-	 * ExecutionControl constructor
+	 * <i>ExecutionControl</i> Constructor
 	 * 
-	 * @param of Objective Function
-	 * @param ecp Execution Control Parameters
+	 * @param params Execution Control Parameters
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public ExecutionControl (
-		final org.drip.function.definition.R1ToR1 of,
-		final org.drip.function.r1tor1solver.ExecutionControlParams ecp)
-		throws java.lang.Exception
+		final ExecutionControlParams params)
+		throws Exception
 	{
-		if (null == (_of = of))
-			throw new java.lang.Exception ("ExecutionControl constructor: Invalid inputs");
-
-		if (null == (_ecp = ecp)) _ecp = new org.drip.function.r1tor1solver.ExecutionControlParams();
+		if (null == (_params = params)) {
+			_params = new ExecutionControlParams();
+		}
 	}
 
 	/**
 	 * Retrieve the Number of Iterations
 	 * 
-	 * @return Number of solver iterations
+	 * @return Number of Solver iterations
 	 */
 
-	public int getNumIterations()
+	public int maximumIterationCount()
 	{
-		return _ecp.getNumIterations();
+		return _params.maximumIterationCount();
 	}
 
 	/**
-	 * Calculate the absolute OF tolerance using the initial OF value
+	 * Calculate the Absolute Objective Function Tolerance using the Initial Objective Function Value
 	 * 
-	 * @param dblOFInitial Initial OF Value
+	 * @param initialObjectiveFunctionValue Initial Objective Function Value
 	 * 
-	 * @return The absolute OF Tolerance
+	 * @return The Absolute Objective Function Tolerance
 	 * 
-	 * @throws java.lang.Exception Thrown if absolute tolerance cannot be calculated
+	 * @throws Exception Thrown if the Absolute Tolerance cannot be Calculated
 	 */
 
-	public double calcAbsoluteOFTolerance (
-		final double dblOFInitial)
-		throws java.lang.Exception
+	public double calculateAbsoluteObjectiveFunctionTolerance (
+		final double initialObjectiveFunctionValue)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblOFInitial))
-			throw new java.lang.Exception ("ExecutionControl::calcAbsoluteOFTolerance => Invalid inputs!");
+		if (!NumberUtil.IsValid (initialObjectiveFunctionValue)) {
+			throw new Exception (
+				"ExecutionControl::calculateAbsoluteObjectiveFunctionTolerance => Invalid inputs!"
+			);
+		}
 
-		double dblAbsoluteTolerance = java.lang.Math.abs (dblOFInitial) * _ecp.getOFGoalToleranceFactor();
+		double absoluteTolerance =
+			Math.abs (initialObjectiveFunctionValue) * _params.objectiveFunctionGoalToleranceFactor();
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblAbsoluteTolerance) || dblAbsoluteTolerance <
-			_ecp.getAbsoluteOFToleranceFallback())
-			dblAbsoluteTolerance = _ecp.getAbsoluteOFToleranceFallback();
-
-		return dblAbsoluteTolerance;
+		return !NumberUtil.IsValid (absoluteTolerance) ||
+			absoluteTolerance < _params.absoluteObjectiveFunctionToleranceFallback() ? 
+			_params.absoluteObjectiveFunctionToleranceFallback() : absoluteTolerance;
 	}
 
 	/**
-	 * Calculate the absolute variate convergence amount using the initial variate
+	 * Calculate the Absolute Variate Convergence Amount using the Initial Variate
 	 * 
-	 * @param dblInitialVariate Initial Variate
+	 * @param initialVariate Initial Variate
 	 * 
 	 * @return The Absolute Variate Convergence Amount
 	 * 
-	 * @throws java.lang.Exception Thrown if Absolute Variate Convergence Amount cannot be calculated
+	 * @throws Exception Thrown if Absolute Variate Convergence Amount cannot be calculated
 	 */
 
-	public double calcAbsoluteVariateConvergence (
-		final double dblInitialVariate)
-		throws java.lang.Exception
+	public double calculateAbsoluteVariateConvergence (
+		final double initialVariate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblInitialVariate))
-			throw new java.lang.Exception
-				("ExecutionControl::calcAbsoluteVariateConvergence => Invalid inputs!");
+		if (!NumberUtil.IsValid (initialVariate)) {
+			throw new Exception ("ExecutionControl::calculateAbsoluteVariateConvergence => Invalid inputs!");
+		}
 
-		double dblAbsoluteConvergence = java.lang.Math.abs (dblInitialVariate) *
-			_ecp.getVariateConvergenceFactor();
+		double absoluteConvergence = Math.abs (initialVariate) * _params.variateConvergenceFactor();
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblAbsoluteConvergence) || dblAbsoluteConvergence <
-			_ecp.getAbsoluteVariateConvergenceFallback())
-			dblAbsoluteConvergence = _ecp.getAbsoluteVariateConvergenceFallback();
-
-		return dblAbsoluteConvergence;
+		return !NumberUtil.IsValid (absoluteConvergence) ||
+			absoluteConvergence < _params.absoluteVariateConvergenceFallback() ?
+			_params.absoluteVariateConvergenceFallback() : absoluteConvergence;
 	}
 
 	/**
-	 * Check to see if the OF has reached the goal
+	 * Check to see if the Objective Function has reached the Goal
 	 * 
-	 * @param dblAbsoluteTolerance Absolute Tolerance
-	 * @param dblOF OF Value
-	 * @param dblOFGoal OF Goal
+	 * @param absoluteTolerance Absolute Tolerance
+	 * @param objectiveFunctionValue Objective Function Value
+	 * @param objectiveFunctionGoal Objective Function Goal
 	 * 
-	 * @return TRUE - If the OF has reached the goal
+	 * @return TRUE - If the Objective Function has reached the Goal
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public boolean hasOFReachedGoal (
-		final double dblAbsoluteTolerance,
-		final double dblOF,
-		final double dblOFGoal)
-		throws java.lang.Exception
+	public boolean objectiveFunctionGoalReached (
+		final double absoluteTolerance,
+		final double objectiveFunctionValue,
+		final double objectiveFunctionGoal)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblAbsoluteTolerance) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (dblOF) || !org.drip.numerical.common.NumberUtil.IsValid
-				(dblOFGoal))
-			throw new java.lang.Exception ("ExecutionControl::hasOFReachedGoal => Invalid inputs!");
+		if (!NumberUtil.IsValid (absoluteTolerance) ||
+			!NumberUtil.IsValid (objectiveFunctionValue) ||
+			!NumberUtil.IsValid (objectiveFunctionGoal))
+		{
+			throw new Exception ("ExecutionControl::objectiveFunctionGoalReached => Invalid inputs!");
+		}
 
-		return dblAbsoluteTolerance > java.lang.Math.abs (dblOF - dblOFGoal);
+		return absoluteTolerance > Math.abs (objectiveFunctionValue - objectiveFunctionGoal);
 	}
 
 	/**
-	 * Indicate if the variate convergence check has been turned on
+	 * Indicate if the Variate Convergence Check has been Turned On
 	 * 
-	 * @return TRUE - Variate convergence check has been turned on
+	 * @return TRUE - Variate Convergence Check has been Turned On
 	 */
 
-	public boolean isVariateConvergenceCheckEnabled()
+	public boolean variateConvergenceCheckEnabled()
 	{
-		return _ecp.isVariateConvergenceCheckEnabled();
+		return _params.variateConvergenceCheckEnabled();
 	}
 }

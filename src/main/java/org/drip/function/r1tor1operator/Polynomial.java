@@ -1,6 +1,7 @@
 
 package org.drip.function.r1tor1operator;
 
+import org.drip.function.definition.R1ToR1;
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -8,6 +9,14 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -86,72 +95,117 @@ import org.drip.numerical.common.NumberUtil;
 
 /**
  * <i>Polynomial</i> provides the evaluation of the n<sup>th</sup> order Polynomial and its derivatives for a
- * specified variate.
+ * 	specified variate. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li><i>Polynomial</i> constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
+ * 		<li>Retrieve the degree of the polynomial</li>
+ * 		<li>Compute the Condition Number at the specified Variate</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class Polynomial extends org.drip.function.definition.R1ToR1 {
-	private int _iDegree = -1;
+public class Polynomial
+	extends R1ToR1
+{
+	private int _degree = -1;
 
 	/**
-	 * Polynomial constructor
+	 * <i>Polynomial</i> constructor
 	 * 
-	 * @param iDegree Degree of the Polynomial
+	 * @param degree Degree of the Polynomial
 	 * 
-	 * @throws java.lang.Exception Thrown if the input is invalid
+	 * @throws Exception Thrown if the input is invalid
 	 */
 
 	public Polynomial (
-		final int iDegree)
-		throws java.lang.Exception
+		final int degree)
+		throws Exception
 	{
 		super (null);
 
-		_iDegree = iDegree;
+		_degree = degree;
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("Polynomial::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("Polynomial::evaluate => Invalid Inputs");
+		}
 
-		return java.lang.Math.pow (dblVariate, _iDegree);
+		return Math.pow (variate, _degree);
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 > iOrder)
-			throw new java.lang.Exception ("Polynomial::derivative => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate) || 0 > order) {
+			throw new Exception ("Polynomial::derivative => Invalid Inputs");
+		}
 
-		return iOrder > _iDegree ? 0. : java.lang.Math.pow (dblVariate, _iDegree - iOrder) *
-			org.drip.numerical.common.NumberUtil.NPK (_iDegree, _iDegree - iOrder);
+		return order > _degree ?
+			0. : Math.pow (variate, _degree - order) * NumberUtil.NPK (_degree, _degree - order);
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("Polynomial::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return (java.lang.Math.pow (dblEnd, _iDegree + 1) - java.lang.Math.pow (dblBegin, _iDegree + 1)) /
-			(_iDegree + 1);
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("Polynomial::integrate => Invalid Inputs");
+		}
+
+		return (Math.pow (end, _degree + 1) - Math.pow (begin, _degree + 1)) / (_degree + 1);
 	}
 
 	/**
@@ -162,8 +216,18 @@ public class Polynomial extends org.drip.function.definition.R1ToR1 {
 
 	public double getDegree()
 	{
-		 return _iDegree;
+		 return _degree;
 	}
+
+	/**
+	 * Compute the Condition Number at the specified Variate
+	 * 
+	 * @param x Variate
+	 * 
+	 * @return The Condition Number
+	 * 
+	 * @throws Exception Thrown if the Condition Number cannot be computed
+	 */
 
 	@Override public double conditionNumber (
 		final double x)
@@ -173,6 +237,6 @@ public class Polynomial extends org.drip.function.definition.R1ToR1 {
 			throw new Exception ("Polynomial::conditionNumber => Invalid Inputs");
 		}
 
-		return Math.abs (_iDegree);
+		return Math.abs (_degree);
 	}
 }

@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,68 +95,86 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>FixedPointFinderZheng</i> implements the fixed point locator using Zheng's improvement to Brent's
- * method.
- * <br><br>
- * FixedPointFinderZheng overrides the iterateCompoundVariate method to achieve the desired simplification in
- * the iterative variate selection.
+ * 	method. It overrides the iterateCompoundVariate method to achieve the desired simplification in the
+ * 	iterative variate selection. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>FixedPointFinderZheng</i> Constructor</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixedPointFinderZheng extends org.drip.function.r1tor1solver.FixedPointFinderBracketing {
+public class FixedPointFinderZheng
+	extends FixedPointFinderBracketing
+{
+
 	@Override protected double iterateCompoundVariate (
-		final double dblCurrentVariate,
-		final double dblContraVariate,
-		final double dblCurrentOF,
-		final double dblContraPointOF,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
-		throws java.lang.Exception
+		final double currentVariate,
+		final double contraVariate,
+		final double currentObjectiveFunctionValue,
+		final double contraObjectiveFunctionValue,
+		final FixedPointFinderOutput fixedPointFinderOutput)
+		throws Exception
 	{
-		double dblVariateMid = org.drip.function.r1tor1solver.VariateIteratorPrimitive.Bisection (dblCurrentVariate,
-			dblContraVariate);
+		double variateMid = VariateIteratorPrimitive.Bisection (currentVariate, contraVariate);
 
-		if (!rfop.incrOFCalcs())
-			throw new java.lang.Exception
-				("FixedPointFinderZheng::iterateCompoundVariate => Cannot increment rfop!");
+		if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+			throw new Exception ("FixedPointFinderZheng::iterateCompoundVariate => Cannot increment rfop!");
+		}
 
-		double dblOF = _of.evaluate (dblVariateMid);
+		double objectiveFunctionValue = _objectiveFunction.evaluate (variateMid);
 
-		double dblNextVariate = java.lang.Double.NaN;
+		double nextVariate = currentObjectiveFunctionValue != objectiveFunctionValue &&
+			contraObjectiveFunctionValue != objectiveFunctionValue ?
+				VariateIteratorPrimitive.InverseQuadraticInterpolation (
+					currentVariate,
+					variateMid,
+					contraVariate,
+					currentObjectiveFunctionValue,
+					objectiveFunctionValue,
+					contraObjectiveFunctionValue
+				) : VariateIteratorPrimitive.FalsePosition (
+					currentVariate,
+					contraVariate,
+					currentObjectiveFunctionValue,
+					contraObjectiveFunctionValue
+				);
 
-		if (dblCurrentOF != dblOF && dblContraPointOF != dblOF)
-			dblNextVariate = org.drip.function.r1tor1solver.VariateIteratorPrimitive.InverseQuadraticInterpolation
-				(dblCurrentVariate, dblVariateMid, dblContraVariate, dblCurrentOF, dblOF, dblContraPointOF);
-		else
-			dblNextVariate = org.drip.function.r1tor1solver.VariateIteratorPrimitive.FalsePosition (dblCurrentVariate,
-				dblContraVariate, dblCurrentOF, dblContraPointOF);
-
-		return dblVariateMid < dblNextVariate ? dblVariateMid : dblNextVariate;
+		return variateMid < nextVariate ? variateMid : nextVariate;
 	}
 
 	/**
-	 * FixedPointFinderZheng constructor
+	 * <i>FixedPointFinderZheng</i> Constructor
 	 * 
-	 * @param dblOFGoal OF Goal
-	 * @param of Objective Function
-	 * @param bWhine TRUE - Balk on Encountering Exception
+	 * @param objectiveFunctionValueGoal Objective Function Value Goal
+	 * @param objectiveFunction Objective Function
+	 * @param whine TRUE - Balk on Encountering Exception
 	 * 
-	 * @throws java.lang.Exception Propogated from below
+	 * @throws Exception Propagated from below
 	 */
 
 	public FixedPointFinderZheng (
-		final double dblOFGoal,
-		final org.drip.function.definition.R1ToR1 of,
-		final boolean bWhine)
-		throws java.lang.Exception
+		final double objectiveFunctionValueGoal,
+		final R1ToR1 objectiveFunction,
+		final boolean whine)
+		throws Exception
 	{
-		super (dblOFGoal, of, null, org.drip.function.r1tor1solver.VariateIteratorPrimitive.BISECTION, bWhine);
+		super (
+			objectiveFunctionValueGoal,
+			objectiveFunction,
+			null,
+			VariateIteratorPrimitive.BISECTION,
+			whine
+		);
 	}
 }

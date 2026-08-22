@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,30 +94,44 @@ package org.drip.function.r1tor1solver;
  */
 
 /**
- * <i>BracketingOutput</i> carries the results of the bracketing initialization.
- * <br><br>
- * 	In addition to the fields of ExecutionInitializationOutput, BracketingOutput holds the left/right bracket
- *  	variates and the corresponding values for the objective function.
+ * <i>BracketingOutput</i> carries the results of the bracketing initialization. In addition to the fields of
+ * 	<i>ExecutionInitializationOutput</i>, <i>BracketingOutput</i> holds the left/right bracket variates and
+ * 	the corresponding values for the objective function. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Default <i>BracketingControlParams</i> Constructor</li>
+ * 		<li>Default <i>BracketingOutput</i> constructor: Initializes the output</li>
+ * 		<li>Return the Left Variate</li>
+ * 		<li>Return the Right Variate</li>
+ * 		<li>Return the Left Objective Function</li>
+ * 		<li>Return the Right Objective Function</li>
+ * 		<li>Set the Brackets in the Output Object</li>
+ * 		<li>Make a <i>ConvergenceOutput</i> Instance for the Open Method from the Bracketing Output</li>
+ * 		<li>Return a String Form of the Bracketing Output</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BracketingOutput extends org.drip.function.r1tor1solver.ExecutionInitializationOutput {
-	private double _dblOFLeft = java.lang.Double.NaN;
-	private double _dblOFRight = java.lang.Double.NaN;
-	private double _dblVariateLeft = java.lang.Double.NaN;
-	private double _dblVariateRight = java.lang.Double.NaN;
+public class BracketingOutput
+	extends ExecutionInitializationOutput
+{
+	private double _variateLeft = Double.NaN;
+	private double _variateRight = Double.NaN;
+	private double _objectiveFunctionLeft = Double.NaN;
+	private double _objectiveFunctionRight = Double.NaN;
 
 	/**
-	 * Default BracketingOutput constructor: Initializes the output
+	 * Default <i>BracketingOutput</i> constructor: Initializes the output
 	 */
 
 	public BracketingOutput()
@@ -116,14 +140,14 @@ public class BracketingOutput extends org.drip.function.r1tor1solver.ExecutionIn
 	}
 
 	/**
-	 * Return the left Variate
+	 * Return the Left Variate
 	 * 
 	 * @return Left Variate
 	 */
 
-	public double getVariateLeft()
+	public double variateLeft()
 	{
-		return _dblVariateLeft;
+		return _variateLeft;
 	}
 
 	/**
@@ -132,94 +156,102 @@ public class BracketingOutput extends org.drip.function.r1tor1solver.ExecutionIn
 	 * @return Right Variate
 	 */
 
-	public double getVariateRight()
+	public double variateRight()
 	{
-		return _dblVariateRight;
+		return _variateRight;
 	}
 
 	/**
-	 * Return the left OF
+	 * Return the Left Objective Function
 	 * 
-	 * @return Left OF
+	 * @return Left Objective Function
 	 */
 
-	public double getOFLeft()
+	public double objectiveFunctionLeft()
 	{
-		return _dblOFLeft;
+		return _objectiveFunctionLeft;
 	}
 
 	/**
-	 * Return the Right OF
+	 * Return the Right Objective Function
 	 * 
-	 * @return Right OF
+	 * @return Right Objective Function
 	 */
 
-	public double getOFRight()
+	public double objectiveFunctionRight()
 	{
-		return _dblOFRight;
+		return _objectiveFunctionRight;
 	}
 
 	/**
-	 * Set the brackets in the output object
+	 * Set the Brackets in the Output Object
 	 * 
-	 * @param dblVariateLeft Left Variate
-	 * @param dblVariateRight Right Variate
-	 * @param dblOFLeft Left OF
-	 * @param dblOFRight Right OF
-	 * @param dblStartingVariate Starting Variate
+	 * @param variateLeft Left Variate
+	 * @param variateRight Right Variate
+	 * @param objectiveFunctionLeft Left Objective Function
+	 * @param objectiveFunctionRight Right Objective Function
+	 * @param startingVariate Starting Variate
 	 * 
 	 * @return TRUE - Successfully set
 	 */
 
 	public boolean done (
-		final double dblVariateLeft,
-		final double dblVariateRight,
-		final double dblOFLeft,
-		final double dblOFRight,
-		final double dblStartingVariate)
+		final double variateLeft,
+		final double variateRight,
+		final double objectiveFunctionLeft,
+		final double objectiveFunctionRight,
+		final double startingVariate)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblVariateLeft = dblVariateLeft) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblVariateRight = dblVariateRight) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblOFLeft = dblOFLeft) ||
-					!org.drip.numerical.common.NumberUtil.IsValid (_dblOFRight = dblOFRight) ||
-						!setStartingVariate (dblStartingVariate))
+		if (!NumberUtil.IsValid (_variateLeft = variateLeft) ||
+			!NumberUtil.IsValid (_variateRight = variateRight) ||
+			!NumberUtil.IsValid (_objectiveFunctionLeft = objectiveFunctionLeft) ||
+			!NumberUtil.IsValid (_objectiveFunctionRight = objectiveFunctionRight) ||
+			!setStartingVariate (startingVariate))
+		{
 			return false;
+		}
 
 		return done();
 	}
 
 	/**
-	 * Make a ConvergenceOutput for the Open Method from the bracketing output
+	 * Make a <i>ConvergenceOutput</i> Instance for the Open Method from the Bracketing Output
 	 * 
-	 * @return The ConvergenceOutput object
+	 * @return The <i>ConvergenceOutput</i> Instance Object
 	 */
 
-	public org.drip.function.r1tor1solver.ConvergenceOutput makeConvergenceVariate()
+	public ConvergenceOutput makeConvergenceVariate()
 	{
-		org.drip.function.r1tor1solver.ConvergenceOutput cop = null;
+		ConvergenceOutput convergenceOutput = null;
 
 		try {
-			cop = new org.drip.function.r1tor1solver.ConvergenceOutput (this);
-		} catch (java.lang.Exception e) {
+			convergenceOutput = new ConvergenceOutput (this);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		return cop.done (getStartingVariate()) ? cop : null;
+		return convergenceOutput.done (startingVariate()) ? convergenceOutput : null;
 	}
 
-	@Override public java.lang.String displayString()
+	/**
+	 * Return a String Form of the Bracketing Output
+	 * 
+	 * @return String Form of the Bracketing Output
+	 */
+
+	@Override public String displayString()
 	{
-		java.lang.StringBuffer sb = new java.lang.StringBuffer();
+		StringBuffer sb = new StringBuffer();
 
 		sb.append (super.displayString());
 
-		sb.append ("\n\t\tLeft Bracket: " + getVariateLeft());
+		sb.append ("\n\t\tLeft Bracket: " + variateLeft());
 
-		sb.append ("\n\t\tRight Bracket: " + getVariateRight());
+		sb.append ("\n\t\tRight Bracket: " + variateRight());
 
-		sb.append ("\n\t\tLeft OF: " + getOFLeft());
+		sb.append ("\n\t\tLeft OF: " + objectiveFunctionLeft());
 
-		sb.append ("\n\t\tRight OF: " + getOFRight());
+		sb.append ("\n\t\tRight OF: " + objectiveFunctionRight());
 
 		return sb.toString();
 	}

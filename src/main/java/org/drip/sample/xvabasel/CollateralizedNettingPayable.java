@@ -259,11 +259,11 @@ public class CollateralizedNettingPayable
 		double bankFundingSpread = bankHazardRate / (1. - bankRecoveryRate);
 		double[][] portfolio1ValueGrid = new double[pathCount][stepCount + 1];
 		double[][] portfolio2ValueGrid = new double[pathCount][stepCount + 1];
+		double counterPartyFundingSpread = counterPartyHazardRate / (1. - counterPartyRecoveryRate);
 		MonoPathExposureAdjustment[] groundMonoPathExposureAdjustmentArray =
 			new MonoPathExposureAdjustment[pathCount];
 		MonoPathExposureAdjustment[] extendedMonoPathExposureAdjustmentArray =
 			new MonoPathExposureAdjustment[pathCount];
-		double counterPartyFundingSpread = counterPartyHazardRate / (1. - counterPartyRecoveryRate);
 
 		PositionGroupSpecification positionGroupSpecification = PositionGroupSpecification.FixedThreshold (
 			"FIXEDTHRESHOLD",

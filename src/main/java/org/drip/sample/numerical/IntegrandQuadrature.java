@@ -12,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -95,179 +103,138 @@ import org.drip.service.env.EnvManager;
  * 	- Simpson/Simpson38 schemes
  * 	- Boole Scheme
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class IntegrandQuadrature {
-
-	/*
-	 * Compute the Integrand Quadrature for the specified Univariate Function using the various methods.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class IntegrandQuadrature
+{
 
 	private static void ComputeQuadrature (
-		final R1ToR1 au,
-		final double dblActual,
-		final double dblStart,
-		final double dblEnd)
+		final R1ToR1 function,
+		final double actual,
+		final double start,
+		final double end)
 		throws Exception
 	{
-		int iRightDecimal = 8;
+		int rightDecimal = 8;
 
-		System.out.println ("\t\tActual      : " +
-			FormatUtil.FormatDouble (dblActual, 1, iRightDecimal, 1.)
-		);
+		System.out.println ("\t\tActual      : " + FormatUtil.FormatDouble (actual, 1, rightDecimal, 1.));
 
-		System.out.println ("\t\tLinear      : " +
-			FormatUtil.FormatDouble (
-				Integrator.LinearQuadrature (
-					au,
-					dblStart,
-					dblEnd
-				),
+		System.out.println (
+			"\t\tLinear      : " + FormatUtil.FormatDouble (
+				Integrator.LinearQuadrature (function, start, end),
 				1,
-				iRightDecimal,
+				rightDecimal,
 				1.
 			)
 		);
 
-		System.out.println ("\t\tMidPoint     : " +
-			FormatUtil.FormatDouble (
-				Integrator.MidPoint (
-					au,
-					dblStart,
-					dblEnd
-				),
+		System.out.println (
+			"\t\tMidPoint     : " + FormatUtil.FormatDouble (
+				Integrator.MidPoint (function, start, end),
 				1,
-				iRightDecimal,
+				rightDecimal,
 				1.
 			)
 		);
 
-		System.out.println ("\t\tTrapezoidal  : " +
-			FormatUtil.FormatDouble (
-				Integrator.Trapezoidal (
-					au,
-					dblStart,
-					dblEnd
-				),
+		System.out.println (
+			"\t\tTrapezoidal  : " + FormatUtil.FormatDouble (
+				Integrator.Trapezoidal (function, start, end),
 				1,
-				iRightDecimal,
+				rightDecimal,
 				1.
 			)
 		);
 
-		System.out.println ("\t\tSimpson      : " +
-			FormatUtil.FormatDouble (
-				Integrator.Simpson (
-					au,
-					dblStart,
-					dblEnd
-				),
+		System.out.println (
+			"\t\tSimpson      : " + FormatUtil.FormatDouble (
+				Integrator.Simpson (function, start, end),
 				1,
-				iRightDecimal,
+				rightDecimal,
 				1.
 			)
 		);
 
-		System.out.println ("\t\tSimpson 38   : " +
-			FormatUtil.FormatDouble (
-				Integrator.Simpson38 (
-					au,
-					dblStart,
-					dblEnd
-				),
+		System.out.println (
+			"\t\tSimpson 38   : " + FormatUtil.FormatDouble (
+				Integrator.Simpson38 (function, start, end),
 				1,
-				iRightDecimal,
+				rightDecimal,
 				1.
 			)
 		);
 
-		System.out.println ("\t\tBoole        : " +
-			FormatUtil.FormatDouble (
-				Integrator.Boole (
-					au,
-					dblStart,
-					dblEnd
-				),
+		System.out.println (
+			"\t\tBoole        : " + FormatUtil.FormatDouble (
+				Integrator.Boole (function, start, end),
 				1,
-				iRightDecimal,
+				rightDecimal,
 				1.
 			)
 		);
 	}
 
-	/*
-	 * Compute the Integrand Quadrature for the various Univariate Functions using the different methods.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static void IntegrandQuadratureSample()
 		throws Exception
 	{
-		double dblStart = 0.;
-		double dblEnd = 1.;
+		double start = 0.;
+		double end = 1.;
 
-		R1ToR1 auExp = new ExponentialTension (
-			Math.E,
-			1.
+		R1ToR1 exponentialTensionFunction = new ExponentialTension (Math.E, 1.);
+
+		System.out.println ("\n\t-------------------------------------\n");
+
+		ComputeQuadrature (
+			exponentialTensionFunction,
+			exponentialTensionFunction.evaluate (end) - exponentialTensionFunction.evaluate (start),
+			start,
+			end
 		);
 
 		System.out.println ("\n\t-------------------------------------\n");
 
 		ComputeQuadrature (
-			auExp,
-			auExp.evaluate (dblEnd) - auExp.evaluate (dblStart),
-			dblStart,
-			dblEnd
-		);
-
-		System.out.println ("\n\t-------------------------------------\n");
-
-		R1ToR1 au1 = new R1ToR1 (null) {
-			@Override public double evaluate (
-				final double dblVariate)
-				throws Exception
+			new R1ToR1 (null)
 			{
-				return Math.cos (dblVariate) - dblVariate * dblVariate * dblVariate;
-			}
-		};
-
-		ComputeQuadrature (
-			au1,
-			Math.sin (dblEnd) - Math.sin (dblStart) - 0.25 * (dblEnd * dblEnd * dblEnd * dblEnd - dblStart * dblStart * dblStart * dblStart),
-			dblStart,
-			dblEnd
+				@Override public double evaluate (
+					final double variate)
+					throws Exception
+				{
+					return Math.cos (variate) - variate * variate * variate;
+				}
+			},
+			Math.sin (end) - Math.sin (start) -
+				0.25 * (end * end * end * end - start * start * start * start),
+			start,
+			end
 		);
 
 		System.out.println ("\n\t-------------------------------------\n");
 
-		R1ToR1 au2 = new R1ToR1 (null) {
-			@Override public double evaluate (
-				final double dblVariate)
-				throws Exception
-			{
-				return dblVariate * dblVariate * dblVariate - 3. * dblVariate * dblVariate + 2. * dblVariate;
-			}
-		};
-
 		ComputeQuadrature (
-			au2,
-			0.25 * (dblEnd * dblEnd * dblEnd * dblEnd - dblStart * dblStart * dblStart * dblStart) -
-				(dblEnd * dblEnd * dblEnd - dblStart * dblStart * dblStart) +
-				(dblEnd * dblEnd - dblStart * dblStart),
-			dblStart,
-			dblEnd
+			new R1ToR1 (null)
+			{
+				@Override public double evaluate (
+					final double variate)
+					throws Exception
+				{
+					return variate * variate * variate - 3. * variate * variate + 2. * variate;
+				}
+			},
+			0.25 * (end * end * end * end - start * start * start * start) -
+				(end * end * end - start * start * start) + (end * end - start * start),
+			start,
+			end
 		);
 
 		System.out.println ("\n\t-------------------------------------\n");
@@ -276,18 +243,16 @@ public class IntegrandQuadrature {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String astrArgs[])
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		IntegrandQuadratureSample();
 

@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,120 +95,124 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>VariateIterationSelectorParams</i> implements the control parameters for the compound variate selector
- * scheme used in Brent's method.
- * <br><br>
- * Brent's method uses the following fields in VariateIterationSelectorParams to generate the next variate:
- * <br>
- * <ul>
- * 	<li>
- * 		The Variate Primitive that is regarded as the "fast" method
- * 	</li>
- * 	<li>
- * 		The Variate Primitive that is regarded as the "robust" method
- * 	</li>
- * 	<li>
- * 		The relative variate shift that determines when the "robust" method is to be invoked over the "fast"
- * 	</li>
- * 	<li>
- * 		The lower bound on the variate shift between iterations that serves as the fall-back to the "robust"
- * 	</li>
- * </ul>
+ * 	Scheme used in Brent's method. Brent's method uses the following fields in
+ *  <i>VariateIterationSelectorParams</i> to generate the next variate:
+ * 	<br>
+ * 	<ul>
+ * 		<li>The Variate Primitive that is regarded as the "fast" method</li>
+ * 		<li>The Variate Primitive that is regarded as the "robust" method</li>
+ * 		<li>The relative variate shift that determines when the "robust" method is to be invoked over the "fast"</li>
+ * 		<li>The lower bound on the variate shift between iterations that serves as the fall-back to the "robust"</li>
+ * 	</ul>
+ * 
+ * 	It may be readily enhanced to accommodate additional primitives. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Default <i>VariateIterationSelectorParams</i> Constructor</li>
+ * 		<li><i>VariateIterationSelectorParams</i> Constructor</li>
+ * 		<li>Retrieve the Relative Variate Shift</li>
+ * 		<li>Retrieve the Variate Shift Lower Bound</li>
+ * 		<li>Retrieve the Variate Iterator Primitive meant for Speed</li>
+ * 		<li>Retrieve the Variate Iterator Primitive meant for Robustness</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class VariateIterationSelectorParams {
-	private int _iFastIteratorPrimitive = -1;
-	private int _iRobustIteratorPrimitive = -1;
-	private double _dblRelativeVariateShift = java.lang.Double.NaN;
-	private double _dblVariateShiftLowerBound = java.lang.Double.NaN;
+public class VariateIterationSelectorParams
+{
+	private int _fastIteratorPrimitive = -1;
+	private int _robustIteratorPrimitive = -1;
+	private double _relativeShift = Double.NaN;
+	private double _shiftLowerBound = Double.NaN;
 
 	/**
-	 * Default VariateIterationSelectorParams constructor
+	 * Default <i>VariateIterationSelectorParams</i> Constructor
 	 */
 
 	public VariateIterationSelectorParams()
 	{
-		_dblRelativeVariateShift = 0.5;
-		_dblVariateShiftLowerBound = 0.01;
-		_iRobustIteratorPrimitive = org.drip.function.r1tor1solver.VariateIteratorPrimitive.BISECTION;
-		_iFastIteratorPrimitive =
-			org.drip.function.r1tor1solver.VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION;
+		_relativeShift = 0.5;
+		_shiftLowerBound = 0.01;
+		_robustIteratorPrimitive = VariateIteratorPrimitive.BISECTION;
+		_fastIteratorPrimitive = VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION;
 	}
 
 	/**
-	 * VariateIterationSelectorParams constructor
+	 * <i>VariateIterationSelectorParams</i> Constructor
 	 * 
-	 * @param dblRelativeVariateShift Relative Variate Shift
-	 * @param dblVariateShiftLowerBound Variant Shift Lower Bound
-	 * @param iFastIteratorPrimitive Fast Iterator Primitive
-	 * @param iRobustIteratorPrimitive Robust Iterator Primitive
+	 * @param relativeShift Relative Variate Shift
+	 * @param shiftLowerBound Variant Shift Lower Bound
+	 * @param fastIteratorPrimitive Fast Iterator Primitive
+	 * @param robustIteratorPrimitive Robust Iterator Primitive
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public VariateIterationSelectorParams (
-		final double dblRelativeVariateShift,
-		final double dblVariateShiftLowerBound,
-		final int iFastIteratorPrimitive,
-		final int iRobustIteratorPrimitive)
-		throws java.lang.Exception
+		final double relativeShift,
+		final double shiftLowerBound,
+		final int fastIteratorPrimitive,
+		final int robustIteratorPrimitive)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblRelativeVariateShift = dblRelativeVariateShift) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblVariateShiftLowerBound =
-				dblVariateShiftLowerBound))
-			throw new java.lang.Exception ("VariateIterationSelectorParams constructor: Invalid inputs!");
+		if (!NumberUtil.IsValid (_relativeShift = relativeShift) ||
+			!NumberUtil.IsValid (_shiftLowerBound = shiftLowerBound))
+		{
+			throw new Exception ("VariateIterationSelectorParams Constructor: Invalid inputs!");
+		}
 	}
 
 	/**
-	 * Retrieve the relative variate Shift
+	 * Retrieve the Relative Variate Shift
 	 * 
-	 * @return Relative variate Shift
+	 * @return Relative Variate Shift
 	 */
 
-	public double getRelativeVariateShift()
+	public double relativeShift()
 	{
-		return _dblRelativeVariateShift;
+		return _relativeShift;
 	}
 
 	/**
-	 * Retrieve the Variate Shift lower bound
+	 * Retrieve the Variate Shift Lower Bound
 	 * 
-	 * @return Variate Shift lower bound
+	 * @return Variate Shift Lower Bound
 	 */
 
-	public double getVariateShiftLowerBound()
+	public double shiftLowerBound()
 	{
-		return _dblVariateShiftLowerBound;
+		return _shiftLowerBound;
 	}
 
 	/**
-	 * Retrieve the variate iterator primitive meant for speed
+	 * Retrieve the Variate Iterator Primitive meant for Speed
 	 * 
-	 * @return variate iterator primitive meant for speed
+	 * @return Variate Iterator Primitive meant for Speed
 	 */
 
-	public int getFastVariateIteratorPrimitive()
+	public int fastIteratorPrimitive()
 	{
-		return _iFastIteratorPrimitive;
+		return _fastIteratorPrimitive;
 	}
 
 	/**
-	 * Retrieve the variate iterator primitive meant for robustness
+	 * Retrieve the Variate Iterator Primitive meant for Robustness
 	 * 
-	 * @return variate iterator primitive meant for robustness
+	 * @return Variate Iterator Primitive meant for Robustness
 	 */
 
-	public int getRobustVariateIteratorPrimitive()
+	public int robustVariateIteratorPrimitive()
 	{
-		return _iRobustIteratorPrimitive;
+		return _robustIteratorPrimitive;
 	}
 }

@@ -180,7 +180,7 @@ public class BracketingRegressorSet implements org.drip.regression.core.Regresso
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopBisect.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopBisect.root());
 
 					return true;
 				}
@@ -216,7 +216,7 @@ public class BracketingRegressorSet implements org.drip.regression.core.Regresso
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopFalsePosition.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopFalsePosition.root());
 
 					return true;
 				}
@@ -252,7 +252,7 @@ public class BracketingRegressorSet implements org.drip.regression.core.Regresso
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopQuadratic.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopQuadratic.root());
 
 					return true;
 				}
@@ -290,7 +290,7 @@ public class BracketingRegressorSet implements org.drip.regression.core.Regresso
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopInverseQuadratic.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopInverseQuadratic.root());
 
 					return true;
 				}
@@ -325,7 +325,7 @@ public class BracketingRegressorSet implements org.drip.regression.core.Regresso
 
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd) {
-					rnvd.set ("FixedPoint", "" + fpfopRidder.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopRidder.root());
 
 					return true;
 				}

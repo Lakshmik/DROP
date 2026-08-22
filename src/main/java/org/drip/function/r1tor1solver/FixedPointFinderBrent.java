@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,115 +96,144 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>FixedPointFinderBrent</i> customizes FixedPointFinderBracketing by applying the Brent's scheme of
- * compound variate selector.
- * <br><br>
- * Brent's scheme, as implemented here, is described in http://www.credit-trader.org. This implementation
- * 	retains absolute shifts that have happened to the variate for the past 2 iterations as the discriminant
- * 	that determines the next variate to be generated.
- * <br><br>
- * FixedPointFinderBrent uses the following parameters specified in VariateIterationSelectorParams:
- * <br>
- * <ul>
- * 	<li>
- * 		The Variate Primitive that is regarded as the "fast" method
- * 	</li>
- * 	<li>
- * 		The Variate Primitive that is regarded as the "robust" method
- * 	</li>
- * 	<li>
- * 		The relative variate shift that determines when the "robust" method is to be invoked over the "fast"
- * 	</li>
- * 	<li>
- * 		The lower bound on the variate shift between iterations that serves as the fall-back to the "robust"
- * 	</li>
- * </ul>
+ * 	compound variate selector. Brent's scheme, as implemented here, is described in
+ *  https://github.com/lakshmik/DROP. This implementation retains absolute shifts that have happened to the
+ *  variate for the past 2 iterations as the discriminant that determines the next variate to be generated.
+ * 	<i>FixedPointFinderBrent</i> uses the following parameters specified in
+ *  <i>VariateIterationSelectorParams</i>:
+ * 	<br>
+ * 	<ul>
+ * 		<li>The Variate Primitive that is regarded as the "fast" method</li>
+ * 		<li>The Variate Primitive that is regarded as the "robust" method</li>
+ * 		<li>The relative variate shift that determines when the "robust" method is to be invoked over the "fast"</li>
+ * 		<li>The lower bound on the variate shift between iterations that serves as the fall-back to the "robust"</li>
+ * 	</ul>
  *
- *	<br><br>
+ *  It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>FixedPointFinderBrent</i> Constructor</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixedPointFinderBrent extends org.drip.function.r1tor1solver.FixedPointFinderBracketing {
-	private double _dblVariateIterativeShift = java.lang.Double.NaN;
-	private double _dblPreviousVariateIterativeShift = java.lang.Double.NaN;
-	private org.drip.function.r1tor1solver.VariateIterationSelectorParams _visp = null;
+public class FixedPointFinderBrent
+	extends FixedPointFinderBracketing
+{
+	private double _variateIterativeShift = Double.NaN;
+	private double _previousVariateIterativeShift = Double.NaN;
+	private VariateIterationSelectorParams _variateIterationSelectorParams = null;
 
 	@Override protected double iterateCompoundVariate (
-		final double dblCurrentVariate,
-		final double dblContraVariate,
-		final double dblCurrentOF,
-		final double dblContraPointOF,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
-		throws java.lang.Exception
+		final double currentVariate,
+		final double contraVariate,
+		final double currentObjectiveFunctionValue,
+		final double contraObjectiveFunctionValue,
+		final FixedPointFinderOutput fixedPointFinderOutput)
+		throws Exception
 	{
-		double dblNextVariate = calcNextVariate (dblCurrentVariate, dblContraVariate, dblCurrentOF,
-			dblContraPointOF, _visp.getFastVariateIteratorPrimitive(), rfop);
+		double nextVariate = nextVariate (
+			currentVariate,
+			contraVariate,
+			currentObjectiveFunctionValue,
+			contraObjectiveFunctionValue,
+			_variateIterationSelectorParams.fastIteratorPrimitive(),
+			fixedPointFinderOutput
+		);
 
-		double dblVariateEstimateShift = java.lang.Math.abs (dblNextVariate - dblCurrentVariate);
+		double variateEstimateShift = Math.abs (nextVariate - currentVariate);
 
-		if (org.drip.numerical.common.NumberUtil.IsValid (_dblVariateIterativeShift) ||
-			_visp.getRobustVariateIteratorPrimitive() == _iIteratorPrimitive) {
-			if (dblVariateEstimateShift < _visp.getRelativeVariateShift() * _dblVariateIterativeShift &&
-				_dblVariateIterativeShift > 0.5 * _visp.getVariateShiftLowerBound()) {
-				_iIteratorPrimitive = _visp.getFastVariateIteratorPrimitive();
+		int robustVariateIteratorPrimitive =
+			_variateIterationSelectorParams.robustVariateIteratorPrimitive();
 
-				_dblPreviousVariateIterativeShift = _dblVariateIterativeShift;
-				_dblVariateIterativeShift = dblVariateEstimateShift;
-				return dblNextVariate;
+		if (NumberUtil.IsValid (_variateIterativeShift) ||
+			robustVariateIteratorPrimitive == _iteratorPrimitive)
+		{
+			if (variateEstimateShift <
+					_variateIterationSelectorParams.relativeShift() * _variateIterativeShift &&
+				_variateIterativeShift > 0.5 * _variateIterationSelectorParams.shiftLowerBound())
+			{
+				_iteratorPrimitive = _variateIterationSelectorParams.fastIteratorPrimitive();
+
+				_previousVariateIterativeShift = _variateIterativeShift;
+				_variateIterativeShift = variateEstimateShift;
+				return nextVariate;
 			}
 
-			_iIteratorPrimitive = _visp.getRobustVariateIteratorPrimitive();
+			_previousVariateIterativeShift = _variateIterativeShift;
+			_variateIterativeShift = variateEstimateShift;
 
-			_dblPreviousVariateIterativeShift = _dblVariateIterativeShift;
-			_dblVariateIterativeShift = dblVariateEstimateShift;
-
-			return calcNextVariate (dblCurrentVariate, dblContraVariate, dblCurrentOF, dblContraPointOF,
-				_visp.getRobustVariateIteratorPrimitive(), rfop);
+			return nextVariate (
+				currentVariate,
+				contraVariate,
+				currentObjectiveFunctionValue,
+				contraObjectiveFunctionValue,
+				_iteratorPrimitive = robustVariateIteratorPrimitive,
+				fixedPointFinderOutput
+			);
 		}
 
-		if (org.drip.numerical.common.NumberUtil.IsValid (_dblPreviousVariateIterativeShift) &&
-			(dblVariateEstimateShift < _visp.getRelativeVariateShift() * _dblPreviousVariateIterativeShift &&
-				_dblPreviousVariateIterativeShift > 0.5 * _visp.getVariateShiftLowerBound())) {
-			_iIteratorPrimitive = _visp.getFastVariateIteratorPrimitive();
+		if (NumberUtil.IsValid (_previousVariateIterativeShift) && (
+				variateEstimateShift <
+					_variateIterationSelectorParams.relativeShift() * _previousVariateIterativeShift &&
+				_previousVariateIterativeShift > 0.5 * _variateIterationSelectorParams.shiftLowerBound()
+			)
+		)
+		{
+			_iteratorPrimitive = _variateIterationSelectorParams.fastIteratorPrimitive();
 
-			_dblPreviousVariateIterativeShift = _dblVariateIterativeShift;
-			_dblVariateIterativeShift = dblVariateEstimateShift;
-			return dblNextVariate;
+			_previousVariateIterativeShift = _variateIterativeShift;
+			_variateIterativeShift = variateEstimateShift;
+			return nextVariate;
 		}
 
-		_iIteratorPrimitive = _visp.getRobustVariateIteratorPrimitive();
+		_previousVariateIterativeShift = _variateIterativeShift;
+		_variateIterativeShift = variateEstimateShift;
 
-		_dblPreviousVariateIterativeShift = _dblVariateIterativeShift;
-		_dblVariateIterativeShift = dblVariateEstimateShift;
-
-		return calcNextVariate (dblCurrentVariate, dblContraVariate, dblCurrentOF, dblContraPointOF,
-			_visp.getRobustVariateIteratorPrimitive(), rfop);
+		return nextVariate (
+			currentVariate,
+			contraVariate,
+			currentObjectiveFunctionValue,
+			contraObjectiveFunctionValue,
+			_iteratorPrimitive = _variateIterationSelectorParams.robustVariateIteratorPrimitive(),
+			fixedPointFinderOutput
+		);
 	}
 
 	/**
-	 * FixedPointFinderBrent constructor
+	 * <i>FixedPointFinderBrent</i> Constructor
 	 * 
-	 * @param dblOFGoal OF Goal
-	 * @param of Objective Function
-	 * @param bWhine TRUE - Balk on Encountering Exception
+	 * @param objectiveFunctionValueGoal Objective Function Value Goal
+	 * @param objectiveFunction Objective Function
+	 * @param whine TRUE - Balk on Encountering Exception
 	 * 
-	 * @throws java.lang.Exception Propogated from below
+	 * @throws Exception Propagated from below
 	 */
 
 	public FixedPointFinderBrent (
-		final double dblOFGoal,
-		final org.drip.function.definition.R1ToR1 of,
-		final boolean bWhine)
-		throws java.lang.Exception
+		final double objectiveFunctionValueGoal,
+		final R1ToR1 objectiveFunction,
+		final boolean whine)
+		throws Exception
 	{
-		super (dblOFGoal, of, null, org.drip.function.r1tor1solver.VariateIteratorPrimitive.BISECTION, bWhine);
+		super (
+			objectiveFunctionValueGoal,
+			objectiveFunction,
+			null,
+			VariateIteratorPrimitive.BISECTION,
+			whine
+		);
 
-		_visp = new org.drip.function.r1tor1solver.VariateIterationSelectorParams();
+		_variateIterationSelectorParams = new VariateIterationSelectorParams();
 	}
 }

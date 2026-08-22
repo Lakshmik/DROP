@@ -113,7 +113,6 @@ import org.drip.numerical.common.NumberUtil;
  * 		<li>Evaluate for the given variate</li>
  * 		<li>Compute the Condition Number at the specified Variate</li>
  *  </ul>
- *  
  *
  *	<br>
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">

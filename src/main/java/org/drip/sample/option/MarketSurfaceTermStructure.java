@@ -20,6 +20,14 @@ import org.drip.state.creator.ScenarioMarketSurfaceBuilder;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -99,19 +107,20 @@ import org.drip.state.creator.ScenarioMarketSurfaceBuilder;
  * <i>MarketSurfaceTermStructure</i> contains an illustration of the Creation and Usage of the Strike
  * 	Anchored and Maturity Anchored Term Structures extracted from the given Market Surface.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/option/README.md">Deterministic (Black) / Stochastic (Heston) Options</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/option/README.md">Deterministic (Black) / Stochastic (Heston) Options</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class MarketSurfaceTermStructure {
+public class MarketSurfaceTermStructure
+{
 
 	private static final SegmentCustomBuilderControl CubicPolySCBC()
 		throws Exception
@@ -119,35 +128,43 @@ public class MarketSurfaceTermStructure {
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
 	}
 
 	private static final void EvaluateSplineSurface (
-		final MarketSurface mktSurf,
-		final double[] adblStrikeATMFactor,
-		final String[] astrMaturityTenor)
+		final MarketSurface marketSurface,
+		final double[] atmStrikeFactorArray,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
 		System.out.println ("\t|------------------------------------------------------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		for (String strMaturity : astrMaturityTenor)
-			System.out.print ("    " + strMaturity + "  ");
+		for (String maturityTenor : maturityTenorArray) {
+			System.out.print ("    " + maturityTenor + "  ");
+		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblStrike : adblStrikeATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblStrike, 1, 2, 1.) + "    =>");
+		for (double atmStrikeFactor : atmStrikeFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (atmStrikeFactor, 1, 2, 1.) + "    =>");
 
-			for (String strMaturity : astrMaturityTenor)
-				System.out.print ("  " + FormatUtil.FormatDouble (mktSurf.node (dblStrike, strMaturity), 2, 2, 100.) + "%");
+			for (String maturityTenor : maturityTenorArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (
+						marketSurface.node (atmStrikeFactor, maturityTenor),
+						2,
+						2,
+						100.
+					) + "%"
+				);
+			}
 
 			System.out.print ("  |\n");
 		}
@@ -156,29 +173,36 @@ public class MarketSurfaceTermStructure {
 	}
 
 	private static final void EvaluateStrikeTermStructure (
-		final MarketSurface mktSurf,
-		final double[] adblStrikeATMFactor,
-		final String[] astrMaturityTenor)
+		final MarketSurface marketSurface,
+		final double[] atmStrikeFactorArray,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
 		System.out.println ("\n\t|--------- STRIKE TERM STRUCTURE FROM MARKET SURFACE --------|");
 
 		System.out.println ("\t|------------------------------------------------------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		for (String strMaturity : astrMaturityTenor)
-			System.out.print ("    " + strMaturity + "  ");
+		for (String maturityTenor : maturityTenorArray) {
+			System.out.print ("    " + maturityTenor + "  ");
+		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblStrike : adblStrikeATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblStrike, 1, 2, 1.) + "    =>");
+		for (double atmStrikeFactor : atmStrikeFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (atmStrikeFactor, 1, 2, 1.) + "    =>");
 
-			NodeStructure tsStrike = mktSurf.xAnchorTermStructure (dblStrike);
+			NodeStructure strikeNodeStructure = marketSurface.xAnchorTermStructure (atmStrikeFactor);
 
-			for (String strMaturity : astrMaturityTenor)
-				System.out.print ("  " + FormatUtil.FormatDouble (tsStrike.node (strMaturity), 2, 2, 100.) + "%");
+			for (String maturityTenor : maturityTenorArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (strikeNodeStructure.node (maturityTenor), 2, 2, 100.) +
+						"%"
+				);
+			}
 
 			System.out.print ("  |\n");
 		}
@@ -187,34 +211,44 @@ public class MarketSurfaceTermStructure {
 	}
 
 	private static final void EvaluateMaturityTermStructure (
-		final MarketSurface mktSurf,
-		final double[] adblStrikeATMFactor,
-		final String[] astrMaturityTenor)
+		final MarketSurface marketSurface,
+		final double[] atmStrikeFactorArray,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
 		System.out.println ("\n\t|-------- MATURITY TERM STRUCTURE FROM MARKET SURFACE -------|");
 
 		System.out.println ("\t|------------------------------------------------------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		Map<String, NodeStructure> mapMaturityTS = new TreeMap<String, NodeStructure>();
+		Map<String, NodeStructure> maturityNodeStructureMap = new TreeMap<String, NodeStructure>();
 
-		for (String strMaturity : astrMaturityTenor) {
-			System.out.print ("    " + strMaturity + "  ");
+		for (String maturityTenor : maturityTenorArray) {
+			System.out.print ("    " + maturityTenor + "  ");
 
-			mapMaturityTS.put (strMaturity, mktSurf.maturityAnchorTermStructure (strMaturity));
+			maturityNodeStructureMap.put (
+				maturityTenor,
+				marketSurface.maturityAnchorTermStructure (maturityTenor)
+			);
 		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblStrike : adblStrikeATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblStrike, 1, 2, 1.) + "    =>");
+		for (double atmStrikeFactor : atmStrikeFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (atmStrikeFactor, 1, 2, 1.) + "    =>");
 
-			for (String strMaturity : astrMaturityTenor) {
-				NodeStructure tsMaturity = mapMaturityTS.get (strMaturity);
-
-				System.out.print ("  " + FormatUtil.FormatDouble (tsMaturity.node ((int) dblStrike), 2, 2, 100.) + "%");
+			for (String maturityTenor : maturityTenorArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (
+						maturityNodeStructureMap.get (maturityTenor).node ((int) atmStrikeFactor),
+						2,
+						2,
+						100.
+					) + "%"
+				);
 			}
 
 			System.out.print ("  |\n");
@@ -226,80 +260,135 @@ public class MarketSurfaceTermStructure {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtStart = DateUtil.Today();
+		JulianDate startDate = DateUtil.Today();
 
-		double[] adblStrikeATMFactorCalib = new double[] {
-			0.8, 0.9, 1.0, 1.1, 1.2
+		double rho = 0.3;
+		double kappa = 1.;
+		double lambda = 0.;
+		double sigma = 0.5;
+		double theta = 0.2;
+		double[] calibrationATMStrikeFactorArray =
+		{
+			0.8,
+			0.9,
+			1.0,
+			1.1,
+			1.2
 		};
-		String[] astrMaturityTenorCalib = new String[] {
-			"12M", "24M", "36M", "48M", "60M"
+		String[] calibrationMaturityTenorArray =
+		{
+			"12M",
+			"24M",
+			"36M",
+			"48M",
+			"60M"
 		};
 
-		double dblRho = 0.3;
-		double dblKappa = 1.;
-		double dblSigma = 0.5;
-		double dblTheta = 0.2;
-		double dblLambda = 0.;
-
-		HestonOptionPricerParams hopp = new HestonOptionPricerParams (
-			HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_AMST_2007,
-			dblRho,
-			dblKappa,
-			dblSigma,
-			dblTheta,
-			dblLambda,
-			PhaseAdjuster.MULTI_VALUE_BRANCH_POWER_PHASE_TRACKER_KAHL_JACKEL
-		);
-
-		MarketSurface priceSurfCubicPoly = ScenarioMarketSurfaceBuilder.HestonRunMarketSurface (
+		MarketSurface cubicPolynomialMarketSurface = ScenarioMarketSurfaceBuilder.HestonRunMarketSurface (
 			"HESTON1993_CUBICPOLY_CALLPRICE_SURFACE",
-			dtStart,
+			startDate,
 			"USD",
 			0.01,
 			1.,
 			false,
-			0.20,
-			adblStrikeATMFactorCalib,
-			astrMaturityTenorCalib,
-			hopp,
+			0.2,
+			calibrationATMStrikeFactorArray,
+			calibrationMaturityTenorArray,
+			new HestonOptionPricerParams (
+				HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_AMST_2007,
+				rho,
+				kappa,
+				sigma,
+				theta,
+				lambda,
+				PhaseAdjuster.MULTI_VALUE_BRANCH_POWER_PHASE_TRACKER_KAHL_JACKEL
+			),
 			true,
 			CubicPolySCBC(),
 			CubicPolySCBC()
 		);
 
 		EvaluateSplineSurface (
-			priceSurfCubicPoly,
-			adblStrikeATMFactorCalib,
-			astrMaturityTenorCalib
+			cubicPolynomialMarketSurface,
+			calibrationATMStrikeFactorArray,
+			calibrationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
-			priceSurfCubicPoly,
-			new double[] {0.500, 0.700, 0.850, 1.000, 1.150, 1.300, 1.500},
-			new String[] {"06M", "21M", "36M", "51M", "66M"}
+			cubicPolynomialMarketSurface,
+			new double[]
+			{
+				0.50,
+				0.70,
+				0.85,
+				1.00,
+				1.15,
+				1.30,
+				1.50
+			},
+			new String[]
+			{
+				"06M",
+				"21M",
+				"36M",
+				"51M",
+				"66M"
+			}
 		);
 
 		EvaluateStrikeTermStructure (
-			priceSurfCubicPoly,
-			new double[] {0.500, 0.700, 0.850, 1.000, 1.150, 1.300, 1.500},
-			new String[] {"06M", "21M", "36M", "51M", "66M"}
+			cubicPolynomialMarketSurface,
+			new double[]
+			{
+				0.50,
+				0.70,
+				0.85,
+				1.00,
+				1.15,
+				1.30,
+				1.50
+			},
+			new String[]
+			{
+				"06M",
+				"21M",
+				"36M",
+				"51M",
+				"66M"
+			}
 		);
 
 		EvaluateMaturityTermStructure (
-			priceSurfCubicPoly,
-			new double[] {0.500, 0.700, 0.850, 1.000, 1.150, 1.300, 1.500},
-			new String[] {"06M", "21M", "36M", "51M", "66M"}
+			cubicPolynomialMarketSurface,
+			new double[]
+			{
+				0.50,
+				0.70,
+				0.85,
+				1.00,
+				1.15,
+				1.30,
+				1.50
+			},
+			new String[]
+			{
+				"06M",
+				"21M",
+				"36M",
+				"51M",
+				"66M"
+			}
 		);
 
 		EnvManager.TerminateEnv();

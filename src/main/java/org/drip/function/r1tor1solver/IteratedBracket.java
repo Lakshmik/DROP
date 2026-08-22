@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,157 +95,181 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>IteratedBracket</i> holds the left/right bracket variates and the corresponding values for the
- * objective function during each iteration.
+ * 	objective function during each iteration. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>IteratedBracket</i> Constructor</li>
+ * 		<li>Retrieve the Left Variate</li>
+ * 		<li>Set the Left Variate</li>
+ * 		<li>Retrieve the Right Variate</li>
+ * 		<li>Set the Right Variate</li>
+ * 		<li>Retrieve the Left Objective Function Value</li>
+ * 		<li>Set the Left Objective Function Value</li>
+ * 		<li>Retrieve the Right Objective Function Value</li>
+ * 		<li>Set the Right Objective Function Value</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class IteratedBracket {
-	private double _dblOFLeft = java.lang.Double.NaN;
-	private double _dblOFRight = java.lang.Double.NaN;
-	private double _dblVariateLeft = java.lang.Double.NaN;
-	private double _dblVariateRight = java.lang.Double.NaN;
+public class IteratedBracket
+{
+	private double _leftVariate = Double.NaN;
+	private double _rightVariate = Double.NaN;
+	private double _leftObjectiveFunctionValue = Double.NaN;
+	private double _rightObjectiveFunctionValue = Double.NaN;
 
 	/**
-	 * BracketingVariateIterator constructor
+	 * <i>IteratedBracket</i> Constructor
 	 * 
-	 * @param bop Bracketing Output
+	 * @param bracketingOutput Bracketing Output
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public IteratedBracket (
-		final org.drip.function.r1tor1solver.BracketingOutput bop)
-		throws java.lang.Exception
+		final BracketingOutput bracketingOutput)
+		throws Exception
 	{
-		if (null == bop) throw new java.lang.Exception ("IteratedBracket constructor: Invalid inputs");
+		if (null == bracketingOutput) {
+			throw new Exception ("IteratedBracket Constructor: Invalid inputs");
+		}
 
-		_dblOFLeft = bop.getOFLeft();
+		_leftVariate = bracketingOutput.variateLeft();
 
-		_dblOFRight = bop.getOFRight();
+		_rightVariate = bracketingOutput.variateRight();
 
-		_dblVariateLeft = bop.getVariateLeft();
+		_leftObjectiveFunctionValue = bracketingOutput.objectiveFunctionLeft();
 
-		_dblVariateRight = bop.getVariateRight();
+		_rightObjectiveFunctionValue = bracketingOutput.objectiveFunctionRight();
 	}
 
 	/**
-	 * Retrieve the left variate
+	 * Retrieve the Left Variate
 	 * 
 	 * @return Left Variate
 	 */
 
-	public double getVariateLeft()
+	public double leftVariate()
 	{
-		return _dblVariateLeft;
+		return _leftVariate;
 	}
 
 	/**
-	 * Set the left variate
+	 * Set the Left Variate
 	 * 
-	 * @param dblVariateLeft Left Variate
+	 * @param leftVariate Left Variate
 	 * 
 	 * @return TRUE - Left Variate set successfully
 	 */
 
 	public boolean setVariateLeft (
-		final double dblVariateLeft)
+		final double leftVariate)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariateLeft)) return false;
+		if (!NumberUtil.IsValid (leftVariate)) {
+			return false;
+		}
 
-		_dblVariateLeft = dblVariateLeft;
+		_leftVariate = leftVariate;
 		return true;
 	}
 
 	/**
-	 * Retrieve the right variate
+	 * Retrieve the Right Variate
 	 * 
 	 * @return Right Variate
 	 */
 
-	public double getVariateRight()
+	public double rightVariate()
 	{
-		return _dblVariateRight;
+		return _rightVariate;
 	}
 
 	/**
-	 * Set the right variate
+	 * Set the Right Variate
 	 * 
-	 * @param dblVariateRight Right Variate
+	 * @param rightVariate Right Variate
 	 * 
 	 * @return TRUE - Right Variate set successfully
 	 */
 
 	public boolean setVariateRight (
-		final double dblVariateRight)
+		final double rightVariate)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariateRight)) return false;
+		if (!NumberUtil.IsValid (rightVariate)) {
+			return false;
+		}
 
-		_dblVariateRight = dblVariateRight;
+		_rightVariate = rightVariate;
 		return true;
 	}
 
 	/**
-	 * Retrieve the left objective function value
+	 * Retrieve the Left Objective Function Value
 	 * 
 	 * @return Left Objective Function Value
 	 */
 
-	public double getOFLeft()
+	public double leftObjectiveFunctionValue()
 	{
-		return _dblOFLeft;
+		return _leftObjectiveFunctionValue;
 	}
 
 	/**
-	 * Set the left objective function value
+	 * Set the Left Objective Function Value
 	 * 
-	 * @param dblOFLeft Left Objective Function Value
+	 * @param leftObjectiveFunctionValue Left Objective Function Value
 	 * 
 	 * @return TRUE - Left Objective Function set successfully
 	 */
 
-	public boolean setOFLeft (
-		final double dblOFLeft)
+	public boolean setLeftObjectiveFunctionValue (
+		final double leftObjectiveFunctionValue)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblOFLeft)) return false;
+		if (!NumberUtil.IsValid (leftObjectiveFunctionValue)) {
+			return false;
+		}
 
-		_dblOFLeft = dblOFLeft;
+		_leftObjectiveFunctionValue = leftObjectiveFunctionValue;
 		return true;
 	}
 
 	/**
-	 * Retrieve the right objective function value
+	 * Retrieve the Right Objective Function Value
 	 * 
 	 * @return Right objective function value
 	 */
 
-	public double getOFRight()
+	public double rightObjectiveFunctionValue()
 	{
-		return _dblOFRight;
+		return _rightObjectiveFunctionValue;
 	}
 
 	/**
-	 * Set the right objective function value
+	 * Set the Right Objective Function Value
 	 * 
-	 * @param dblOFRight Right Objective Function Value
+	 * @param rightObjectiveFunctionValue Right Objective Function Value
 	 * 
 	 * @return TRUE - Right Objective Function set successfully
 	 */
 
-	public boolean setOFRight (
-		final double dblOFRight)
+	public boolean setRightObjectiveFunctionValue (
+		final double rightObjectiveFunctionValue)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblOFRight)) return false;
+		if (!NumberUtil.IsValid (rightObjectiveFunctionValue)) {
+			return false;
+		}
 
-		_dblOFRight = dblOFRight;
+		_rightObjectiveFunctionValue = rightObjectiveFunctionValue;
 		return true;
 	}
 }

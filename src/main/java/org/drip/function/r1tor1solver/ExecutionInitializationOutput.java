@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,176 +94,190 @@ package org.drip.function.r1tor1solver;
  */
 
 /**
- * <i>ExecutionInitializationOutput</i> holds the output of the root initializer calculation.
- * <br><br>
- * The following are the fields held by ExecutionInitializationOutput:
+ * <i>ExecutionInitializationOutput</i> holds the output of the root initializer calculation. The following
+ * 	are the fields held by ExecutionInitializationOutput:
  * <br>
- * <ul>
- * 	<li>
- * 		Whether the initialization completed successfully
- * 	</li>
- * 	<li>
- * 		The number of iterations, the number of objective function calculations, and the time taken for the
- * 			initialization
- * 	</li>
- * 	<li>
- * 		The starting variate from the initialization
- * 	</li>
+ * 	<ul>
+ * 		<li>Whether the initialization completed successfully</li>
+ * 		<li>The number of iterations, the number of objective function calculations, and the time taken for
+ * 			the initialization</li>
+ * 		<li>The starting variate from the initialization</li>
  * </ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Increment the Number of Iterations</li>
+ * 		<li>Return The Number of Iterations Consumed</li>
+ * 		<li>Increment the Number of Objective Function Evaluations</li>
+ * 		<li>Retrieve the Number of Objective Function Calculations Needed</li>
+ * 		<li>Increment the Number of Objective Function Derivative Evaluations</li>
+ * 		<li>Retrieve the Number of Objective Function Derivative Calculations Needed</li>
+ * 		<li>Indicate if the Execution Initialization is Done</li>
+ * 		<li>Return the Time Elapsed for the Execution Initialization Operation</li>
+ * 		<li>Set the Starting Variate</li>
+ * 		<li>Return the Starting Variate</li>
+ * 		<li>Return a String Form of the Initializer output</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class ExecutionInitializationOutput {
-	private int _iNumOFCalcs = 0;
-	private long _lStartTime = 0L;
-	private boolean _bDone = false;
-	private int _iNumIterations = 0;
-	private int _iNumOFDerivCalcs = 0;
-	private double _dblTime = java.lang.Double.NaN;
-	private double _dblStartingVariate = java.lang.Double.NaN;
+public abstract class ExecutionInitializationOutput
+{
+	private long _startTime = 0L;
+	private boolean _done = false;
+	private int _iterationCount = 0;
+	private double _time = Double.NaN;
+	private double _startingVariate = Double.NaN;
+	private int _objectiveFunctionCalculationCount = 0;
+	private int _objectiveFunctionDerivativeCalculationCount = 0;
 
 	protected ExecutionInitializationOutput()
 	{
-		_lStartTime = System.nanoTime();
+		_startTime = System.nanoTime();
 	}
 
 	protected ExecutionInitializationOutput (
-		final ExecutionInitializationOutput eiopOther)
-		throws java.lang.Exception
+		final ExecutionInitializationOutput other)
+		throws Exception
 	{
-		if (null == eiopOther)
-			throw new java.lang.Exception ("ExecutionInitializationOutput constructor: Invalid inputs!");
+		if (null == other) {
+			throw new Exception ("ExecutionInitializationOutput constructor: Invalid inputs!");
+		}
 
-		_iNumOFCalcs = eiopOther._iNumOFCalcs;
-		_lStartTime = eiopOther._lStartTime;
-		_bDone = eiopOther._bDone;
-		_iNumIterations = eiopOther._iNumIterations;
-		_iNumOFDerivCalcs = eiopOther._iNumOFDerivCalcs;
-		_dblTime = eiopOther._dblTime;
-		_dblStartingVariate = eiopOther._dblStartingVariate;
+		_done = other._done;
+		_time = other._time;
+		_startTime = other._startTime;
+		_iterationCount = other._iterationCount;
+		_startingVariate = other._startingVariate;
+		_objectiveFunctionCalculationCount = other._objectiveFunctionCalculationCount;
+		_objectiveFunctionDerivativeCalculationCount = other._objectiveFunctionDerivativeCalculationCount;
 	}
 
 	protected boolean done()
 	{
-		_dblTime = (System.nanoTime() - _lStartTime) * 0.000001;
+		_time = (System.nanoTime() - _startTime) * 0.000001;
 
-		return _bDone = true;
+		return _done = true;
 	}
 
 	/**
 	 * Increment the Number of Iterations
 	 * 
-	 * @return TRUE - Successfully incremented
+	 * @return TRUE - Number of Iterations Successfully Incremented
 	 */
 
-	public final boolean incrIterations()
+	public final boolean incrementIterationCount()
 	{
-		++_iNumIterations;
+		++_iterationCount;
 		return true;
 	}
 
 	/**
-	 * Return The number of Iterations consumed
+	 * Return The Number of Iterations Consumed
 	 * 
-	 * @return Number of Iterations consumed
+	 * @return Number of Iterations Consumed
 	 */
 
-	public final int getNumIterations()
+	public final int iterationCount()
 	{
-		return _iNumIterations;
+		return _iterationCount;
 	}
 
 	/**
 	 * Increment the Number of Objective Function Evaluations
 	 * 
-	 * @return TRUE - Successfully incremented
+	 * @return TRUE - Number of Objective Function Evaluations Successfully Incremented
 	 */
 
-	public final boolean incrOFCalcs()
+	public final boolean incrementObjectiveFunctionCalculationCount()
 	{
-		++_iNumOFCalcs;
+		++_objectiveFunctionCalculationCount;
 		return true;
 	}
 
 	/**
-	 * Retrieve the number of objective function calculations needed
+	 * Retrieve the Number of Objective Function Calculations Needed
 	 * 
-	 * @return Number of objective function calculations needed
+	 * @return Number of Objective Function Calculations Needed
 	 */
 
-	public final int getNumOFCalcs()
+	public final int objectiveFunctionCalculationCount()
 	{
-		return _iNumOFCalcs;
+		return _objectiveFunctionCalculationCount;
 	}
 
 	/**
-	 * Increment the number of Objective Function Derivative evaluations
+	 * Increment the Number of Objective Function Derivative Evaluations
 	 * 
-	 * @return TRUE - Successfully incremented
+	 * @return TRUE - Number of Objective Function Derivative Evaluations Successfully Incremented
 	 */
 
-	public final boolean incrOFDerivCalcs()
+	public final boolean incrementObjectiveFunctionDerivativeCalculationCount()
 	{
-		++_iNumOFDerivCalcs;
+		++_objectiveFunctionDerivativeCalculationCount;
 		return true;
 	}
 
 	/**
-	 * Retrieve the number of objective function derivative calculations needed
+	 * Retrieve the Number of Objective Function Derivative Calculations Needed
 	 * 
-	 * @return Number of objective function derivative calculations needed
+	 * @return Number of Objective Function Derivative Calculations Needed
 	 */
 
-	public final int getNumOFDerivCalcs()
+	public final int objectiveFunctionDerivativeCalculationCount()
 	{
-		return _iNumOFDerivCalcs;
+		return _objectiveFunctionDerivativeCalculationCount;
 	}
 
 	/**
-	 * Indicate if the execution initialization is done
+	 * Indicate if the Execution Initialization is Done
 	 * 
-	 * @return TRUE - Execution initialization is done
+	 * @return TRUE - Execution Initialization is Done
 	 */
 
 	public final boolean isDone()
 	{
-		return _bDone;
+		return _done;
 	}
 
 	/**
-	 * Return the time elapsed for the execution initialization operation
+	 * Return the Time Elapsed for the Execution Initialization Operation
 	 * 
-	 * @return execution initialization time
+	 * @return Execution Initialization Time
 	 */
 
 	public final double time()
 	{
-		return _dblTime;
+		return _time;
 	}
 
 	/**
 	 * Set the Starting Variate
 	 * 
-	 * @param dblStartingVariate Starting Variate
+	 * @param startingVariate Starting Variate
 	 * 
 	 * @return TRUE - Starting Variate set successfully
 	 */
 
 	public boolean setStartingVariate (
-		final double dblStartingVariate)
+		final double startingVariate)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblStartingVariate)) return false;
+		if (!NumberUtil.IsValid (startingVariate)) {
+			return false;
+		}
 
-		_dblStartingVariate = dblStartingVariate;
+		_startingVariate = startingVariate;
 		return true;
 	}
 
@@ -263,30 +287,30 @@ public abstract class ExecutionInitializationOutput {
 	 * @return Starting Variate
 	 */
 
-	public double getStartingVariate()
+	public double startingVariate()
 	{
-		return _dblStartingVariate;
+		return _startingVariate;
 	}
 
 	/**
-	 * Return a string form of the Initializer output
+	 * Return a String Form of the Initializer output
 	 * 
-	 * @return String form of the Initializer output
+	 * @return String Form of the Initializer output
 	 */
 
-	public java.lang.String displayString()
+	public String displayString()
 	{
-		java.lang.StringBuffer sb = new java.lang.StringBuffer();
+		StringBuffer sb = new StringBuffer();
 
 		sb.append ("\t\tInitialization Done? " + isDone() + " [" + time() + " msec]");
 
-		sb.append ("\n\t\tNum Iterations: " + getNumIterations());
+		sb.append ("\n\t\tNum Iterations: " + iterationCount());
 
-		sb.append ("\n\t\tNum OF Calculations: " + getNumOFCalcs());
+		sb.append ("\n\t\tNum OF Calculations: " + objectiveFunctionCalculationCount());
 
-		sb.append ("\n\t\tNum OF Derivative Calculations: " + getNumOFDerivCalcs());
+		sb.append ("\n\t\tNum OF Derivative Calculations: " + objectiveFunctionDerivativeCalculationCount());
 
-		sb.append ("\n\t\tStarting Variate: " + getStartingVariate());
+		sb.append ("\n\t\tStarting Variate: " + startingVariate());
 
 		return sb.toString();
 	}

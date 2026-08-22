@@ -14,13 +14,24 @@ import org.drip.service.env.EnvManager;
 import org.drip.state.creator.*;
 import org.drip.state.discount.*;
 import org.drip.state.forward.ForwardCurve;
-import org.drip.state.identifier.*;
+import org.drip.state.identifier.FXLabel;
+import org.drip.state.identifier.ForwardLabel;
+import org.drip.state.identifier.FundingLabel;
+import org.drip.state.identifier.VolatilityLabel;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -99,195 +110,185 @@ import org.drip.state.identifier.*;
  * <i>OTCCrossCurrencySwaps</i> demonstrates the Construction and Valuation of the Cross-Currency Floating
  * 	Swap of OTC contracts.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/xccy/README.md">OTC Cross Currency Swaps Definition</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/xccy/README.md">OTC Cross Currency Swaps Definition</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class OTCCrossCurrencySwaps {
+public class OTCCrossCurrencySwaps
+{
 
 	private static final FloatFloatComponent OTCCrossCurrencyFloatFloat (
-		final String strReferenceCurrency,
-		final String strDerivedCurrency,
-		final JulianDate dtSpot,
-		final String strMaturityTenor,
-		final double dblBasis,
-		final double dblDerivedNotionalScaler)
+		final String referenceCurrency,
+		final String derivedCurrency,
+		final JulianDate spotDate,
+		final String maturityTenor,
+		final double basis,
+		final double derivedNotionalScaler)
 	{
-		CrossFloatSwapConvention ccfc = CrossFloatConventionContainer.ConventionFromJurisdiction (
-			strReferenceCurrency,
-			strDerivedCurrency
-		);
-
-		return ccfc.createFloatFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblBasis,
+		return CrossFloatConventionContainer.ConventionFromJurisdiction (
+			referenceCurrency,
+			derivedCurrency
+		).createFloatFloatComponent (
+			spotDate,
+			maturityTenor,
+			basis,
 			1.,
-			-1. * dblDerivedNotionalScaler
+			-1. * derivedNotionalScaler
 		);
 	}
 
 	private static final void OTCCrossCurrencyRun (
-		final JulianDate dtSpot,
-		final String strReferenceCurrency,
-		final String strDerivedCurrency,
-		final String strMaturityTenor,
-		final double dblBasis,
-		final double dblReferenceDerivedFXRate)
+		final JulianDate spotDate,
+		final String referenceCurrency,
+		final String derivedCurrency,
+		final String maturityTenor,
+		final double basis,
+		final double referenceDerivedFXRate)
 		throws Exception
 	{
-		double dblReferenceFundingRate = 0.02;
-		double dblDerived3MForwardRate = 0.02;
+		double derived3MForwardRate = 0.02;
+		double referenceFundingRate = 0.02;
 
-		double dblReferenceFundingVol = 0.3;
-		double dblDerivedForward3MVol = 0.3;
-		double dblReferenceDerivedFXVol = 0.3;
+		double derivedForward3MVolatility = 0.3;
+		double referenceFundingVolatility = 0.3;
+		double referenceDerivedFXVolatility = 0.3;
 
-		double dblDerived3MReferenceDerivedFXCorr = 0.1;
-		double dblReferenceFundingDerived3MCorr = 0.1;
-		double dblReferenceFundingReferenceDerivedFXCorr = 0.1;
+		double referenceFundingDerived3MCorrelation = 0.1;
+		double derived3MReferenceDerivedFXCorrelation = 0.1;
+		double referenceFundingReferenceDerivedFXCorrelation = 0.1;
 
-		MergedDiscountForwardCurve dcReferenceFunding = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtSpot,
-			strReferenceCurrency,
-			dblReferenceFundingRate
+		MergedDiscountForwardCurve referenceFundingCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
+				spotDate,
+				referenceCurrency,
+				referenceFundingRate
+			);
+
+		ForwardLabel derived3MForwardLabel = ForwardLabel.Create (derivedCurrency, "3M");
+
+		ForwardCurve derived3MForwardCurve = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
+			spotDate,
+			derived3MForwardLabel,
+			derived3MForwardRate
 		);
 
-		ForwardLabel friDerived3M = ForwardLabel.Create (
-			strDerivedCurrency,
-			"3M"
-		);
+		CurrencyPair currencyPair = CurrencyPair.FromCode (referenceCurrency + "/" + derivedCurrency);
 
-		ForwardCurve fcDerived3M = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-			dtSpot,
-			friDerived3M,
-			dblDerived3MForwardRate
-		);
+		FXLabel fxLabel = FXLabel.Standard (currencyPair);
 
-		CurrencyPair cp = CurrencyPair.FromCode (
-			strReferenceCurrency + "/" + strDerivedCurrency
-		);
+		FundingLabel referenceFundingLabel = FundingLabel.Standard (referenceCurrency);
 
-		FXLabel fxLabel = FXLabel.Standard (cp);
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		FundingLabel fundingLabelReference = org.drip.state.identifier.FundingLabel.Standard (
-			strReferenceCurrency
-		);
+		curveSurfaceQuoteContainer.setForwardState (derived3MForwardCurve);
 
-		CurveSurfaceQuoteContainer mktParams = new CurveSurfaceQuoteContainer();
+		curveSurfaceQuoteContainer.setFundingState (referenceFundingCurve);
 
-		mktParams.setForwardState (
-			fcDerived3M
-		);
-
-		mktParams.setFundingState (
-			dcReferenceFunding
-		);
-
-		mktParams.setFXState (
+		curveSurfaceQuoteContainer.setFXState (
 			ScenarioFXCurveBuilder.CubicPolynomialCurve (
-				"FX::" + cp.code(),
-				dtSpot,
-				cp,
-				new String[] {"10Y"},
-				new double[] {dblReferenceDerivedFXRate},
-				dblReferenceDerivedFXRate
+				"FX::" + currencyPair.code(),
+				spotDate,
+				currencyPair,
+				new String[] {
+					"10Y"
+				},
+				new double[] {
+					referenceDerivedFXRate
+				},
+				referenceDerivedFXRate
 			)
 		);
 
-		mktParams.setForwardVolatility (
+		int spotDateJulian = spotDate.julian();
+
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtSpot.julian(),
-				VolatilityLabel.Standard (friDerived3M),
-				strDerivedCurrency,
-				dblDerivedForward3MVol
+				spotDateJulian,
+				VolatilityLabel.Standard (derived3MForwardLabel),
+				derivedCurrency,
+				derivedForward3MVolatility
 			)
 		);
 
-		mktParams.setFundingVolatility (
+		curveSurfaceQuoteContainer.setFundingVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtSpot.julian(),
-				VolatilityLabel.Standard (fundingLabelReference),
-				strReferenceCurrency,
-				dblReferenceFundingVol
+				spotDateJulian,
+				VolatilityLabel.Standard (referenceFundingLabel),
+				referenceCurrency,
+				referenceFundingVolatility
 			)
 		);
 
-		mktParams.setFXVolatility (
+		curveSurfaceQuoteContainer.setFXVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtSpot.julian(),
+				spotDateJulian,
 				VolatilityLabel.Standard (fxLabel),
-				strDerivedCurrency,
-				dblReferenceDerivedFXVol
+				derivedCurrency,
+				referenceDerivedFXVolatility
 			)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			friDerived3M,
-			fundingLabelReference,
-			new Flat (
-				dblReferenceFundingDerived3MCorr
-			)
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			derived3MForwardLabel,
+			referenceFundingLabel,
+			new Flat (referenceFundingDerived3MCorrelation)
 		);
 
-		mktParams.setForwardFXCorrelation (
-			friDerived3M,
+		curveSurfaceQuoteContainer.setForwardFXCorrelation (
+			derived3MForwardLabel,
 			fxLabel,
-			new Flat (
-				dblDerived3MReferenceDerivedFXCorr
-			)
+			new Flat (derived3MReferenceDerivedFXCorrelation)
 		);
 
-		mktParams.setFundingFXCorrelation (
-			fundingLabelReference,
+		curveSurfaceQuoteContainer.setFundingFXCorrelation (
+			referenceFundingLabel,
 			fxLabel,
-			new Flat (
-				dblReferenceFundingReferenceDerivedFXCorr
-			)
+			new Flat (referenceFundingReferenceDerivedFXCorrelation)
 		);
 
 		FloatFloatComponent xccySwap = OTCCrossCurrencyFloatFloat (
-			strReferenceCurrency,
-			strDerivedCurrency,
-			dtSpot,
-			strMaturityTenor,
-			dblBasis,
-			1. / dblReferenceDerivedFXRate
+			referenceCurrency,
+			derivedCurrency,
+			spotDate,
+			maturityTenor,
+			basis,
+			1. / referenceDerivedFXRate
 		);
 
 		xccySwap.setPrimaryCode (
-			strDerivedCurrency + "_" + strReferenceCurrency + "_OTC::FLOATFLOAT::" + strMaturityTenor
+			derivedCurrency + "_" + referenceCurrency + "_OTC::FLOATFLOAT::" + maturityTenor
 		);
 
-		mktParams.setFixing (
+		curveSurfaceQuoteContainer.setFixing (
 			xccySwap.effectiveDate(),
 			fxLabel,
-			dblReferenceDerivedFXRate
+			referenceDerivedFXRate
 		);
 
 		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strReferenceCurrency + "," + strDerivedCurrency
+			spotDate,
+			spotDate,
+			referenceCurrency + "," + derivedCurrency
 		);
 
 		CaseInsensitiveTreeMap<Double> mapXCcyOutput = xccySwap.value (
 			valParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
 		System.out.println (
-			"\t| " + xccySwap.name() + "  [" + xccySwap.effectiveDate() + " -> " + xccySwap.maturityDate() + "]  =>  " +
+			"\t| " + xccySwap.name() +
+			"  [" + xccySwap.effectiveDate() + " -> " + xccySwap.maturityDate() + "]  =>  " +
 			FormatUtil.FormatDouble (mapXCcyOutput.get ("Price"), 1, 2, 1.) + "  |  " +
 			FormatUtil.FormatDouble (mapXCcyOutput.get ("DerivedParBasisSpread"), 1, 2, 1.) + "  |  " +
 			FormatUtil.FormatDouble (mapXCcyOutput.get ("ReferenceParBasisSpread"), 1, 2, 1.) + "  |  " +
@@ -299,23 +300,18 @@ public class OTCCrossCurrencySwaps {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
 		System.out.println ("\t---------------------------------------------------------");
 
@@ -341,33 +337,37 @@ public class OTCCrossCurrencySwaps {
 
 		System.out.println ("\t\tAnnualized Reference Stream Duration");
 
-		System.out.println ("\t------------------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t------------------------------------------------------------------------------------------------------------------"
+		);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "AUD", "2Y", 0.0003, 0.7769);
+		OTCCrossCurrencyRun (spotDate, "USD", "AUD", "2Y", 0.0003, 0.7769);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "CAD", "2Y", 0.0003, 0.7861);
+		OTCCrossCurrencyRun (spotDate, "USD", "CAD", "2Y", 0.0003, 0.7861);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "CHF", "2Y", 0.0003, 1.0811);
+		OTCCrossCurrencyRun (spotDate, "USD", "CHF", "2Y", 0.0003, 1.0811);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "CLP", "2Y", 0.0003, 0.0016);
+		OTCCrossCurrencyRun (spotDate, "USD", "CLP", "2Y", 0.0003, 0.0016);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "DKK", "2Y", 0.0003, 0.1517);
+		OTCCrossCurrencyRun (spotDate, "USD", "DKK", "2Y", 0.0003, 0.1517);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "EUR", "2Y", 0.0003, 1.1294);
+		OTCCrossCurrencyRun (spotDate, "USD", "EUR", "2Y", 0.0003, 1.1294);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "GBP", "2Y", 0.0003, 1.5004);
+		OTCCrossCurrencyRun (spotDate, "USD", "GBP", "2Y", 0.0003, 1.5004);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "JPY", "2Y", 0.0003, 0.0085);
+		OTCCrossCurrencyRun (spotDate, "USD", "JPY", "2Y", 0.0003, 0.0085);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "MXN", "2Y", 0.0003, 0.0666);
+		OTCCrossCurrencyRun (spotDate, "USD", "MXN", "2Y", 0.0003, 0.0666);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "NOK", "2Y", 0.0003, 0.1288);
+		OTCCrossCurrencyRun (spotDate, "USD", "NOK", "2Y", 0.0003, 0.1288);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "PLN", "2Y", 0.0003, 0.2701);
+		OTCCrossCurrencyRun (spotDate, "USD", "PLN", "2Y", 0.0003, 0.2701);
 
-		OTCCrossCurrencyRun (dtSpot, "USD", "SEK", "2Y", 0.0003, 0.1211);
+		OTCCrossCurrencyRun (spotDate, "USD", "SEK", "2Y", 0.0003, 0.1211);
 
-		System.out.println ("\t------------------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t------------------------------------------------------------------------------------------------------------------"
+		);
 
 		EnvManager.TerminateEnv();
 	}

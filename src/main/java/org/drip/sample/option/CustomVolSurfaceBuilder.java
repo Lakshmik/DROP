@@ -15,6 +15,14 @@ import org.drip.state.creator.ScenarioMarketSurfaceBuilder;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -94,29 +102,28 @@ import org.drip.state.creator.ScenarioMarketSurfaceBuilder;
  * <i>CustomVolSurfaceBuilder</i> contains an Comparison of the Construction of the Volatility Surface using
  * 	different Splining Techniques.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/option/README.md">Deterministic (Black) / Stochastic (Heston) Options</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/option/README.md">Deterministic (Black) / Stochastic (Heston) Options</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CustomVolSurfaceBuilder {
+public class CustomVolSurfaceBuilder
+{
+
 	private static final SegmentCustomBuilderControl CubicPolySCBC()
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
@@ -128,10 +135,7 @@ public class CustomVolSurfaceBuilder {
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (5),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
@@ -143,58 +147,46 @@ public class CustomVolSurfaceBuilder {
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KAKLIS_PANDELIS,
 			new KaklisPandelisSetParams (2),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
 	}
 
 	private static final SegmentCustomBuilderControl KLKHyperbolicSCBC(
-		final double dblTension)
+		final double tension)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			new ExponentialTensionSetParams (tension),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
 	}
 
 	private static final SegmentCustomBuilderControl KLKRationalLinearSCBC(
-		final double dblTension)
+		final double tension)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_RATIONAL_LINEAR_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			new ExponentialTensionSetParams (tension),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
 	}
 
 	private static final SegmentCustomBuilderControl KLKRationalQuadraticSCBC(
-		final double dblTension)
+		final double tension)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_RATIONAL_QUADRATIC_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			new ExponentialTensionSetParams (tension),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
@@ -202,24 +194,35 @@ public class CustomVolSurfaceBuilder {
 
 	private static final void EvaluateSplineSurface (
 		final MarketSurface volSurface,
-		final double[] adblStrikeATMFactor,
-		final String[] astrMaturityTenor)
+		final double[] strikeATMFactorArray,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
 		System.out.println ("\t|------------------------------------------------------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		for (String strMaturity : astrMaturityTenor)
-			System.out.print ("    " + strMaturity + "  ");
+		for (String maturityTenor : maturityTenorArray) {
+			System.out.print ("    " + maturityTenor + "  ");
+		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblStrike : adblStrikeATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblStrike, 1, 2, 1.) + "    =>");
+		for (double strikeATMFactor : strikeATMFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (strikeATMFactor, 1, 2, 1.) + "    =>");
 
-			for (String strMaturity : astrMaturityTenor)
-				System.out.print ("  " + FormatUtil.FormatDouble (volSurface.node (dblStrike, strMaturity), 2, 2, 100.) + "%");
+			for (String maturityTenor : maturityTenorArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (
+						volSurface.node (strikeATMFactor, maturityTenor),
+						2,
+						2,
+						100.
+					) + "%"
+				);
+			}
 
 			System.out.print ("  |\n");
 		}
@@ -230,165 +233,184 @@ public class CustomVolSurfaceBuilder {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtStart = DateUtil.Today();
+		JulianDate startDate = DateUtil.Today();
 
-		double[] adblStrikeATMFactorCalib = new double[] {
-			0.8, 0.9, 1.0, 1.1, 1.2
+		double[] calibrationStrikeATMFactorArray =
+		{
+			0.8,
+			0.9,
+			1.0,
+			1.1,
+			1.2
 		};
-		String[] astrMaturityTenorCalib = new String[] {
-			"1Y", "2Y", "3Y", "4Y", "5Y"
+		String[] calibrationMaturityTenorArray =
+		{
+			"1Y",
+			"2Y",
+			"3Y",
+			"4Y",
+			"5Y"
 		};
-
-		double[][] aadblImpliedVolatility = new double[][] {
+		double[][] impliedVolatilityGrid =
+		{
 			{0.44, 0.38, 0.33, 0.27, 0.25},
 			{0.41, 0.34, 0.30, 0.22, 0.27},
 			{0.36, 0.31, 0.28, 0.30, 0.37},
 			{0.38, 0.31, 0.34, 0.40, 0.47},
 			{0.43, 0.46, 0.48, 0.52, 0.57}
 		};
-
-		double[] adblStrikeATMFactorCalc = new double[] {
-			0.700, 0.850, 1.000, 1.150, 1.300
+		double[] calculationStrikeATMFactorArray =
+		{
+			0.70,
+			0.85,
+			1.00,
+			1.15,
+			1.30
 		};
-		String[] astrMaturityTenorCalc = new String[] {
-			"06M", "21M", "36M", "51M", "66M"
+		String[] calculationMaturityTenorArray =
+		{
+			"06M",
+			"21M",
+			"36M",
+			"51M",
+			"66M"
 		};
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.CubicPolynomialWireSurface (
 				"CUBIC_POLY_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.QuarticPolynomialWireSurface (
 				"QUARTIC_POLY_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.KaklisPandelisWireSurface (
 				"KAKLIS_PANDELIS_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.KLKHyperbolicWireSurface (
 				"KLK_HYPERBOLIC_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility,
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid,
 				1.
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.KLKRationalLinearWireSurface (
 				"KLK_RATIONAL_LINEAR_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility,
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid,
 				1.
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.KLKRationalQuadraticWireSurface (
 				"KLK_RATIONAL_QUADRATIC_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility,
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid,
 				1.
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.CustomWireSurface (
 				"CUBIC_WIRESPAN_QUARTIC_SURFACE_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility,
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid,
 				CubicPolySCBC(),
 				QuarticPolySCBC()
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.CustomWireSurface (
 				"KAKLISPANDELIS_WIRESPAN_KLKHYPERBOLIC_SURFACE_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility,
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid,
 				KaklisPandelisSCBC(),
 				KLKHyperbolicSCBC (2.)
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EvaluateSplineSurface (
 			ScenarioMarketSurfaceBuilder.CustomWireSurface (
 				"KLKRATIONALLINEAR_WIRESPAN_KLKRATIONALQUADRATIC_SURFACE_VOL_SURFACE",
-				dtStart,
+				startDate,
 				"USD",
-				adblStrikeATMFactorCalib,
-				astrMaturityTenorCalib,
-				aadblImpliedVolatility,
+				calibrationStrikeATMFactorArray,
+				calibrationMaturityTenorArray,
+				impliedVolatilityGrid,
 				KLKRationalLinearSCBC (3.),
 				KLKRationalQuadraticSCBC (1.)
 			),
-			adblStrikeATMFactorCalc,
-			astrMaturityTenorCalc
+			calculationStrikeATMFactorArray,
+			calculationMaturityTenorArray
 		);
 
 		EnvManager.TerminateEnv();

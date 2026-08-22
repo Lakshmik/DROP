@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,89 +94,105 @@ package org.drip.function.r1tor1solver;
  */
 
 /**
- * <i>FixedPointFinderOutput</i> holds the result of the fixed point search.
+ * <i>FixedPointFinderOutput</i> holds the result of the fixed point search. It contains the following
+ * 	 fields:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Whether the search completed successfully</li>
+ * 		<li>The number of iterations, the number of objective function base/derivative calculations, and the
+ * 			time taken for the search</li>
+ * 		<li>The output from initialization</li>
+ * 	</ul>
  *
- * FixedPointFinderOutput contains the following fields:
- * <br>
- * <ul>
- * 	<li>
- * 		Whether the search completed successfully
- * 	</li>
- * 	<li>
- * 		The number of iterations, the number of objective function base/derivative calculations, and the time
- * 			taken for the search
- * 	</li>
- * 	<li>
- * 		The output from initialization
- * 	</li>
- * </ul>
+ * 	It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>FixedPointFinderOutput</i> Constructor</li>
+ * 		<li>Set the Root</li>
+ * 		<li>Indicate whether the root is present in the output, i.e., if the finder has successfully completed</li>
+ * 		<li>Return the time elapsed for the the full root finding operation</li>
+ * 		<li>Return the Root</li>
+ * 		<li>Increment the Number of Iterations</li>
+ * 		<li>Return the Number of Iterations taken</li>
+ * 		<li>Increment the Number of Objective Function Evaluations</li>
+ * 		<li>Retrieve the Number of Objective Function Calculations needed</li>
+ * 		<li>Increment the Number of Objective Function Derivative Evaluations</li>
+ * 		<li>Retrieve the Number of Objective Function Derivative Calculations needed</li>
+ * 		<li>Retrieve the Execution Initialization Output</li>
+ * 		<li>Return a String Form of the Root Finder Output</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixedPointFinderOutput {
-	private int _iNumOFCalcs = 0;
-	private long _lStartTime = 0L;
-	private int _iNumIterations = 0;
-	private int _iNumOFDerivCalcs = 0;
-	private boolean _bHasRoot = false;
-	private double _dblRoot = java.lang.Double.NaN;
-	private double _dblRootFindingTime = java.lang.Double.NaN;
-	private org.drip.function.r1tor1solver.ExecutionInitializationOutput _eiop = null;
+public class FixedPointFinderOutput
+{
+	private long _startTime = 0L;
+	private int _iterationCount = 0;
+	private boolean _hasRoot = false;
+	private double _root = Double.NaN;
+	private double _rootFindingTime = Double.NaN;
+	private int _numberOfObjectiveFunctionCalculations = 0;
+	private int _numberOfObjectiveFunctionDerivativesCalculations = 0;
+	private ExecutionInitializationOutput _executionInitializationOutput = null;
 
 	/**
-	 * FixedPointFinderOutput constructor
+	 * <i>FixedPointFinderOutput</i> Constructor
 	 * 
-	 * @param eiop Execution Initialization Output 1D
+	 * @param executionInitializationOutput Execution Initialization Output 1D
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public FixedPointFinderOutput (
-		final org.drip.function.r1tor1solver.ExecutionInitializationOutput eiop)
-		throws java.lang.Exception
+		final ExecutionInitializationOutput executionInitializationOutput)
+		throws Exception
 	{
-		if (null == (_eiop = eiop))
-			throw new java.lang.Exception ("FixedPointFinderOutput constructor: Invalid inputs!");
+		if (null == (_executionInitializationOutput = executionInitializationOutput)) {
+			throw new Exception ("FixedPointFinderOutput constructor: Invalid inputs!");
+		}
 
-		_lStartTime = System.nanoTime();
+		_startTime = System.nanoTime();
 	}
 
 	/**
 	 * Set the Root
 	 * 
-	 * @param dblRoot Root
+	 * @param root Root
 	 * 
 	 * @return TRUE - Successfully set
 	 */
 
 	public boolean setRoot (
-		final double dblRoot)
+		final double root)
 	{
-		_dblRootFindingTime = (System.nanoTime() - _lStartTime) * 0.000001;
+		_rootFindingTime = (System.nanoTime() - _startTime) * 0.000001;
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblRoot = dblRoot)) return false;
+		if (!NumberUtil.IsValid (_root = root)) {
+			return false;
+		}
 
-		return _bHasRoot = true;
+		return _hasRoot = true;
 	}
 
 	/**
-	 * Indicate whether the root is present in the output, i.e., if the finder has successfully completed.
+	 * Indicate whether the root is present in the output, i.e., if the finder has successfully completed
 	 * 
 	 * @return TRUE - Root exists in the output
 	 */
 
 	public boolean containsRoot()
 	{
-		return _bHasRoot;
+		return _hasRoot;
 	}
 
 	/**
@@ -177,87 +203,87 @@ public class FixedPointFinderOutput {
 
 	public double time()
 	{
-		return _dblRootFindingTime;
+		return _rootFindingTime;
 	}
 
 	/**
-	 * Return the root
+	 * Return the Root
 	 * 
 	 * @return Root
 	 */
 
-	public double getRoot()
+	public double root()
 	{
-		return _dblRoot;
+		return _root;
 	}
 
 	/**
-	 * Increment the number of Iterations
+	 * Increment the Number of Iterations
 	 * 
-	 * @return TRUE - Successfully incremented
+	 * @return TRUE - Successfully Incremented
 	 */
 
-	public boolean incrIterations()
+	public boolean incrementIterationCount()
 	{
-		++_iNumIterations;
+		++_iterationCount;
 		return true;
 	}
 
 	/**
-	 * Return The number of iterations taken
+	 * Return the Number of Iterations taken
 	 * 
-	 * @return Number of iterations taken
+	 * @return Number of Iterations taken
 	 */
 
-	public int getNumIterations()
+	public int iterationCount()
 	{
-		return _iNumIterations;
+		return _iterationCount;
 	}
 
 	/**
-	 * Increment the number of Objective Function evaluations
+	 * Increment the Number of Objective Function Evaluations
 	 * 
 	 * @return TRUE - Successfully incremented
 	 */
 
-	public boolean incrOFCalcs()
+	public boolean incrementObjectiveFunctionCalculations()
 	{
-		++_iNumOFCalcs;
+		++_numberOfObjectiveFunctionCalculations;
 		return true;
 	}
 
 	/**
-	 * Retrieve the number of objective function calculations needed
+	 * Retrieve the Number of Objective Function Calculations needed
 	 * 
-	 * @return Number of objective function calculations needed
+	 * @return Number of Objective Function Calculations needed
 	 */
 
-	public int getNumOFCalcs()
+	public int umberOfObjectiveFunctionCalculations()
 	{
-		return _iNumOFCalcs;
+		return _numberOfObjectiveFunctionCalculations;
 	}
 
 	/**
-	 * Increment the number of Objective Function Derivative evaluations
+	 * Increment the Number of Objective Function Derivative Evaluations
 	 * 
 	 * @return TRUE - Successfully incremented
 	 */
 
-	public boolean incrOFDerivCalcs()
+	public boolean incrementNumberOfObjectiveFunctionDerivativesCalculations()
 	{
-		++_iNumOFDerivCalcs;
+		++_numberOfObjectiveFunctionDerivativesCalculations;
 		return true;
 	}
 
 	/**
-	 * Retrieve the number of objective function derivative calculations needed
+	 * Retrieve the Number of Objective Function Derivative Calculations needed
 	 * 
-	 * @return Number of objective function derivative calculations needed
+	 * @return Number of Objective Function Derivative Calculations needed
 	 */
 
-	public int getNumOFDerivCalcs()
+	public int numberOfObjectiveFunctionDerivativesCalculations()
 	{
-		return _iNumOFDerivCalcs;
+		return _numberOfObjectiveFunctionDerivativesCalculations;
 	}
 
 	/**
@@ -266,33 +292,35 @@ public class FixedPointFinderOutput {
 	 * @return Execution Initialization Output
 	 */
 
-	public org.drip.function.r1tor1solver.ExecutionInitializationOutput getEIOP()
+	public ExecutionInitializationOutput executionInitializationOutput()
 	{
-		return _eiop;
+		return _executionInitializationOutput;
 	}
 
 	/**
-	 * Return a string form of the root finder output
+	 * Return a String Form of the Root Finder Output
 	 * 
-	 * @return String form of the root finder output
+	 * @return String Form of the Root Finder Output
 	 */
 
-	public java.lang.String displayString()
+	public String displayString()
 	{
-		java.lang.StringBuffer sb = new java.lang.StringBuffer();
+		StringBuffer stringBuffer = new StringBuffer();
 
-		sb.append (_eiop.displayString());
+		stringBuffer.append (_executionInitializationOutput.displayString());
 
-		sb.append ("\n\tRoot finding Done? " + _bHasRoot + " [" + _dblRootFindingTime + " msec]");
+		stringBuffer.append ("\n\tRoot finding Done? " + _hasRoot + " [" + _rootFindingTime + " msec]");
 
-		sb.append ("\n\tRoot: " + _dblRoot);
+		stringBuffer.append ("\n\tRoot: " + _root);
 
-		sb.append ("\n\tNum Iterations: " + _iNumIterations);
+		stringBuffer.append ("\n\tNum Iterations: " + _iterationCount);
 
-		sb.append ("\n\tNum OF Calculations: " + _iNumOFCalcs);
+		stringBuffer.append ("\n\tNum OF Calculations: " + _numberOfObjectiveFunctionCalculations);
 
-		sb.append ("\n\tNum OF Derivative Calculations: " + _iNumOFDerivCalcs);
+		stringBuffer.append (
+			"\n\tNum OF Derivative Calculations: " + _numberOfObjectiveFunctionDerivativesCalculations
+		);
 
-		return sb.toString();
+		return stringBuffer.toString();
 	}
 }

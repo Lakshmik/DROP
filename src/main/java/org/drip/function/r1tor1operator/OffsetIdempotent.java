@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1operator;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,38 +92,51 @@ package org.drip.function.r1tor1operator;
  */
 
 /**
- * <i>OffsetIdempotent</i> provides the Implementation of the Offset Idempotent Operator - f(x) = x - C.
+ * <i>OffsetIdempotent</i> provides the Implementation of the Offset Idempotent Operator - f(x) = x - C. It
+ * 	exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li><i>OffsetIdempotent</i> Constructor</li>
+ * 		<li>Retrieve the Offset</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class OffsetIdempotent extends org.drip.function.definition.R1ToR1 {
-	private double _dblOffset = java.lang.Double.NaN;
+public class OffsetIdempotent
+	extends R1ToR1
+{
+	private double _offset = Double.NaN;
 
 	/**
-	 * OffsetIdempotent Constructor
+	 * <i>OffsetIdempotent</i> Constructor
 	 * 
-	 * @param dblOffset The Offset
+	 * @param offset The Offset
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public OffsetIdempotent (
-		final double dblOffset)
-		throws java.lang.Exception
+		final double offset)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblOffset = dblOffset))
-			throw new java.lang.Exception ("OffsetIdempotent ctr: Invalid Inputs");
+		if (!NumberUtil.IsValid (_offset = offset)) {
+			throw new Exception ("OffsetIdempotent Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -123,39 +147,73 @@ public class OffsetIdempotent extends org.drip.function.definition.R1ToR1 {
 
 	public double offset()
 	{
-		return _dblOffset;
+		return _offset;
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("OffsetIdempotent::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("OffsetIdempotent::evaluate => Invalid Inputs");
+		}
 
-		return dblVariate - _dblOffset;
+		return variate - _offset;
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 > iOrder)
-			throw new java.lang.Exception ("OffsetIdempotent::derivative => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate) || 0 > order) {
+			throw new Exception ("OffsetIdempotent::derivative => Invalid Inputs");
+		}
 
-		return iOrder > 1 ? 0. : 1;
+		return order > 1 ? 0. : 1;
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("OffsetIdempotent::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return 0.5 * (dblEnd * dblEnd - dblBegin - dblBegin) + _dblOffset * (dblEnd - dblBegin);
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("OffsetIdempotent::integrate => Invalid Inputs");
+		}
+
+		return 0.5 * (end * end - begin - begin) + _offset * (end - begin);
 	}
 }

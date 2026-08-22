@@ -354,7 +354,7 @@ public class R1ContinuousUniformPiecewiseLinear
 			throw new Exception ("R1ContinuousUniformPiecewiseLinear::invCumulative => No roots");
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**

@@ -178,7 +178,7 @@ public class CompoundBracketingRegressorSet implements org.drip.regression.core.
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopBrent.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopBrent.root());
 
 					return true;
 				}
@@ -213,7 +213,7 @@ public class CompoundBracketingRegressorSet implements org.drip.regression.core.
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopZheng.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopZheng.root());
 
 					return true;
 				}

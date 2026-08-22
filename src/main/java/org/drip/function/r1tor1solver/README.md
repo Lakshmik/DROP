@@ -65,71 +65,55 @@ DROP Function R<sup>1</sup> Solver Package contains several Built-in R<sup>1</su
  	* Convergence Zone initialization: This generates a variate that lies within the convergence zone for the
  		iterative determination of the fixed point using the Newton's method. Convergence Zone Determination
  		is controlled by the parameters in ConvergenceControlParams.
- ExecutionInitializer behavior can be customized/optimized through several of the initialization heuristics
- techniques implemented in the InitializationHeuristics class.
 
  * [***FixedPointFinder***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinder.java)
  <i>FixedPointFinder</i> is the base abstract class that is implemented by customized invocations, e.g., Newton method, or any of the bracketing methodologies. FixedPointFinder invokes the core routine for determining the fixed point from the goal. The ExecutionControl determines the execution termination. The initialization heuristics implements targeted customization of the search.
-
- * FixedPointFinder main flow comprises of the following steps:
- 	* Initialize the fixed point search zone by determining either a) the brackets, or b) the starting variate.
- 	* Compute the absolute OF tolerance that establishes the attainment of the fixed point.
- 	* Launch the variate iterator that iterates the variate.
- 	* Iterate until the desired tolerance has been attained
- 	* Return the fixed point output.
-
- * Fixed point finders that derive from this provide implementations for the following:
- 	* Variate initialization: They may choose either bracketing initializer, or the convergence initializer; functionality is provided for both in this module.
- 	* Variate Iteration: Variates are iterated using a) any of the standard primitive built-in variate iterators (or custom ones), or b) a variate selector scheme for each iteration.
-
+ 	* FixedPointFinder main flow comprises of the following steps:
+ 		* Initialize the fixed point search zone by determining either a) the brackets, or b) the starting variate.
+ 		* Compute the absolute OF tolerance that establishes the attainment of the fixed point.
+ 		* Launch the variate iterator that iterates the variate.
+ 		* Iterate until the desired tolerance has been attained
+ 		* Return the fixed point output.
+ 	* Fixed point finders that derive from this provide implementations for the following:
+ 		* Variate initialization: They may choose either bracketing initializer, or the convergence initializer; functionality is provided for both in this module.
+ 		* Variate Iteration: Variates are iterated using a) any of the standard primitive built-in variate iterators (or custom ones), or b) a variate selector scheme for each iteration.
+ 
  * [***FixedPointFinderBracketing***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinderBracketing.java)
  <i>FixedPointFinderBracketing</i> customizes the FixedPointFinder for bracketing based fixed point finder
- functionality.
-
- FixedPointFinderBracketing applies the following customization:
+ functionality. It applies the following customization:
  	* Initializes the fixed point finder by computing the starting brackets
  	* Iterating the next search variate using one of the specified variate iterator primitives.
-
- By default, FixedPointFinderBracketing does not do compound iterations of the variate using any schemes -
- 	that is done by classes that extend it.
-
+ 
  * [***FixedPointFinderBrent***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinderBrent.java)
  <i>FixedPointFinderBrent</i> customizes FixedPointFinderBracketing by applying the Brent's scheme of
- compound variate selector.
-
- Brent's scheme, as implemented here, is described in http://www.credit-trader.org. This implementation
- 	retains absolute shifts that have happened to the variate for the past 2 iterations as the discriminant
- 	that determines the next variate to be generated.
-
- FixedPointFinderBrent uses the following parameters specified in VariateIterationSelectorParams:
+ compound variate selector. Brent's scheme, as implemented here, is described in http://www.credit-trader.org. This implementation retains absolute shifts that have happened to the variate for the past 2 iterations as the discriminant
+ 	that determines the next variate to be generated. FixedPointFinderBrent uses the following parameters specified in VariateIterationSelectorParams:
  	* The Variate Primitive that is regarded as the "fast" method
  	* The Variate Primitive that is regarded as the "robust" method
  	* The relative variate shift that determines when the "robust" method is to be invoked over the "fast"
  	* The lower bound on the variate shift between iterations that serves as the fall-back to the "robust"
-
+ 
  * [***FixedPointFinderNewton***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinderNewton.java)
  <i>FixedPointFinderNewton</i> customizes the FixedPointFinder for Open (Newton's) fixed point finder
- 	functionality.
-
- FixedPointFinderNewton applies the following customization:
+ 	functionality. It applies the following customization:
  	* Initializes the fixed point finder by computing a starting variate in the convergence zone
  	* Iterating the next search variate using the Newton's method.
-
+ 
  * [***FixedPointFinderOutput***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinderOutput.java)
- <i>FixedPointFinderOutput</i> holds the result of the fixed point search.
-
- * FixedPointFinderOutput contains the following fields:
+ <i>FixedPointFinderOutput</i> holds the result of the fixed point search. It contains the following fields:
  	* Whether the search completed successfully
  	* The number of iterations, the number of objective function base/derivative calculations, and the time
  		taken for the search
  	* The output from initialization
 
  * [***FixedPointFinderOutput***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinderOutput.java)
- <i>FixedPointFinderZheng</i> implements the fixed point locator using Zheng's improvement to Brent's
- 	method.
+ <i>FixedPointFinderOutput</i> holds the result of the fixed point search.
 
  * [***FixedPointFinderZheng***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/FixedPointFinderZheng.java)
  <i>FixedPointFinderZheng</i> overrides the iterateCompoundVariate method to achieve the desired simplification in the iterative variate selection.
+
+ * [***InitializationHeuristics***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/InitializationHeuristics.java)
+ <i>InitializationHeuristics</i> implements several heuristics used to kick off the fixed point bracketing/search process.
 
  * [***IteratedBracket***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/IteratedBracket.java)
  <i>IteratedBracket</i> holds the left/right bracket variates and the corresponding values for the objective
@@ -141,25 +125,19 @@ DROP Function R<sup>1</sup> Solver Package contains several Built-in R<sup>1</su
 
  * [***VariateIterationSelectorParams***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/VariateIterationSelectorParams.java)
  <i>VariateIterationSelectorParams</i> implements the control parameters for the compound variate selector
- scheme used in Brent's method.
-
- Brent's method uses the following fields in VariateIterationSelectorParams to generate the next variate:
+ scheme used in Brent's method. Brent's method uses the following fields in VariateIterationSelectorParams to generate the next variate:
  	* The Variate Primitive that is regarded as the "fast" method
  	* The Variate Primitive that is regarded as the "robust" method
  	* The relative variate shift that determines when the "robust" method is to be invoked over the "fast"
  	* The lower bound on the variate shift between iterations that serves as the fall-back to the "robust"
 
  * [***VariateIteratorPrimitive***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/VariateIteratorPrimitive.java)
-<i>VariateIteratorPrimitive</i> implements the various Primitive Variate Iterator routines.
-
- VariateIteratorPrimitive implements the following iteration primitives:
+<i>VariateIteratorPrimitive</i> implements the various Primitive Variate Iterator routines. It implements the following iteration primitives:
  	* Bisection
  	* False Position
  	* Quadratic
  	* Inverse Quadratic
  	* Ridder
-
- It may be readily enhanced to accommodate additional primitives.
 
 
 ## DROP Specifications

@@ -2073,7 +2073,7 @@ public class LatentStateResponseModel
 				return new Monotonocity (Monotonocity.MONOTONIC);
 			}
 
-			double extremum = fixedPointFinderOutput.getRoot();
+			double extremum = fixedPointFinderOutput.root();
 
 			if (!NumberUtil.IsValid (extremum) || 0. >= extremum || 1. <= extremum) {
 				return new Monotonocity (Monotonocity.MONOTONIC);

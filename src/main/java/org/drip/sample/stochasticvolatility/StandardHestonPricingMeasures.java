@@ -22,6 +22,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -101,153 +109,153 @@ import org.drip.state.identifier.ForwardLabel;
  * <i>StandardHestonPricingMeasures</i> contains an illustration of the Stochastic Volatility based Pricing
  *  Algorithm of an European Call Using the Heston Algorithm.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stochasticvolatility/README.md">Heston AMST Stochastic Volatility Pricing</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stochasticvolatility/README.md">Heston AMST Stochastic Volatility Pricing</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class StandardHestonPricingMeasures {
+public class StandardHestonPricingMeasures
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final int[] aiDay,
-		final int iNumFutures,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final int[] maturityDaysArray,
+		final int futuresCount,
+		final String currency)
 		throws Exception
 	{
-		CalibratableComponent[] aCalibComp = new CalibratableComponent[aiDay.length + iNumFutures];
+		CalibratableComponent[] calibratableComponentArray =
+			new CalibratableComponent[maturityDaysArray.length + futuresCount];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aCalibComp[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					strCurrency,
-					"3M"
-				)
+		for (int maturityDaysIndex = 0; maturityDaysIndex < maturityDaysArray.length; ++maturityDaysIndex) {
+			calibratableComponentArray[maturityDaysIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityDaysIndex], currency),
+				ForwardLabel.Create (currency, "3M")
 			);
-
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtEffective,
-			iNumFutures,
-			strCurrency
-		);
-
-		for (int i = aiDay.length; i < aiDay.length + iNumFutures; ++i)
-			aCalibComp[i] = aEDF[i - aiDay.length];
-
-		return aCalibComp;
-	}
-
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
-		throws Exception
-	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			FixFloatComponent irs = OTCIRS (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
-			);
-
-			irs.setPrimaryCode ("IRS." + astrMaturityTenor[i] + "." + strCurrency);
-
-			aIRS[i] = irs;
 		}
 
-		return aIRS;
-	}
-
-	/*
-	 * Construct the discount curve using the following steps:
-	 * 	- Construct the array of cash instruments and their quotes.
-	 * 	- Construct the array of swap instruments and their quotes.
-	 * 	- Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
-		throws Exception
-	{
-		/*
-		 * Construct the array of Deposit instruments and their quotes.
-		 */
-
-		CalibratableComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			new int[] {
-				1, 2, 3, 7, 14, 21, 30, 60
-			},
-			0,
-			strCurrency
+		CalibratableComponent[] futuresComponentArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
+			effectiveDate,
+			futuresCount,
+			currency
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.01200, 0.01200, 0.01200, 0.01450, 0.01550, 0.01600, 0.01660, 0.01850
+		for (int instrumentIndex = maturityDaysArray.length;
+			instrumentIndex < maturityDaysArray.length + futuresCount;
+			++instrumentIndex)
+		{
+			calibratableComponentArray[instrumentIndex] =
+				futuresComponentArray[instrumentIndex - maturityDaysArray.length];
+		}
+
+		return calibratableComponentArray;
+	}
+
+	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
+		throws Exception
+	{
+		FixFloatComponent[] fixFloatComponentArray = new FixFloatComponent[maturityTenorArray.length];
+
+		for (int fixFloatComponentIndex = 0;
+			fixFloatComponentIndex < maturityTenorArray.length;
+			++fixFloatComponentIndex)
+		{
+			FixFloatComponent fixFloatComponent = OTCIRS (
+				spotDate,
+				currency,
+				maturityTenorArray[fixFloatComponentIndex],
+				couponArray[fixFloatComponentIndex]
+			);
+
+			fixFloatComponent.setPrimaryCode (
+				"IRS." + maturityTenorArray[fixFloatComponentIndex] + "." + currency
+			);
+
+			fixFloatComponentArray[fixFloatComponentIndex] = fixFloatComponent;
+		}
+
+		return fixFloatComponentArray;
+	}
+
+	private static final MergedDiscountForwardCurve MakeDC (
+		final JulianDate spotDate,
+		final String currency)
+		throws Exception
+	{
+		CalibratableComponent[] depositComponentArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			new int[] {
+				1,
+				2,
+				3,
+				7,
+				14,
+				21,
+				30,
+				60
+			},
+			0,
+			currency
+		);
+
+		double[] depositQuoteArray =
+		{
+			0.01200,
+			0.01200,
+			0.01200,
+			0.01450,
+			0.01550,
+			0.01600,
+			0.01660,
+			0.01850
 		};
 
-		String[] astrDepositManifestMeasure = new String[] {
-			"ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate"
+		String[] depositManifestMeasureArray =
+		{
+			"ForwardRate",
+			"ForwardRate",
+			"ForwardRate",
+			"ForwardRate",
+			"ForwardRate",
+			"ForwardRate",
+			"ForwardRate",
+			"ForwardRate"
 		};
 
-		/*
-		 * Construct the array of Swap instruments and their quotes.
-		 */
-
-		double[] adblSwapQuote = new double[] {
+		double[] swapQuoteArray =
+		{
 			0.02604,    //  4Y
 			0.02808,    //  5Y
 			0.02983,    //  6Y
@@ -265,7 +273,8 @@ public class StandardHestonPricingMeasures {
 			0.03145     // 50Y
 		};
 
-		String[] astrSwapManifestMeasure = new String[] {
+		String[] swapManifestMeasureArray =
+		{
 			"SwapRate",    //  4Y
 			"SwapRate",    //  5Y
 			"SwapRate",    //  6Y
@@ -283,32 +292,38 @@ public class StandardHestonPricingMeasures {
 			"SwapRate"     // 50Y
 		};
 
-		CalibratableComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
+		CalibratableComponent[] irsComponentArray = SwapInstrumentsFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[] {
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y"
 			},
-			adblSwapQuote
+			swapQuoteArray
 		);
-
-		/*
-		 * Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-		 */
 
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
-			),
-			aDepositComp,
-			adblDepositQuote,
-			astrDepositManifestMeasure,
-			aSwapComp,
-			adblSwapQuote,
-			astrSwapManifestMeasure,
+			new ValuationParams (spotDate, spotDate, currency),
+			depositComponentArray,
+			depositQuoteArray,
+			depositManifestMeasureArray,
+			irsComponentArray,
+			swapQuoteArray,
+			swapManifestMeasureArray,
 			true
 		);
 	}
@@ -316,78 +331,61 @@ public class StandardHestonPricingMeasures {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			"USD"
-		);
+		ValuationParams valuationParams = new ValuationParams (today, today, "USD");
 
-		/*
-		 * Construct the Discount Curve using its instruments and quotes
-		 */
+		MergedDiscountForwardCurve discountCurve = MakeDC (today, "USD");
 
-		MergedDiscountForwardCurve dc = MakeDC (
-			dtToday,
-			"USD"
-		);
+		JulianDate exerciseDate = today.addTenor ("6M");
 
-		JulianDate dtMaturity = dtToday.addTenor ("6M");
+		double strike = 1.;
 
-		double dblStrike = 1.;
+		EuropeanCallPut option = new EuropeanCallPut (exerciseDate, strike);
 
-		EuropeanCallPut option = new EuropeanCallPut (
-			dtMaturity,
-			dblStrike
-		);
+		double spot = 1.;
 
-		double dblSpot = 1.;
+		double rho = 0.3;
+		double kappa = 1.;
+		double sigma = 0.5;
+		double theta = 0.2;
+		double lambda = 0.;
+		double spotVolatility = 0.2;
 
-		double dblRho = 0.3;
-		double dblKappa = 1.;
-		double dblSigma = 0.5;
-		double dblTheta = 0.2;
-		double dblLambda = 0.;
-		double dblSpotVolatility = 0.2;
-
-		HestonOptionPricerParams fphp = new HestonOptionPricerParams (
+		HestonOptionPricerParams hestonOptionPricerParams = new HestonOptionPricerParams (
 			HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993,
-			dblRho, 			// Rho
-			dblKappa,			// Kappa
-			dblSigma,			// Sigma
-			dblTheta,			// Theta
-			dblLambda,			// Lambda
-			PhaseAdjuster.MULTI_VALUE_BRANCH_POWER_PHASE_TRACKER_KAHL_JACKEL // Indicates Apply Phase Tracking Adjustment for Log + Power
+			rho, 			// Rho
+			kappa,			// Kappa
+			sigma,			// Sigma
+			theta,			// Theta
+			lambda,			// Lambda
+			PhaseAdjuster.MULTI_VALUE_BRANCH_POWER_PHASE_TRACKER_KAHL_JACKEL
+				// Indicates Apply Phase Tracking Adjustment for Log + Power
 		);
 
-		FokkerPlanckGenerator fpg = new HestonStochasticVolatilityAlgorithm (
-			fphp				// FP Heston Parameters
+		FokkerPlanckGenerator fokkerPlanckGenerator = new HestonStochasticVolatilityAlgorithm (
+			hestonOptionPricerParams				// FP Heston Parameters
 		);
 
 		System.out.println (
 			option.value (
-				valParams,
-				dblSpot,
+				valuationParams,
+				spot,
 				false,
-				dc,
-				new Flat (dblSpotVolatility),
-				fpg
+				discountCurve,
+				new Flat (spotVolatility),
+				fokkerPlanckGenerator
 			)
 		);
 

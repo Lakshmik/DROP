@@ -294,7 +294,7 @@ public abstract class R1Continuous
 			throw new Exception ("R1Continuous::invCumulative => Cannot find Root");
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**
@@ -510,7 +510,7 @@ public abstract class R1Continuous
 			throw new Exception ("R1Continuous::invCumulative => Cannot find Root");
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**
@@ -729,7 +729,7 @@ public abstract class R1Continuous
 			throw new Exception ("R1Continuous::bPOE => Cannot find Root");
 		}
 
-		return 1. - fixedPointFinderOutput.getRoot();
+		return 1. - fixedPointFinderOutput.root();
 	}
 
 	/**

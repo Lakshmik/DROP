@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,144 +96,163 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>FixedPointFinder</i> is the base abstract class that is implemented by customized invocations, e.g.,
- * Newton's method, or any of the bracketing methodologies.
- * <br><br>
- * FixedPointFinder invokes the core routine for determining the fixed point from the goal. The
- * 	ExecutionControl determines the execution termination. The initialization heuristics implements
- * 	targeted customization of the search.
- * <br><br>
- * FixedPointFinder main flow comprises of the following steps:
- * <br>
- * <ul>
- * 	<li>
- * 		Initialize the fixed point search zone by determining either a) the brackets, or b) the starting
- * 			variate.
- * 	</li>
- * 	<li>
- * 		Compute the absolute OF tolerance that establishes the attainment of the fixed point.
- * 	</li>
- * 	<li>
- * 		Launch the variate iterator that iterates the variate.
- * 	</li>
- * 	<li>
- * 		Iterate until the desired tolerance has been attained
- * 	</li>
- * 	<li>
- * 		Return the fixed point output.
- * 	</li>
- * </ul>
- * <br><br>
- * Fixed point finders that derive from this provide implementations for the following:
- * <br>
- * <ul>
- * 	<li>
- * 	- Variate initialization: They may choose either bracketing initializer, or the convergence initializer -
- * 		functionality is provided for both in this module.
- * 	</li>
- * 	<li>
- * 	- Variate Iteration: Variates are iterated using a) any of the standard primitive built-in variate
- * 		iterators (or custom ones), or b) a variate selector scheme for each iteration.
- * 	</li>
- * </ul>
+ * 	Newton's method, or any of the bracketing methodologies. <i>FixedPointFinder</i> invokes the core routine
+ *  for determining the fixed point from the goal. <i>ExecutionControl</i> determines the execution
+ *  termination. The initialization heuristics implements targeted customization of the search.
+ *  <i>FixedPointFinder</i> main flow comprises of the following steps:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Initialize the fixed point search zone by determining either a) the brackets, or b) the starting
+ * 			variate.</li>
+ * 		<li>Compute the absolute OF tolerance that establishes the attainment of the fixed point.</li>
+ * 		<li>Launch the variate iterator that iterates the variate.</li>
+ * 		<li>Iterate until the desired tolerance has been attained</li>
+ * 		<li>Return the fixed point output.</li>
+ * 	</ul>
+ * 
+ * 	Fixed point finders that derive from this provide implementations for the following:
+ * 	<br>
+ * 	<ul>
+ * 		<li>- Variate initialization: They may choose either bracketing initializer, or the convergence
+ * 			initializer - functionality is provided for both in this module.</li>
+ * 		<li>- Variate Iteration: Variates are iterated using a) any of the standard primitive built-in
+ * 			variate iterators (or custom ones), or b) a variate selector scheme for each iteration.</li>
+ * 	</ul>
+ * 
+ *  It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Invoke the Solution 1D Root Finding Sequence #1</li>
+ * 		<li>Invoke the Solution 1D Root Finding Sequence #2</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class FixedPointFinder {
-	protected boolean _bWhine = false;
-	protected double _dblOFGoal = java.lang.Double.NaN;
-	protected org.drip.function.r1tor1solver.ExecutionControl _ec = null;
-	protected org.drip.function.definition.R1ToR1 _of = null;
+public abstract class FixedPointFinder
+{
+	protected boolean _whine = false;
+	protected R1ToR1 _objectiveFunction = null;
+	protected ExecutionControl _executionControl = null;
+	protected double _objectiveFunctionValueGoal = Double.NaN;
 
 	protected FixedPointFinder (
-		final double dblOFGoal,
-		final org.drip.function.definition.R1ToR1 of,
-		final org.drip.function.r1tor1solver.ExecutionControl ec,
-		final boolean bWhine)
-		throws java.lang.Exception
+		final double objectiveFunctionValueGoal,
+		final R1ToR1 objectiveFunction,
+		final ExecutionControl executionControl,
+		final boolean whine)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblOFGoal = dblOFGoal) || null == (_of = of))
-			throw new java.lang.Exception ("FixedPointFinder constructor: Invalid inputs");
+		if (!NumberUtil.IsValid (_objectiveFunctionValueGoal = objectiveFunctionValueGoal) ||
+			null == (_objectiveFunction = objectiveFunction))
+		{
+			throw new Exception ("FixedPointFinder constructor: Invalid inputs");
+		}
 
-		_ec = new org.drip.function.r1tor1solver.ExecutionControl (of, null);
+		_executionControl = new ExecutionControl (null);
 
-		_bWhine = bWhine;
+		_whine = whine;
 	}
 
 	protected abstract boolean iterateVariate (
-		final org.drip.function.r1tor1solver.IteratedVariate vi,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop);
+		final IteratedVariate iteratedVariate,
+		final FixedPointFinderOutput fixedPointFinderOutput
+	);
 
-	protected abstract org.drip.function.r1tor1solver.ExecutionInitializationOutput initializeVariateZone (
-		final org.drip.function.r1tor1solver.InitializationHeuristics ih);
+	protected abstract ExecutionInitializationOutput initializeVariateZone (
+		final InitializationHeuristics initializationHeuristics
+	);
 
 	/**
-	 * Invoke the solution 1D root finding sequence
+	 * Invoke the Solution 1D Root Finding Sequence #1
 	 * 
-	 * @param ih Optional Initialization Heuristics
+	 * @param initializationHeuristics Optional Initialization Heuristics
 	 * 
-	 * @return Root finder Solution Object for the variate
+	 * @return Root Finder Solution Object for the Variate
 	 */
 
-	public org.drip.function.r1tor1solver.FixedPointFinderOutput findRoot (
-		final org.drip.function.r1tor1solver.InitializationHeuristics ih)
+	public FixedPointFinderOutput findRoot (
+		final InitializationHeuristics initializationHeuristics)
 	{
-		org.drip.function.r1tor1solver.FixedPointFinderOutput rfop = null;
+		FixedPointFinderOutput fixedPointFinderOutput = null;
 
-		org.drip.function.r1tor1solver.ExecutionInitializationOutput eiop = initializeVariateZone (ih);
+		ExecutionInitializationOutput executionInitializationOutput =
+			initializeVariateZone (initializationHeuristics);
 
-		if (null == eiop || !eiop.isDone()) return null;
-
-		try {
-			rfop = new org.drip.function.r1tor1solver.FixedPointFinderOutput (eiop);
-
-			if (!rfop.incrOFCalcs()) return rfop;
-
-			double dblOF = _of.evaluate (eiop.getStartingVariate());
-
-			double dblAbsoluteTolerance = _ec.calcAbsoluteOFTolerance (dblOF);
-
-			double dblAbsoluteConvergence = _ec.calcAbsoluteVariateConvergence (eiop.getStartingVariate());
-
-			org.drip.function.r1tor1solver.IteratedVariate iv = new
-				org.drip.function.r1tor1solver.IteratedVariate (eiop, dblOF);
-
-			int iNumIterationsPending = _ec.getNumIterations();
-
-			while (!_ec.hasOFReachedGoal (dblAbsoluteTolerance, iv.getOF(), _dblOFGoal)) {
-				double dblPrevVariate = iv.getVariate();
-
-				if (!rfop.incrIterations() || 0 == --iNumIterationsPending || !iterateVariate (iv, rfop))
-					return rfop;
-
-				if (_ec.isVariateConvergenceCheckEnabled() && (java.lang.Math.abs (dblPrevVariate -
-					iv.getVariate()) < dblAbsoluteConvergence))
-					break;
-			}
-
-			rfop.setRoot (iv.getVariate());
-		} catch (java.lang.Exception e) {
-			if (_bWhine) e.printStackTrace();
+		if (null == executionInitializationOutput || !executionInitializationOutput.isDone()) {
+			return null;
 		}
 
-		return rfop;
+		try {
+			fixedPointFinderOutput = new FixedPointFinderOutput (executionInitializationOutput);
+
+			if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+				return fixedPointFinderOutput;
+			}
+
+			double objectiveFunctionValue =
+				_objectiveFunction.evaluate (executionInitializationOutput.startingVariate());
+
+			double absoluteTolerance =
+				_executionControl.calculateAbsoluteObjectiveFunctionTolerance (objectiveFunctionValue);
+
+			double absoluteConvergence = _executionControl.calculateAbsoluteVariateConvergence (
+				executionInitializationOutput.startingVariate()
+			);
+
+			IteratedVariate iteratedVariate =
+				new IteratedVariate (executionInitializationOutput, objectiveFunctionValue);
+
+			int pendingIterationCount = _executionControl.maximumIterationCount();
+
+			while (!_executionControl.objectiveFunctionGoalReached (
+				absoluteTolerance,
+				iteratedVariate.objectiveFunctionValue(),
+				_objectiveFunctionValueGoal
+			))
+			{
+				double previousVariate = iteratedVariate.x();
+
+				if (!fixedPointFinderOutput.incrementIterationCount() ||
+					0 == --pendingIterationCount ||
+					!iterateVariate (iteratedVariate, fixedPointFinderOutput))
+				{
+					return fixedPointFinderOutput;
+				}
+
+				if (_executionControl.variateConvergenceCheckEnabled() &&
+					Math.abs (previousVariate - iteratedVariate.x()) < absoluteConvergence)
+				{
+					break;
+				}
+			}
+
+			fixedPointFinderOutput.setRoot (iteratedVariate.x());
+		} catch (Exception e) {
+			if (_whine) {
+				e.printStackTrace();
+			}
+		}
+
+		return fixedPointFinderOutput;
 	}
 
 	/**
-	 * Invoke the solution 1D root finding sequence
+	 * Invoke the Solution 1D Root Finding Sequence #2
 	 * 
 	 * @return Root finder Solution Object for the variate
 	 */
 
-	public org.drip.function.r1tor1solver.FixedPointFinderOutput findRoot()
+	public FixedPointFinderOutput findRoot()
 	{
 		return findRoot (null);
 	}

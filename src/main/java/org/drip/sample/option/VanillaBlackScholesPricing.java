@@ -23,6 +23,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -102,153 +110,111 @@ import org.drip.state.identifier.ForwardLabel;
  * <i>VanillaBlackScholesPricing</i> contains an illustration of the Vanilla Black Scholes based European
  * 	Call and Put Options Pricer.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/option/README.md">Deterministic (Black) / Stochastic (Heston) Options</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/option/README.md">Deterministic (Black) / Stochastic (Heston) Options</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class VanillaBlackScholesPricing {
+public class VanillaBlackScholesPricing
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final int[] aiDay,
-		final int iNumFutures,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final int[] depositMaturityDaysArray,
+		final int futuresCount,
+		final String currency)
 		throws Exception
 	{
-		CalibratableComponent[] aCalibComp = new CalibratableComponent[aiDay.length + iNumFutures];
+		CalibratableComponent[] calibratableComponentArray =
+			new CalibratableComponent[depositMaturityDaysArray.length + futuresCount];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aCalibComp[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					strCurrency,
-					"3M"
-				)
+		for (int depositIndex = 0; depositIndex < depositMaturityDaysArray.length; ++depositIndex) {
+			calibratableComponentArray[depositIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (depositMaturityDaysArray[depositIndex], currency),
+				ForwardLabel.Create (currency, "3M")
 			);
-
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtEffective,
-			iNumFutures,
-			strCurrency
-		);
-
-		for (int i = aiDay.length; i < aiDay.length + iNumFutures; ++i)
-			aCalibComp[i] = aEDF[i - aiDay.length];
-
-		return aCalibComp;
-	}
-
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
-		throws Exception
-	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			FixFloatComponent irs = OTCIRS (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
-			);
-
-			irs.setPrimaryCode ("IRS." + astrMaturityTenor[i] + "." + strCurrency);
-
-			aIRS[i] = irs;
 		}
 
-		return aIRS;
-	}
-
-	/*
-	 * Construct the discount curve using the following steps:
-	 * 	- Construct the array of cash instruments and their quotes.
-	 * 	- Construct the array of swap instruments and their quotes.
-	 * 	- Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
-		throws Exception
-	{
-		/*
-		 * Construct the array of Deposit instruments and their quotes.
-		 */
-
-		CalibratableComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			new int[] {
-				1, 2, 3, 7, 14, 21, 30, 60
-			},
-			0,
-			strCurrency
+		CalibratableComponent[] futuresArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
+			effectiveDate,
+			futuresCount,
+			currency
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.01200, 0.01200, 0.01200, 0.01450, 0.01550, 0.01600, 0.01660, 0.01850
-		};
+		for (int calibratableComponentIndex = depositMaturityDaysArray.length;
+			calibratableComponentIndex < depositMaturityDaysArray.length + futuresCount;
+			++calibratableComponentIndex)
+		{
+			calibratableComponentArray[calibratableComponentIndex] =
+				futuresArray[calibratableComponentIndex - depositMaturityDaysArray.length];
+		}
 
-		String[] astrDepositManifestMeasure = new String[] {
-			"ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate"
-		};
+		return calibratableComponentArray;
+	}
 
-		/*
-		 * Construct the array of Swap instruments and their quotes.
-		 */
+	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
+		throws Exception
+	{
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
 
-		double[] adblSwapQuote = new double[] {
+		for (int maturityTenorIndex = 0;
+			maturityTenorIndex < maturityTenorArray.length;
+			++maturityTenorIndex)
+		{
+			FixFloatComponent irs = OTCIRS (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityTenorIndex],
+				couponArray[maturityTenorIndex]
+			);
+
+			irs.setPrimaryCode ("IRS." + maturityTenorArray[maturityTenorIndex] + "." + currency);
+
+			irsArray[maturityTenorIndex] = irs;
+		}
+
+		return irsArray;
+	}
+
+	private static final MergedDiscountForwardCurve MakeDC (
+		final JulianDate spotDate,
+		final String currency)
+		throws Exception
+	{
+		double[] swapQuoteArray =
+		{
 			0.02604,    //  4Y
 			0.02808,    //  5Y
 			0.02983,    //  6Y
@@ -266,50 +232,89 @@ public class VanillaBlackScholesPricing {
 			0.03145     // 50Y
 		};
 
-		String[] astrSwapManifestMeasure = new String[] {
-			"SwapRate",    //  4Y
-			"SwapRate",    //  5Y
-			"SwapRate",    //  6Y
-			"SwapRate",    //  7Y
-			"SwapRate",    //  8Y
-			"SwapRate",    //  9Y
-			"SwapRate",    // 10Y
-			"SwapRate",    // 11Y
-			"SwapRate",    // 12Y
-			"SwapRate",    // 15Y
-			"SwapRate",    // 20Y
-			"SwapRate",    // 25Y
-			"SwapRate",    // 30Y
-			"SwapRate",    // 40Y
-			"SwapRate"     // 50Y
-		};
-
-		CalibratableComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
-			},
-			adblSwapQuote
-		);
-
-		/*
-		 * Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-		 */
-
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
+			new ValuationParams (spotDate, spotDate, currency),
+			DepositInstrumentsFromMaturityDays (
+				spotDate,
+				new int[]
+				{
+					1,
+					2,
+					3,
+					7,
+					14,
+					21,
+					30,
+					60
+				},
+				0,
+				currency
 			),
-			aDepositComp,
-			adblDepositQuote,
-			astrDepositManifestMeasure,
-			aSwapComp,
-			adblSwapQuote,
-			astrSwapManifestMeasure,
+			new double[]
+			{
+				0.0120,
+				0.0120,
+				0.0120,
+				0.0145,
+				0.0155,
+				0.0160,
+				0.0166,
+				0.0185
+			},
+			new String[]
+			{
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate"
+			},
+			SwapInstrumentsFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"40Y",
+					"50Y"
+				},
+				swapQuoteArray
+			),
+			swapQuoteArray,
+			new String[]
+			{
+				"SwapRate",    //  4Y
+				"SwapRate",    //  5Y
+				"SwapRate",    //  6Y
+				"SwapRate",    //  7Y
+				"SwapRate",    //  8Y
+				"SwapRate",    //  9Y
+				"SwapRate",    // 10Y
+				"SwapRate",    // 11Y
+				"SwapRate",    // 12Y
+				"SwapRate",    // 15Y
+				"SwapRate",    // 20Y
+				"SwapRate",    // 25Y
+				"SwapRate",    // 30Y
+				"SwapRate",    // 40Y
+				"SwapRate"     // 50Y
+			},
 			true
 		);
 	}
@@ -317,68 +322,59 @@ public class VanillaBlackScholesPricing {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		double spot = 1.;
+		double strike = 1.;
+		double volatility = 1.;
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			"USD"
-		);
+		JulianDate today = DateUtil.Today();
 
-		/*
-		 * Construct the Discount Curve using its instruments and quotes
-		 */
+		JulianDate maturityDate = today.addTenor ("6M");
 
-		MergedDiscountForwardCurve dc = MakeDC (
-			dtToday,
-			"USD"
-		);
+		MergedDiscountForwardCurve discountCurve = MakeDC (today, "USD");
 
-		JulianDate dtMaturity = dtToday.addTenor ("6M");
+		EuropeanCallPut option = new EuropeanCallPut (maturityDate, strike);
 
-		double dblStrike = 1.;
+		ValuationParams valuationParams = new ValuationParams (today, today, "USD");
 
-		EuropeanCallPut option = new EuropeanCallPut (
-			dtMaturity,
-			dblStrike
-		);
-
-		double dblSpot = 1.;
-		double dblVolatility = 1.;
-
-		Map<String, Double> mapOptionCalc = option.value (
-			valParams,
-			dblSpot,
+		Map<String, Double> optionMeasuresMap = option.value (
+			valuationParams,
+			spot,
 			false,
-			dc,
-			new Flat (dblVolatility),
+			discountCurve,
+			new Flat (volatility),
 			new BlackScholesAlgorithm()
 		);
 
-		for (Map.Entry<String, Double> me : mapOptionCalc.entrySet())
-			System.out.println ("\t" + me.getKey() + " => " + me.getValue());
+		for (Map.Entry<String, Double> optionMeasuresMapEntry : optionMeasuresMap.entrySet()) {
+			System.out.println (
+				"\t|| " + optionMeasuresMapEntry.getKey() + " => " + optionMeasuresMapEntry.getValue()
+			);
+		}
 
-		System.out.println ("\n\tImplied Vol:" + FormatUtil.FormatDouble (option.implyVolatilityFromCallPrice (
-			valParams,
-			dblSpot,
-			false,
-			dc,
-			mapOptionCalc.get ("CallPrice")), 2, 2, 100.) + "%"
+		System.out.println (
+			"\n\t|| Implied Vol:" + FormatUtil.FormatDouble (
+				option.implyVolatilityFromCallPrice (
+					valuationParams,
+					spot,
+					false,
+					discountCurve,
+					optionMeasuresMap.get ("CallPrice")
+				),
+				2,
+				2,
+				100.
+			) + "%"
 		);
 
 		EnvManager.TerminateEnv();

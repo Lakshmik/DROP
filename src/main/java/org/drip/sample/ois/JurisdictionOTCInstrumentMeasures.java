@@ -3,6 +3,7 @@ package org.drip.sample.ois;
 
 import java.util.Map;
 
+import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.function.r1tor1custom.QuadraticRationalShapeControl;
 import org.drip.market.otc.*;
@@ -18,7 +19,6 @@ import org.drip.spline.basis.PolynomialFunctionSetParams;
 import org.drip.spline.params.*;
 import org.drip.spline.stretch.*;
 import org.drip.state.creator.ScenarioDiscountCurveBuilder;
-import org.drip.state.discount.MergedDiscountForwardCurve;
 import org.drip.state.estimator.LatentStateStretchBuilder;
 import org.drip.state.identifier.OvernightLabel;
 import org.drip.state.inference.*;
@@ -28,6 +28,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -106,128 +114,111 @@ import org.drip.state.inference.*;
  * <i>JurisdictionOTCInstrumentMeasures</i> contains the Curve Construction and Valuation Functionality of
  * 	the OTC OIS Instruments across Multiple Jurisdictions.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/ois/README.md">Index/Fund OIS Curve Reconcilation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/ois/README.md">Index/Fund OIS Curve Reconciliation</a></td></tr>
+ *  </table>
+ *	<br>
+ *
  * @author Lakshmi Krishnamurthy
  */
 
-public class JurisdictionOTCInstrumentMeasures {
+public class JurisdictionOTCInstrumentMeasures
+{
 
 	private static final FixFloatComponent OTCOISFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = OvernightFixedFloatContainer.FundConventionFromJurisdiction (
-			strCurrency
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		return OvernightFixedFloatContainer.FundConventionFromJurisdiction (
+			currency
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		SingleStreamComponent[] depositComponentArray = new SingleStreamComponent[maturityDaysArray.length];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				OvernightLabel.Create (
-					strCurrency
-				)
+		for (int maturityDaysIndex = 0; maturityDaysIndex < maturityDaysArray.length; ++maturityDaysIndex) {
+			depositComponentArray[maturityDaysIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityDaysIndex], currency),
+				OvernightLabel.Create (currency)
 			);
+		}
 
-		return aDeposit;
+		return depositComponentArray;
 	}
-
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FixFloatComponent[] OISFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOIS[i] = OTCOISFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityTenorIndex = 0;
+			maturityTenorIndex < maturityTenorArray.length;
+			++maturityTenorIndex)
+		{
+			oisArray[maturityTenorIndex] = OTCOISFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityTenorIndex],
+				couponArray[maturityTenorIndex]
 			);
+		}
 
-		return aOIS;
+		return oisArray;
 	}
 
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFuturesFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrStartTenor,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] startTenorArray,
+		final String[] maturityTenorArray,
+		final double[] couponIndex)
 		throws Exception
 	{
-		FixFloatComponent[] aOISFutures = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisFuturesArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOISFutures[i] = OTCOISFixFloat (
-				dtSpot.addTenor (astrStartTenor[i]),
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex< maturityTenorArray.length; ++maturityIndex) {
+			oisFuturesArray[maturityIndex] = OTCOISFixFloat (
+				spotDate.addTenor (startTenorArray[maturityIndex]),
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponIndex[maturityIndex]
 			);
+		}
 
-		return aOISFutures;
+		return oisFuturesArray;
 	}
 
 	private static final void OTCOISRun (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrOTCMaturityTenor,
-		final boolean bCalibMetricDisplay)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] otcOISMaturityTenorArray,
+		final boolean displayCalibrationMetric)
 		throws Exception
 	{
-		if (bCalibMetricDisplay) {
+		if (displayCalibrationMetric) {
 			System.out.println ("\n\t----------------------------------------------------------------");
 
 			System.out.println ("\t--------- DISCOUNT CURVE WITH OVERNIGHT INDEX ------------------");
@@ -235,69 +226,47 @@ public class JurisdictionOTCInstrumentMeasures {
 			System.out.println ("\t----------------------------------------------------------------");
 		}
 
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
-				1, 2, 3
+		SingleStreamComponent[] depositComponentArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
+				1,
+				2,
+				3
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.0004, 0.0004, 0.0004		 // Deposit
+		double[] depositQuoteArray =
+		{
+			0.0004,
+			0.0004,
+			0.0004
 		};
 
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"   DEPOSIT   ",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of Short End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblShortEndOISQuote = new double[] {
+		double[] shortEndOISQuoteArray =
+		{
 			0.00070,    //   1W
 			0.00069,    //   2W
 			0.00078,    //   3W
 			0.00074     //   1M
 		};
 
-		CalibratableComponent[] aShortEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1W", "2W", "3W", "1M"
+		CalibratableComponent[] shortEndOISComponentArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1W", 
+				"2W",
+				"3W",
+				"1M"
 			},
-			adblShortEndOISQuote
+			shortEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Short End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisShortEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"SHORT END OIS",
-			aShortEndOISComp,
-			"SwapRate",
-			adblShortEndOISQuote
-		);
-
-		/*
-		 * Construct the Array of OIS Futures Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblOISFutureQuote = new double[] {
+		double[] oisFutureQuoteArray =
+		{
 			 0.00046,    //   1M x 1M
 			 0.00016,    //   2M x 1M
 			-0.00007,    //   3M x 1M
@@ -305,34 +274,30 @@ public class JurisdictionOTCInstrumentMeasures {
 			-0.00014     //   5M x 1M
 		};
 
-		CalibratableComponent[] aOISFutureComp = OISFuturesFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1M", "2M", "3M", "4M", "5M"
+		CalibratableComponent[] oisFuturesComponentArray = OISFuturesFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1M",
+				"2M",
+				"3M",
+				"4M",
+				"5M"
 			},
-			new java.lang.String[] {
-				"1M", "1M", "1M", "1M", "1M"
+			new String[]
+			{
+				"1M",
+				"1M",
+				"1M",
+				"1M",
+				"1M"
 			},
-			adblOISFutureQuote
+			oisFutureQuoteArray
 		);
 
-		/*
-		 * Construct the OIS Future Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisFutureStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			" OIS FUTURE  ",
-			aOISFutureComp,
-			"SwapRate",
-			adblOISFutureQuote
-		);
-
-		/*
-		 * Construct the Array of Long End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblLongEndOISQuote = new double[] {
+		double[] longEndOISQuoteArray =
+		{
 			0.00002,    //  15M
 			0.00008,    //  18M
 			0.00021,    //  21M
@@ -353,85 +318,84 @@ public class JurisdictionOTCInstrumentMeasures {
 			0.02038     //  30Y
 		};
 
-		CalibratableComponent[] aLongEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"15M", "18M", "21M", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+		CalibratableComponent[] longEndOISComponentArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"15M",
+				"18M",
+				"21M",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
 			},
-			adblLongEndOISQuote
+			longEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Long End OIS Instrument Set Stretch Builder
-		 */
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		LatentStateStretchSpec oisLongEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"LONG END OIS ",
-			aLongEndOISComp,
-			"SwapRate",
-			adblLongEndOISQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			oisShortEndStretch,
-			oisFutureStretch,
-			oisLongEndStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+				currency,
+				new LinearLatentStateCalibrator (
+					new SegmentCustomBuilderControl (
+						MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+						new PolynomialFunctionSetParams (4),
+						SegmentInelasticDesignControl.Create (2, 2),
+						new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+						null
+					),
+					BoundarySettings.NaturalStandard(),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null
 				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
-				null
+				new LatentStateStretchSpec[]
+				{
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"   DEPOSIT   ",
+						depositComponentArray,
+						"ForwardRate",
+						depositQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"SHORT END OIS",
+						shortEndOISComponentArray,
+						"SwapRate",
+						shortEndOISQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						" OIS FUTURE  ",
+						oisFuturesComponentArray,
+						"SwapRate",
+						oisFutureQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"LONG END OIS ",
+						longEndOISComponentArray,
+						"SwapRate",
+						longEndOISQuoteArray
+					)
+				},
+				valuationParams,
+				null,
+				null,
+				null,
+				1.
 			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit and Swap Stretches.
-		 */
-
-		MergedDiscountForwardCurve dc = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
-			valParams,
-			null,
-			null,
-			null,
-			1.
-		);
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
 			null,
 			null,
 			null,
@@ -440,28 +404,36 @@ public class JurisdictionOTCInstrumentMeasures {
 			null
 		);
 
-		if (bCalibMetricDisplay) {
-
-			/*
-			 * Cross-Comparison of the Deposit Calibration Instrument "Rate" metric across the different curve
-			 * 	construction methodologies.
-			 */
-
+		if (displayCalibrationMetric) {
 			System.out.println ("\t----------------------------------------------------------------");
 
 			System.out.println ("\t     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
 
 			System.out.println ("\t----------------------------------------------------------------");
 
-			for (int i = 0; i < aDepositComp.length; ++i)
-				System.out.println ("\t[" + aDepositComp[i].effectiveDate() + " => " + aDepositComp[i].maturityDate() + "] = " +
-					FormatUtil.FormatDouble (aDepositComp[i].measureValue (valParams, null, mktParams, null, "Rate"), 1, 6, 1.) + " | " +
-						FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.));
-
-			/*
-			 * Cross-Comparison of the Short End OIS Calibration Instrument "Rate" metric across the different curve
-			 * 	construction methodologies.
-			 */
+			for (int depositIndex = 0; depositIndex < depositComponentArray.length; ++depositIndex) {
+				System.out.println (
+					"\t[" + depositComponentArray[depositIndex].effectiveDate() + " => " +
+						depositComponentArray[depositIndex].maturityDate() + "] = " +
+						FormatUtil.FormatDouble (
+							depositComponentArray[depositIndex].measureValue (
+								valuationParams,
+								null,
+								curveSurfaceQuoteContainer,
+								null,
+								"Rate"
+							),
+							1,
+							6,
+							1.
+						) + " | " + FormatUtil.FormatDouble (
+							depositQuoteArray[depositIndex],
+							1,
+							6,
+							1.
+						)
+				);
+			}
 
 			System.out.println ("\n\t----------------------------------------------------------------");
 
@@ -469,20 +441,39 @@ public class JurisdictionOTCInstrumentMeasures {
 
 			System.out.println ("\t----------------------------------------------------------------");
 
-			for (int i = 0; i < aShortEndOISComp.length; ++i) {
-				Map<String, Double> mapShortEndOISComp = aShortEndOISComp[i].value (valParams, null, mktParams, null);
+			for (int shortEndOISIndex = 0;
+				shortEndOISIndex < shortEndOISComponentArray.length;
+				++shortEndOISIndex)
+			{
+				Map<String, Double> shortEndOISComponentMap =
+					shortEndOISComponentArray[shortEndOISIndex].value (
+						valuationParams,
+						null,
+						curveSurfaceQuoteContainer,
+						null
+					);
 
-				System.out.println ("\t[" + aShortEndOISComp[i].effectiveDate() + " => " + aShortEndOISComp[i].maturityDate() + "] = " +
-					FormatUtil.FormatDouble (mapShortEndOISComp.get ("CalibSwapRate"), 1, 6, 1.) + " | " +
-					FormatUtil.FormatDouble (adblShortEndOISQuote[i], 1, 6, 1.) + " | " +
-					FormatUtil.FormatDouble (mapShortEndOISComp.get ("FairPremium"), 1, 6, 1.)
+				System.out.println (
+					"\t[" + shortEndOISComponentArray[shortEndOISIndex].effectiveDate() + " => " +
+						shortEndOISComponentArray[shortEndOISIndex].maturityDate() + "] = " +
+						FormatUtil.FormatDouble (
+							shortEndOISComponentMap.get ("CalibSwapRate"),
+							1,
+							6,
+							1.
+						) + " | " + FormatUtil.FormatDouble (
+							shortEndOISQuoteArray[shortEndOISIndex],
+							1,
+							6,
+							1.
+						) + " | " + FormatUtil.FormatDouble (
+							shortEndOISComponentMap.get ("FairPremium"),
+							1,
+							6,
+							1.
+						)
 				);
 			}
-
-			/*
-			 * Cross-Comparison of the OIS Future Calibration Instrument "Rate" metric across the different curve
-			 * 	construction methodologies.
-			 */
 
 			System.out.println ("\n\t----------------------------------------------------------------");
 
@@ -490,20 +481,25 @@ public class JurisdictionOTCInstrumentMeasures {
 
 			System.out.println ("\t----------------------------------------------------------------");
 
-			for (int i = 0; i < aOISFutureComp.length; ++i) {
-				Map<String, Double> mapOISFutureComp = aOISFutureComp[i].value (valParams, null, mktParams, null);
+			for (int oisFuturesIndex = 0;
+				oisFuturesIndex < oisFuturesComponentArray.length;
+				++oisFuturesIndex)
+			{
+				Map<String, Double> oisFuturesMeasureMap = oisFuturesComponentArray[oisFuturesIndex].value (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null
+				);
 
-				System.out.println ("\t[" + aOISFutureComp[i].effectiveDate() + " => " + aOISFutureComp[i].maturityDate() + "] = " +
-					FormatUtil.FormatDouble (mapOISFutureComp.get ("SwapRate"), 1, 6, 1.) + " | " +
-					FormatUtil.FormatDouble (adblOISFutureQuote[i], 1, 6, 1.) + " | " +
-					FormatUtil.FormatDouble (mapOISFutureComp.get ("FairPremium"), 1, 6, 1.)
+				System.out.println (
+					"\t[" + oisFuturesComponentArray[oisFuturesIndex].effectiveDate() + " => " +
+						oisFuturesComponentArray[oisFuturesIndex].maturityDate() + "] = " +
+						FormatUtil.FormatDouble (oisFuturesMeasureMap.get ("SwapRate"), 1, 6, 1.) + " | " +
+						FormatUtil.FormatDouble (oisFutureQuoteArray[oisFuturesIndex], 1, 6, 1.) + " | " +
+						FormatUtil.FormatDouble (oisFuturesMeasureMap.get ("FairPremium"), 1, 6, 1.)
 				);
 			}
-
-			/*
-			 * Cross-Comparison of the Long End OIS Calibration Instrument "Rate" metric across the different curve
-			 * 	construction methodologies.
-			 */
 
 			System.out.println ("\n\t----------------------------------------------------------------");
 
@@ -511,39 +507,60 @@ public class JurisdictionOTCInstrumentMeasures {
 
 			System.out.println ("\t----------------------------------------------------------------");
 
-			for (int i = 0; i < aLongEndOISComp.length; ++i) {
-				Map<String, Double> mapLongEndOISComp = aLongEndOISComp[i].value (valParams, null, mktParams, null);
+			for (int longEndOISIndex = 0;
+				longEndOISIndex < longEndOISComponentArray.length;
+				++longEndOISIndex)
+			{
+				Map<String, Double> longEndOISMeasureMap = longEndOISComponentArray[longEndOISIndex].value (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null
+				);
 
-				System.out.println ("\t[" + aLongEndOISComp[i].effectiveDate() + " => " + aLongEndOISComp[i].maturityDate() + "] = " +
-					FormatUtil.FormatDouble (mapLongEndOISComp.get ("CalibSwapRate"), 1, 6, 1.) + " | " +
-					FormatUtil.FormatDouble (adblLongEndOISQuote[i], 1, 6, 1.) + " | " +
-					FormatUtil.FormatDouble (mapLongEndOISComp.get ("FairPremium"), 1, 6, 1.)
+				System.out.println (
+					"\t[" + longEndOISComponentArray[longEndOISIndex].effectiveDate() + " => " +
+						longEndOISComponentArray[longEndOISIndex].maturityDate() + "] = " +
+						FormatUtil.FormatDouble (
+							longEndOISMeasureMap.get ("CalibSwapRate"),
+							1,
+							6,
+							1.
+						) + " | " + FormatUtil.FormatDouble (
+							longEndOISQuoteArray[longEndOISIndex],
+							1,
+							6,
+							1.
+						) + " | " + FormatUtil.FormatDouble (
+							longEndOISMeasureMap.get ("FairPremium"),
+							1,
+							6,
+							1.
+						)
 				);
 			}
 
 			System.out.println ("\t----------------------------------------------------------------");
 		}
 
-		System.out.print ("\t[" + strCurrency + "] = ");
+		System.out.print ("\t[" + currency + "] = ");
 
-		for (int i = 0; i < astrOTCMaturityTenor.length; ++i) {
-			FixFloatComponent swap = OTCOISFixFloat (
-				dtSpot,
-				strCurrency,
-				astrOTCMaturityTenor[i],
+		for (int otcOISIndex = 0; otcOISIndex < otcOISMaturityTenorArray.length; ++otcOISIndex) {
+			Map<String, Double> oisMeasureMap = OTCOISFixFloat (
+				spotDate,
+				currency,
+				otcOISMaturityTenorArray[otcOISIndex],
 				0.
-			);
-
-			Map<String, Double> mapOutput = swap.value (
-				valParams,
+			).value (
+				valuationParams,
 				null,
-				mktParams,
+				curveSurfaceQuoteContainer,
 				null
 			);
 
 			System.out.print (
-				FormatUtil.FormatDouble (mapOutput.get ("SwapRate"), 1, 4, 100.) + "% (" +
-				FormatUtil.FormatDouble (mapOutput.get ("FairPremium"), 1, 4, 100.) + "%) || "
+				FormatUtil.FormatDouble (oisMeasureMap.get ("SwapRate"), 1, 4, 100.) + "% (" +
+				FormatUtil.FormatDouble (oisMeasureMap.get ("FairPremium"), 1, 4, 100.) + "%) || "
 			);
 		}
 
@@ -553,50 +570,57 @@ public class JurisdictionOTCInstrumentMeasures {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = org.drip.analytics.date.DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		String[] astrOTCMaturityTenor = new String[] {
-			"1Y", "3Y", "5Y", "7Y", "10Y"
+		String[] otcOISMaturityTenor =
+		{
+			"1Y",
+			"3Y",
+			"5Y",
+			"7Y",
+			"10Y"
 		};
 
-		OTCOISRun (dtToday, "AUD", astrOTCMaturityTenor, true);
+		OTCOISRun (today, "AUD", otcOISMaturityTenor, true);
 
-		System.out.println ("\n\t--------------------------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\n\t--------------------------------------------------------------------------------------------------------------------------"
+		);
 
-		System.out.println ("\t JURISDICTION       1Y      ||          3Y         ||          5Y         ||          7Y         ||         10Y         ||");
+		System.out.println (
+			"\t JURISDICTION       1Y      ||          3Y         ||          5Y         ||          7Y         ||         10Y         ||"
+		);
 
-		System.out.println ("\t--------------------------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t--------------------------------------------------------------------------------------------------------------------------"
+		);
 
-		OTCOISRun (dtToday, "AUD", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "AUD", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "CAD", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "CAD", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "EUR", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "EUR", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "GBP", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "GBP", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "INR", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "INR", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "JPY", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "JPY", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "SGD", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "SGD", otcOISMaturityTenor, false);
 
-		OTCOISRun (dtToday, "USD", astrOTCMaturityTenor, false);
+		OTCOISRun (today, "USD", otcOISMaturityTenor, false);
 
 		EnvManager.TerminateEnv();
 	}

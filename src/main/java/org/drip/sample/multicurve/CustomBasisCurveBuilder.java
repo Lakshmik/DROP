@@ -13,6 +13,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,46 +99,59 @@ import org.drip.state.identifier.ForwardLabel;
 /**
  * <i>CustomBasisCurveBuilder</i> contains the sample demonstrating the full functionality behind creating
  * 	highly customized spline based Basis curves.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/multicurve/README.md">Multi-Curve Construction and Valuation</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/multicurve/README.md">Multi-Curve Construction and Valuation</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CustomBasisCurveBuilder {
+public class CustomBasisCurveBuilder
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		String[] astrTenor = new String[] {
-			"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+		String[] tenorArray =
+		{
+			"1Y",
+			"2Y",
+			"3Y",
+			"4Y",
+			"5Y",
+			"6Y",
+			"7Y",
+			"8Y",
+			"9Y",
+			"10Y",
+			"11Y",
+			"12Y",
+			"15Y",
+			"20Y",
+			"25Y",
+			"30Y"
 		};
-
-		double[] adblBasis = new double[] {
+		double[] basisQuoteArray =
+		{
 			0.00186,    //  1Y
 			0.00127,    //  2Y
 			0.00097,    //  3Y
@@ -149,156 +170,189 @@ public class CustomBasisCurveBuilder {
 			0.00018     // 30Y
 		};
 
-		BasisCurve bcCubicPolynomial = ScenarioBasisCurveBuilder.CubicPolynomialBasisCurve (
+		ForwardLabel forwardLabel3M = ForwardLabel.Create ("USD", "3M");
+
+		ForwardLabel forwardLabel6M = ForwardLabel.Create ("USD", "6M");
+
+		BasisCurve cubicPolynomialBasisCurve = ScenarioBasisCurveBuilder.CubicPolynomialBasisCurve (
 			"USD3M6MBasis_CubicPolynomial",
-			dtToday,
-			ForwardLabel.Create (
-				"USD",
-				"6M"
-			),
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			today,
+			forwardLabel6M,
+			forwardLabel3M,
 			false,
-			astrTenor,
-			adblBasis
+			tenorArray,
+			basisQuoteArray
 		);
 
-		BasisCurve bcQuinticPolynomial = ScenarioBasisCurveBuilder.QuarticPolynomialBasisCurve (
+		BasisCurve quinticPolynomialBasisCurve = ScenarioBasisCurveBuilder.QuarticPolynomialBasisCurve (
 			"USD3M6MBasis_QuinticPolynomial",
-			dtToday,
-			ForwardLabel.Create (
-				"USD",
-				"6M"
-			),
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			today,
+			forwardLabel6M,
+			forwardLabel3M,
 			false,
-			astrTenor,
-			adblBasis
+			tenorArray,
+			basisQuoteArray
 		);
 
-		BasisCurve bcKaklisPandelis = ScenarioBasisCurveBuilder.KaklisPandelisBasisCurve (
+		BasisCurve kaklisPandelisBasisCurve = ScenarioBasisCurveBuilder.KaklisPandelisBasisCurve (
 			"USD3M6MBasis_KaklisPandelis",
-			dtToday,
-			ForwardLabel.Create (
-				"USD",
-				"6M"
-			),
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			today,
+			forwardLabel6M,
+			forwardLabel3M,
 			false,
-			astrTenor,
-			adblBasis
+			tenorArray,
+			basisQuoteArray
 		);
 
-		BasisCurve bcKLKHyperbolic = ScenarioBasisCurveBuilder.KLKHyperbolicBasisCurve (
+		BasisCurve klkHyperbolicBasisCurve = ScenarioBasisCurveBuilder.KLKHyperbolicBasisCurve (
 			"USD3M6MBasis_KLKHyperbolic",
-			dtToday,
-			ForwardLabel.Create (
-				"USD",
-				"6M"
-			),
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			today,
+			forwardLabel6M,
+			forwardLabel3M,
 			false,
-			astrTenor,
-			adblBasis,
+			tenorArray,
+			basisQuoteArray,
 			1.
 		);
 
-		BasisCurve bcKLKRationalLinear = ScenarioBasisCurveBuilder.KLKRationalLinearBasisCurve (
+		BasisCurve klkRationalLinearBasisCurve = ScenarioBasisCurveBuilder.KLKRationalLinearBasisCurve (
 			"USD3M6MBasis_KLKRationalLinear",
-			dtToday,
-			ForwardLabel.Create (
-				"USD",
-				"6M"
-			),
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			today,
+			forwardLabel6M,
+			forwardLabel3M,
 			false,
-			astrTenor,
-			adblBasis,
+			tenorArray,
+			basisQuoteArray,
 			0.1
 		);
 
-		BasisCurve bcKLKRationalQuadratic = ScenarioBasisCurveBuilder.KLKRationalLinearBasisCurve (
+		BasisCurve klkRationalQuadraticBasisCurve = ScenarioBasisCurveBuilder.KLKRationalLinearBasisCurve (
 			"USD3M6MBasis_KLKRationalQuadratic",
-			dtToday,
-			ForwardLabel.Create (
-				"USD",
-				"6M"
-			),
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			today,
+			forwardLabel6M,
+			forwardLabel3M,
 			false,
-			astrTenor,
-			adblBasis,
+			tenorArray,
+			basisQuoteArray,
 			2.
 		);
 
-		System.out.println ("\tPrinting the Basis Node Values in Order (Left -> Right):");
+		System.out.println ("\t||-------------------------------------------------------------|");
 
-		System.out.println ("\t\tCalculated Cubic Polynomial Basis (%)");
+		System.out.println ("\t||Printing the Basis Node Values in Order (Left -> Right):");
 
-		System.out.println ("\t\tCalculated Quintic Polynomial Basis (%)");
+		System.out.println ("\t||\tCalculated Cubic Polynomial Basis (%)");
 
-		System.out.println ("\t\tCalculated Kaklis Pandelis Basis (%)");
+		System.out.println ("\t||\tCalculated Quintic Polynomial Basis (%)");
 
-		System.out.println ("\t\tCalculated KLK Hyperbolic Basis (%)");
+		System.out.println ("\t||\tCalculated Kaklis Pandelis Basis (%)");
 
-		System.out.println ("\t\tCalculated KLK Rational Linear Basis (%)");
+		System.out.println ("\t||\tCalculated KLK Hyperbolic Basis (%)");
 
-		System.out.println ("\t\tCalculated KLK Rational Quadratic Basis (%)");
+		System.out.println ("\t||\tCalculated KLK Rational Linear Basis (%)");
 
-		System.out.println ("\t\tInput Quote (bp)");
+		System.out.println ("\t||\tCalculated KLK Rational Quadratic Basis (%)");
 
-		System.out.println ("\t-------------------------------------------------------------");
+		System.out.println ("\t||\tInput Quote (bp)");
 
-		System.out.println ("\t-------------------------------------------------------------");
+		System.out.println ("\t||-------------------------------------------------------------|");
 
-		for (int i = 0; i < adblBasis.length; ++i)
-			System.out.println ("\t" + astrTenor[i] + " => " +
-				FormatUtil.FormatDouble (bcCubicPolynomial.basis (astrTenor[i]), 1, 2, 10000.) + " | " +
-				FormatUtil.FormatDouble (bcQuinticPolynomial.basis (astrTenor[i]), 1, 2, 10000.) + " | " +
-				FormatUtil.FormatDouble (bcKaklisPandelis.basis (astrTenor[i]), 1, 2, 10000.) + " | " +
-				FormatUtil.FormatDouble (bcKLKHyperbolic.basis (astrTenor[i]), 1, 2, 10000.) + " | " +
-				FormatUtil.FormatDouble (bcKLKRationalLinear.basis (astrTenor[i]), 1, 2, 10000.) + " | " +
-				FormatUtil.FormatDouble (bcKLKRationalQuadratic.basis (astrTenor[i]), 1, 2, 10000.) + " | " +
-				FormatUtil.FormatDouble (adblBasis[i], 1, 2, 10000.)
-			);
+		System.out.println ("\t||-------------------------------------------------------------|");
 
-		System.out.println ("\n\t|----------------------------------------------------------------------------|");
-
-		System.out.println ("\t|  DATE    =>  CUBIC | QUINTIC  | KAKPAND | KLKHYPER | KLKRATLNR | KLKRATQUA |");
-
-		System.out.println ("\t|----------------------------------------------------------------------------|\n");
-
-		for (int i = 3; i < 30; ++i) {
-			JulianDate dt = dtToday.addTenor (i + "Y");
-
-			System.out.println ("\t" + dt + " => " +
-				FormatUtil.FormatDouble (bcCubicPolynomial.basis (dt), 1, 2, 10000.) + "  |  " +
-				FormatUtil.FormatDouble (bcQuinticPolynomial.basis (dt), 1, 2, 10000.) + "   |  " +
-				FormatUtil.FormatDouble (bcKaklisPandelis.basis (dt), 1, 2, 10000.) + "  |  " +
-				FormatUtil.FormatDouble (bcKLKHyperbolic.basis (dt), 1, 2, 10000.) + "   |  " +
-				FormatUtil.FormatDouble (bcKLKRationalLinear.basis (dt), 1, 2, 10000.) + "    |  " +
-				FormatUtil.FormatDouble (bcKLKRationalQuadratic.basis (dt), 1, 2, 10000.) + "    |  "
+		for (int basisQuoteIndex = 0; basisQuoteIndex < basisQuoteArray.length; ++basisQuoteIndex) {
+			System.out.println (
+				"\t|| " + tenorArray[basisQuoteIndex] + " => " + FormatUtil.FormatDouble (
+					cubicPolynomialBasisCurve.basis (tenorArray[basisQuoteIndex]),
+					1,
+					2,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					quinticPolynomialBasisCurve.basis (tenorArray[basisQuoteIndex]),
+					1,
+					2,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					kaklisPandelisBasisCurve.basis (tenorArray[basisQuoteIndex]),
+					1,
+					2,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					klkHyperbolicBasisCurve.basis (tenorArray[basisQuoteIndex]),
+					1,
+					2,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					klkRationalLinearBasisCurve.basis (tenorArray[basisQuoteIndex]),
+					1,
+					2,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					klkRationalQuadraticBasisCurve.basis (tenorArray[basisQuoteIndex]),
+					1,
+					2,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					basisQuoteArray[basisQuoteIndex],
+					1,
+					2,
+					10000.
+				)
 			);
 		}
 
-		System.out.println ("\n\t|----------------------------------------------------------------------------|");
+		System.out.println (
+			"\n\t||------------------------------------------------------------------------------|"
+		);
+
+		System.out.println (
+			"\t|| DATE    =>  CUBIC | QUINTIC  | KAKPAND | KLKHYPER | KLKRATLNR | KLKRATQUA    |"
+		);
+
+		System.out.println (
+			"\t||------------------------------------------------------------------------------|"
+		);
+
+		for (int monthIndex = 3; monthIndex < 30; ++monthIndex) {
+			JulianDate date = today.addTenor (monthIndex + "Y");
+
+			System.out.println (
+				"\t|| " + date + " => " + FormatUtil.FormatDouble (
+					cubicPolynomialBasisCurve.basis (date),
+					1,
+					2,
+					10000.
+				) + "  |  " + FormatUtil.FormatDouble (
+					quinticPolynomialBasisCurve.basis (date),
+					1,
+					2,
+					10000.
+				) + "   |  " + FormatUtil.FormatDouble (
+					kaklisPandelisBasisCurve.basis (date),
+					1,
+					2,
+					10000.
+				) + "  |  " + FormatUtil.FormatDouble (
+					klkHyperbolicBasisCurve.basis (date),
+					1,
+					2,
+					10000.
+				) + "   |  " + FormatUtil.FormatDouble (
+					klkRationalLinearBasisCurve.basis (date),
+					1,
+					2,
+					10000.
+				) + "    |  " + FormatUtil.FormatDouble (
+					klkRationalQuadraticBasisCurve.basis (date),
+					1,
+					2,
+					10000.
+				) + "    |  "
+			);
+		}
+
+		System.out.println (
+			"\t||-------------------------------------------------------------------------------|"
+		);
 
 		EnvManager.TerminateEnv();
 	}

@@ -1543,7 +1543,7 @@ public class CDSComponent extends org.drip.product.definition.CreditDefaultSwap 
 						true).findRoot();
 
 				if (null == rfop || !rfop.containsRoot() && !csqs.setCreditState (ccOld))
-					return new SpreadCalibOP (rfop.getRoot(), ccOld);
+					return new SpreadCalibOP (rfop.root(), ccOld);
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
 			}

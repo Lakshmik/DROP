@@ -312,7 +312,7 @@ public class CalibratableMultiSegmentSequence
 				return false;
 			}
 
-			if (null == fixedPointFinderOutput || !NumberUtil.IsValid (fixedPointFinderOutput.getRoot()) ||
+			if (null == fixedPointFinderOutput || !NumberUtil.IsValid (fixedPointFinderOutput.root()) ||
 				!_segmentSequenceBuilder.manifestMeasureSensitivity (0.)) {
 				System.out.println ("FPOP: " + fixedPointFinderOutput);
 

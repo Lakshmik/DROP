@@ -4,6 +4,7 @@ package org.drip.sample.piterbarg2012;
 import org.drip.analytics.date.*;
 import org.drip.function.r1tor1operator.Flat;
 import org.drip.product.params.CurrencyPair;
+import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.ScenarioDiscountCurveBuilder;
 import org.drip.state.curve.ForeignCollateralizedDiscountCurve;
@@ -17,6 +18,14 @@ import org.drip.state.nonlinear.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -120,155 +129,187 @@ import org.drip.state.nonlinear.*;
  *  	</li>
  *  </ul>
  *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2012/README.md">Piterbarg (2012) Domestic Foreign Collateral</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2012/README.md">Piterbarg (2012) Domestic Foreign Collateral</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ForeignCollateralizedZeroCoupon {
-	private static final double ZeroCouponVolCorr (
-		final JulianDate dtSpot,
-		final CurrencyPair cp,
-		final MergedDiscountForwardCurve dcCcyForeignCollatForeign,
+public class ForeignCollateralizedZeroCoupon
+{
+
+	private static final double ZeroCouponVolatilityCorrelation (
+		final JulianDate spotDate,
+		final CurrencyPair currencyPair,
+		final MergedDiscountForwardCurve foreignCollateralizedForeignDiscountCurve,
 		final FXCurve fxCurve,
-		final double dblForeignRatesVolatility,
-		final double dblFXVolatility,
-		final double dblFXForeignRatesCorrelation,
-		final JulianDate dtMaturity,
-		final double dblBaselinePrice)
+		final double foreignRateVolatility,
+		final double fxVolatility,
+		final double fxForeignRatesCorrelation,
+		final JulianDate maturityDate,
+		final double baselinePrice)
 		throws Exception
 	{
-		MergedDiscountForwardCurve dcCcyDomesticCollatForeign = new ForeignCollateralizedDiscountCurve (
-			cp.denomCcy(),
-			dcCcyForeignCollatForeign,
+		int spotDateJulian = spotDate.julian();
+
+		int[] dateArray = new int[] {spotDateJulian};
+
+		String denominatorCurrency = currencyPair.denomCcy();
+
+		double price = new ForeignCollateralizedDiscountCurve (
+			denominatorCurrency,
+			foreignCollateralizedForeignDiscountCurve,
 			fxCurve,
 			new FlatForwardVolatilityCurve (
-				dtSpot.julian(),
-				VolatilityLabel.Standard (CollateralLabel.Standard (cp.numCcy())),
-				cp.denomCcy(),
-				new int[] {dtSpot.julian()},
-				new double[] {dblForeignRatesVolatility}
+				spotDateJulian,
+				VolatilityLabel.Standard (CollateralLabel.Standard (currencyPair.numCcy())),
+				denominatorCurrency,
+				dateArray,
+				new double[] {
+					foreignRateVolatility
+				}
 			),
 			new FlatForwardVolatilityCurve (
-				dtSpot.julian(),
-				VolatilityLabel.Standard (FXLabel.Standard (cp)),
-				cp.denomCcy(),
-				new int[] {dtSpot.julian()},
-				new double[] {dblFXVolatility}
+				spotDateJulian,
+				VolatilityLabel.Standard (FXLabel.Standard (currencyPair)),
+				denominatorCurrency,
+				dateArray,
+				new double[] {
+					fxVolatility
+				}
 			),
-			new Flat (dblFXForeignRatesCorrelation)
+			new Flat (
+				fxForeignRatesCorrelation
+			)
+		).df (
+			maturityDate
 		);
 
-		double dblPrice = dcCcyDomesticCollatForeign.df (dtMaturity);
-
-		System.out.println ("\t[" +
-			org.drip.service.common.FormatUtil.FormatDouble (dblForeignRatesVolatility, 2, 0, 100.) + "%," +
-			org.drip.service.common.FormatUtil.FormatDouble (dblFXVolatility, 2, 0, 100.) + "%," +
-			org.drip.service.common.FormatUtil.FormatDouble (dblFXForeignRatesCorrelation, 2, 0, 100.) + "%] =" +
-			org.drip.service.common.FormatUtil.FormatDouble (dblPrice, 1, 2, 100.) + " | " +
-			org.drip.service.common.FormatUtil.FormatDouble (dblPrice - dblBaselinePrice, 1, 0, 10000.)
+		System.out.println (
+			"\t|| [" + FormatUtil.FormatDouble (foreignRateVolatility, 2, 0, 100.) + "%," +
+			FormatUtil.FormatDouble (fxVolatility, 2, 0, 100.) + "%, " +
+			FormatUtil.FormatDouble (fxForeignRatesCorrelation, 2, 0, 100.) + "%] => " +
+			FormatUtil.FormatDouble (price, 1, 2, 100.) + " | " +
+			FormatUtil.FormatDouble (price - baselinePrice, 2, 0, 10000.)
 		);
 
-		return dblPrice;
+		return price;
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		String strMaturityTenor = "5Y";
-		String strDomesticCurrency = "USD";
-		String strForeignCurrency = "JPY";
-		double dblForeignCollateralRate = 0.02;
-		double dblCollateralizedFXRate = 0.01;
+		String maturityTenor = "5Y";
+		String foreignCurrency = "JPY";
+		String domesticCurrency = "USD";
+		double collateralizedFXRate = 0.01;
+		double foreignCollateralRate = 0.02;
+		double[] foreignRateVolatilityArray =
+		{
+			0.1,
+			0.2,
+			0.3,
+			0.4,
+			0.5
+		};
+		double[] fxVolatilityArray =
+		{
+			0.10,
+			0.15,
+			0.20,
+			0.25,
+			0.30
+		};
+		double[] foreignRateFXCorrelationArray =
+		{
+			-0.99,
+			-0.50,
+			 0.00,
+			 0.50,
+			 0.99
+		};
 
-		JulianDate dtZeroCouponMaturity = dtToday.addTenor (strMaturityTenor);
+		int todayJulian = today.julian();
 
-		MergedDiscountForwardCurve dcCcyForeignCollatForeign = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			strForeignCurrency,
-			dblForeignCollateralRate
-		);
+		JulianDate zeroCouponMaturity = today.addTenor (maturityTenor);
 
-		CurrencyPair cp = CurrencyPair.FromCode (strForeignCurrency + "/" + strDomesticCurrency);
+		MergedDiscountForwardCurve foreignCollateralizedForeignDiscountCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
+				today,
+				foreignCurrency,
+				foreignCollateralRate
+			);
+
+		CurrencyPair currencyPair = CurrencyPair.FromCode (foreignCurrency + "/" + domesticCurrency);
 
 		FXCurve fxCurve = new FlatForwardFXCurve (
-			dtToday.julian(),
-			cp,
-			dblCollateralizedFXRate,
-			new int[] {dtToday.julian()},
-			new double[] {dblCollateralizedFXRate}
+			todayJulian,
+			currencyPair,
+			collateralizedFXRate,
+			new int[] {todayJulian},
+			new double[] {collateralizedFXRate}
 		);
 
-		double dblBaselinePrice = ZeroCouponVolCorr (
-			dtToday,
-			cp,
-			dcCcyForeignCollatForeign,
+		double baselinePrice = ZeroCouponVolatilityCorrelation (
+			today,
+			currencyPair,
+			foreignCollateralizedForeignDiscountCurve,
 			fxCurve,
 			0.,
 			0.,
 			0.,
-			dtZeroCouponMaturity,
+			zeroCouponMaturity,
 			0.
 		);
 
-		double[] adblForeignRatesVol = new double[] {
-			0.1, 0.2, 0.3, 0.4, 0.5
-		};
-		double[] adblFXVol = new double[] {
-			0.10, 0.15, 0.20, 0.25, 0.30
-		};
-		double[] adblForeignRatesFXCorr = new double[] {
-			-0.99, -0.50, 0.00, 0.50, 0.99
-		};
+		System.out.println ("\t||--------------------------------------------------------------|");
 
-		System.out.println ("\tPrinting the Zero Coupon Bond Price in Order (Left -> Right):");
+		System.out.println ("\t|| Printing the Zero Coupon Bond Price in Order (Left -> Right) |");
 
-		System.out.println ("\t\tPrice (%)");
+		System.out.println ("\t||--------------------------------------------------------------|");
 
-		System.out.println ("\t\tDifference from Baseline (pt)");
+		System.out.println ("\t|| Price (%)");
 
-		System.out.println ("\t-------------------------------------------------------------");
+		System.out.println ("\t|| Difference from Baseline (pt)");
 
-		System.out.println ("\t-------------------------------------------------------------");
+		System.out.println ("\t||--------------------------------------------------------------|");
 
-		for (double dblForeignRatesVol : adblForeignRatesVol) {
-			for (double dblFXVol : adblFXVol) {
-				for (double dblForeignRatesFXCorr : adblForeignRatesFXCorr)
-					ZeroCouponVolCorr (
-						dtToday,
-						cp,
-						dcCcyForeignCollatForeign,
+		System.out.println ("\t||--------------------------------------------------------------|");
+
+		for (double foreignRateVolatility : foreignRateVolatilityArray) {
+			for (double fxVolatility : fxVolatilityArray) {
+				for (double foreignRateFXCorrelation : foreignRateFXCorrelationArray) {
+					ZeroCouponVolatilityCorrelation (
+						today,
+						currencyPair,
+						foreignCollateralizedForeignDiscountCurve,
 						fxCurve,
-						dblForeignRatesVol,
-						dblFXVol,
-						dblForeignRatesFXCorr,
-						dtZeroCouponMaturity,
-						dblBaselinePrice
+						foreignRateVolatility,
+						fxVolatility,
+						foreignRateFXCorrelation,
+						zeroCouponMaturity,
+						baselinePrice
 					);
+				}
 			}
 		}
 

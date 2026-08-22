@@ -231,7 +231,7 @@ public class FRAStandardCapFloor extends org.drip.product.option.OptionComponent
 		mapResult.put ("CalcTime", (System.nanoTime() - lStart) * 1.e-09);
 
 		if (null != fpfo && fpfo.containsRoot())
-			mapResult.put ("FlatVolatility", fpfo.getRoot());
+			mapResult.put ("FlatVolatility", fpfo.root());
 		else
 			mapResult.put ("FlatVolatility", java.lang.Double.NaN);
 
@@ -424,7 +424,7 @@ public class FRAStandardCapFloor extends org.drip.product.option.OptionComponent
 			throw new java.lang.Exception
 				("FRAStandardCapFloor::volatilityFromATMPrice => Cannot imply Flat Vol");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 
 	/**
@@ -513,7 +513,7 @@ public class FRAStandardCapFloor extends org.drip.product.option.OptionComponent
 			throw new java.lang.Exception
 				("FRAStandardCapFloor::flatVolatilityFromPrice => Cannot imply Flat Vol");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 
 	/**
@@ -627,7 +627,7 @@ public class FRAStandardCapFloor extends org.drip.product.option.OptionComponent
 
 		if (null == fpfo || !fpfo.containsRoot()) return false;
 
-		double dblVolatility = fpfo.getRoot();
+		double dblVolatility = fpfo.root();
 
 		iIndex = 0;
 

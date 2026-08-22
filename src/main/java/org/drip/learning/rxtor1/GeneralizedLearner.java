@@ -593,7 +593,7 @@ public abstract class GeneralizedLearner implements org.drip.learning.rxtor1.Emp
 			throw new java.lang.Exception
 				("GeneralizedLearner::genericCoveringSampleSize => Cannot Estimate Minimal Sample Size");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 
 	/**
@@ -668,7 +668,7 @@ public abstract class GeneralizedLearner implements org.drip.learning.rxtor1.Emp
 			throw new java.lang.Exception
 				("GeneralizedLearner::genericCoveringSampleSize => Cannot Estimate Minimal Sample Size");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 
 	/**
@@ -755,7 +755,7 @@ public abstract class GeneralizedLearner implements org.drip.learning.rxtor1.Emp
 			throw new java.lang.Exception
 				("GeneralizedLearner::regressorCoveringSampleSize => Cannot Estimate Minimal Sample Size");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 
 	/**
@@ -847,6 +847,6 @@ public abstract class GeneralizedLearner implements org.drip.learning.rxtor1.Emp
 			throw new java.lang.Exception
 				("GeneralizedLearner::regressorCoveringSampleSize => Cannot Estimate Minimal Sample Size");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 }

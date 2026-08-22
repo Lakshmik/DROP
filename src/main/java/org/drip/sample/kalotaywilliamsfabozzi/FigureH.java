@@ -1,0 +1,437 @@
+
+package org.drip.sample.kalotaywilliamsfabozzi;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.drip.dynamics.kwf1993.KalotayWilliamsFabozzi;
+import org.drip.dynamics.kwf1993.KalotayWilliamsFabozziMarket;
+import org.drip.dynamics.kwf1993.KalotayWilliamsFabozziPeriodState;
+import org.drip.dynamics.kwf1993.KalotayWilliamsFabozziTree;
+import org.drip.dynamics.kwf1993.ProxyBond;
+import org.drip.service.common.FormatUtil;
+import org.drip.service.env.EnvManager;
+
+/*
+ * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+ */
+
+/*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * 
+ *  This file is part of DROP, an open-source library targeting analytics/risk, transaction cost analytics,
+ *  	asset liability management analytics, capital, exposure, and margin analytics, valuation adjustment
+ *  	analytics, and portfolio construction analytics within and across fixed income, credit, commodity,
+ *  	equity, FX, and structured products. It also includes auxiliary libraries for algorithm support,
+ *  	numerical analysis, numerical optimization, spline builder, model validation, statistical learning,
+ *  	graph builder/navigator, and computational support.
+ *  
+ *  	https://lakshmidrip.github.io/DROP/
+ *  
+ *  DROP is composed of three modules:
+ *  
+ *  - DROP Product Core - https://lakshmidrip.github.io/DROP-Product-Core/
+ *  - DROP Portfolio Core - https://lakshmidrip.github.io/DROP-Portfolio-Core/
+ *  - DROP Computational Core - https://lakshmidrip.github.io/DROP-Computational-Core/
+ * 
+ * 	DROP Product Core implements libraries for the following:
+ * 	- Fixed Income Analytics
+ * 	- Loan Analytics
+ * 	- Transaction Cost Analytics
+ * 
+ * 	DROP Portfolio Core implements libraries for the following:
+ * 	- Asset Allocation Analytics
+ *  - Asset Liability Management Analytics
+ * 	- Capital Estimation Analytics
+ * 	- Exposure Analytics
+ * 	- Margin Analytics
+ * 	- XVA Analytics
+ * 
+ * 	DROP Computational Core implements libraries for the following:
+ * 	- Algorithm Support
+ * 	- Computation Support
+ * 	- Function Analysis
+ *  - Graph Algorithm
+ *  - Model Validation
+ * 	- Numerical Analysis
+ * 	- Numerical Optimizer
+ * 	- Spline Builder
+ *  - Statistical Learning
+ * 
+ * 	Documentation for DROP is Spread Over:
+ * 
+ * 	- Main                     => https://lakshmidrip.github.io/DROP/
+ * 	- Wiki                     => https://github.com/lakshmiDRIP/DROP/wiki
+ * 	- GitHub                   => https://github.com/lakshmiDRIP/DROP
+ * 	- Repo Layout Taxonomy     => https://github.com/lakshmiDRIP/DROP/blob/master/Taxonomy.md
+ * 	- Javadoc                  => https://lakshmidrip.github.io/DROP/Javadoc/index.html
+ * 	- Technical Specifications => https://github.com/lakshmiDRIP/DROP/tree/master/Docs/Internal
+ * 	- Release Versions         => https://lakshmidrip.github.io/DROP/version.html
+ * 	- Community Credits        => https://lakshmidrip.github.io/DROP/credits.html
+ * 	- Issues Catalog           => https://github.com/lakshmiDRIP/DROP/issues
+ * 
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *   	you may not use this file except in compliance with the License.
+ *   
+ *  You may obtain a copy of the License at
+ *  	http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  	distributed under the License is distributed on an "AS IS" BASIS,
+ *  	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  
+ *  See the License for the specific language governing permissions and
+ *  	limitations under the License.
+ */
+
+/**
+ * <i>FigureG</i> reconciles the Output of Figure G in Kalotay, Williams, and Fabozzi (1993). The References
+ * 	are:
+ *  
+ * 	<br>
+ *  <ul>
+ * 		<li>
+ * 			Black, F., E. Derman, and W. Toy (1990): A One-Factor Model of Interest Rates and Its Application
+ * 				to Treasury Bond Options <i>Financial Analysis Journal</i> <b>46 (1)</b> 33-39
+ * 		</li>
+ * 		<li>
+ * 			Hull, J. and A. White (1990a): Valuing Derivative Securities Using the Explicit Finite Difference
+ * 				Method <i>Journal of Financial and Quantitative Analysis</i> <b>25 (1)</b> 87-100
+ * 		</li>
+ * 		<li>
+ * 			Hull, J. and A. White (1990b): Pricing Interest-Rate-Derivative Securities <i>Review of Financial
+ * 				Studies</i> <b>3 (4)</b> 573-592
+ * 		</li>
+ * 		<li>
+ * 			Kalotay, A. J. and G. O. Williams (1992): The Valuation and Management of Bonds with Sinking Fund
+ * 				Provisions <i>Financial Analysis Journal</i> <b>48 (2)</b> 59-67
+ * 		</li>
+ * 		<li>
+ * 			Kalotay, A. J., G. O. Williams, and F. J. Fabozzi (1993): A Model for Valuing Bonds and Embedded
+ * 				Options <i>Financial Analysis Journal</i> <b>49 (3)</b> 35-46
+ * 		</li>
+ *  </ul>
+ * 
+ * <br><br>
+ *  <ul>
+ *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
+ *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
+ *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
+ *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/kalotaywilliamsfabozzi/README.md">Kalotay, Williams, Fabozzi (1993) Output Reconcilers</a></li>
+ *  </ul>
+ * <br><br>
+ *
+ * @author Lakshmi Krishnamurthy
+ */
+
+public class FigureH
+{
+
+	private static final TreeMap<Double, Double> BondMarketYieldMapInput()
+	{
+		TreeMap<Double, Double> bondMarketYieldMapInput = new TreeMap<Double, Double>();
+
+		bondMarketYieldMapInput.put (1., 0.03500);
+
+		bondMarketYieldMapInput.put (2., 0.04010);
+
+		bondMarketYieldMapInput.put (3., 0.04531);
+
+		return bondMarketYieldMapInput;
+	}
+
+	private static final TreeMap<Double, Double> ProjectedBaseForwardYieldMapInput()
+	{
+		TreeMap<Double, Double> projectedBaseForwardYieldMapInput = new TreeMap<Double, Double>();
+
+		projectedBaseForwardYieldMapInput.put (2., 0.04074);
+
+		projectedBaseForwardYieldMapInput.put (3., 0.04530);
+
+		return projectedBaseForwardYieldMapInput;
+	}
+
+	private static final Map<Double, List<Double>> ProjectedForwardYieldListMapReconciliation()
+	{
+		Map<Double, List<Double>> projectedForwardYieldListMap = new TreeMap<Double, List<Double>>();
+
+		List<Double> projected2YForwardYieldList = new ArrayList<Double>();
+
+		projected2YForwardYieldList.add (0.04074);
+
+		projected2YForwardYieldList.add (0.04976);
+
+		projectedForwardYieldListMap.put (2., projected2YForwardYieldList);
+
+		List<Double> projected3YForwardYieldList = new ArrayList<Double>();
+
+		projected3YForwardYieldList.add (0.04530);
+
+		projected3YForwardYieldList.add (0.05532);
+
+		projected3YForwardYieldList.add (0.06757);
+
+		projectedForwardYieldListMap.put (3., projected3YForwardYieldList);
+
+		return projectedForwardYieldListMap;
+	}
+
+	private static final Map<Double, List<Double>> ProjectedBulletBondValueListMapReconciler()
+	{
+		Map<Double, List<Double>> projectedBulletBondValueListMap = new TreeMap<Double, List<Double>>();
+
+		List<Double> projected1YBulletBondValueList = new ArrayList<Double>();
+
+		projected1YBulletBondValueList.add (102.075);
+
+		projectedBulletBondValueListMap.put (1., projected1YBulletBondValueList);
+
+		List<Double> projected2YBulletBondValueList = new ArrayList<Double>();
+
+		projected2YBulletBondValueList.add (101.333);
+
+		projected2YBulletBondValueList.add (99.461);
+
+		projectedBulletBondValueListMap.put (2., projected2YBulletBondValueList);
+
+		List<Double> projected3YBulletBondValueList = new ArrayList<Double>();
+
+		projected3YBulletBondValueList.add (100.689);
+
+		projected3YBulletBondValueList.add (99.732);
+
+		projected3YBulletBondValueList.add (98.588);
+
+		projectedBulletBondValueListMap.put (3., projected3YBulletBondValueList);
+
+		return projectedBulletBondValueListMap;
+	}
+
+	private static final Map<Double, List<Double>> ProjectedPuttableBondValueListMapReconciler()
+	{
+		Map<Double, List<Double>> projectedPuttableBondValueListMap = new TreeMap<Double, List<Double>>();
+
+		List<Double> projected1YPuttableBondValueList = new ArrayList<Double>();
+
+		projected1YPuttableBondValueList.add (102.523);
+
+		projectedPuttableBondValueListMap.put (1., projected1YPuttableBondValueList);
+
+		List<Double> projected2YPuttableBondValueList = new ArrayList<Double>();
+
+		projected2YPuttableBondValueList.add (100.461);
+
+		projected2YPuttableBondValueList.add (100.261);
+
+		projectedPuttableBondValueListMap.put (2., projected2YPuttableBondValueList);
+
+		List<Double> projected3YPuttableBondValueList = new ArrayList<Double>();
+
+		projected3YPuttableBondValueList.add (100.689);
+
+		projected3YPuttableBondValueList.add (100.000);
+
+		projected3YPuttableBondValueList.add (100.000);
+
+		projectedPuttableBondValueListMap.put (3., projected3YPuttableBondValueList);
+
+		return projectedPuttableBondValueListMap;
+	}
+
+	/**
+	 * Entry Point
+	 * 
+	 * @param argumentArray Command Line Argument Array
+	 * 
+	 * @throws Exception Thrown on Error/Exception Situation
+	 */
+
+	public static final void main (
+		final String[] argumentArray)
+		throws Exception
+	{
+		EnvManager.InitEnv ("");
+
+		double bondCoupon = 0.0525;
+		double bondMaturityTime = 3.;
+		double annualizedForwardVolatility = 0.1;
+
+		TreeMap<Double, Double> putPriceSchedule = new TreeMap<Double, Double>();
+
+		putPriceSchedule.put (1., 1.);
+
+		putPriceSchedule.put (2., 1.);
+
+		KalotayWilliamsFabozziMarket kalotayWilliamsFabozziMarket =
+			new KalotayWilliamsFabozziMarket (BondMarketYieldMapInput(), annualizedForwardVolatility);
+
+		TreeMap<Double, Double> projectedBaseForwardYieldMapInput = ProjectedBaseForwardYieldMapInput();
+
+		Map<Double, List<Double>> projectedForwardYieldListMapReconciliation =
+			ProjectedForwardYieldListMapReconciliation();
+
+		KalotayWilliamsFabozziTree kalotayWilliamsFabozziTree = new KalotayWilliamsFabozzi().tree (
+			kalotayWilliamsFabozziMarket,
+			projectedBaseForwardYieldMapInput
+		);
+
+		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeProjectedPeriodStateMap =
+			kalotayWilliamsFabozziTree.timeProjectedPeriodStateMap();
+
+		ProxyBond proxyBulletBond = ProxyBond.Bullet (bondMaturityTime, bondCoupon);
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		System.out.println ("\t|    Kalotay, Williams, and Fabozzi (1993) Figure F    ||");
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		System.out.println ("\t| L -> R:                                              ||");
+
+		System.out.println ("\t|   - Year                                             ||");
+
+		System.out.println ("\t|   - Projected \"Up\" Rate (Reconciler)                 ||");
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		for (double time : timeProjectedPeriodStateMap.keySet()) {
+			if (projectedForwardYieldListMapReconciliation.containsKey (time)) {
+				String dump = "\t|" + FormatUtil.FormatDouble (time, 1, 0, 1.) + " => ";
+
+				List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+					timeProjectedPeriodStateMap.get (time);
+
+				List<Double> projectedForwardYieldListReconciliation =
+					projectedForwardYieldListMapReconciliation.get (time);
+
+				for (int i = 0; i < kalotayWilliamsFabozziPeriodStateList.size(); ++i) {
+					dump += FormatUtil.FormatDouble (
+						kalotayWilliamsFabozziPeriodStateList.get (i).forwardYield(),
+						1,
+						3,
+						100.,
+						false
+					) + "% (" + FormatUtil.FormatDouble (
+						projectedForwardYieldListReconciliation.get (i),
+						1,
+						3,
+						100.,
+						false
+					) + "%) | ";
+				}
+
+				System.out.println (dump);
+			}
+		}
+
+		System.out.println ("\t|------------------------------------------------------||\n");
+
+		Map<Double, List<Double>> projectedBulletBondValueListMapReconciler =
+			ProjectedBulletBondValueListMapReconciler();
+
+		TreeMap<Double, List<Double>> projectedBulletBondValueListMap =
+			proxyBulletBond.value (kalotayWilliamsFabozziTree);
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		System.out.println ("\t|    Kalotay, Williams, and Fabozzi (1993) Figure F    ||");
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		System.out.println ("\t| L -> R:                                              ||");
+
+		System.out.println ("\t|   - Year                                             ||");
+
+		System.out.println ("\t|   - Projected Proxy Bullet Bond Price                ||");
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		for (double time : projectedBulletBondValueListMap.keySet()) {
+			String dump = "\t|" + FormatUtil.FormatDouble (time, 1, 0, 1.) + " => ";
+
+			List<Double> projectedBulletBondValueList = projectedBulletBondValueListMap.get (time);
+
+			List<Double> projectedBulletBondValueReconcilerList =
+				projectedBulletBondValueListMapReconciler.get (time);
+
+			for (int i = 0; i < projectedBulletBondValueList.size(); ++i) {
+				dump += FormatUtil.FormatDouble (
+					projectedBulletBondValueList.get (i),
+					3,
+					3,
+					100.,
+					false
+				) + " (" + FormatUtil.FormatDouble (
+					projectedBulletBondValueReconcilerList.get (i),
+					3,
+					3,
+					1.,
+					false
+				) + ") | ";
+			}
+
+			System.out.println (dump);
+		}
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		ProxyBond proxyPuttableBond = ProxyBond.Puttable (bondMaturityTime, bondCoupon, putPriceSchedule);
+
+		Map<Double, List<Double>> projectedPuttableBondValueListMapReconciler =
+			ProjectedPuttableBondValueListMapReconciler();
+
+		TreeMap<Double, List<Double>> projectedPuttableBondValueListMap =
+			proxyPuttableBond.value (kalotayWilliamsFabozziTree);
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		System.out.println ("\t|    Kalotay, Williams, and Fabozzi (1993) Figure G    ||");
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		System.out.println ("\t| L -> R:                                              ||");
+
+		System.out.println ("\t|   - Year                                             ||");
+
+		System.out.println ("\t|   - Projected Proxy Puttable Bond Price              ||");
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		for (double time : projectedPuttableBondValueListMap.keySet()) {
+			String dump = "\t|" + FormatUtil.FormatDouble (time, 1, 0, 1.) + " => ";
+
+			List<Double> projectedPuttableBondValueList = projectedPuttableBondValueListMap.get (time);
+
+			List<Double> projectedPuttableBondValueReconcilerList =
+				projectedPuttableBondValueListMapReconciler.get (time);
+
+			for (int i = 0; i < projectedPuttableBondValueList.size(); ++i) {
+				dump += FormatUtil.FormatDouble (
+					projectedPuttableBondValueList.get (i),
+					3,
+					3,
+					100.,
+					false
+				) + " (" + FormatUtil.FormatDouble (
+					projectedPuttableBondValueReconcilerList.get (i),
+					3,
+					3,
+					1.,
+					false
+				) + ") | ";
+			}
+
+			System.out.println (dump);
+		}
+
+		System.out.println ("\t|------------------------------------------------------||");
+
+		EnvManager.TerminateEnv();
+	}
+}

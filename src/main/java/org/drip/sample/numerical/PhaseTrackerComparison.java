@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -94,51 +102,51 @@ import org.drip.service.env.EnvManager;
  * 	implemented by three different ways for the calculation of the Inverse Fourier Transforms. The sample
  * 	problem chosen is the stochastic volatility evolution using the Heston Method.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class PhaseTrackerComparison {
+public class PhaseTrackerComparison
+{
 
 	private static final Map<Double, Double> PhaseSet (
-		final double dblRho,
-		final double dblKappa,
-		final double dblSigma,
-		final double dblTheta,
-		final double dblLambda,
-		final double dblStrike,
-		final double dbTimeToExpiry,
-		final double dblRiskFreeRate,
-		final double dblSpot,
-		final double dblSpotVolatility,
-		final int iPhaseTrackerType)
+		final double rho,
+		final double kappa,
+		final double sigma,
+		final double theta,
+		final double lambda,
+		final double strike,
+		final double timeToExpiry,
+		final double riskFreeRate,
+		final double spot,
+		final double spotVolatility,
+		final int phaseTrackerType)
 		throws Exception
 	{
-		HestonOptionPricerParams fphp = new HestonOptionPricerParams (
-			HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993,
-			dblRho,
-			dblKappa,
-			dblSigma,
-			dblTheta,
-			dblLambda,
-			iPhaseTrackerType
-		);
-
-		HestonStochasticVolatilityAlgorithm hsva = new HestonStochasticVolatilityAlgorithm (fphp);
-
-		return hsva.recordPhase (
-			dblStrike,
-			dbTimeToExpiry,
-			dblRiskFreeRate,
-			dblSpot,
-			dblSpotVolatility,
+		return new HestonStochasticVolatilityAlgorithm (
+			new HestonOptionPricerParams (
+				HestonStochasticVolatilityAlgorithm.PAYOFF_TRANSFORM_SCHEME_HESTON_1993,
+				rho,
+				kappa,
+				sigma,
+				theta,
+				lambda,
+				phaseTrackerType
+			)
+		).recordPhase (
+			strike,
+			timeToExpiry,
+			riskFreeRate,
+			spot,
+			spotVolatility,
 			true
 		);
 	}
@@ -146,70 +154,68 @@ public class PhaseTrackerComparison {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		double dblRho = 0.3;
-		double dblKappa = 1.;
-		double dblSigma = 0.5;
-		double dblTheta = 0.2;
-		double dblLambda = 0.;
+		double rho = 0.3;
+		double kappa = 1.;
+		double lambda = 0.;
+		double sigma = 0.5;
+		double theta = 0.2;
 
-		double dblStrike = 1.;
-		double dbTimeToExpiry = 0.5;
-		double dblRiskFreeRate = 0.0;
-		double dblSpot = 1.;
-		double dblSpotVolatility = 0.1;
+		double spot = 1.;
+		double strike = 1.;
+		double riskFreeRate = 0.;
+		double timeToExpiry = 0.5;
+		double spotVolatility = 0.1;
 
-		Map<Double, Double> mapFreqPhaseNoAdjust = PhaseSet (
-			dblRho,
-			dblKappa,
-			dblSigma,
-			dblTheta,
-			dblLambda,
-			dblStrike,
-			dbTimeToExpiry,
-			dblRiskFreeRate,
-			dblSpot,
-			dblSpotVolatility,
+		Map<Double, Double> frequencyPhaseNoAdjustmentMap = PhaseSet (
+			rho,
+			kappa,
+			sigma,
+			theta,
+			lambda,
+			strike,
+			timeToExpiry,
+			riskFreeRate,
+			spot,
+			spotVolatility,
 			PhaseAdjuster.MULTI_VALUE_BRANCH_PHASE_TRACKER_NONE
 		);
 
-		Map<Double, Double> mapFreqPhaseRotationCount = PhaseSet (
-			dblRho,
-			dblKappa,
-			dblSigma,
-			dblTheta,
-			dblLambda,
-			dblStrike,
-			dbTimeToExpiry,
-			dblRiskFreeRate,
-			dblSpot,
-			dblSpotVolatility,
+		Map<Double, Double> frequencyPhaseRotationCountMap = PhaseSet (
+			rho,
+			kappa,
+			sigma,
+			theta,
+			lambda,
+			strike,
+			timeToExpiry,
+			riskFreeRate,
+			spot,
+			spotVolatility,
 			PhaseAdjuster.MULTI_VALUE_BRANCH_PHASE_TRACKER_ROTATION_COUNT
 		);
 
-		Map<Double, Double> mapFreqPhaseKahlJackel = PhaseSet (
-			dblRho,
-			dblKappa,
-			dblSigma,
-			dblTheta,
-			dblLambda,
-			dblStrike,
-			dbTimeToExpiry,
-			dblRiskFreeRate,
-			dblSpot,
-			dblSpotVolatility,
+		Map<Double, Double> frequencyPhaseKahlJackelMap = PhaseSet (
+			rho,
+			kappa,
+			sigma,
+			theta,
+			lambda,
+			strike,
+			timeToExpiry,
+			riskFreeRate,
+			spot,
+			spotVolatility,
 			PhaseAdjuster.MULTI_VALUE_BRANCH_POWER_PHASE_TRACKER_KAHL_JACKEL
 		);
 
@@ -219,14 +225,14 @@ public class PhaseTrackerComparison {
 
 		System.out.println ("\t|--------------------------------------------|");
 
-		for (Map.Entry<Double, Double> me : mapFreqPhaseKahlJackel.entrySet()) {
-			Double dblKey = me.getKey();
+		for (Map.Entry<Double, Double> mapEntry : frequencyPhaseKahlJackelMap.entrySet()) {
+			Double key = mapEntry.getKey();
 
-			System.out.println ("\t|" +
-				FormatUtil.FormatDouble (dblKey, 2, 0, 1.) + " =>  " +
-				FormatUtil.FormatDouble (mapFreqPhaseNoAdjust.get (dblKey), 1, 6, 1.)  + " | " +
-				FormatUtil.FormatDouble (mapFreqPhaseRotationCount.get (dblKey), 1, 6, 1.)  + " | " +
-				FormatUtil.FormatDouble (mapFreqPhaseKahlJackel.get (dblKey), 1, 6, 1.) + "   |"
+			System.out.println (
+				"\t|" + FormatUtil.FormatDouble (key, 2, 0, 1.) + " =>  " +
+				FormatUtil.FormatDouble (frequencyPhaseNoAdjustmentMap.get (key), 1, 6, 1.)  + " | " +
+				FormatUtil.FormatDouble (frequencyPhaseRotationCountMap.get (key), 1, 6, 1.)  + " | " +
+				FormatUtil.FormatDouble (frequencyPhaseKahlJackelMap.get (key), 1, 6, 1.) + "   |"
 			);
 		}
 

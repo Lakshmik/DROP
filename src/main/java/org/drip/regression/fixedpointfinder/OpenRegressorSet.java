@@ -178,7 +178,7 @@ public class OpenRegressorSet implements org.drip.regression.core.RegressorSet {
 				@Override public boolean postRegression (
 					final org.drip.regression.core.RegressionRunDetail rnvd)
 				{
-					rnvd.set ("FixedPoint", "" + fpfopNewton.getRoot());
+					rnvd.set ("FixedPoint", "" + fpfopNewton.root());
 
 					return true;
 				}

@@ -1,11 +1,23 @@
 
 package org.drip.function.r1tor1operator;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.Differential;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,75 +94,120 @@ package org.drip.function.r1tor1operator;
  */
 
 /**
- * <i>Flat</i> implements the level constant Univariate Function.
+ * <i>Flat</i> implements the level constant Univariate Function. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li><i>Flat</i> Constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the Differential</li>
+ * 		<li>Integrate over the given range</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class Flat extends org.drip.function.definition.R1ToR1 {
-	private double _dblLevel = java.lang.Double.NaN;
+public class Flat
+	extends R1ToR1
+{
+	private double _level = Double.NaN;
 
 	/**
-	 * Flat constructor
+	 * <i>Flat</i> constructor
 	 * 
-	 * @param dblLevel The Flat Level
+	 * @param level The Flat Level
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public Flat (
-		final double dblLevel)
-		throws java.lang.Exception
+		final double level)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblLevel = dblLevel))
-			throw new java.lang.Exception ("Flat ctr => Invalid Inputs");
+		if (!NumberUtil.IsValid (_level = level)) {
+			throw new Exception ("Flat Constructor => Invalid Inputs");
+		}
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("Flat::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("Flat::evaluate => Invalid Inputs");
+		}
 
-		return _dblLevel;
+		return _level;
 	}
 
-	@Override public org.drip.numerical.differentiation.Differential differential (
-		final double dblVariate,
-		final double dblOFBase,
-		final int iOrder)
+	/**
+	 * Calculate the Differential
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param baseValue Base Value for the Objective Function
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 */
+
+	@Override public Differential differential (
+		final double variate,
+		final double baseValue,
+		final int order)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 >= iOrder) return null;
+		if (!NumberUtil.IsValid (variate) || 0 >= order) {
+			return null;
+		}
 
 		try {
-			return new org.drip.numerical.differentiation.Differential (_dc.getVariateInfinitesimal (dblVariate), 0.);
-		} catch (java.lang.Exception e) {
+			return new Differential (_dc.getVariateInfinitesimal (variate), 0.);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("Flat::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return (dblEnd - dblBegin) * _dblLevel;
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("Flat::integrate => Invalid Inputs");
+		}
+
+		return (end - begin) * _level;
 	}
 }

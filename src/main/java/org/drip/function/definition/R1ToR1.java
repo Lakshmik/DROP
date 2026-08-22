@@ -257,7 +257,7 @@ public abstract class R1ToR1 {
 
 			if (null == fpfo) return null;
 
-			double dblExtrema = fpfo.getRoot();
+			double dblExtrema = fpfo.root();
 
 			if (0. <= derivative (dblExtrema, 2)) return null;
 
@@ -336,7 +336,7 @@ public abstract class R1ToR1 {
 
 			if (null == fpfo) return null;
 
-			double dblExtrema = fpfo.getRoot();
+			double dblExtrema = fpfo.root();
 
 			if (0. >= derivative (dblExtrema, 2)) return null;
 
@@ -422,7 +422,7 @@ public abstract class R1ToR1 {
 	 * 
 	 * @return The Condition Number
 	 * 
-	 * @throws Exception Thrown if the Condition Number cannor be computed
+	 * @throws Exception Thrown if the Condition Number cannot be computed
 	 */
 
 	public double conditionNumber (

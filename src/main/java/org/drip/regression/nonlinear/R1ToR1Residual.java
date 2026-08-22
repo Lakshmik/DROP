@@ -2,12 +2,17 @@
 package org.drip.regression.nonlinear;
 
 import org.drip.numerical.common.NumberUtil;
+import org.drip.regression.function.R1ToR1Parametric;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
  * Copyright (C) 2026 Lakshmi Krishnamurthy
  * 
  *  This file is part of DROP, an open-source library targeting analytics/risk, transaction cost analytics,
@@ -102,14 +107,14 @@ import org.drip.numerical.common.NumberUtil;
  *  	</li>
  *  </ul>
  *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/regression/README.md">Regression Engine Core and the Unit Regressors</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/regression/nonlinear/README.md">Non-linear Least Squares Regression</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationSupportLibrary.md">Computation Support</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/regression/README.md">Regression Engine Core and the Unit Regressors</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/regression/nonlinear/README.md">Non-linear Least Squares Regression</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -205,16 +210,42 @@ public class R1ToR1Residual
 	public double[] jacobian (
 		final double[] parameterArray)
 	{
-		double[] parameterJacobianArray = _parametricFunction.parameterJacobianArray (parameterArray, _x);
+		double[] parameterJacobian = _parametricFunction.parameterJacobian (parameterArray, _x);
 
-		if (null == parameterJacobianArray) {
+		if (null == parameterJacobian) {
 			return null;
 		}
 
-		for (int parameterIndex = 0; parameterIndex < parameterJacobianArray.length; ++parameterIndex) {
-			parameterJacobianArray[parameterIndex] *= -1;
+		for (int parameterIndex = 0; parameterIndex < parameterJacobian.length; ++parameterIndex) {
+			parameterJacobian[parameterIndex] *= -1;
 		}
 
-		return parameterJacobianArray;
+		return parameterJacobian;
+	}
+
+	/**
+	 * Calculate the Residual Hessian given the Parameter Array
+	 * 
+	 * @param parameterArray Parameter Array
+	 * 
+	 * @return Residual Hessian given the Parameter Array
+	 */
+
+	public double[][] hessian (
+		final double[] parameterArray)
+	{
+		double[][] parameterHessian = _parametricFunction.parameterHessian (parameterArray, _x);
+
+		if (null == parameterHessian) {
+			return null;
+		}
+
+		for (double[] parameterHessianRow : parameterHessian) {
+			for (int rowIndex = 0; rowIndex < parameterHessianRow.length; ++rowIndex) {
+				parameterHessianRow[rowIndex] *= -1.;
+			}
+		}
+
+		return parameterHessian;
 	}
 }

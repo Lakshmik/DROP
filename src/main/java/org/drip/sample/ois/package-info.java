@@ -1,6 +1,6 @@
 
 /**
- * Index/Fund OIS Curve Reconcilation
+ * Index/Fund OIS Curve Reconciliation
  *
  * @author Lakshmi Krishnamurthy
  */

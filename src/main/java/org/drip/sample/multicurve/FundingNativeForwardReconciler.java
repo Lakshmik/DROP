@@ -19,6 +19,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -97,139 +105,104 @@ import org.drip.state.identifier.ForwardLabel;
  * <i>FundingNativeForwardReconciler</i> demonstrates the Construction of the Forward Curve Native to the
  * 	Discount Curve across different Tenors, and display their Reconciliation.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/multicurve/README.md">Multi-Curve Construction and Valuation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/multicurve/README.md">Multi-Curve Construction and Valuation</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FundingNativeForwardReconciler {
+public class FundingNativeForwardReconciler
+{
 
 	private static final FixFloatComponent OTCFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final int[] aiDay,
-		final int iNumFuture,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final int[] maturityDaysArray,
+		final int futuresCount,
+		final String currency)
 		throws Exception
 	{
-		CalibratableComponent[] aCalibComp = new CalibratableComponent[aiDay.length + iNumFuture];
+		CalibratableComponent[] calibratableComponentArray =
+			new CalibratableComponent[maturityDaysArray.length + futuresCount];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aCalibComp[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					strCurrency,
-					"3M"
-				)
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			calibratableComponentArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				ForwardLabel.Create (currency, "3M")
 			);
+		}
 
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtEffective,
-			iNumFuture,
-			strCurrency
+		CalibratableComponent[] futuresArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
+			effectiveDate,
+			futuresCount,
+			currency
 		);
 
-		for (int i = aiDay.length; i < aiDay.length + iNumFuture; ++i)
-			aCalibComp[i] = aEDF[i - aiDay.length];
+		for (int componentIndex = maturityDaysArray.length;
+			componentIndex < maturityDaysArray.length + futuresCount;
+			++componentIndex)
+		{
+			calibratableComponentArray[componentIndex] =
+				futuresArray[componentIndex - maturityDaysArray.length];
+		}
 
-		return aCalibComp;
+		return calibratableComponentArray;
 	}
 
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+	private static final CalibratableComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aIRS[i] = OTCFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int irsIndex = 0; irsIndex < maturityTenorArray.length; ++irsIndex) {
+			irsArray[irsIndex] = OTCFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[irsIndex],
+				couponArray[irsIndex]
 			);
+		}
 
-		return aIRS;
+		return irsArray;
 	}
 
 	private static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the array of Deposit instruments and their quotes.
-		 */
-
-		CalibratableComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			new int[] {
-				30,
-				60,
-				91,
-				182,
-				273
-			},
-			0,
-			strCurrency
-		);
-
-		double[] adblDepositQuote = new double[] {
-			0.0668750,	//  30D
-			0.0675000,	//  60D
-			0.0678125,	//  91D
-			0.0712500,	// 182D
-			0.0750000	// 273D
-		};
-
-		String[] astrDepositManifestMeasure = new String[] {
-			"ForwardRate", //  30D
-			"ForwardRate", //  60D
-			"ForwardRate", //  91D
-			"ForwardRate", // 182D
-			"ForwardRate"  // 273D
-		};
-
-		/*
-		 * Construct the array of Swap instruments and their quotes.
-		 */
-
-		double[] adblSwapQuote = new double[] {
+		double[] swapQuoteArray =
+		{
 			0.08265,    //  2Y
 			0.08550,    //  3Y
 			0.08655,    //  4Y
@@ -238,81 +211,101 @@ public class FundingNativeForwardReconciler {
 			0.08920     // 10Y
 		};
 
-		String[] astrSwapManifestMeasure = new String[] {
-			"SwapRate",    //  2Y
-			"SwapRate",    //  3Y
-			"SwapRate",    //  4Y
-			"SwapRate",    //  5Y
-			"SwapRate",    //  7Y
-			"SwapRate"     // 10Y
-		};
-
-		CalibratableComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"2Y",
-				"3Y",
-				"4Y",
-				"5Y",
-				"7Y",
-				"10Y"
-			},
-			adblSwapQuote
-		);
-
-		/*
-		 * Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-		 */
-
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
 			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
+				spotDate,
+				spotDate,
+				currency
 			),
-			aDepositComp,
-			adblDepositQuote,
-			astrDepositManifestMeasure,
-			aSwapComp,
-			adblSwapQuote,
-			astrSwapManifestMeasure,
+			DepositInstrumentsFromMaturityDays (
+				spotDate,
+				new int[]
+				{
+					30,
+					60,
+					91,
+					182,
+					273
+				},
+				0,
+				currency
+			),
+			new double[]
+			{
+				0.0668750,	//  30D
+				0.0675000,	//  60D
+				0.0678125,	//  91D
+				0.0712500,	// 182D
+				0.0750000	// 273D
+			},
+			new String[]
+			{
+				"ForwardRate", //  30D
+				"ForwardRate", //  60D
+				"ForwardRate", //  91D
+				"ForwardRate", // 182D
+				"ForwardRate"  // 273D
+			},
+			SwapInstrumentsFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"7Y",
+					"10Y"
+				},
+				swapQuoteArray
+			),
+			swapQuoteArray,
+			new String[]
+			{
+				"SwapRate",    //  2Y
+				"SwapRate",    //  3Y
+				"SwapRate",    //  4Y
+				"SwapRate",    //  5Y
+				"SwapRate",    //  7Y
+				"SwapRate"     // 10Y
+			},
 			false
 		);
 	}
 
 	private static final void DiscountForwardReconciliation (
-		final JulianDate dtSpot,
-		final MergedDiscountForwardCurve dc,
-		final ForwardCurve fc,
-		final String strTenor)
+		final JulianDate spotDate,
+		final MergedDiscountForwardCurve discountCurve,
+		final ForwardCurve forwardCurve,
+		final String tenor)
 		throws Exception
 	{
-		int iNumTenor = 20;
-		JulianDate dtStart = dtSpot;
+		int tenorCount = 20;
+		JulianDate startDate = spotDate;
 
 		System.out.println ("\n\t|--------------------------------------------------||");
 
-		System.out.println ("\t|-------- RECONCILIATION FOR " + fc.label().fullyQualifiedName() + " ---------||");
+		System.out.println (
+			"\t|-------- RECONCILIATION FOR " + forwardCurve.label().fullyQualifiedName() + " ---------||"
+		);
 
 		System.out.println ("\t|--------------------------------------------------||");
 
 		System.out.println ("\t|                                                  ||");
 
-		for (int i = 0; i < iNumTenor; ++i) {
-			JulianDate dtEnd = dtStart.addTenor (strTenor);
+		for (int tenorIndex = 0; tenorIndex < tenorCount; ++tenorIndex) {
+			JulianDate endDate = startDate.addTenor (tenor);
 
 			System.out.println (
-				"\t|   [" + dtStart + " - " + dtEnd + "]   |  " +
-				FormatUtil.FormatDouble (dc.libor (dtStart, strTenor), 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (fc.forward (dtEnd), 1, 2, 100.) + "% ||"
+				"\t| [" + startDate + " - " + endDate + "]   |  " +
+				FormatUtil.FormatDouble (discountCurve.libor (startDate, tenor), 1, 2, 100.) + "% | " +
+				FormatUtil.FormatDouble (forwardCurve.forward (endDate), 1, 2, 100.) + "% ||"
 			);
 
-			dtStart = dtEnd;
+			startDate = endDate;
 		}
-
-		System.out.println ("\t|                                                  ||");
 
 		System.out.println ("\t|--------------------------------------------------||");
 
@@ -322,41 +315,36 @@ public class FundingNativeForwardReconciler {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			1995,
-			DateUtil.FEBRUARY,
-			3
-		);
-
-		String strCurrency = "GBP";
-		String[] astrFRATenor = {
-			"1M", "3M", "6M", "12M"
+		String currency = "GBP";
+		String[] fraTenorArray =
+		{
+			"1M",
+			"3M",
+			"6M",
+			"12M"
 		};
 
-		MergedDiscountForwardCurve dc = MakeDC (
-			dtSpot,
-			strCurrency
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (1995, DateUtil.FEBRUARY, 3);
 
-		for (String strFRATenor : astrFRATenor) {
-			ForwardCurve fcNative = dc.nativeForwardCurve (strFRATenor);
+		MergedDiscountForwardCurve discountCurve = MakeDC (spotDate, currency);
 
+		for (String fraTenor : fraTenorArray) {
 			DiscountForwardReconciliation (
-				dtSpot,
-				dc,
-				fcNative,
-				strFRATenor
+				spotDate,
+				discountCurve,
+				discountCurve.nativeForwardCurve (fraTenor),
+				fraTenor
 			);
 		}
 

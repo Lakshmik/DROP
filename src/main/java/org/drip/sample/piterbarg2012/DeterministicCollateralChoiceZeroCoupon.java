@@ -7,7 +7,8 @@ import org.drip.product.params.CurrencyPair;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.*;
-import org.drip.state.curve.*;
+import org.drip.state.curve.DeterministicCollateralChoiceDiscountCurve;
+import org.drip.state.curve.ForeignCollateralizedDiscountCurve;
 import org.drip.state.discount.MergedDiscountForwardCurve;
 import org.drip.state.fx.FXCurve;
 import org.drip.state.identifier.*;
@@ -18,6 +19,14 @@ import org.drip.state.nonlinear.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -120,104 +129,112 @@ import org.drip.state.nonlinear.*;
  *  			<i>Risk</i> <b>21 (2)</b> 97-102
  *  	</li>
  *  </ul>
- *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2012/README.md">Piterbarg (2012) Domestic Foreign Collateral</a></li>
- *  </ul>
- * <br><br>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2012/README.md">Piterbarg (2012) Domestic Foreign Collateral</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class DeterministicCollateralChoiceZeroCoupon {
+public class DeterministicCollateralChoiceZeroCoupon
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		String strDomesticCurrency = "USD";
-		String strForeignCurrency = "EUR";
-		double dblDomesticCollateralRate = 0.03;
-		double dblForeignCollateralRate = 0.02;
-		double dblCollateralizedFXRate = 1.03;
-		double dblForeignRatesVolatility = 0.20;
-		double dblFXVolatility = 0.10;
-		double dblFXForeignRatesCorrelation = 0.30;
-		int iDiscreteCollateralizationIncrement = 30; // 30 Days
-		String strCollateralizationCheckTenor = "5Y";
+		double fxVolatility = 0.1;
+		String foreignCurrency = "EUR";
+		String domesticCurrency = "USD";
+		double collateralizedFXRate = 1.03;
+		double foreignCollateralRate = 0.02;
+		double foreignRatesVolatility = 0.2;
+		double domesticCollateralRate = 0.03;
+		double fxForeignRatesCorrelation = 0.3;
+		String collateralizationCheckTenor = "5Y";
+		int discreteCollateralizationDaysIncrement = 30; // 30 Days
 
-		MergedDiscountForwardCurve dcCcyDomesticCollatDomestic = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			strDomesticCurrency,
-			dblDomesticCollateralRate
-		);
+		MergedDiscountForwardCurve domesticCollateralizedDomesticDiscountCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
+				today,
+				domesticCurrency,
+				domesticCollateralRate
+			);
 
-		MergedDiscountForwardCurve dcCcyForeignCollatForeign = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			strForeignCurrency,
-			dblForeignCollateralRate
-		);
+		CurrencyPair currencyPair = CurrencyPair.FromCode (foreignCurrency + "/" + domesticCurrency);
 
-		CurrencyPair cp = CurrencyPair.FromCode (strForeignCurrency + "/" + strDomesticCurrency);
+		String denominatorCurrency = currencyPair.denomCcy();
+
+		int todayJulian = today.julian();
+
+		int[] dateArray = {
+			todayJulian
+		};
 
 		FXCurve fxCurve = new FlatForwardFXCurve (
-			dtToday.julian(),
-			cp,
-			dblCollateralizedFXRate,
-			new int[] {dtToday.julian()},
-			new double[] {dblCollateralizedFXRate}
+			todayJulian,
+			currencyPair,
+			collateralizedFXRate,
+			dateArray,
+			new double[] {collateralizedFXRate}
 		);
 
-		ForeignCollateralizedDiscountCurve dcCcyDomesticCollatForeign = new ForeignCollateralizedDiscountCurve (
-			strDomesticCurrency,
-			dcCcyForeignCollatForeign,
-			fxCurve,
-			new FlatForwardVolatilityCurve (
-				dtToday.julian(),
-				VolatilityLabel.Standard (CollateralLabel.Standard (strForeignCurrency)),
-				cp.denomCcy(),
-				new int[] {dtToday.julian()},
-				new double[] {dblForeignRatesVolatility}
-			),
-			new FlatForwardVolatilityCurve (
-				dtToday.julian(),
-				VolatilityLabel.Standard (FXLabel.Standard (cp)),
-				cp.denomCcy(),
-				new int[] {dtToday.julian()},
-				new double[] {dblFXVolatility}
-			),
-			new Flat (dblFXForeignRatesCorrelation)
-		);
+		ForeignCollateralizedDiscountCurve foreignCollateralizedDiscountCurve =
+			new ForeignCollateralizedDiscountCurve (
+				domesticCurrency,
+				ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
+					today,
+					foreignCurrency,
+					foreignCollateralRate
+				),
+				fxCurve,
+				new FlatForwardVolatilityCurve (
+					todayJulian,
+					VolatilityLabel.Standard (CollateralLabel.Standard (foreignCurrency)),
+					denominatorCurrency,
+					dateArray,
+					new double[] {foreignRatesVolatility}
+				),
+				new FlatForwardVolatilityCurve (
+					todayJulian,
+					VolatilityLabel.Standard (FXLabel.Standard (currencyPair)),
+					denominatorCurrency,
+					dateArray,
+					new double[] {fxVolatility}
+				),
+				new Flat (
+					fxForeignRatesCorrelation
+				)
+			);
 
-		DeterministicCollateralChoiceDiscountCurve dccdc = new DeterministicCollateralChoiceDiscountCurve (
-			dcCcyDomesticCollatDomestic,
-			new org.drip.state.curve.ForeignCollateralizedDiscountCurve[] {dcCcyDomesticCollatForeign},
-			iDiscreteCollateralizationIncrement
-		);
+		DeterministicCollateralChoiceDiscountCurve deterministicCollateralChoiceDiscountCurve =
+			new DeterministicCollateralChoiceDiscountCurve (
+				domesticCollateralizedDomesticDiscountCurve,
+				new ForeignCollateralizedDiscountCurve[] {foreignCollateralizedDiscountCurve},
+				discreteCollateralizationDaysIncrement
+			);
 
-		int iStart = dtToday.julian() + iDiscreteCollateralizationIncrement;
+		double collateralizationCheckDate = today.addTenor (collateralizationCheckTenor).julian();
 
-		double dblCollateralizationCheckDate = dtToday.addTenor (strCollateralizationCheckTenor).julian();
+		System.out.println ("\t-------------------------------------------------------------");
 
 		System.out.println ("\tPrinting the Zero Coupon Bond Price in Order (Left -> Right):");
 
@@ -231,22 +248,32 @@ public class DeterministicCollateralChoiceZeroCoupon {
 
 		System.out.println ("\t-------------------------------------------------------------");
 
-		System.out.println ("\t-------------------------------------------------------------");
-
-		for (int iDate = iStart; iDate <= dblCollateralizationCheckDate; iDate += iDiscreteCollateralizationIncrement) {
-			double dblDomesticCollateralDF = dcCcyDomesticCollatDomestic.df (iDate);
-
-			double dblForeignCollateralDF = dcCcyDomesticCollatForeign.df (iDate);
-
-			double dblChoiceCollateralDF = dccdc.df (iDate);
-
+		for (int date = todayJulian + discreteCollateralizationDaysIncrement;
+			date <= collateralizationCheckDate;
+			date += discreteCollateralizationDaysIncrement)
+		{
 			System.out.println (
-				new JulianDate (iDate) + " => " +
-				FormatUtil.FormatDouble (dblDomesticCollateralDF, 2, 2, 100.) + " | " +
-				FormatUtil.FormatDouble (dblForeignCollateralDF, 2, 2, 100.) + " | " +
-				FormatUtil.FormatDouble (dblChoiceCollateralDF, 2, 2, 100.)
+				"\t" + new JulianDate (date) + " => " + FormatUtil.FormatDouble (
+					domesticCollateralizedDomesticDiscountCurve.df (date),
+					2,
+					2,
+					100.
+				) + " | " + FormatUtil.FormatDouble (
+					foreignCollateralizedDiscountCurve.df (date),
+					2,
+					2,
+					100.
+				) + " | " +
+				FormatUtil.FormatDouble (
+					deterministicCollateralChoiceDiscountCurve.df (date),
+					2,
+					2,
+					100.
+				)
 			);
 		}
+
+		System.out.println ("\t-------------------------------------------------------------");
 
 		EnvManager.TerminateEnv();
 	}

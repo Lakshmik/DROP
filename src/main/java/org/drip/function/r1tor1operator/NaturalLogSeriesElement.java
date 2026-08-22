@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1operator;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -83,68 +94,111 @@ package org.drip.function.r1tor1operator;
  */
 
 /**
- * <i>NaturalLogSeriesElement</i> implements an element in the natural log series expansion.
+ * <i>NaturalLogSeriesElement</i> implements an element in the natural log series expansion. It exposes the
+ * 	following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li><i>NaturalLogSeriesElement</i> constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
+ * 		<li>Retrieve the exponent in the natural log series</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *  
  * @author Lakshmi Krishnamurthy
  */
 
-public class NaturalLogSeriesElement extends org.drip.function.definition.R1ToR1 {
-	private int _iExponent = -1;
+public class NaturalLogSeriesElement
+	extends R1ToR1
+{
+	private int _exponent = -1;
 
 	/**
-	 * NaturalLogSeriesElement constructor
+	 * <i>NaturalLogSeriesElement</i> constructor
 	 * 
-	 * @param iExponent The series exponent
+	 * @param exponent The series exponent
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public NaturalLogSeriesElement (
-		final int iExponent)
-		throws java.lang.Exception
+		final int exponent)
+		throws Exception
 	{
 		super (null);
 
-		if (0 > (_iExponent = iExponent))
-			throw new java.lang.Exception ("NaturalLogSeriesElement ctr: Invalid Inputs");
+		if (0 > (_exponent = exponent))
+			throw new Exception ("NaturalLogSeriesElement ctr: Invalid Inputs");
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		return java.lang.Math.pow (dblVariate, _iExponent) / org.drip.numerical.common.NumberUtil.Factorial
-			(_iExponent);
+		return Math.pow (variate, _exponent) / NumberUtil.Factorial (_exponent);
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		return iOrder > _iExponent ? 0. : java.lang.Math.pow (dblVariate, _iExponent - iOrder) /
-			org.drip.numerical.common.NumberUtil.Factorial (_iExponent - iOrder);
+		return order > _exponent ? 0. : Math.pow (variate, _exponent - order) /
+			NumberUtil.Factorial (_exponent - order);
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("NaturalLogSeriesElement::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return (java.lang.Math.pow (dblEnd, _iExponent) - java.lang.Math.pow (dblBegin, _iExponent)) /
-			org.drip.numerical.common.NumberUtil.Factorial (_iExponent + 1);
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("NaturalLogSeriesElement::integrate => Invalid Inputs");
+		}
+
+		return (Math.pow (end, _exponent) - Math.pow (begin, _exponent)) /
+			NumberUtil.Factorial (_exponent + 1);
 	}
 
 	/**
@@ -155,6 +209,6 @@ public class NaturalLogSeriesElement extends org.drip.function.definition.R1ToR1
 
 	public int getExponent()
 	{
-		return _iExponent;
+		return _exponent;
 	}
 }

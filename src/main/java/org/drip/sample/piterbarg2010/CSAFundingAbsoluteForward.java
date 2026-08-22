@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -110,48 +118,49 @@ import org.drip.service.env.EnvManager;
  *  			<i>Risk</i> <b>21 (2)</b> 97-102
  *  	</li>
  *  </ul>
- *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2010/README.md">Piterbarg (2010) CSA Measure Extraction</a></li>
- *  </ul>
- * <br><br>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/piterbarg2010/README.md">Piterbarg (2010) CSA Measure Extraction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CSAFundingAbsoluteForward {
+public class CSAFundingAbsoluteForward
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double dblUnderlyingVolatility = 0.3;
-		double dblFundingSpreadVolatility = 0.015;
-		double dblFundingSpreadMeanReversionRate = 0.05;
-		double dblCSALIBOR = 0.018;
-
-		double[] adblCorrelation = new double[] {
-			-0.20,
-			 0.00,
-			 0.20,
-			 0.40
+		double csaLIBOR = 0.018;
+		double underlyingVolatility = 0.3;
+		double fundingSpreadVolatility = 0.015;
+		double fundingSpreadMeanReversionRate = 0.05;
+		double[] correlationArray =
+		{
+			-0.2,
+			 0.0,
+			 0.2,
+			 0.4
 		};
-
-		int[] aiTenor = new int[] {
+		int[] tenorArray =
+		{
 			 1,
 			 2,
 			 3,
@@ -165,48 +174,53 @@ public class CSAFundingAbsoluteForward {
 			30
 		};
 
-		DiffusionEvaluatorLogarithmic delUnderlying = DiffusionEvaluatorLogarithmic.Standard (
-			0.,
-			dblUnderlyingVolatility
-		);
+		DiffusionEvaluatorLogarithmic underlyingDiffusionEvaluatorLogarithmic =
+			DiffusionEvaluatorLogarithmic.Standard (0., underlyingVolatility);
 
-		DiffusionEvaluatorMeanReversion demrFundingSpread = DiffusionEvaluatorMeanReversion.Standard (
-			dblFundingSpreadMeanReversionRate,
-			0.,
-			dblFundingSpreadVolatility
-		);
+		DiffusionEvaluatorMeanReversion fundingSpreadDiffusionEvaluatorMeanReversion =
+			DiffusionEvaluatorMeanReversion.Standard (
+				fundingSpreadMeanReversionRate,
+				0.,
+				fundingSpreadVolatility
+			);
 
 		System.out.println();
 
 		System.out.println ("\t||--------------------------------------------||");
 
-		System.out.println ("\t||     DRIP CSA vs Non CSA Forward Rates      ||");
+		System.out.println ("\t||     DROP CSA vs Non CSA Forward Rates      ||");
 
 		System.out.println ("\t||--------------------------------------------||");
 
-		String strHeader = "\t|| CORR => ";
+		String header = "\t|| CORR => ";
 
-		for (double dblCorrelation : adblCorrelation)
-			strHeader = strHeader + "  " + FormatUtil.FormatDouble (dblCorrelation, 2, 0, 100.) + "%  |";
+		for (double correlation : correlationArray) {
+			header += "  " + FormatUtil.FormatDouble (correlation, 2, 0, 100.) + "%  |";
+		}
 
-		System.out.println (strHeader + "|");
+		System.out.println (header + "|");
 
 		System.out.println ("\t||--------------------------------------------||");
 
-		for (int iTenor : aiTenor) {
-			String strDump = "\t|| " + FormatUtil.FormatDouble (iTenor, 2, 0, 1.) + "Y => ";
+		for (int tenor : tenorArray) {
+			String dump = "\t|| " + FormatUtil.FormatDouble (tenor, 2, 0, 1.) + "Y => ";
 
-			for (double dblCorrelation : adblCorrelation) {
-				FundingBasisEvolver sftf = new FundingBasisEvolver (
-					delUnderlying,
-					demrFundingSpread,
-					dblCorrelation
-				);
-
-				strDump = strDump + " " + FormatUtil.FormatDouble (dblCSALIBOR * (sftf.CSANoCSARatio (iTenor + "Y") - 1.), 1, 2, 100.) + "% |";
+			for (double correlation : correlationArray) {
+				dump += " " + FormatUtil.FormatDouble (
+					csaLIBOR * (
+						new FundingBasisEvolver (
+							underlyingDiffusionEvaluatorLogarithmic,
+							fundingSpreadDiffusionEvaluatorMeanReversion,
+							correlation
+						).CSANoCSARatio (tenor + "Y") - 1.
+					),
+					1,
+					2,
+					100.
+				) + "% |";
 			}
 
-			System.out.println (strDump + "|");
+			System.out.println (dump + "|");
 		}
 
 		System.out.println ("\t||--------------------------------------------||");

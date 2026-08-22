@@ -1,11 +1,23 @@
 
 package org.drip.function.r1tor1operator;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.r1integration.Integrator;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,76 +96,117 @@ package org.drip.function.r1tor1operator;
 
 /**
  * <i>Convolution</i> provides the evaluation of the Convolution <code>au1 * au2</code> and its derivatives
- * 	for a specified variate.
+ * 	for a specified variate. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li>Construct a <i>Convolution</i> instance</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class Convolution extends org.drip.function.definition.R1ToR1 {
-	private org.drip.function.definition.R1ToR1 _au1 = null;
-	private org.drip.function.definition.R1ToR1 _au2 = null;
+public class Convolution
+	extends R1ToR1
+{
+	private R1ToR1 _function1 = null;
+	private R1ToR1 _function2 = null;
 
 	/**
-	 * Construct a Convolution instance
+	 * Construct a <i>Convolution</i> instance
 	 * 
-	 * @param au1 Univariate Function #1
-	 * @param au2 Univariate Function #2
+	 * @param function1 Univariate Function #1
+	 * @param function2 Univariate Function #2
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public Convolution (
-		final org.drip.function.definition.R1ToR1 au1,
-		final org.drip.function.definition.R1ToR1 au2)
-		throws java.lang.Exception
+		final R1ToR1 function1,
+		final R1ToR1 function2)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_au1 = au1) || null == (_au2 = au2))
-			throw new java.lang.Exception ("Convolution ctr: Invalid Inputs");
+		if (null == (_function1 = function1) || null == (_function2 = function2)) {
+			throw new Exception ("Convolution Constructor: Invalid Inputs");
+		}
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("Convolution::evaluate => Invalid Input");
-
-		return _au1.evaluate (dblVariate) * _au2.evaluate (dblVariate);
+		return _function1.evaluate (variate) * _function2.evaluate (variate);
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		double dblDerivative = _au1.evaluate (dblVariate) * _au2.derivative (dblVariate, iOrder);
+		double derivative = _function1.evaluate (variate) * _function2.derivative (variate, order);
 
-		for (int i = 1; i < iOrder; ++i)
-			dblDerivative += org.drip.numerical.common.NumberUtil.NCK (iOrder, i) * _au1.derivative (dblVariate,
-				i) * _au2.derivative (dblVariate, iOrder - i);
+		for (int i = 1; i < order; ++i) {
+			derivative += NumberUtil.NCK (order, i) * _function1.derivative (variate, i) *
+				_function2.derivative (variate, order - i);
+		}
 
-		return dblDerivative + _au1.derivative (dblVariate, iOrder) * _au2.evaluate (dblVariate);
+		return derivative + _function1.derivative (variate, order) * _function2.evaluate (variate);
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("Convolution::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws java.lang.Exception Thrown if the Integration cannot be done
+	 */
 
-		return org.drip.numerical.r1integration.Integrator.Boole (this, dblBegin, dblEnd);
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("Convolution::integrate => Invalid Inputs");
+		}
+
+		return Integrator.Boole (this, begin, end);
 	}
 }

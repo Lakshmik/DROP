@@ -393,7 +393,7 @@ public class NonlinearCurveBuilder
 			);
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**
@@ -555,7 +555,7 @@ public class NonlinearCurveBuilder
 				);
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**
@@ -696,7 +696,7 @@ public class NonlinearCurveBuilder
 			);
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**

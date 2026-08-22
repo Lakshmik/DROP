@@ -20,6 +20,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -121,91 +129,74 @@ import org.drip.service.env.EnvManager;
  *  	</li>
  *  </ul>
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/lvar/README.md">Liquidity VaR Based Optimal Trajectory</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/lvar/README.md">Liquidity VaR Based Optimal Trajectory</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class OptimalTrajectoryNoDrift {
+public class OptimalTrajectoryNoDrift
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double dblS0 = 50.;
-		double dblSigma = 0.9487;
-		double dblAlpha = 0.02;
-		double dblEpsilon = 0.0625;
-		double dblGamma = 2.5e-07;
-		double dblEta = 2.5e-06;
-		double dblConfidenceLevel = 0.90;
+		double s0 = 50.;
+		double alpha = 0.02;
+		double eta = 2.5e-06;
+		double sigma = 0.9487;
+		double gamma = 2.5e-07;
+		double epsilon = 0.0625;
+		double confidenceLevel = 0.9;
 
-		double dblX = 1000000.;
-		double dblT = 5.;
-		int iN = 5;
+		double x = 1000000.;
+		double t = 5.;
+		int n = 5;
 
-		double dblLambdaV = R1UnivariateNormal.Standard().confidenceInterval (dblConfidenceLevel);
+		double lambdaV = R1UnivariateNormal.Standard().confidenceInterval (confidenceLevel);
 
-		DiscreteTradingTrajectoryControl dttc = DiscreteTradingTrajectoryControl.FixedInterval (
-			new OrderSpecification (
-				dblX,
-				dblT
-			),
-			iN
+		LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+			ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
+				new ArithmeticPriceDynamicsSettings (0., new Flat (sigma), 0.),
+				new UniformParticipationRateLinear (new ParticipationRateLinear (0., gamma)),
+				new UniformParticipationRateLinear (new ParticipationRateLinear (epsilon, eta))
+			);
+
+		EfficientTradingTrajectoryDiscrete efficientTradingTrajectoryDiscrete =
+			(EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
+				DiscreteTradingTrajectoryControl.FixedInterval (new OrderSpecification (x, t), n),
+				linearPermanentExpectationParameters,
+				PowerVarianceObjectiveUtility.LiquidityVaR (lambdaV)
+			).generate();
+
+		double[] executionTimeNodeArray = efficientTradingTrajectoryDiscrete.executionTimeNode();
+
+		double[] tradeListArray = efficientTradingTrajectoryDiscrete.tradeList();
+
+		double[] holdingsArray = efficientTradingTrajectoryDiscrete.holdings();
+
+		R1UnivariateNormal r1un = new LinearImpactTrajectoryEstimator (
+			efficientTradingTrajectoryDiscrete
+		).totalCostDistributionSynopsis (
+			linearPermanentExpectationParameters
 		);
-
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
-			new ArithmeticPriceDynamicsSettings (
-				0.,
-				new Flat (dblSigma),
-				0.
-			),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					0.,
-					dblGamma
-				)
-			),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					dblEpsilon,
-					dblEta
-				)
-			)
-		);
-
-		EfficientTradingTrajectoryDiscrete ettd = (EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
-			dttc,
-			lpep,
-			PowerVarianceObjectiveUtility.LiquidityVaR (dblLambdaV)
-		).generate();
-
-		double[] adblExecutionTimeNode = ettd.executionTimeNode();
-
-		double[] adblTradeList = ettd.tradeList();
-
-		double[] adblHoldings = ettd.holdings();
-
-		LinearImpactTrajectoryEstimator lite = new LinearImpactTrajectoryEstimator (ettd);
-
-		R1UnivariateNormal r1un = lite.totalCostDistributionSynopsis (lpep);
 
 		System.out.println ("\n\t|---------------------------------------------||");
 
@@ -213,37 +204,40 @@ public class OptimalTrajectoryNoDrift {
 
 		System.out.println ("\t|---------------------------------------------||");
 
-		System.out.println ("\t| Initial Stock Price           : " + dblS0);
+		System.out.println ("\t| Initial Stock Price           : " + s0);
 
-		System.out.println ("\t| Initial Holdings              : " + dblX);
+		System.out.println ("\t| Initial Holdings              : " + x);
 
-		System.out.println ("\t| Liquidation Time              : " + dblT);
+		System.out.println ("\t| Liquidation Time              : " + t);
 
-		System.out.println ("\t| Number of Time Periods        : " + iN);
+		System.out.println ("\t| Number of Time Periods        : " + n);
 
-		System.out.println ("\t| Daily Volume 5 million Shares : " + dblGamma);
+		System.out.println ("\t| Daily Volume 5 million Shares : " + gamma);
 
-		System.out.println ("\t| VaR Confidence Level          :" + FormatUtil.FormatDouble (dblConfidenceLevel, 2, 2, 100.) + "%");
+		System.out.println (
+			"\t| VaR Confidence Level          :" +
+				FormatUtil.FormatDouble (confidenceLevel, 2, 2, 100.) + "%"
+		);
 
-		System.out.println ("\t| VaR Based Risk Aversion       : " + dblLambdaV);
+		System.out.println ("\t| VaR Based Risk Aversion       : " + lambdaV);
 
 		System.out.println ("\t|");
 
 		System.out.println (
 			"\t| Daily Volatility              : " +
-			FormatUtil.FormatDouble (dblSigma, 1, 4, 1.)
+				FormatUtil.FormatDouble (sigma, 1, 4, 1.)
 		);
 
 		System.out.println (
 			"\t| Daily Returns                 : " +
-			FormatUtil.FormatDouble (dblAlpha, 1, 4, 1.)
+				FormatUtil.FormatDouble (alpha, 1, 4, 1.)
 		);
 
-		System.out.println ("\t| Temporary Impact Fixed Offset :  " + dblEpsilon);
+		System.out.println ("\t| Temporary Impact Fixed Offset :  " + epsilon);
 
-		System.out.println ("\t| Eta                           :  " + dblEta);
+		System.out.println ("\t| Eta                           :  " + eta);
 
-		System.out.println ("\t| Gamma                         :  " + dblGamma);
+		System.out.println ("\t| Gamma                         :  " + gamma);
 
 		System.out.println ("\t|---------------------------------------------||");
 
@@ -263,19 +257,20 @@ public class OptimalTrajectoryNoDrift {
 
 		System.out.println ("\t|-----------------------------||");
 
-		for (int i = 0; i <= iN; ++i) {
-			if (i == 0)
+		for (int stepIndex = 0; stepIndex <= n; ++stepIndex) {
+			if (0 == stepIndex) {
 				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 0, 1.) + " => " +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (0., 6, 1, 1.) + " ||"
+					"\t|" + FormatUtil.FormatDouble (executionTimeNodeArray[stepIndex], 1, 0, 1.) + " => " +
+						FormatUtil.FormatDouble (holdingsArray[stepIndex], 7, 1, 1.) + " | " +
+						FormatUtil.FormatDouble (0., 6, 1, 1.) + " ||"
 				);
-			else
+			} else {
 				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 0, 1.) + " => " +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (adblTradeList[i - 1], 6, 1, 1.) + " ||"
+					"\t|" + FormatUtil.FormatDouble (executionTimeNodeArray[stepIndex], 1, 0, 1.) + " => " +
+						FormatUtil.FormatDouble (holdingsArray[stepIndex], 7, 1, 1.) + " | " +
+						FormatUtil.FormatDouble (tradeListArray[stepIndex - 1], 6, 1, 1.) + " ||"
 				);
+			}
 		}
 
 		System.out.println ("\t|-----------------------------||");
@@ -287,15 +282,31 @@ public class OptimalTrajectoryNoDrift {
 		System.out.println ("\t|----------------------------------------------------------------||");
 
 		System.out.println (
-			"\t| Transaction Cost Expectation         : " +
-			FormatUtil.FormatDouble (r1un.mean(), 7, 1, 1.) + " | " +
-			FormatUtil.FormatDouble (ettd.transactionCostExpectation(), 7, 1, 1.) + " ||"
+			"\t| Transaction Cost Expectation         : " + FormatUtil.FormatDouble (
+				r1un.mean(),
+				7,
+				1,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryDiscrete.transactionCostExpectation(),
+				7,
+				1,
+				1.
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Transaction Cost Variance (X 10^-06) : " +
-			FormatUtil.FormatDouble (r1un.variance(), 7, 1, 1.e-06) + " | " +
-			FormatUtil.FormatDouble (ettd.transactionCostVariance(), 7, 1, 1.e-06) + " ||"
+			"\t| Transaction Cost Variance (X 10^-06) : " + FormatUtil.FormatDouble (
+				r1un.variance(),
+				7,
+				1,
+				1.e-06
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryDiscrete.transactionCostVariance(),
+				7,
+				1,
+				1.e-06
+			) + " ||"
 		);
 
 		System.out.println ("\t|----------------------------------------------------------------||");

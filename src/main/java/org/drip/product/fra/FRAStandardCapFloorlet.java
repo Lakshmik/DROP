@@ -500,7 +500,7 @@ public class FRAStandardCapFloorlet extends org.drip.product.option.OptionCompon
 			throw new java.lang.Exception
 				("FRAStandardCapFloorlet::implyVolatility => Cannot calibrate the Vol");
 
-		return fpfo.getRoot();
+		return fpfo.root();
 	}
 
 	@Override public org.drip.analytics.support.CaseInsensitiveTreeMap<java.lang.Double> value (

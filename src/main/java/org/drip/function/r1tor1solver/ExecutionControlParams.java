@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,117 +95,126 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>ExecutionControlParams</i> holds the parameters needed for controlling the execution of the fixed point
- * finder.
- * <br><br>
- * ExecutionControlParams fields control the fixed point search in one of the following ways:
- * <br>
- * <ul>
- * 	<li>
- * 		Number of iterations after which the search is deemed to have failed
- * 	</li>
- * 	<li>
- * 		Relative Objective Function Tolerance Factor which, when reached by the objective function, will
- * 			indicate that the fixed point has been reached
- * 	</li>
- * 	<li>
- * 		Variate Convergence Factor, factor applied to the initial variate to determine the absolute
- * 			convergence
- * 	</li>
- * 	<li>
- * 		Absolute Tolerance fall-back, which is used to determine that the fixed point has been reached when
- * 			the relative tolerance factor becomes zero
- * 	</li>
- * 	<li>
- * 		Absolute Variate Convergence Fall-back, fall-back used to determine if the variate has converged.
- * 	</li>
- * </ul>
+ * 	finder. <i>ExecutionControlParams</i> fields control the fixed point search in one of the following ways:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Number of iterations after which the search is deemed to have failed</li>
+ * 		<li>Relative Objective Function Tolerance Factor which, when reached by the objective function, will
+ * 			indicate that the fixed point has been reached</li>
+ * 		<li>Variate Convergence Factor, factor applied to the initial variate to determine the absolute
+ * 			convergence</li>
+ * 		<li>Absolute Tolerance fall-back, which is used to determine that the fixed point has been reached
+ * 			when the relative tolerance factor becomes zero</li>
+ * 		<li>Absolute Variate Convergence Fall-back, fall-back used to determine if the variate has
+ * 			converged.</li>
+ * 	</ul>
  *
- *	<br><br>
+ *	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Default Execution Control Parameters Constructor</li>
+ * 		<li>Execution Control Parameters Constructor</li>
+ * 		<li>Return the Number of Iterations Allowed</li>
+ * 		<li>Return the Tolerance Factor for the Objective Function Goal</li>
+ * 		<li>Return the Variate Convergence Factor</li>
+ * 		<li>Return the Fall-back Absolute Tolerance for the Objective Function</li>
+ * 		<li>Return the Fall-back Absolute Variate Convergence</li>
+ * 		<li>Indicate if the Variate Convergence Check has been Turned On</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ExecutionControlParams {
-	private int _iNumIterations = 0;
-	private boolean _bIsVariateConvergenceCheckEnabled = false;
-	private double _dblOFGoalToleranceFactor = java.lang.Double.NaN;
-	private double _dblVariateConvergenceFactor = java.lang.Double.NaN;
-	private double _dblAbsoluteOFToleranceFallback = java.lang.Double.NaN;
-	private double _dblAbsoluteVariateConvergenceFallback = java.lang.Double.NaN;
+public class ExecutionControlParams
+{
+	private int _maximumIterationCount = 0;
+	private double _variateConvergenceFactor = Double.NaN;
+	private boolean _variateConvergenceCheckEnabled = false;
+	private double _absoluteVariateConvergenceFallback = Double.NaN;
+	private double _objectiveFunctionGoalToleranceFactor = Double.NaN;
+	private double _absoluteObjectiveFunctionToleranceFallback = Double.NaN;
 
 	/**
-	 * Default Execution Control Parameters constructor
+	 * Default <i>ExecutionControlParams</i> Constructor
 	 */
 
 	public ExecutionControlParams()
 	{
-		_iNumIterations = 200;
-		_dblOFGoalToleranceFactor = 1.0e-07;
-		_dblVariateConvergenceFactor = 1.0e-07;
-		_dblAbsoluteOFToleranceFallback = 1.0e-08;
-		_dblAbsoluteVariateConvergenceFallback = 1.0e-08;
+		_maximumIterationCount = 200;
+		_variateConvergenceFactor = 1.e-07;
+		_absoluteVariateConvergenceFallback = 1.e-08;
+		_objectiveFunctionGoalToleranceFactor = 1.e-07;
+		_absoluteObjectiveFunctionToleranceFallback = 1.e-08;
 	}
 
 	/**
-	 * Execution Control Parameters constructor
+	 * <i>ExecutionControlParams</i> Constructor
 	 * 
-	 * @param iNumIterations Number of Iterations
-	 * @param bIsVariateConvergenceCheckEnabled Flag indicating if the variate convergence check is on
-	 * @param dblOFGoalToleranceFactor Tolerance factor for the OF Goal
-	 * @param dblVariateConvergenceFactor Variate Convergence Factor
-	 * @param dblAbsoluteOFToleranceFallback Absolute Tolerance Fall-back
-	 * @param dblAbsoluteVariateConvergenceFallback Absolute Variate Convergence fall-back
+	 * @param maximumIterationCount Number of Iterations
+	 * @param variateConvergenceCheckEnabled Flag indicating if the variate convergence check is on
+	 * @param objectiveFunctionGoalToleranceFactor Tolerance factor for the OF Goal
+	 * @param variateConvergenceFactor Variate Convergence Factor
+	 * @param absoluteObjectiveFunctionToleranceFallback Absolute Tolerance Fall-back
+	 * @param absoluteVariateConvergenceFallback Absolute Variate Convergence fall-back
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public ExecutionControlParams (
-		final int iNumIterations,
-		final boolean bIsVariateConvergenceCheckEnabled,
-		final double dblOFGoalToleranceFactor,
-		final double dblVariateConvergenceFactor,
-		final double dblAbsoluteOFToleranceFallback,
-		final double dblAbsoluteVariateConvergenceFallback)
-		throws java.lang.Exception
+		final int maximumIterationCount,
+		final boolean variateConvergenceCheckEnabled,
+		final double objectiveFunctionGoalToleranceFactor,
+		final double variateConvergenceFactor,
+		final double absoluteObjectiveFunctionToleranceFallback,
+		final double absoluteVariateConvergenceFallback)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblOFGoalToleranceFactor = dblOFGoalToleranceFactor)
-			|| !org.drip.numerical.common.NumberUtil.IsValid (_dblVariateConvergenceFactor =
-				dblVariateConvergenceFactor) || !org.drip.numerical.common.NumberUtil.IsValid
-					(_dblAbsoluteOFToleranceFallback = dblAbsoluteOFToleranceFallback) ||
-						!org.drip.numerical.common.NumberUtil.IsValid (_dblAbsoluteVariateConvergenceFallback =
-							dblAbsoluteVariateConvergenceFallback) || 0 >= (_iNumIterations =
-								iNumIterations))
-			throw new java.lang.Exception ("ExecutionControlParams constructor: Invalid inputs");
+		if (!NumberUtil.IsValid (
+				_objectiveFunctionGoalToleranceFactor = objectiveFunctionGoalToleranceFactor
+			) || !NumberUtil.IsValid (
+				_variateConvergenceFactor = variateConvergenceFactor
+			) || !NumberUtil.IsValid (
+				_absoluteObjectiveFunctionToleranceFallback = absoluteObjectiveFunctionToleranceFallback
+			) || !NumberUtil.IsValid (
+				_absoluteVariateConvergenceFallback = absoluteVariateConvergenceFallback
+			) || 0 >= (_maximumIterationCount = maximumIterationCount
+		))
+		{
+			throw new Exception ("ExecutionControlParams Constructor: Invalid inputs");
+		}
 
-		_bIsVariateConvergenceCheckEnabled = bIsVariateConvergenceCheckEnabled;
+		_variateConvergenceCheckEnabled = variateConvergenceCheckEnabled;
 	}
 
 	/**
-	 * Return the number of iterations allowed
+	 * Return the Number of Iterations Allowed
 	 * 
-	 * @return Number of iterations
+	 * @return Number of Iterations
 	 */
 
-	public int getNumIterations()
+	public int maximumIterationCount()
 	{
-		return _iNumIterations;
+		return _maximumIterationCount;
 	}
 
 	/**
-	 * Return the tolerance factor for the OF Goal
+	 * Return the Tolerance Factor for the Objective Function Goal
 	 * 
-	 * @return Tolerance factor for the OF Goal
+	 * @return Tolerance Factor for the Objective Function Goal
 	 */
 
-	public double getOFGoalToleranceFactor()
+	public double objectiveFunctionGoalToleranceFactor()
 	{
-		return _dblOFGoalToleranceFactor;
+		return _objectiveFunctionGoalToleranceFactor;
 	}
 
 	/**
@@ -204,41 +223,41 @@ public class ExecutionControlParams {
 	 * @return Variate Convergence Factor
 	 */
 
-	public double getVariateConvergenceFactor()
+	public double variateConvergenceFactor()
 	{
-		return _dblVariateConvergenceFactor;
+		return _variateConvergenceFactor;
 	}
 
 	/**
-	 * Return the Fall-back absolute tolerance for the OF
+	 * Return the Fall-back Absolute Tolerance for the Objective Function
 	 * 
-	 * @return Fall-back absolute tolerance for the OF
+	 * @return Fall-back Absolute Tolerance for the Objective Function
 	 */
 
-	public double getAbsoluteOFToleranceFallback()
+	public double absoluteObjectiveFunctionToleranceFallback()
 	{
-		return _dblAbsoluteOFToleranceFallback;
+		return _absoluteObjectiveFunctionToleranceFallback;
 	}
 
 	/**
-	 * Return the fall-back absolute variate convergence
+	 * Return the Fall-back Absolute Variate Convergence
 	 * 
-	 * @return Fall-back absolute variate convergence
+	 * @return Fall-back Absolute Variate Convergence
 	 */
 
-	public double getAbsoluteVariateConvergenceFallback()
+	public double absoluteVariateConvergenceFallback()
 	{
-		return _dblAbsoluteVariateConvergenceFallback;
+		return _absoluteVariateConvergenceFallback;
 	}
 
 	/**
-	 * Indicate if the variate convergence check has been turned on
+	 * Indicate if the Variate Convergence Check has been Turned On
 	 * 
-	 * @return TRUE - Variate convergence check has been turned on
+	 * @return TRUE - Variate Convergence Check has been Turned On
 	 */
 
-	public boolean isVariateConvergenceCheckEnabled()
+	public boolean variateConvergenceCheckEnabled()
 	{
-		return _bIsVariateConvergenceCheckEnabled;
+		return _variateConvergenceCheckEnabled;
 	}
 }

@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -87,32 +95,35 @@ import org.drip.service.env.EnvManager;
  * <i>OTCCrossCurrencyDefinitions</i> contains all the pre-fixed Definitions of the OTC Cross-Currency
  * 	Float-Float Swap Contracts.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/xccy/README.md">OTC Cross Currency Swaps Definition</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/xccy/README.md">OTC Cross Currency Swaps Definition</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class OTCCrossCurrencyDefinitions {
+public class OTCCrossCurrencyDefinitions
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		String[] args)
+		String[] argumentArray)
 	{
 		EnvManager.InitEnv ("");
 
-		System.out.println ("\n\t--------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\n\t--------------------------------------------------------------------------------------------------------"
+		);
 
 		System.out.println ("\t\tL -> R:");
 
@@ -132,7 +143,9 @@ public class OTCCrossCurrencyDefinitions {
 
 		System.out.println ("\t\t\tSpot Lag in Business Days");
 
-		System.out.println ("\t--------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t--------------------------------------------------------------------------------------------------------"
+		);
 
 		System.out.println ("\t\t" + CrossFloatConventionContainer.ConventionFromJurisdiction ("AUD"));
 
@@ -158,7 +171,9 @@ public class OTCCrossCurrencyDefinitions {
 
 		System.out.println ("\t\t" + CrossFloatConventionContainer.ConventionFromJurisdiction ("SEK"));
 
-		System.out.println ("\t--------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t--------------------------------------------------------------------------------------------------------"
+		);
 
 		EnvManager.TerminateEnv();
 	}

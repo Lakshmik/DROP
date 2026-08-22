@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,196 +95,251 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>FixedPointFinderBracketing</i> customizes the FixedPointFinder for bracketing based fixed point finder
- * 	functionality.
- * <br><br>
- * FixedPointFinderBracketing applies the following customization:
- * <br>
- * <ul>
- * 	<li>
- * 		Initializes the fixed point finder by computing the starting brackets
- * 	</li>
- * 	<li>
- * 		Iterating the next search variate using one of the specified variate iterator primitives.
- * 	</li>
- * </ul>
- * <br><br>
- * By default, FixedPointFinderBracketing does not do compound iterations of the variate using any schemes -
- * that is done by classes that extend it.
+ * 	functionality. It applies the following customization:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Initializes the fixed point finder by computing the starting brackets</li>
+ * 		<li>Iterating the next search variate using one of the specified variate iterator primitives.</li>
+ * 	</ul>
+ * 	<br>
+ * 
+ * 	By default, <i>FixedPointFinderBracketing</i> does not do compound iterations of the variate using any
+ * 		schemes - that is done by classes that extend it. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li><i>FixedPointFinderBracketing</i> Constructor</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixedPointFinderBracketing extends org.drip.function.r1tor1solver.FixedPointFinder {
-	protected int _iIteratorPrimitive = -1;
-	protected org.drip.function.r1tor1solver.IteratedBracket _ib = null;
+public class FixedPointFinderBracketing
+	extends FixedPointFinder
+{
+	protected int _iteratorPrimitive = -1;
+	protected IteratedBracket _iteratedBracket = null;
+	private ExecutionInitializer _executionInitializer = null;
 
-	private org.drip.function.r1tor1solver.ExecutionInitializer _ei = null;
-
-	protected final double calcNextVariate (
-		final double dblCurrentVariate,
-		final double dblContraVariate,
-		final double dblCurrentOF,
-		final double dblContraPointOF,
-		final int iIteratorPrimitive,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
-		throws java.lang.Exception
+	protected final double nextVariate (
+		final double currentVariate,
+		final double contraVariate,
+		final double currentObjectiveFunctionValue,
+		final double contraObjectiveFunctionValue,
+		final int iteratorPrimitive,
+		final FixedPointFinderOutput fixedPointFinderOutput)
+		throws Exception
 	{
-		if (org.drip.function.r1tor1solver.VariateIteratorPrimitive.BISECTION == iIteratorPrimitive)
-			return org.drip.function.r1tor1solver.VariateIteratorPrimitive.Bisection (dblCurrentVariate,
-				dblContraVariate);
+		if (VariateIteratorPrimitive.BISECTION == iteratorPrimitive) {
+			return VariateIteratorPrimitive.Bisection (currentVariate, contraVariate);
+		}
 
-		if (org.drip.function.r1tor1solver.VariateIteratorPrimitive.FALSE_POSITION == iIteratorPrimitive)
-			return org.drip.function.r1tor1solver.VariateIteratorPrimitive.FalsePosition (dblCurrentVariate,
-				dblContraVariate, dblCurrentOF, dblContraPointOF);
+		if (VariateIteratorPrimitive.FALSE_POSITION == iteratorPrimitive) {
+			return VariateIteratorPrimitive.FalsePosition (
+				currentVariate,
+				contraVariate,
+				currentObjectiveFunctionValue,
+				contraObjectiveFunctionValue
+			);
+		}
 
-		double dblIntermediateVariate = org.drip.function.r1tor1solver.VariateIteratorPrimitive.Bisection
-			(dblCurrentVariate, dblContraVariate);
+		double intermediateVariate = VariateIteratorPrimitive.Bisection (currentVariate, contraVariate);
 
-		if (!rfop.incrOFCalcs())
-			throw new java.lang.Exception
-				("FixedPointFinderBracketing::calcNextVariate => Cannot increment rfop!");
+		if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+			throw new Exception ("FixedPointFinderBracketing::nextVariate => Cannot increment rfop!");
+		}
 
-		if (org.drip.function.r1tor1solver.VariateIteratorPrimitive.QUADRATIC_INTERPOLATION == iIteratorPrimitive)
-			return org.drip.function.r1tor1solver.VariateIteratorPrimitive.QuadraticInterpolation (dblCurrentVariate,
-				dblIntermediateVariate, dblContraVariate, dblCurrentOF, _of.evaluate
-					(dblIntermediateVariate), dblContraPointOF);
+		if (VariateIteratorPrimitive.QUADRATIC_INTERPOLATION == iteratorPrimitive) {
+			return VariateIteratorPrimitive.QuadraticInterpolation (
+				currentVariate,
+				intermediateVariate,
+				contraVariate,
+				currentObjectiveFunctionValue,
+				_objectiveFunction.evaluate (intermediateVariate),
+				contraObjectiveFunctionValue
+			);
+		}
 
-		if (org.drip.function.r1tor1solver.VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION ==
-			iIteratorPrimitive)
-			return org.drip.function.r1tor1solver.VariateIteratorPrimitive.InverseQuadraticInterpolation
-				(dblCurrentVariate, dblIntermediateVariate, dblContraVariate, dblCurrentOF, _of.evaluate
-					(dblIntermediateVariate), dblContraPointOF);
+		if (VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION == iteratorPrimitive) {
+			return VariateIteratorPrimitive.InverseQuadraticInterpolation (
+				currentVariate,
+				intermediateVariate,
+				contraVariate,
+				currentObjectiveFunctionValue,
+				_objectiveFunction.evaluate (intermediateVariate),
+				contraObjectiveFunctionValue
+			);
+		}
 
-		if (org.drip.function.r1tor1solver.VariateIteratorPrimitive.RIDDER == iIteratorPrimitive)
-			return org.drip.function.r1tor1solver.VariateIteratorPrimitive.Ridder (dblCurrentVariate,
-				dblIntermediateVariate, dblContraVariate, dblCurrentOF, _of.evaluate
-					(dblIntermediateVariate), dblContraPointOF);
+		if (VariateIteratorPrimitive.RIDDER == iteratorPrimitive) {
+			return VariateIteratorPrimitive.Ridder (
+				currentVariate,
+				intermediateVariate,
+				contraVariate,
+				currentObjectiveFunctionValue,
+				_objectiveFunction.evaluate (intermediateVariate),
+				contraObjectiveFunctionValue
+			);
+		}
 
-		throw new java.lang.Exception
-			("FixedPointFinderBracketing.calcNextVariate => Unknown Iterator Primitive");
+		throw new Exception ("FixedPointFinderBracketing.calcNextVariate => Unknown Iterator Primitive");
 	}
 
 	protected double iterateCompoundVariate (
-		final double dblCurrentVariate,
-		final double dblContraVariate,
-		final double dblCurrentOF,
-		final double dblContraPointOF,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
-		throws java.lang.Exception
+		final double currentVariate,
+		final double contraVariate,
+		final double currentObjectiveFunctionValue,
+		final double contraObjectiveFunctionValue,
+		final FixedPointFinderOutput fixedPointFinderOutput)
+		throws Exception
 	{
-		return calcNextVariate (dblCurrentVariate, dblContraVariate, dblCurrentOF, dblContraPointOF,
-			_iIteratorPrimitive, rfop);
+		return nextVariate (
+			currentVariate,
+			contraVariate,
+			currentObjectiveFunctionValue,
+			contraObjectiveFunctionValue,
+			_iteratorPrimitive,
+			fixedPointFinderOutput
+		);
 	}
 
 	@Override protected boolean iterateVariate (
-		final org.drip.function.r1tor1solver.IteratedVariate iv,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
+		final IteratedVariate iteratedVariate,
+		final FixedPointFinderOutput fixedPointFinderOutput)
 	{
-		if (null == iv || null == rfop) return false;
+		if (null == iteratedVariate || null == fixedPointFinderOutput) {
+			return false;
+		}
 
-		double dblContraRoot = java.lang.Double.NaN;
-		double dblContraRootOF = java.lang.Double.NaN;
+		double contraRoot = Double.NaN;
+		double contraObjectiveFunctionValue = Double.NaN;
 
-		double dblOF = iv.getOF();
+		double variate = iteratedVariate.x();
 
-		double dblOFLeft = _ib.getOFLeft();
+		double leftVariate = _iteratedBracket.leftVariate();
 
-		double dblOFRight = _ib.getOFRight();
+		double rightVariate = _iteratedBracket.rightVariate();
 
-		double dblVariate = iv.getVariate();
+		double objectiveFunctionValue = iteratedVariate.objectiveFunctionValue();
 
-		double dblVariateLeft = _ib.getVariateLeft();
+		double leftObjectiveFunctionValue = _iteratedBracket.leftObjectiveFunctionValue();
 
-		double dblVariateRight = _ib.getVariateRight();
+		double rightObjectiveFunctionValue = _iteratedBracket.rightObjectiveFunctionValue();
 
-		if (((dblOFLeft - _dblOFGoal) * (dblOF - _dblOFGoal)) > 0.) {
-			if (!_ib.setOFLeft (dblOF) || !_ib.setVariateLeft (dblVariate)) return false;
+		if (0. < (
+			(leftObjectiveFunctionValue - _objectiveFunctionValueGoal) *
+				(objectiveFunctionValue - _objectiveFunctionValueGoal)
+		))
+		{
+			if (!_iteratedBracket.setLeftObjectiveFunctionValue (objectiveFunctionValue) ||
+				!_iteratedBracket.setVariateLeft (variate))
+			{
+				return false;
+			}
 
-			dblContraRootOF = dblOFRight;
-			dblContraRoot = dblVariateRight;
-		} else if (((dblOFRight - _dblOFGoal) * (dblOF - _dblOFGoal)) > 0.) {
-			if (!_ib.setOFRight (dblOF) || !_ib.setVariateRight (dblVariate)) return false;
+			contraObjectiveFunctionValue = rightObjectiveFunctionValue;
+			contraRoot = rightVariate;
+		} else if (0. < (
+			(rightObjectiveFunctionValue - _objectiveFunctionValueGoal) *
+				(objectiveFunctionValue - _objectiveFunctionValueGoal)
+		))
+		{
+			if (!_iteratedBracket.setRightObjectiveFunctionValue (objectiveFunctionValue) ||
+				!_iteratedBracket.setVariateRight (variate))
+			{
+				return false;
+			}
 
-			dblContraRootOF = dblOFLeft;
-			dblContraRoot = dblVariateLeft;
+			contraObjectiveFunctionValue = leftObjectiveFunctionValue;
+			contraRoot = leftVariate;
 		}
 
 		try {
-			dblVariate = iterateCompoundVariate (dblVariate, dblContraRoot, dblOF, dblContraRootOF, rfop);
+			variate = iterateCompoundVariate (
+				variate,
+				contraRoot,
+				objectiveFunctionValue,
+				contraObjectiveFunctionValue,
+				fixedPointFinderOutput
+			);
 
-			return iv.setVariate (dblVariate) && iv.setOF (_of.evaluate (dblVariate)) && rfop.incrOFCalcs();
-		} catch (java.lang.Exception e) {
-			if (_bWhine) e.printStackTrace();
+			return iteratedVariate.setX (variate) &&
+				iteratedVariate.setObjectiveFunctionValue (_objectiveFunction.evaluate (variate)) &&
+				fixedPointFinderOutput.incrementObjectiveFunctionCalculations();
+		} catch (Exception e) {
+			if (_whine) e.printStackTrace();
 		}
 
 		return false;
 	}
 
-	@Override protected org.drip.function.r1tor1solver.ExecutionInitializationOutput initializeVariateZone (
-		final org.drip.function.r1tor1solver.InitializationHeuristics ih)
+	@Override protected ExecutionInitializationOutput initializeVariateZone (
+		final InitializationHeuristics initializationHeuristics)
 	{
-		org.drip.function.r1tor1solver.BracketingOutput bop = null;
+		BracketingOutput bracketingOutput = null != initializationHeuristics &&
+			InitializationHeuristics.SEARCH_HARD_BRACKETS == initializationHeuristics.determinant() ?
+			_executionInitializer.verifyHardSearchEdges (
+				initializationHeuristics,
+				_objectiveFunctionValueGoal
+			) : _executionInitializer.initializeBracket (
+				initializationHeuristics,
+				_objectiveFunctionValueGoal
+			);
 
-		if (null != ih && org.drip.function.r1tor1solver.InitializationHeuristics.SEARCH_HARD_BRACKETS ==
-			ih.getDeterminant())
-			bop = _ei.verifyHardSearchEdges (ih, _dblOFGoal);
-		else
-			bop = _ei.initializeBracket (ih, _dblOFGoal);
-
-		if (null == bop || !bop.isDone()) return null;
+		if (null == bracketingOutput || !bracketingOutput.isDone()) {
+			return null;
+		}
 
 		try {
-			_ib = new org.drip.function.r1tor1solver.IteratedBracket (bop);
+			_iteratedBracket = new IteratedBracket (bracketingOutput);
 
-			return bop;
-		} catch (java.lang.Exception e) {
-			if (_bWhine) e.printStackTrace();
+			return bracketingOutput;
+		} catch (Exception e) {
+			if (_whine) e.printStackTrace();
 		}
 
 		return null;
 	}
 
 	/**
-	 * FixedPointFinderBracketing constructor
+	 * <i>FixedPointFinderBracketing</i> Constructor
 	 * 
-	 * @param dblOFGoal OF Goal
-	 * @param of Objective Function
-	 * @param ec Execution Control
-	 * @param iIteratorPrimitive Iterator Primitive
-	 * @param bWhine TRUE - Balk on Encountering Exception
+	 * @param objectiveFunctionValueGoal Objective Function Value Goal
+	 * @param objectiveFunction Objective Function
+	 * @param executionControl Execution Control
+	 * @param iteratorPrimitive Iterator Primitive
+	 * @param whine TRUE - Balk on Encountering Exception
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public FixedPointFinderBracketing (
-		final double dblOFGoal,
-		final org.drip.function.definition.R1ToR1 of,
-		final org.drip.function.r1tor1solver.ExecutionControl ec,
-		final int iIteratorPrimitive,
-		final boolean bWhine)
-		throws java.lang.Exception
+		final double objectiveFunctionValueGoal,
+		final R1ToR1 objectiveFunction,
+		final ExecutionControl executionControl,
+		final int iteratorPrimitive,
+		final boolean whine)
+		throws Exception
 	{
-		super (dblOFGoal, of, ec, bWhine);
+		super (objectiveFunctionValueGoal, objectiveFunction, executionControl, whine);
 
-		if (org.drip.function.r1tor1solver.VariateIteratorPrimitive.BISECTION != (_iIteratorPrimitive =
-			iIteratorPrimitive) && org.drip.function.r1tor1solver.VariateIteratorPrimitive.FALSE_POSITION !=
-				_iIteratorPrimitive &&
-					org.drip.function.r1tor1solver.VariateIteratorPrimitive.QUADRATIC_INTERPOLATION !=
-						_iIteratorPrimitive &&
-							org.drip.function.r1tor1solver.VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION
-								!= _iIteratorPrimitive &&
-									org.drip.function.r1tor1solver.VariateIteratorPrimitive.RIDDER !=
-										_iIteratorPrimitive)
-			throw new java.lang.Exception ("FixedPointFinderBracketing constructor: Invalid inputs!");
+		if (VariateIteratorPrimitive.BISECTION != (_iteratorPrimitive = iteratorPrimitive) &&
+			VariateIteratorPrimitive.FALSE_POSITION != _iteratorPrimitive &&
+			VariateIteratorPrimitive.QUADRATIC_INTERPOLATION != _iteratorPrimitive &&
+			VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION != _iteratorPrimitive &&
+			VariateIteratorPrimitive.RIDDER != _iteratorPrimitive)
+		{
+			throw new Exception ("FixedPointFinderBracketing constructor: Invalid inputs!");
+		}
 
-		_ei = new org.drip.function.r1tor1solver.ExecutionInitializer (_of, null, true);
+		_executionInitializer = new ExecutionInitializer (_objectiveFunction, null, true);
 	}
 }

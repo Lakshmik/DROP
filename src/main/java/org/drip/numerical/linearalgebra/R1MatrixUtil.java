@@ -1520,7 +1520,6 @@ public class R1MatrixUtil
 	{
 		if (null == matrix || !org.drip.numerical.common.NumberUtil.IsValid (scaleFactor))
 		{
-			return null;
 		}
 
 		int rowCount = matrix.length;

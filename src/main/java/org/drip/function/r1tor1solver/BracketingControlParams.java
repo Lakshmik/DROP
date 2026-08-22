@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,124 +95,129 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>BracketingControlParams</i> implements the control parameters for bracketing solutions.
- * <br><br>
- * BracketingControlParams provides the following parameters:
- * <ul>
- * 	<li>
- * 			The starting variate from which the search for bracketing begins
- * 	</li>
- * 	<li>
- * 			The initial width for the brackets
- * 	</li>
- * 	<li>
- * 			The factor by which the width expands with each iterative search
- * 	</li>
- * 	<li>
- * 			The number of such iterations.
- * 	</li>
- * </ul>
+ * 	<i>BracketingControlParams</i> provides the following parameters:
+ * 	<ul>
+ * 		<li>The starting variate from which the search for bracketing begins</li>
+ * 		<li>The initial width for the brackets</li>
+ * 		<li>The factor by which the width expands with each iterative search</li>
+ * 		<li>The number of such iterations.</li>
+ * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Default <i>BracketingControlParams</i> Constructor</li>
+ * 		<li><i>BracketingControlParams</i> Constructor</li>
+ * 		<li>Return the Maximum Number of Expansions</li>
+ * 		<li>Return the Starting Point of Bracketing Determination</li>
+ * 		<li>Return the Initial Bracket Width</li>
+ * 		<li>Return the Bracket Width Expansion Factor</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BracketingControlParams {
+public class BracketingControlParams
+{
 
 	/*
 	 * Bracket Determination Parameters
 	 */
 
-	private int _iNumExpansions = 0;
-	private double _dblVariateStart = java.lang.Double.NaN;
-	private double _dblBracketStartingWidth = java.lang.Double.NaN;
-	private double _dblBracketWidthExpansionFactor = java.lang.Double.NaN;
+	private int _maximumNumberOfExpansions = 0;
+	private double _startingVariate = Double.NaN;
+	private double _bracketStartingWidth = Double.NaN;
+	private double _bracketWidthExpansionFactor = Double.NaN;
 
 	/**
-	 * Default BracketingControlParams constructor
+	 * Default <i>BracketingControlParams</i> Constructor
 	 */
 
 	public BracketingControlParams()
 	{
-		_dblVariateStart = 0.;
-		_iNumExpansions = 100;
-		_dblBracketStartingWidth = 1.e-06;
-		_dblBracketWidthExpansionFactor = 2.;
+		_startingVariate = 0.;
+		_bracketStartingWidth = 1.e-06;
+		_maximumNumberOfExpansions = 100;
+		_bracketWidthExpansionFactor = 2.;
 	}
 
 	/**
-	 * BracketingControlParams constructor
+	 * <i>BracketingControlParams</i> Constructor
 	 * 
-	 * @param iNumExpansions Number of bracket expansions to determine the bracket
-	 * @param dblVariateStart Variate start for the bracket determination
-	 * @param dblBracketStartingWidth Base Bracket Width
-	 * @param dblBracketWidthExpansionFactor Bracket width expansion factor
+	 * @param maximumNumberOfExpansions Number of bracket expansions to determine the bracket
+	 * @param startingVariate Variate start for the bracket determination
+	 * @param bracketStartingWidth Base Bracket Width
+	 * @param bracketWidthExpansionFactor Bracket width expansion factor
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public BracketingControlParams (
-		final int iNumExpansions,
-		final double dblVariateStart,
-		final double dblBracketStartingWidth,
-		final double dblBracketWidthExpansionFactor)
-		throws java.lang.Exception
+		final int maximumNumberOfExpansions,
+		final double startingVariate,
+		final double bracketStartingWidth,
+		final double bracketWidthExpansionFactor)
+		throws Exception
 	{
-		if (0 >= (_iNumExpansions = iNumExpansions) || !org.drip.numerical.common.NumberUtil.IsValid
-			(_dblVariateStart = dblVariateStart) || !org.drip.numerical.common.NumberUtil.IsValid
-				(_dblBracketStartingWidth = dblBracketStartingWidth) ||
-					!org.drip.numerical.common.NumberUtil.IsValid (_dblBracketWidthExpansionFactor =
-						dblBracketWidthExpansionFactor))
-			throw new java.lang.Exception ("BracketingControlParams constructor: Invalid inputs!");
+		if (0 >= (_maximumNumberOfExpansions = maximumNumberOfExpansions) ||
+			!NumberUtil.IsValid (_startingVariate = startingVariate) ||
+			!NumberUtil.IsValid (_bracketStartingWidth = bracketStartingWidth) ||
+			!NumberUtil.IsValid (_bracketWidthExpansionFactor = bracketWidthExpansionFactor))
+		{
+			throw new Exception ("BracketingControlParams constructor: Invalid inputs!");
+		}
 	}
 
 	/**
-	 * Return the number of expansions
+	 * Return the Maximum Number of Expansions
 	 * 
-	 * @return Number of expansions
+	 * @return Maximum Number of Expansions
 	 */
 
-	public int getNumExpansions()
+	public int maximumNumberOfExpansions()
 	{
-		return _iNumExpansions;
+		return _maximumNumberOfExpansions;
 	}
 
 	/**
-	 * Return the starting point of bracketing determination
+	 * Return the Starting Point of Bracketing Determination
 	 * 
-	 * @return Starting point of bracketing determination
+	 * @return Starting Point of Bracketing Determination
 	 */
 
-	public double getVariateStart()
+	public double startingVariate()
 	{
-		return _dblVariateStart;
+		return _startingVariate;
 	}
 
 	/**
-	 * Return the initial bracket width
+	 * Return the Initial Bracket Width
 	 * 
-	 * @return Initial bracket width
+	 * @return Initial Bracket Width
 	 */
 
-	public double getStartingBracketWidth()
+	public double bracketStartingWidth()
 	{
-		return _dblBracketStartingWidth;
+		return _bracketStartingWidth;
 	}
 
 	/**
-	 * Return the bracket width expansion factor
+	 * Return the Bracket Width Expansion Factor
 	 * 
-	 * @return Bracket width expansion factor
+	 * @return Bracket Width Expansion Factor
 	 */
 
-	public double getBracketWidthExpansionFactor()
+	public double bracketWidthExpansionFactor()
 	{
-		return _dblBracketWidthExpansionFactor;
+		return _bracketWidthExpansionFactor;
 	}
 }

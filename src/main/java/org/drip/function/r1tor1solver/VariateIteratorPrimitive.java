@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,42 +95,48 @@ package org.drip.function.r1tor1solver;
  */
 
 /**
- * <i>VariateIteratorPrimitive</i> implements the various Primitive Variate Iterator routines.
- * 
- * VariateIteratorPrimitive implements the following iteration primitives:
- * <br>
- * <ul>
- * 	<li>
- * 		Bisection
- * 	</li>
- * 	<li>
- * 		False Position
- * 	</li>
- * 	<li>
- * 		Quadratic
- * 	</li>
- * 	<li>
- * 		Inverse Quadratic
- * 	</li>
- * 	<li>
- * 		Ridder
- * 	</li>
+ * <i>VariateIteratorPrimitive</i> implements the various Primitive Variate Iterator routines. It implements
+ * 	 the following iteration primitives:
+ * 	<br>
+ * 	<ul>
+ * 		<li>Bisection</li>
+ * 		<li>False Position</li>
+ * 		<li>Quadratic</li>
+ * 		<li>Inverse Quadratic</li>
+ * 		<li>Ridder</li>
  * </ul>
  * <br>
- * It may be readily enhanced to accommodate additional primitives.
+ * 
+ * 	It may be readily enhanced to accommodate additional primitives.It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Bisection</li>
+ * 		<li>False Position</li>
+ * 		<li>Quadratic Interpolation</li>
+ * 		<li>Inverse Quadratic Interpolation</li>
+ * 		<li>Ridder's Method</li>
+ * 		<li>Iterate for the Next Variate using Bisection</li>
+ * 		<li>Iterate for the Next Variate using False Position</li>
+ * 		<li>Iterate for the Next Variate using Quadratic Interpolation</li>
+ * 		<li>Iterate for the Next Variate using Inverse Quadratic Interpolation</li>
+ * 		<li>Iterate for the Next Variate using Ridder's Method</li>
+ * 		<li>Iterate for the Next Variate using the Multi-function Method</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class VariateIteratorPrimitive {
+public class VariateIteratorPrimitive
+{
 
 	/**
 	 * Bisection
@@ -152,308 +169,331 @@ public class VariateIteratorPrimitive {
 	public static int RIDDER = 4;
 
 	/**
-	 * Iterate for the next variate using bisection
+	 * Iterate for the Next Variate using Bisection
 	 * 
-	 * @param dblX1 Left variate
-	 * @param dblX2 Right variate
+	 * @param x1 Left variate
+	 * @param x2 Right variate
 	 * 
-	 * @return The next variate
+	 * @return The Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public static final double Bisection (
-		final double dblX1,
-		final double dblX2)
-		throws java.lang.Exception
+		final double x1,
+		final double x2)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX1) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblX2))
-			throw new java.lang.Exception ("VariateIteratorPrimitive::Bisection => Invalid inputs " + dblX2);
+		if (!NumberUtil.IsValid (x1) || !NumberUtil.IsValid (x2)) {
+			throw new Exception ("VariateIteratorPrimitive::Bisection => Invalid Inputs " + x2);
+		}
 
-		return 0.5 * (dblX1 + dblX2);
+		return 0.5 * (x1 + x2);
 	}
 
 	/**
-	 * Iterate for the next variate using false position
+	 * Iterate for the Next Variate using False Position
 	 * 
-	 * @param dblX1 Left variate
-	 * @param dblX2 Right variate
-	 * @param dblY1 Left OF value
-	 * @param dblY2 Right OF value
+	 * @param x1 Left variate
+	 * @param x2 Right variate
+	 * @param y1 Left OF value
+	 * @param y2 Right OF value
 	 * 
-	 * @return The next variate
+	 * @return The Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public static final double FalsePosition (
-		final double dblX1,
-		final double dblX2,
-		final double dblY1,
-		final double dblY2)
-		throws java.lang.Exception
+		final double x1,
+		final double x2,
+		final double y1,
+		final double y2)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX1) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblX2) || !org.drip.numerical.common.NumberUtil.IsValid (dblY1) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (dblY2))
-			throw new java.lang.Exception ("VariateIteratorPrimitive::FalsePosition => Invalid inputs");
+		if (!NumberUtil.IsValid (x1) ||
+			!NumberUtil.IsValid (x2) ||
+			!NumberUtil.IsValid (y1) ||
+			!NumberUtil.IsValid (y2))
+		{
+			throw new Exception ("VariateIteratorPrimitive::FalsePosition => Invalid Inputs");
+		}
 
-		return dblX1 + ((dblX1 - dblX2) / (dblY2 - dblY1) * dblY1);
+		return x1 + ((x1 - x2) / (y2 - y1) * y1);
 	}
 
 	/**
-	 * Iterate for the next variate using quadratic interpolation
+	 * Iterate for the Next Variate using Quadratic Interpolation
 	 * 
-	 * @param dblX1 Left variate
-	 * @param dblX2 Intermediate variate
-	 * @param dblX3 Right variate
-	 * @param dblY1 Left OF value
-	 * @param dblY2 Intermediate OF value
-	 * @param dblY3 Right OF value
+	 * @param x1 Left variate
+	 * @param x2 Intermediate variate
+	 * @param x3 Right variate
+	 * @param y1 Left OF value
+	 * @param y2 Intermediate OF value
+	 * @param y3 Right OF value
 	 * 
-	 * @return The next variate
+	 * @return The Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public static final double QuadraticInterpolation (
-		final double dblX1,
-		final double dblX2,
-		final double dblX3,
-		final double dblY1,
-		final double dblY2,
-		final double dblY3)
-		throws java.lang.Exception
+		final double x1,
+		final double x2,
+		final double x3,
+		final double y1,
+		final double y2,
+		final double y3)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX1) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblX2) || !org.drip.numerical.common.NumberUtil.IsValid (dblX3) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (dblY1) || !org.drip.numerical.common.NumberUtil.IsValid
-					(dblY2) || !org.drip.numerical.common.NumberUtil.IsValid (dblY3))
-			throw new java.lang.Exception
-				("VariateIteratorPrimitive.QuadraticInterpolation => Invalid inputs!");
+		if (!NumberUtil.IsValid (x1) ||
+			!NumberUtil.IsValid (x2) ||
+			!NumberUtil.IsValid (x3) ||
+			!NumberUtil.IsValid (y1) ||
+			!NumberUtil.IsValid (y2) ||
+			!NumberUtil.IsValid (y3))
+		{
+			throw new Exception ("VariateIteratorPrimitive.QuadraticInterpolation => Invalid Inputs!");
+		}
 
-		double dblA = dblY1 / (dblX1 - dblX2) / (dblX1 - dblX3);
-		dblA       += dblY2 / (dblX2 - dblX3) / (dblX2 - dblX1);
-		dblA       += dblY3 / (dblX3 - dblX1) / (dblX3 - dblX2);
-		double dblB = -1. * (dblX2 + dblX3) * dblY1 / (dblX1 - dblX2) / (dblX1 - dblX3);
-		dblB       -=       (dblX3 + dblX1) * dblY2 / (dblX2 - dblX3) / (dblX2 - dblX1);
-		dblB       -=       (dblX1 + dblX2) * dblY3 / (dblX3 - dblX1) / (dblX3 - dblX2);
-		double dblC = dblX2 * dblX3 * dblY1 / (dblX1 - dblX2) / (dblX1 - dblX3);
-		dblC       += dblX3 * dblX1 * dblY2 / (dblX2 - dblX3) / (dblX2 - dblX1);
-		dblC       += dblX1 * dblX2 * dblY3 / (dblX3 - dblX1) / (dblX3 - dblX2);
-		double dblSQRTArg = dblB * dblB - 4. * dblA * dblC;
+		double a = y1 / (x1 - x2) / (x1 - x3);
+		a       += y2 / (x2 - x3) / (x2 - x1);
+		a       += y3 / (x3 - x1) / (x3 - x2);
+		double b = -1. * (x2 + x3) * y1 / (x1 - x2) / (x1 - x3);
+		b       -=       (x3 + x1) * y2 / (x2 - x3) / (x2 - x1);
+		b       -=       (x1 + x2) * y3 / (x3 - x1) / (x3 - x2);
+		double c = x2 * x3 * y1 / (x1 - x2) / (x1 - x3);
+		c       += x3 * x1 * y2 / (x2 - x3) / (x2 - x1);
+		c       += x1 * x2 * y3 / (x3 - x1) / (x3 - x2);
+		double sqrtArguments = b * b - 4. * a * c;
 
-		if (0. > dblSQRTArg)
-			throw new java.lang.Exception
-				("VariateIteratorPrimitive.QuadraticInterpolation => No real roots!");
+		if (0. > sqrtArguments) {
+			throw new Exception ("VariateIteratorPrimitive::QuadraticInterpolation => No real roots!");
+		}
 
-		double dblSQRT = java.lang.Math.sqrt (dblSQRTArg);
+		double sqrt = Math.sqrt (sqrtArguments);
 
-		double dblRoot1 = (-1. * dblB + dblSQRT) / 2. / dblA;
-		double dblRoot2 = (-1. * dblB - dblSQRT) / 2. / dblA;
+		double root1 = (-1. * b + sqrt) / 2. / a;
+		double root2 = (-1. * b - sqrt) / 2. / a;
 
-		if (dblX1 > dblRoot1 || dblX3 < dblRoot1) return dblRoot2;
+		if (x1 > root1 || x3 < root1) {
+			return root2;
+		}
 
-		if (dblX1 > dblRoot2 || dblX3 < dblRoot2) return dblRoot1;
+		if (x1 > root2 || x3 < root2) {
+			return root1;
+		}
 
-		return java.lang.Math.abs (dblX2 - dblRoot1) < java.lang.Math.abs (dblX2 - dblRoot2) ? dblRoot1 :
-			dblRoot2;
+		return Math.abs (x2 - root1) < Math.abs (x2 - root2) ? root1 : root2;
 	}
 
 	/**
-	 * Iterate for the next variate using inverse quadratic interpolation
+	 * Iterate for the Next Variate using Inverse Quadratic Interpolation
 	 * 
-	 * @param dblX1 Left variate
-	 * @param dblX2 Intermediate variate
-	 * @param dblX3 Right variate
-	 * @param dblY1 Left OF value
-	 * @param dblY2 Intermediate OF value
-	 * @param dblY3 Right OF value
+	 * @param x1 Left variate
+	 * @param x2 Intermediate variate
+	 * @param x3 Right variate
+	 * @param y1 Left OF value
+	 * @param y2 Intermediate OF value
+	 * @param y3 Right OF value
 	 * 
-	 * @return The next variate
+	 * @return The Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public static final double InverseQuadraticInterpolation (
-		final double dblX1,
-		final double dblX2,
-		final double dblX3,
-		final double dblY1,
-		final double dblY2,
-		final double dblY3)
-		throws java.lang.Exception
+		final double x1,
+		final double x2,
+		final double x3,
+		final double y1,
+		final double y2,
+		final double y3)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX1) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblX2) || !org.drip.numerical.common.NumberUtil.IsValid (dblX3) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (dblY1) || !org.drip.numerical.common.NumberUtil.IsValid
-					(dblY2) || !org.drip.numerical.common.NumberUtil.IsValid (dblY3))
-			throw new java.lang.Exception
-				("VariateIteratorPrimitive.InverseQuadraticInterpolation => Invalid inputs!");
+		if (!NumberUtil.IsValid (x1) ||
+			!NumberUtil.IsValid (x2) ||
+			!NumberUtil.IsValid (x3) ||
+			!NumberUtil.IsValid (y1) ||
+			!NumberUtil.IsValid (y2) ||
+			!NumberUtil.IsValid (y3))
+		{
+			throw new Exception (
+				"VariateIteratorPrimitive::InverseQuadraticInterpolation => Invalid Inputs!"
+			);
+		}
 
-		double dblNextRoot = (dblY2 * dblY3 * dblX1 / (dblY1 - dblY2) / (dblY1 - dblY3));
-		dblNextRoot       += (dblY3 * dblY1 * dblX2 / (dblY2 - dblY3) / (dblY2 - dblY1));
-		dblNextRoot       += (dblY1 * dblY2 * dblX3 / (dblY3 - dblY1) / (dblY3 - dblY2));
-		return dblNextRoot;
+		double nextRoot = (y2 * y3 * x1 / (y1 - y2) / (y1 - y3));
+		nextRoot       += (y3 * y1 * x2 / (y2 - y3) / (y2 - y1));
+		nextRoot       += (y1 * y2 * x3 / (y3 - y1) / (y3 - y2));
+		return nextRoot;
 	}
 
 	/**
-	 * Iterate for the next variate using Ridder's method
+	 * Iterate for the Next Variate using Ridder's Method
 	 * 
-	 * @param dblX1 Left variate
-	 * @param dblX2 Intermediate variate
-	 * @param dblX3 Right variate
-	 * @param dblY1 Left OF value
-	 * @param dblY2 Intermediate OF value
-	 * @param dblY3 Right OF value
+	 * @param x1 Left variate
+	 * @param x2 Intermediate variate
+	 * @param x3 Right variate
+	 * @param y1 Left OF value
+	 * @param y2 Intermediate OF value
+	 * @param y3 Right OF value
 	 * 
-	 * @return The next variate
+	 * @return The Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if inputs are invalid
 	 */
 
 	public static final double Ridder (
-		final double dblX1,
-		final double dblX2,
-		final double dblX3,
-		final double dblY1,
-		final double dblY2,
-		final double dblY3)
-		throws java.lang.Exception
+		final double x1,
+		final double x2,
+		final double x3,
+		final double y1,
+		final double y2,
+		final double y3)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX1) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblX2) || !org.drip.numerical.common.NumberUtil.IsValid (dblX3) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (dblY1) || !org.drip.numerical.common.NumberUtil.IsValid
-					(dblY2) || !org.drip.numerical.common.NumberUtil.IsValid (dblY3))
-			throw new java.lang.Exception ("VariateIteratorPrimitive.Ridder => Invalid inputs!");
+		if (!NumberUtil.IsValid (x1) ||
+			!NumberUtil.IsValid (x2) ||
+			!NumberUtil.IsValid (x3) ||
+			!NumberUtil.IsValid (y1) ||
+			!NumberUtil.IsValid (y2) ||
+			!NumberUtil.IsValid (y3))
+		{
+			throw new Exception ("VariateIteratorPrimitive::Ridder => Invalid inputs!");
+		}
 
-		double dblSQRTArg = dblY3 * dblY3 - dblY1 * dblY2;
+		double sqrtArgument = y3 * y3 - y1 * y2;
 
-		if (0. > dblSQRTArg)
-			throw new java.lang.Exception ("VariateIteratorPrimitive.Ridder => No real roots!");
+		if (0. > sqrtArgument) {
+			throw new Exception ("VariateIteratorPrimitive::Ridder => No real roots!");
+		}
 
-		return dblX3 + (dblX3 - dblX1) * dblY3 * java.lang.Math.signum (dblY1 - dblY2) / java.lang.Math.sqrt
-			(dblSQRTArg);
+		return x3 + (x3 - x1) * y3 * Math.signum (y1 - y2) / Math.sqrt (sqrtArgument);
 	}
 
 	/**
-	 * Iterate for the next variate using the multi-function method
+	 * Iterate for the Next Variate using the Multi-function Method
 	 * 
-	 * @param dblX1 Left variate
-	 * @param dblX2 Intermediate variate
-	 * @param dblX3 Right variate
-	 * @param dblY1 Left OF value
-	 * @param dblY2 Intermediate OF value
-	 * @param dblY3 Right OF value
-	 * @param of Objective Function
-	 * @param dblOFTarget OF Target
-	 * @param rfop Root Finder Output
+	 * @param x1 Left variate
+	 * @param x2 Intermediate variate
+	 * @param x3 Right variate
+	 * @param y1 Left OF value
+	 * @param y2 Intermediate OF value
+	 * @param y3 Right OF value
+	 * @param objectiveFunction Objective Function
+	 * @param objectiveFunctionValueTarget Objective Function Value Target
+	 * @param fixedPointFinderOutput Root Finder Output
 	 * 
-	 * @return The next variate
+	 * @return The Next Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if inputs are invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public static final double MultiFunction (
-		final double dblX1,
-		final double dblX2,
-		final double dblX3,
-		final double dblY1,
-		final double dblY2,
-		final double dblY3,
-		final org.drip.function.definition.R1ToR1 of,
-		final double dblOFTarget,
-		final org.drip.function.r1tor1solver.FixedPointFinderOutput rfop)
-		throws java.lang.Exception
+		final double x1,
+		final double x2,
+		final double x3,
+		final double y1,
+		final double y2,
+		final double y3,
+		final R1ToR1 objectiveFunction,
+		final double objectiveFunctionValueTarget,
+		final FixedPointFinderOutput fixedPointFinderOutput)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX1) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblX2) || !org.drip.numerical.common.NumberUtil.IsValid (dblX3) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (dblY1) || !org.drip.numerical.common.NumberUtil.IsValid
-					(dblY2) || !org.drip.numerical.common.NumberUtil.IsValid (dblY3) ||
-						!org.drip.numerical.common.NumberUtil.IsValid (dblOFTarget) || null == rfop || null == of)
-			throw new java.lang.Exception ("VariateIteratorPrimitive.MultiFunction => Invalid inputs!");
+		if (!NumberUtil.IsValid (x1) ||
+			!NumberUtil.IsValid (x2) ||
+			!NumberUtil.IsValid (x3) ||
+			!NumberUtil.IsValid (y1) ||
+			!NumberUtil.IsValid (y2) ||
+			!NumberUtil.IsValid (y3) ||
+			!NumberUtil.IsValid (objectiveFunctionValueTarget) ||
+			null == fixedPointFinderOutput ||
+			null == objectiveFunction)
+		{
+			throw new Exception ("VariateIteratorPrimitive::MultiFunction => Invalid inputs!");
+		}
 
-		double dblNextRoot = Bisection (dblX1, dblX2);
+		double nextRoot = Bisection (x1, x2);
 
-		if (!rfop.incrOFCalcs())
-			throw new java.lang.Exception
-				("VariateIteratorPrimitive.MultiFunction => Cannot increment rfop!");
+		if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+			throw new Exception ("VariateIteratorPrimitive::MultiFunction => Cannot increment rfop!");
+		}
 
-		double dblTargetDiff = java.lang.Math.abs (of.evaluate (dblNextRoot) - dblOFTarget);
+		double targetDifference =
+			Math.abs (objectiveFunction.evaluate (nextRoot) - objectiveFunctionValueTarget);
 
 		try {
-			double dblRootSecant = FalsePosition (dblX1, dblX2, dblY1, dblY2);
+			double rootSecant = FalsePosition (x1, x2, y1, y2);
 
-			if (!rfop.incrOFCalcs())
-				throw new java.lang.Exception
-					("VariateIteratorPrimitive.MultiFunction => Cannot increment rfop!");
-
-			double dblTargetDiffSecant = java.lang.Math.abs (of.evaluate (dblRootSecant) - dblOFTarget);
-
-			if (dblTargetDiffSecant < dblTargetDiff) {
-				dblNextRoot = dblRootSecant;
-				dblTargetDiff = dblTargetDiffSecant;
+			if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+				throw new Exception ("VariateIteratorPrimitive::MultiFunction => Cannot increment rfop!");
 			}
-		} catch (java.lang.Exception e) {
-			// e.printStackTrace();
+
+			double targetDifferenceSecant =
+				Math.abs (objectiveFunction.evaluate (rootSecant) - objectiveFunctionValueTarget);
+
+			if (targetDifferenceSecant < targetDifference) {
+				nextRoot = rootSecant;
+				targetDifference = targetDifferenceSecant;
+			}
+		} catch (Exception e) {
 		}
 
 		try {
-			double dblRootQuadraticInterpolation = QuadraticInterpolation (dblX1, dblX2, dblX3, dblY1, dblY2,
-				dblY3);
+			double rootQuadraticInterpolation = QuadraticInterpolation (x1, x2, x3, y1, y2, y3);
 
-			if (!rfop.incrOFCalcs())
-				throw new java.lang.Exception
-					("VariateIteratorPrimitive.MultiFunction => Cannot increment rfop!");
-
-			double dblTargetDiffQuadraticInterpolation = java.lang.Math.abs (of.evaluate
-				(dblRootQuadraticInterpolation) - dblOFTarget);
-
-			if (dblTargetDiffQuadraticInterpolation < dblTargetDiff) {
-				dblNextRoot = dblRootQuadraticInterpolation;
-				dblTargetDiff = dblTargetDiffQuadraticInterpolation;
+			if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+				throw new Exception ("VariateIteratorPrimitive::MultiFunction => Cannot increment rfop!");
 			}
-		} catch (java.lang.Exception e) {
-			// e.printStackTrace();
+
+			double targetDifferenceQuadraticInterpolation = Math.abs (
+				objectiveFunction.evaluate (rootQuadraticInterpolation) - objectiveFunctionValueTarget
+			);
+
+			if (targetDifferenceQuadraticInterpolation < targetDifference) {
+				nextRoot = rootQuadraticInterpolation;
+				targetDifference = targetDifferenceQuadraticInterpolation;
+			}
+		} catch (Exception e) {
 		}
 
 		try {
-			double dblRootInverseQuadraticInterpolation = QuadraticInterpolation (dblX1, dblX2, dblX3, dblY1,
-				dblY2, dblY3);
+			double rootInverseQuadraticInterpolation = QuadraticInterpolation (x1, x2, x3, y1, y2, y3);
 
-			if (!rfop.incrOFCalcs())
-				throw new java.lang.Exception
-					("VariateIteratorPrimitive.MultiFunction => Cannot increment rfop!");
-
-			double dblTargetDiffInverseQuadraticInterpolation = java.lang.Math.abs (of.evaluate
-				(dblRootInverseQuadraticInterpolation) - dblOFTarget);
-
-			if (dblTargetDiffInverseQuadraticInterpolation < dblTargetDiff) {
-				dblNextRoot = dblRootInverseQuadraticInterpolation;
-				dblTargetDiff = dblTargetDiffInverseQuadraticInterpolation;
+			if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+				throw new Exception ("VariateIteratorPrimitive::MultiFunction => Cannot increment rfop!");
 			}
-		} catch (java.lang.Exception e) {
-			// e.printStackTrace();
+
+			double targetDifferenceInverseQuadraticInterpolation = Math.abs (
+				objectiveFunction.evaluate (rootInverseQuadraticInterpolation) - objectiveFunctionValueTarget
+			);
+
+			if (targetDifferenceInverseQuadraticInterpolation < targetDifference) {
+				nextRoot = rootInverseQuadraticInterpolation;
+				targetDifference = targetDifferenceInverseQuadraticInterpolation;
+			}
+		} catch (Exception e) {
 		}
 
 		try {
-			double dblRootRidder = Ridder (dblX1, dblX2, dblX3, dblY1, dblY2, dblY3);
+			double rootRidder = Ridder (x1, x2, x3, y1, y2, y3);
 
-			if (!rfop.incrOFCalcs())
-				throw new java.lang.Exception
-					("VariateIteratorPrimitive.MultiFunction => Cannot increment rfop!");
-
-			double dblTargetDiffRidder = java.lang.Math.abs (of.evaluate (dblRootRidder) - dblOFTarget);
-
-			if (dblTargetDiffRidder < dblTargetDiff) {
-				dblNextRoot = dblRootRidder;
-				dblTargetDiff = dblTargetDiffRidder;
+			if (!fixedPointFinderOutput.incrementObjectiveFunctionCalculations()) {
+				throw new Exception ("VariateIteratorPrimitive::MultiFunction => Cannot increment rfop!");
 			}
-		} catch (java.lang.Exception e) {
-			// e.printStackTrace();
+
+			double targetDifferenceRidder =
+				Math.abs (objectiveFunction.evaluate (rootRidder) - objectiveFunctionValueTarget);
+
+			if (targetDifferenceRidder < targetDifference) {
+				nextRoot = rootRidder;
+				targetDifference = targetDifferenceRidder;
+			}
+		} catch (Exception e) {
 		}
 
-		return dblNextRoot;
+		return nextRoot;
 	}
 }

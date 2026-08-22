@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -102,43 +110,42 @@ import org.drip.service.env.EnvManager;
  * 	- Brent's method
  * 	- Zheng's method
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/numerical/README.md">Search, Quadratures, Fourier Phase Tracker</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixedPointSearch {
-
-	/*
-	 * Sample illustrating the Invocation of the Newton-Raphson Open Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class FixedPointSearch
+{
 
 	private static final void InvokeNewton (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderNewton (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderNewton (
 				0.,
-				func,
+				function,
 				true
 			).findRoot();
 
 			System.out.println ("--------\nNEWTON START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nNEWTON FINISH\n-------\n");
 		} catch (Exception e) {
@@ -146,19 +153,13 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the Bisection Bracketing Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeBisection (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderBracketing (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
 				0.,
-				func,
+				function,
 				null,
 				VariateIteratorPrimitive.BISECTION,
 				true
@@ -166,12 +167,15 @@ public class FixedPointSearch {
 
 			System.out.println ("--------\nBISECTION START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nBISECTION FINISH\n-------\n");
 		} catch (Exception e) {
@@ -179,19 +183,13 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the False Position Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeFalsePosition (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderBracketing (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
 				0.,
-				func,
+				function,
 				null,
 				VariateIteratorPrimitive.FALSE_POSITION,
 				true
@@ -199,12 +197,15 @@ public class FixedPointSearch {
 
 			System.out.println ("--------\nFALSE POSITION START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nFALSE POSITION FINISH\n-------\n");
 		} catch (Exception e) {
@@ -212,19 +213,13 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the Quadratic Interpolation Bracketing Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeQuadraticInterpolation (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderBracketing (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
 				0.,
-				func,
+				function,
 				null,
 				VariateIteratorPrimitive.QUADRATIC_INTERPOLATION,
 				true
@@ -232,10 +227,12 @@ public class FixedPointSearch {
 
 			System.out.println ("--------\nQUADRATIC INTERPOLATION START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
+				System.out.println (fixedPointFinderOutput.displayString());
 			} else
 				System.out.println ("Root searched failed!");
 
@@ -245,19 +242,13 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the Inverse Quadratic Interpolation Bracketing Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeInverseQuadraticInterpolation (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderBracketing (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
 				0.,
-				func,
+				function,
 				null,
 				VariateIteratorPrimitive.INVERSE_QUADRATIC_INTERPOLATION,
 				true
@@ -265,12 +256,15 @@ public class FixedPointSearch {
 
 			System.out.println ("--------\nINVERSE QUADRATIC INTERPOLATION START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nINVERSE QUADRATIC INTERPOLATION FINISH\n-------\n");
 		} catch (Exception e) {
@@ -278,19 +272,13 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the Ridder Bracketing Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeRidder (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderBracketing (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
 				0.,
-				func,
+				function,
 				null,
 				VariateIteratorPrimitive.RIDDER,
 				true
@@ -298,12 +286,15 @@ public class FixedPointSearch {
 
 			System.out.println ("--------\nRIDDER START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nRIDDER FINISH\n-------\n");
 		} catch (Exception e) {
@@ -311,30 +302,27 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the Brent's Bracketing Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeBrent (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderBrent (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBrent (
 				0.,
-				func,
+				function,
 				true
 			).findRoot();
 
 			System.out.println ("--------\nBRENT START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nBRENT FINISH\n-------\n");
 		} catch (Exception e) {
@@ -342,30 +330,27 @@ public class FixedPointSearch {
 		}
 	}
 
-	/*
-	 * Sample illustrating the Invocation of the Zheng's Bracketing Method
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void InvokeZheng (
-		final R1ToR1 func)
+		final R1ToR1 function)
 	{
 		try {
-			FixedPointFinderOutput fpop = new FixedPointFinderZheng (
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderZheng (
 				0.,
-				func,
+				function,
 				true
 			).findRoot();
 
 			System.out.println ("--------\nZHENG START\n-------");
 
-			if (null != fpop && fpop.containsRoot()) {
-				System.out.println ("Root: " + FormatUtil.FormatDouble (fpop.getRoot(), 1, 4, 1.));
+			if (null != fixedPointFinderOutput && fixedPointFinderOutput.containsRoot()) {
+				System.out.println (
+					"Root: " + FormatUtil.FormatDouble (fixedPointFinderOutput.root(), 1, 4, 1.)
+				);
 
-				System.out.println (fpop.displayString());
-			} else
+				System.out.println (fixedPointFinderOutput.displayString());
+			} else {
 				System.out.println ("Root searched failed!");
+			}
 
 			System.out.println ("--------\nZHENG FINISH\n-------\n");
 		} catch (Exception e) {
@@ -376,69 +361,48 @@ public class FixedPointSearch {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		/*
-		 * Define and implement the objective function
-		 */
-
-		R1ToR1 func = new R1ToR1 (null) {
+		R1ToR1 function = new R1ToR1 (null)
+		{
 			@Override public double evaluate (
-				final double dblVariate)
+				final double variate)
 				throws Exception
 			{
-				return Math.cos (dblVariate) - dblVariate * dblVariate * dblVariate;
-
-				/* return dblVariate * dblVariate * dblVariate - 3. * dblVariate * dblVariate + 2. *
-					dblVariate;
-
-				return dblVariate * dblVariate * dblVariate + 4. * dblVariate + 4.;
-
-				return 32. * dblVariate * dblVariate * dblVariate * dblVariate * dblVariate * dblVariate
-					- 48. * dblVariate * dblVariate * dblVariate * dblVariate + 18. * dblVariate *
-						dblVariate - 1.;
-
-				return 1. + 3. * dblVariate - 2. * java.lang.Math.sin (dblVariate); */
+				return Math.cos (variate) - variate * variate * variate;
 			}
 
 			@Override public Differential differential (
-				final double dblVariate,
-				final double dblOFBase,
-				final int iOrder)
+				final double variate,
+				final double objectiveFunctionValue,
+				final int order)
 			{
-				if (0 >= iOrder || 2 < iOrder) return null;
+				if (0 >= order || 2 < order) {
+					return null;
+				}
 
-				double dblVariateInfinitesimal = Double.NaN;
+				double variateInfinitesimal = Double.NaN;
 
 				try {
-					dblVariateInfinitesimal = _dc.getVariateInfinitesimal (dblVariate);
+					variateInfinitesimal = _dc.getVariateInfinitesimal (variate);
 				} catch (Exception e) {
 					e.printStackTrace();
 
 					return null;
 				}
 
-				if (1 != iOrder) {
+				if (1 != order) {
 					try {
-						return new Differential (dblVariateInfinitesimal, (-1. * Math.cos (dblVariate) - 6. * dblVariate)
-							* dblVariateInfinitesimal);
-
-						/* return new Differential (dblVariateInfinitesimal, (6. * dblVariate - 6.) * dblVariateInfinitesimal);
-
-						return new Differential (dblVariateInfinitesimal, (6. * dblVariate) * dblVariateInfinitesimal);
-
-						return new Differential (dblVariateInfinitesimal, (960. * dblVariate * dblVariate * dblVariate *
-						 	dblVariate - 576. * dblVariate * dblVariate + 36.) * dblVariateInfinitesimal);
-
-						return new Differential (dblVariateInfinitesimal, (2. * Math.sin (dblVariate)) * dblVariateInfinitesimal); */
+						return new Differential (
+							variateInfinitesimal,
+							(-1. * Math.cos (variate) - 6. * variate) * variateInfinitesimal
+						);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -447,18 +411,10 @@ public class FixedPointSearch {
 				}
 
 				try {
-					return new Differential (dblVariateInfinitesimal, (-1. * Math.sin (dblVariate) - 3. * dblVariate * dblVariate) *
-				 		dblVariateInfinitesimal);
-
-					/* return new Differential (dblVariateInfinitesimal, (3. * dblVariate * dblVariate - 6. * dblVariate + 2.) *
-					 	dblVariateInfinitesimal);
-
-					return new Differential (dblVariateInfinitesimal, (3. * dblVariate * dblVariate + 4.) * dblVariateInfinitesimal);
-
-					return new Differential (dblVariateInfinitesimal, (192. * dblVariate * dblVariate * dblVariate * dblVariate *
-						dblVariate - 192. * dblVariate * dblVariate * dblVariate + 36. * dblVariate) * dblVariateInfinitesimal);
-
-					return new Differential (dblVariateInfinitesimal, (3. - 2. * Math.cos (dblVariate)) * dblVariateInfinitesimal); */
+					return new Differential (
+						variateInfinitesimal,
+						(-1. * Math.sin (variate) - 3. * variate * variate) * variateInfinitesimal
+					);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -467,29 +423,29 @@ public class FixedPointSearch {
 			}
 
 			@Override public double integrate (
-				final double dblBegin,
-				final double dblEnd)
+				final double begin,
+				final double end)
 				throws Exception
 			{
-				return Integrator.Boole (this, dblBegin, dblEnd);
+				return Integrator.Boole (this, begin, end);
 			}
 		};
 
-		InvokeNewton (func);
+		InvokeNewton (function);
 
-		InvokeBisection (func);
+		InvokeBisection (function);
 
-		InvokeFalsePosition (func);
+		InvokeFalsePosition (function);
 
-		InvokeQuadraticInterpolation (func);
+		InvokeQuadraticInterpolation (function);
 
-		InvokeInverseQuadraticInterpolation (func);
+		InvokeInverseQuadraticInterpolation (function);
 
-		InvokeRidder (func);
+		InvokeRidder (function);
 
-		InvokeBrent (func);
+		InvokeBrent (function);
 
-		InvokeZheng (func);
+		InvokeZheng (function);
 
 		EnvManager.TerminateEnv();
 	}

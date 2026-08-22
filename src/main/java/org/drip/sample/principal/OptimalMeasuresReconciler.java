@@ -17,6 +17,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -117,60 +125,62 @@ import org.drip.service.env.EnvManager;
  *  	</li>
  *  </ul>
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/principal/README.md">Information Ratio Based Principal Trading</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/principal/README.md">Information Ratio Based Principal Trading</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class OptimalMeasuresReconciler {
+public class OptimalMeasuresReconciler
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double dblS0 = 50.;
-		double dblDailyVolume = 1000000.;
-		double dblBidAskSpread = 0.;
-		double dblPermanentImpactFactor = 0.;
-		double dblTemporaryImpactFactor = 0.01;
-		double dblDailyVolumeExecutionFactor = 0.1;
-		double dblDrift = 0.;
-		double dblVolatility = 1.;
-		double dblSerialCorrelation = 0.;
-		double dblX = 100000.;
-		double dblFinishTime = 1.;
-		double dblLambda = 5.e-06;
+		double s0 = 50.;
+		double drift = 0.;
+		double x = 100000.;
+		double finishTime = 1.;
+		double volatility = 1.;
+		double lambda = 5.e-06;
+		double bidAskSpread = 0.;
+		double dailyVolume = 1000000.;
+		double serialCorrelation = 0.;
+		double permanentImpactFactor = 0.;
+		double temporaryImpactFactor = 0.01;
+		double dailyVolumeExecutionFactor = 0.1;
 
-		double[] adblK = new double[] {
+		double[] kArray =
+		{
 			0.5,
 			1.0,
 			2.0
 		};
 
-		double[][] aadblOptimalHorizonDependenceReconciler = new double[][] {
+		double[][] optimalHorizonDependenceReconcilerGrid = new double[][] {
 			{0.810, 2.0, 1.0, 0.0, -2.0},
 			{1.000, 1.0, 1.0, 0.0, -1.0},
 			{1.134, 0.5, 1.0, 0.0, -0.5}
 		};
 
-		double[][] aadblOptimalInformationRatioDependenceReconciler = new double[][] {
+		double[][] optimalInformationRatioDependenceReconcilerGrid = new double[][] {
 			{1.063, -2.0, -1.0, -1.0, 3.0},
 			{0.707, -1.0, -1.0, -1.0, 2.0},
 			{0.449, -0.5, -1.0, -1.0, 1.5}
@@ -184,49 +194,63 @@ public class OptimalMeasuresReconciler {
 
 		System.out.println ("\t|-----------------------------------------------------||");
 
-		for (double dblK : adblK) {
-			PriceMarketImpactPower pmip = new PriceMarketImpactPower (
-				new AssetTransactionSettings (
-					dblS0,
-					dblDailyVolume,
-					dblBidAskSpread
-				),
-				dblPermanentImpactFactor,
-				dblTemporaryImpactFactor,
-				dblDailyVolumeExecutionFactor,
-				dblK
+		for (double k : kArray) {
+			PriceMarketImpactPower priceMarketImpactPower = new PriceMarketImpactPower (
+				new AssetTransactionSettings (s0, dailyVolume, bidAskSpread),
+				permanentImpactFactor,
+				temporaryImpactFactor,
+				dailyVolumeExecutionFactor,
+				k
 			);
 
-			LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
-				new ArithmeticPriceDynamicsSettings (
-					dblDrift,
-					new Flat (dblVolatility),
-					dblSerialCorrelation
-				),
-				new UniformParticipationRateLinear ((ParticipationRateLinear) pmip.permanentTransactionFunction()),
-				new UniformParticipationRate ((ParticipationRatePower) pmip.temporaryTransactionFunction())
-			);
+			LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+				ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
+					new ArithmeticPriceDynamicsSettings (drift, new Flat (volatility), serialCorrelation),
+					new UniformParticipationRateLinear (
+						(ParticipationRateLinear) priceMarketImpactPower.permanentTransactionFunction()
+					),
+					new UniformParticipationRate (
+						(ParticipationRatePower) priceMarketImpactPower.temporaryTransactionFunction()
+					)
+				);
 
-			Almgren2003Estimator a2003e = new Almgren2003Estimator (
+			OptimalMeasureDependence optimalMeasureDependence = new Almgren2003Estimator (
 				(PowerImpactContinuous) ContinuousPowerImpact.Standard (
-					dblX,
-					dblFinishTime,
-					lpep,
-					dblLambda
+					x,
+					finishTime,
+					linearPermanentExpectationParameters,
+					lambda
 				).generate(),
-				lpep
-			);
-
-			OptimalMeasureDependence omd = a2003e.optimalMeasures().omdHorizon();
+				linearPermanentExpectationParameters
+			).optimalMeasures().omdHorizon();
 
 			System.out.println (
-				"\t| " +
-				FormatUtil.FormatDouble (dblK, 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.constant(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.liquidityExponent(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.blockSizeExponent(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.volatilityExponent(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.adjustedPrincipalDiscountExponent(), 1, 3, 1.) + " ||"
+				"\t| " + FormatUtil.FormatDouble (k, 1, 3, 1.) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.constant(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.liquidityExponent(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.blockSizeExponent(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.volatilityExponent(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.adjustedPrincipalDiscountExponent(),
+					1,
+					3,
+					1.
+				) + " ||"
 			);
 		}
 
@@ -234,16 +258,16 @@ public class OptimalMeasuresReconciler {
 
 		System.out.println ("\t|-----------------------------------------------------||");
 
-		for (int i = 0; i < adblK.length; ++i)
+		for (int i = 0; i < kArray.length; ++i) {
 			System.out.println (
-				"\t| " +
-				FormatUtil.FormatDouble (adblK[i], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalHorizonDependenceReconciler[i][0], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalHorizonDependenceReconciler[i][1], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalHorizonDependenceReconciler[i][2], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalHorizonDependenceReconciler[i][3], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalHorizonDependenceReconciler[i][4], 1, 3, 1.) + " ||"
+				"\t| " + FormatUtil.FormatDouble (kArray[i], 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (optimalHorizonDependenceReconcilerGrid[i][0], 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (optimalHorizonDependenceReconcilerGrid[i][1], 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (optimalHorizonDependenceReconcilerGrid[i][2], 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (optimalHorizonDependenceReconcilerGrid[i][3], 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (optimalHorizonDependenceReconcilerGrid[i][4], 1, 3, 1.) + " ||"
 			);
+		}
 
 		System.out.println ("\t|-----------------------------------------------------||");
 
@@ -255,49 +279,63 @@ public class OptimalMeasuresReconciler {
 
 		System.out.println ("\t|-----------------------------------------------------||");
 
-		for (double dblK : adblK) {
-			PriceMarketImpactPower pmip = new PriceMarketImpactPower (
-				new AssetTransactionSettings (
-					dblS0,
-					dblDailyVolume,
-					dblBidAskSpread
-				),
-				dblPermanentImpactFactor,
-				dblTemporaryImpactFactor,
-				dblDailyVolumeExecutionFactor,
-				dblK
+		for (double k : kArray) {
+			PriceMarketImpactPower priceMarketImpactPower = new PriceMarketImpactPower (
+				new AssetTransactionSettings (s0, dailyVolume, bidAskSpread),
+				permanentImpactFactor,
+				temporaryImpactFactor,
+				dailyVolumeExecutionFactor,
+				k
 			);
 
-			LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
-				new ArithmeticPriceDynamicsSettings (
-					dblDrift,
-					new Flat (dblVolatility),
-					dblSerialCorrelation
-				),
-				new UniformParticipationRateLinear ((ParticipationRateLinear) pmip.permanentTransactionFunction()),
-				new UniformParticipationRate ((ParticipationRatePower) pmip.temporaryTransactionFunction())
-			);
+			LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+				ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
+					new ArithmeticPriceDynamicsSettings (drift, new Flat (volatility), serialCorrelation),
+					new UniformParticipationRateLinear (
+						(ParticipationRateLinear) priceMarketImpactPower.permanentTransactionFunction()
+					),
+					new UniformParticipationRate (
+						(ParticipationRatePower) priceMarketImpactPower.temporaryTransactionFunction()
+					)
+				);
 
-			Almgren2003Estimator a2003e = new Almgren2003Estimator (
+			OptimalMeasureDependence optimalMeasureDependence = new Almgren2003Estimator (
 				(PowerImpactContinuous) ContinuousPowerImpact.Standard (
-					dblX,
-					dblFinishTime,
-					lpep,
-					dblLambda
+					x,
+					finishTime,
+					linearPermanentExpectationParameters,
+					lambda
 				).generate(),
-				lpep
-			);
-
-			OptimalMeasureDependence omd = a2003e.optimalMeasures().omdInformationRatio();
+				linearPermanentExpectationParameters
+			).optimalMeasures().omdInformationRatio();
 
 			System.out.println (
-				"\t| " +
-				FormatUtil.FormatDouble (dblK, 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.constant(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.liquidityExponent(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.blockSizeExponent(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.volatilityExponent(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (omd.adjustedPrincipalDiscountExponent(), 1, 3, 1.) + " ||"
+				"\t| " + FormatUtil.FormatDouble (k, 1, 3, 1.) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.constant(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.liquidityExponent(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.blockSizeExponent(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.volatilityExponent(),
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalMeasureDependence.adjustedPrincipalDiscountExponent(),
+					1,
+					3,
+					1.
+				) + " ||"
 			);
 		}
 
@@ -305,16 +343,36 @@ public class OptimalMeasuresReconciler {
 
 		System.out.println ("\t|-----------------------------------------------------||");
 
-		for (int i = 0; i < adblK.length; ++i)
+		for (int i = 0; i < kArray.length; ++i) {
 			System.out.println (
-				"\t| " +
-				FormatUtil.FormatDouble (adblK[i], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalInformationRatioDependenceReconciler[i][0], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalInformationRatioDependenceReconciler[i][1], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalInformationRatioDependenceReconciler[i][2], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalInformationRatioDependenceReconciler[i][3], 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (aadblOptimalInformationRatioDependenceReconciler[i][4], 1, 3, 1.) + " ||"
+				"\t| " + FormatUtil.FormatDouble (kArray[i], 1, 3, 1.) + " | " + FormatUtil.FormatDouble (
+					optimalInformationRatioDependenceReconcilerGrid[i][0],
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalInformationRatioDependenceReconcilerGrid[i][1],
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalInformationRatioDependenceReconcilerGrid[i][2],
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalInformationRatioDependenceReconcilerGrid[i][3],
+					1,
+					3,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalInformationRatioDependenceReconcilerGrid[i][4],
+					1,
+					3,
+					1.
+				) + " ||"
 			);
+		}
 
 		System.out.println ("\t|-----------------------------------------------------||");
 

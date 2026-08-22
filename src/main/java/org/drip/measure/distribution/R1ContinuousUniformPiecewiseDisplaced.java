@@ -405,7 +405,7 @@ public class R1ContinuousUniformPiecewiseDisplaced
 			throw new Exception ("R1ContinuousUniformPiecewiseDisplaced::invCumulative => No roots");
 		}
 
-		return fixedPointFinderOutput.getRoot();
+		return fixedPointFinderOutput.root();
 	}
 
 	/**

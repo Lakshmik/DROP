@@ -17849,7 +17849,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				throw new java.lang.Exception
 					("BondComponent::BondCalibrator::calibrateYieldFromPrice => Cannot get root!");
 
-			return rfop.getRoot();
+			return rfop.root();
 		}
 
 		/**
@@ -17907,7 +17907,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 
 			if (null == rfop || !rfop.containsRoot())
 				rfop = new org.drip.function.r1tor1solver.FixedPointFinderBracketing (0., ofZSpreadToPrice,
-					new org.drip.function.r1tor1solver.ExecutionControl (ofZSpreadToPrice, new
+					new org.drip.function.r1tor1solver.ExecutionControl (new
 						org.drip.function.r1tor1solver.ExecutionControlParams (200, false, 1.e-02, 1.e-02,
 							1.e-01, 1.e-01)),
 								org.drip.function.r1tor1solver.VariateIteratorPrimitive.FALSE_POSITION,
@@ -17917,7 +17917,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				throw new java.lang.Exception
 					("BondComponent::BondCalibrator::calibrateZSpreadFromPrice => Cannot get root!");
 
-			return rfop.getRoot();
+			return rfop.root();
 		}
 
 		/**
@@ -17978,7 +17978,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				throw new java.lang.Exception
 					("BondComponent::BondCalibrator::calibrateOASFromPrice => Cannot get root!");
 
-			return rfop.getRoot();
+			return rfop.root();
 		}
 
 		/**
@@ -18037,7 +18037,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				throw new java.lang.Exception
 					("BondComponent::BondCalibrator::calibDiscCurveSpreadFromPrice => Cannot get root!");
 
-			return rfop.getRoot();
+			return rfop.root();
 		}
 
 		/**
@@ -18098,7 +18098,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				throw new java.lang.Exception
 					("BondComponent.calibZeroCurveSpreadFromPrice => Cannot get root!");
 
-			return rfop.getRoot();
+			return rfop.root();
 		}
 
 		/**
@@ -18157,7 +18157,7 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				throw new java.lang.Exception
 					("BondComponent.calibrateCreditBasisFromPrice => Cannot get root!");
 
-			return rfop.getRoot();
+			return rfop.root();
 		}
 	}
 

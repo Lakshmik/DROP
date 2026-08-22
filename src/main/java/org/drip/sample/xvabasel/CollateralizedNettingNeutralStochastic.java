@@ -349,7 +349,8 @@ public class CollateralizedNettingNeutralStochastic
 		double bankThreshold = -0.1;
 		double counterPartyThreshold = 0.1;
 
-		double[][] correlationMatrix = new double[][] {
+		double[][] correlationMatrix =
+		{
 			{1.00,  0.00,  0.03,  0.07,  0.04,  0.05,  0.08,  0.00,  0.00},  // PORTFOLIO
 			{0.00,  1.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  1.00},  // OVERNIGHT
 			{0.03,  0.00,  1.00,  0.26,  0.33,  0.21,  0.35,  0.13,  0.00},  // CSA

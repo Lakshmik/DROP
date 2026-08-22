@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1solver;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,129 +95,129 @@ package org.drip.function.r1tor1solver;
 
 /**
  * <i>ConvergenceControlParams</i> holds the fields needed for the controlling the execution of Newton's
- * method.
- * <br>
- * ConvergenceControlParams does that using the following parameters:
- * <ul>
- * 	<li>
- * 		The determinant limit below which the convergence zone is deemed to have been reached.
- * 	</li>
- * 	<li>
- * 		Starting variate from where the convergence search is kicked off.
- * 	</li>
- * 	<li>
- * 		The factor by which the variate expands across each iterative search.
- * 	</li>
- * 	<li>
- * 		The number of search iterations.
- * 	</li>
- * </ul>
+ * 	method. <i>ConvergenceControlParams</i> does that using the following parameters:
+ * 	<ul>
+ * 		<li> The determinant limit below which the convergence zone is deemed to have been reached.</li>
+ * 		<li>Starting variate from where the convergence search is kicked off.</li>
+ * 		<li>The factor by which the variate expands across each iterative search.</li>
+ * 		<li>The number of search iterations.</li>
+ * 	</ul>
  *
- *	<br><br>
+ *	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></li>
+ * 		<li>Default Convergence Control Parameters Constructor</li>
+ * 		<li><i>ConvergenceControlParams</i> Constructor</li>
+ * 		<li>Return the Number of Fixed Point Convergence Iterations</li>
+ * 		<li>Return the Limit of the Fixed point Convergence Zone Edge</li>
+ * 		<li>Return the Start of the Fixed Point Convergence Variate</li>
+ * 		<li>Return the Bump Factor for the Fixed Point Convergence Variate Iteration</li>
  *  </ul>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1solver/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Solvers</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ConvergenceControlParams {
+public class ConvergenceControlParams
+{
+
 	/*
 	 * Convergence Zone Locator Determination
 	 */
 
-	private int _iFixedPointConvergenceIterations = 0;
-	private double _dblConvergenceZoneEdgeLimit = java.lang.Double.NaN;
-	private double _dblConvergenceZoneVariateBegin = java.lang.Double.NaN;
-	private double _dblConvergenceZoneVariateBumpFactor = java.lang.Double.NaN;
+	private int _fixedPointIterations = 0;
+	private double _zoneEdgeLimit = Double.NaN;
+	private double _zoneVariateBegin = Double.NaN;
+	private double _zoneVariateBumpFactor = Double.NaN;
 
 	/**
-	 * Default Convergence Control Parameters constructor
+	 * Default Convergence Control Parameters Constructor
 	 */
 
 	public ConvergenceControlParams()
 	{
-		/*
-		 * Convergence Zone Locator Determination Initialization
-		 */
-
-		_iFixedPointConvergenceIterations = 100;
-		_dblConvergenceZoneEdgeLimit = 0.01;
-		_dblConvergenceZoneVariateBegin = 1.0e-30;
-		_dblConvergenceZoneVariateBumpFactor = 3.;
+		_zoneEdgeLimit = 0.01;
+		_zoneVariateBegin = 1.e-30;
+		_fixedPointIterations = 100;
+		_zoneVariateBumpFactor = 3.;
 	}
 
 	/**
-	 * ConvergenceControlParams constructor
+	 * <i>ConvergenceControlParams</i> Constructor
 	 * 
-	 * @param iFixedPointConvergenceIterations Iterations to locate a variate inside the convergence zone
-	 * @param dblConvergenceZoneVariateBegin Starting variate for convergence zone determination
-	 * @param dblConvergenceZoneEdgeLimit Convergence zone edge limit
-	 * @param dblConvergenceZoneVariateBumpFactor Convergence Zone Variate Bump Factor
+	 * @param fixedPointIterations Iterations to locate a variate inside the convergence zone
+	 * @param zoneVariateBegin Starting variate for convergence zone determination
+	 * @param zoneEdgeLimit Convergence zone edge limit
+	 * @param zoneVariateBumpFactor Convergence Zone Variate Bump Factor
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public ConvergenceControlParams (
-		final int iFixedPointConvergenceIterations,
-		final double dblConvergenceZoneVariateBegin,
-		final double dblConvergenceZoneEdgeLimit,
-		final double dblConvergenceZoneVariateBumpFactor)
-		throws java.lang.Exception
+		final int fixedPointIterations,
+		final double zoneVariateBegin,
+		final double zoneEdgeLimit,
+		final double zoneVariateBumpFactor)
+		throws Exception
 	{
-		if (0 >= (_iFixedPointConvergenceIterations = iFixedPointConvergenceIterations) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblConvergenceZoneVariateBegin =
-				dblConvergenceZoneVariateBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-					(_dblConvergenceZoneEdgeLimit = dblConvergenceZoneEdgeLimit) ||
-						!org.drip.numerical.common.NumberUtil.IsValid (_dblConvergenceZoneVariateBumpFactor =
-							dblConvergenceZoneVariateBumpFactor))
-			throw new java.lang.Exception ("ConvergenceControlParams constructor: Invalid inputs");
+		if (0 >= (_fixedPointIterations = fixedPointIterations) ||
+			!NumberUtil.IsValid (_zoneVariateBegin = zoneVariateBegin) ||
+			!NumberUtil.IsValid (_zoneEdgeLimit = zoneEdgeLimit) ||
+			!NumberUtil.IsValid (_zoneVariateBumpFactor = zoneVariateBumpFactor))
+		{
+			throw new Exception ("ConvergenceControlParams Constructor: Invalid inputs");
+		}
 	}
 
 	/**
-	 * Return the number of fixed point convergence iterations
+	 * Return the Number of Fixed Point Convergence Iterations
 	 * 
-	 * @return Number of fixed point convergence iterations
+	 * @return Number of Fixed Point Convergence Iterations
 	 */
 
-	public int getFixedPointConvergenceIterations()
+	public int fixedPointIterations()
 	{
-		return _iFixedPointConvergenceIterations;
+		return _fixedPointIterations;
 	}
 
 	/**
-	 * Return the limit of the fixed point convergence zone edge
+	 * Return the Limit of the Fixed point Convergence Zone Edge
 	 * 
-	 * @return Limit of fixed point convergence zone edge
+	 * @return Limit of Fixed Point Convergence Zone Edge
 	 */
 
-	public double getConvergenceZoneEdgeLimit()
+	public double zoneEdgeLimit()
 	{
-		return _dblConvergenceZoneEdgeLimit;
+		return _zoneEdgeLimit;
 	}
 
 	/**
-	 * Return the start of the fixed point convergence variate
+	 * Return the Start of the Fixed Point Convergence Variate
 	 * 
-	 * @return Start of the fixed point convergence variate
+	 * @return Start of the Fixed Point Convergence Variate
 	 */
 
-	public double getConvergenceZoneVariateBegin()
+	public double zoneVariateBegin()
 	{
-		return _dblConvergenceZoneVariateBegin;
+		return _zoneVariateBegin;
 	}
 
 	/**
-	 * Return the bump factor for the fixed point convergence variate iteration
+	 * Return the Bump Factor for the Fixed Point Convergence Variate Iteration
 	 * 
-	 * @return Bump factor for the fixed point convergence variate iteration
+	 * @return Bump Factor for the Fixed Point Convergence Variate Iteration
 	 */
 
-	public double getConvergenceZoneVariateBumpFactor()
+	public double zoneVariateBumpFactor()
 	{
-		return _dblConvergenceZoneVariateBumpFactor;
+		return _zoneVariateBumpFactor;
 	}
 }

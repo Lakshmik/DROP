@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,29 +97,32 @@ import org.drip.service.env.EnvManager;
  * <i>OvernightJurisdictionIndexDefinition</i> demonstrates the functionality to retrieve the Overnight Index
  *  Settings across the various Jurisdictions.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/ois/README.md">Index/Fund OIS Curve Reconcilation</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/ois/README.md">Index/Fund OIS Curve Reconciliation</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class OvernightJurisdictionIndexDefinition {
+public class OvernightJurisdictionIndexDefinition
+{
+
 	private static final String AccrualType (
 		final int iAccrualCompounding)
 	{
-		return CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_ARITHMETIC == iAccrualCompounding ? "ARITHMETIC" : " GEOMETRIC";
+		return CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_ARITHMETIC == iAccrualCompounding ?
+			"ARITHMETIC" : " GEOMETRIC";
 	}
 
 	private static final void DisplayJurisdictionOvernightSetting (
-		final String strJurisdiction)
+		final String jurisdiction)
 	{
-		OvernightIndex index = OvernightIndexContainer.IndexFromJurisdiction (strJurisdiction);
+		OvernightIndex index = OvernightIndexContainer.IndexFromJurisdiction (jurisdiction);
 
 		System.out.println ("\t[" +
 			index.currency() + "] => " +
@@ -126,11 +137,11 @@ public class OvernightJurisdictionIndexDefinition {
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		String[] args)
+		String[] argumentArray)
 	{
 		EnvManager.InitEnv ("");
 

@@ -18,6 +18,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -119,92 +127,88 @@ import org.drip.service.env.EnvManager;
  *  	</li>
  *  </ul>
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/principal/README.md">Information Ratio Based Principal Trading</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/principal/README.md">Information Ratio Based Principal Trading</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class OptimalTrajectoryMeasures {
+public class OptimalTrajectoryMeasures
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double dblS0 = 50.;
-		double dblX = 100000.;
-		double dblVolatility = 1.;
-		double dblDailyVolume = 1000000.;
-		double dblDailyVolumeExecutionFactor = 0.1;
-		double dblPermanentImpactFactor = 0.;
-		double dblTemporaryImpactFactor = 0.01;
-		double dblT = 5.;
-		int iNumInterval = 20;
-		double dblLambda = 1.e-06;
-		double dblK = 1.;
-		double dblPrincipalDiscount = 0.15;
+		double k = 1.;
+		double t = 5.;
+		double s0 = 50.;
+		double x = 100000.;
+		double lambda = 1.e-06;
+		double volatility = 1.;
+		int numberOfIntervals = 20;
+		double dailyVolume = 1000000.;
+		double principalDiscount = 0.15;
+		double permanentImpactFactor = 0.;
+		double temporaryImpactFactor = 0.01;
+		double dailyVolumeExecutionFactor = 0.1;
 
-		PriceMarketImpactPower pmip = new PriceMarketImpactPower (
-			new AssetTransactionSettings (
-				dblS0,
-				dblDailyVolume,
-				0.
-			),
-			dblPermanentImpactFactor,
-			dblTemporaryImpactFactor,
-			dblDailyVolumeExecutionFactor,
-			dblK
+		PriceMarketImpactPower priceMarketImpactPower = new PriceMarketImpactPower (
+			new AssetTransactionSettings (s0, dailyVolume, 0.),
+			permanentImpactFactor,
+			temporaryImpactFactor,
+			dailyVolumeExecutionFactor,
+			k
 		);
 
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
-			new ArithmeticPriceDynamicsSettings (
-				0.,
-				new Flat (dblVolatility),
-				0.
-			),
-			new UniformParticipationRateLinear ((ParticipationRateLinear) pmip.permanentTransactionFunction()),
-			new UniformParticipationRate ((ParticipationRatePower) pmip.temporaryTransactionFunction())
-		);
+		LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+			ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
+				new ArithmeticPriceDynamicsSettings (0, new Flat (volatility), 0.),
+				new UniformParticipationRateLinear (
+					(ParticipationRateLinear) priceMarketImpactPower.permanentTransactionFunction()
+				),
+				new UniformParticipationRate (
+					(ParticipationRatePower) priceMarketImpactPower.temporaryTransactionFunction()
+				)
+			);
 
-		ContinuousPowerImpact cpi = ContinuousPowerImpact.Standard (
-			dblX,
-			dblT,
-			lpep,
-			dblLambda
-		);
+		PowerImpactContinuous powerImpactContinuous = (PowerImpactContinuous) ContinuousPowerImpact.Standard (
+			x,
+			t,
+			linearPermanentExpectationParameters,
+			lambda
+		).generate();
 
-		PowerImpactContinuous pic = (PowerImpactContinuous) cpi.generate();
+		R1ToR1 holdingsFunction = powerImpactContinuous.holdings();
 
-		R1ToR1 r1ToR1Holdings = pic.holdings();
+		double[] holdingsArray = new double[numberOfIntervals];
+		double[] executionTimeArray = new double[numberOfIntervals];
 
-		double[] adblHoldings = new double[iNumInterval];
-		double[] adblExecutionTime = new double[iNumInterval];
-
-		for (int i = 1; i <= iNumInterval; ++i) {
-			adblExecutionTime[i - 1] = dblT * i / iNumInterval;
-
-			adblHoldings[i - 1] = r1ToR1Holdings.evaluate (adblExecutionTime[i - 1]);
+		for (int intervalIndex = 1; intervalIndex <= numberOfIntervals; ++intervalIndex) {
+			holdingsArray[intervalIndex - 1] = holdingsFunction.evaluate (
+				executionTimeArray[intervalIndex - 1] = t * intervalIndex / numberOfIntervals
+			);
 		}
 
-		Almgren2003Estimator a2003e = new Almgren2003Estimator (
-			pic,
-			lpep
+		Almgren2003Estimator almgren2003Estimator = new Almgren2003Estimator (
+			powerImpactContinuous,
+			linearPermanentExpectationParameters
 		);
 
 		System.out.println();
@@ -227,14 +231,22 @@ public class OptimalTrajectoryMeasures {
 
 		System.out.println ("\t|----------------------------------||");
 
-		for (int i = 1; i < adblExecutionTime.length; ++i)
+		for (int executionTimeIndex = 1;
+			executionTimeIndex < executionTimeArray.length;
+			++executionTimeIndex)
+		{
 			System.out.println (
-				"\t| " +
-				FormatUtil.FormatDouble (adblExecutionTime[i], 1, 2, 1.) + " | " +
-				FormatUtil.FormatDouble (adblHoldings[i], 5, 0, 1.) + " | " + 
-				FormatUtil.FormatDouble (adblHoldings[i] - adblHoldings[i - 1], 5, 0, 1.) + " | " + 
-				FormatUtil.FormatDouble (adblHoldings[i] / dblX, 2, 1, 100.) + "% ||"
+				"\t| " + FormatUtil.FormatDouble (executionTimeArray[executionTimeIndex], 1, 2, 1.) + " | " +
+				FormatUtil.FormatDouble (holdingsArray[executionTimeIndex], 5, 0, 1.) + " | " + 
+				FormatUtil.FormatDouble (
+					holdingsArray[executionTimeIndex] - holdingsArray[executionTimeIndex - 1],
+					5,
+					0,
+					1.
+				) + " | " +
+				FormatUtil.FormatDouble (holdingsArray[executionTimeIndex] / x, 2, 1, 100.) + "% ||"
 			);
+		}
 
 		System.out.println ("\t|----------------------------------||");
 
@@ -248,62 +260,91 @@ public class OptimalTrajectoryMeasures {
 
 		System.out.println (
 			"\t| Transaction Cost Expectation ( X 10^-03)                  : " +
-			FormatUtil.FormatDouble (pic.transactionCostExpectation(), 5, 2, 1.e-03) + " ||"
+			FormatUtil.FormatDouble (powerImpactContinuous.transactionCostExpectation(), 5, 2, 1.e-03) +
+			" ||"
 		);
 
 		System.out.println (
 			"\t| Transaction Cost Variance ( X 10^-06)                     : " +
-			FormatUtil.FormatDouble (pic.transactionCostVariance(), 5, 2, 1.e-06) + " ||"
+			FormatUtil.FormatDouble (powerImpactContinuous.transactionCostVariance(), 5, 2, 1.e-06) + " ||"
 		);
 
 		System.out.println (
 			"\t| Characteristic Time                                       : " +
-			FormatUtil.FormatDouble (pic.characteristicTime(), 5, 2, 1.) + " ||"
+			FormatUtil.FormatDouble (powerImpactContinuous.characteristicTime(), 5, 2, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t| Efficient Frontier Hyperboloid Boundary Value ( X 10^-12) : " +
-			FormatUtil.FormatDouble (pic.hyperboloidBoundaryValue(), 5, 2, 1.e-12) + " ||"
+			FormatUtil.FormatDouble (powerImpactContinuous.hyperboloidBoundaryValue(), 5, 2, 1.e-12) + " ||"
 		);
 
 		System.out.println (
 			"\t| Break-even Principal Discount (cents per unit)            : " +
-			FormatUtil.FormatDouble (a2003e.breakevenPrincipalDiscount(), 5, 2, 100.) + " ||"
+			FormatUtil.FormatDouble (almgren2003Estimator.breakevenPrincipalDiscount(), 5, 2, 100.) + " ||"
 		);
 
 		System.out.println (
-			"\t| Gross Profit Expectation                                  : " +
-			FormatUtil.FormatDouble (a2003e.principalMeasure (dblPrincipalDiscount).mean(), 5, 2, 1.) + " ||"
+			"\t| Gross Profit Expectation                                  : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.principalMeasure (principalDiscount).mean(),
+				5,
+				2,
+				1.
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Gross Profit Variance ( X 10^-06)                         : " +
-			FormatUtil.FormatDouble (a2003e.principalMeasure (dblPrincipalDiscount).variance(), 5, 2, 1.e-06) + " ||"
+			"\t| Gross Profit Variance ( X 10^-06)                         : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.principalMeasure (principalDiscount).variance(),
+				5,
+				2,
+				1.e-06
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Gross Returns Expectation                                 : " +
-			FormatUtil.FormatDouble (a2003e.horizonPrincipalMeasure (dblPrincipalDiscount).mean(), 5, 2, 1.) + " ||"
+			"\t| Gross Returns Expectation                                 : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.horizonPrincipalMeasure (principalDiscount).mean(),
+				5,
+				2,
+				1.
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Gross Returns Variance ( X 10^-06)                        : " +
-			FormatUtil.FormatDouble (a2003e.horizonPrincipalMeasure (dblPrincipalDiscount).variance(), 5, 2, 1.e-06) + " ||"
+			"\t| Gross Returns Variance ( X 10^-06)                        : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.horizonPrincipalMeasure (principalDiscount).variance(),
+				5,
+				2,
+				1.e-06
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Information Ratio ( X 10^+03)                             : " +
-			FormatUtil.FormatDouble (a2003e.informationRatio (dblPrincipalDiscount), 5, 2, 1.e+03) + " ||"
+			"\t| Information Ratio ( X 10^+03)                             : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.informationRatio (principalDiscount),
+				5,
+				2,
+				1.e+03
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Optimal Information Ratio ( X 10^+03)                     : " +
-			FormatUtil.FormatDouble (a2003e.optimalInformationRatio (dblPrincipalDiscount), 5, 2, 1.e+03) + " ||"
+			"\t| Optimal Information Ratio ( X 10^+03)                     : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.optimalInformationRatio (principalDiscount),
+				5,
+				2,
+				1.e+03
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Optimal Information Ratio Horizon                         : " +
-			FormatUtil.FormatDouble (a2003e.optimalInformationRatioHorizon (dblPrincipalDiscount), 5, 2, 1.) + " ||"
+			"\t| Optimal Information Ratio Horizon                         : " + FormatUtil.FormatDouble (
+				almgren2003Estimator.optimalInformationRatioHorizon (principalDiscount),
+				5,
+				2,
+				1.
+			) + " ||"
 		);
 
 		System.out.println ("\t|-----------------------------------------------------------------------||");
