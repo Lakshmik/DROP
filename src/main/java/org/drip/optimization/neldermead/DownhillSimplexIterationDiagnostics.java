@@ -1,8 +1,6 @@
 
 package org.drip.optimization.neldermead;
 
-import org.drip.numerical.common.NumberUtil;
-
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -117,10 +115,10 @@ import org.drip.numerical.common.NumberUtil;
 
 public class DownhillSimplexIterationDiagnostics
 {
-	private double[] _centroidVertex = null;
 	private DownhillSimplexVertexes _vertexes = null;
 	private ObjectiveFunctionCoordinate _lowestObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _highestObjectiveFunctionCoordinate = null;
+	private ObjectiveFunctionCoordinate _centroidObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _expandedObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _reflectedObjectiveFunctionCoordinate = null;
 	private ObjectiveFunctionCoordinate _contractedObjectiveFunctionCoordinate = null;
@@ -132,33 +130,34 @@ public class DownhillSimplexIterationDiagnostics
 	}
 
 	/**
-	 * Set the Centroid Vertex
+	 * Set the Centroid <i>ObjectiveFunctionCoordinate</i>
 	 * 
-	 * @param centroidVertex Centroid Vertex
+	 * @param centroidObjectiveFunctionCoordinate Centroid <i>ObjectiveFunctionCoordinate</i>
 	 * 
-	 * @return TRUE - Centroid Vertex successfully set
+	 * @return TRUE - Centroid <i>ObjectiveFunctionCoordinate</i> successfully set
 	 */
 
-	public boolean setCentroidVertex (
-		final double[] centroidVertex)
+	public boolean setCentroidObjectiveFunctionCoordinate (
+		final ObjectiveFunctionCoordinate centroidObjectiveFunctionCoordinate)
 	{
-		if (null == centroidVertex) {
+		if (null == centroidObjectiveFunctionCoordinate) {
 			return false;
 		}
 
-		_centroidVertex = centroidVertex;
+		_centroidObjectiveFunctionCoordinate = centroidObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
 	/**
-	 * Retrieve the Centroid Vertex
+	 * Retrieve the Centroid <i>ObjectiveFunctionCoordinate</i>
 	 * 
-	 * @return Centroid Vertex
+	 * @return Centroid <i>ObjectiveFunctionCoordinate</i>
 	 */
 
-	public double[] centroidVertex()
+	public ObjectiveFunctionCoordinate centroidObjectiveFunctionCoordinate()
 	{
-		return _centroidVertex;
+		return _centroidObjectiveFunctionCoordinate;
 	}
 
 	/**
@@ -176,7 +175,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_highestObjectiveFunctionCoordinate = highestObjectiveFunctionCoordinate;
+		_highestObjectiveFunctionCoordinate = highestObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -206,7 +206,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_reflectedObjectiveFunctionCoordinate = reflectedObjectiveFunctionCoordinate;
+		_reflectedObjectiveFunctionCoordinate = reflectedObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -236,7 +237,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_expandedObjectiveFunctionCoordinate = expandedObjectiveFunctionCoordinate;
+		_expandedObjectiveFunctionCoordinate = expandedObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -267,7 +269,9 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_penultimateHighestObjectiveFunctionCoordinate = penultimateHighestObjectiveFunctionCoordinate;
+		_penultimateHighestObjectiveFunctionCoordinate =
+			penultimateHighestObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -297,7 +301,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_lowestObjectiveFunctionCoordinate = lowestObjectiveFunctionCoordinate;
+		_lowestObjectiveFunctionCoordinate = lowestObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -327,7 +332,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_contractedObjectiveFunctionCoordinate = contractedObjectiveFunctionCoordinate;
+		_contractedObjectiveFunctionCoordinate = contractedObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -357,7 +363,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_shrinkCentroidObjectiveFunctionCoordinate = shrinkCentroidObjectiveFunctionCoordinate;
+		_shrinkCentroidObjectiveFunctionCoordinate = shrinkCentroidObjectiveFunctionCoordinate.clone();
+
 		return true;
 	}
 
@@ -387,7 +394,8 @@ public class DownhillSimplexIterationDiagnostics
 			return false;
 		}
 
-		_vertexes = vertexes;
+		_vertexes = vertexes.clone();
+
 		return true;
 	}
 
@@ -415,8 +423,8 @@ public class DownhillSimplexIterationDiagnostics
 	{
 		String dump = prefix + "{";
 
-		if (null != _centroidVertex) {
-			dump += "(" + NumberUtil.ArrayRow (_centroidVertex, 1, 4, false) + "); ";
+		if (null != _centroidObjectiveFunctionCoordinate) {
+			dump += "(" + _centroidObjectiveFunctionCoordinate + "); ";
 		}
 
 		if (null != _highestObjectiveFunctionCoordinate) {

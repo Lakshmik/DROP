@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.drip.dynamics.kwf1993.KalotayWilliamsFabozzi;
-import org.drip.dynamics.kwf1993.KalotayWilliamsFabozziMarket;
-import org.drip.dynamics.kwf1993.KalotayWilliamsFabozziPeriodState;
-import org.drip.dynamics.kwf1993.KalotayWilliamsFabozziTree;
-import org.drip.dynamics.kwf1993.ProxyBond;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
+import org.drip.state.municipal.KalotayWilliamsFabozzi;
+import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.ProxyBond;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -133,29 +131,31 @@ import org.drip.service.env.EnvManager;
 public class FigureC
 {
 
-	private static final TreeMap<Double, Double> BondMarketYieldMapInput()
+	private static final TreeMap<Double, Double> TimeToCalibrationYieldMap()
 	{
-		TreeMap<Double, Double> bondMarketYieldMapInput = new TreeMap<Double, Double>();
+		TreeMap<Double, Double> timeToCalibrationYieldMap = new TreeMap<Double, Double>();
 
-		bondMarketYieldMapInput.put (1., 0.0350);
+		timeToCalibrationYieldMap.put (1., 0.03500);
 
-		bondMarketYieldMapInput.put (2., 0.0401);
+		timeToCalibrationYieldMap.put (2., 0.04010);
 
-		return bondMarketYieldMapInput;
+		timeToCalibrationYieldMap.put (3., 0.04531);
+
+		return timeToCalibrationYieldMap;
 	}
 
-	private static final TreeMap<Double, Double> ProjectedBaseForwardYieldMapInput()
+	private static final TreeMap<Double, Double> TimeToProjectedBaseForwardYieldMapInput()
 	{
-		TreeMap<Double, Double> projectedBaseForwardYieldMapInput = new TreeMap<Double, Double>();
+		TreeMap<Double, Double> timeToProjectedBaseForwardYieldMapInput = new TreeMap<Double, Double>();
 
-		projectedBaseForwardYieldMapInput.put (2., 0.045);
+		timeToProjectedBaseForwardYieldMapInput.put (2., 0.045);
 
-		return projectedBaseForwardYieldMapInput;
+		return timeToProjectedBaseForwardYieldMapInput;
 	}
 
-	private static final Map<Double, List<Double>> ProjectedForwardYieldListMapReconciliation()
+	private static final Map<Double, List<Double>> TimeToProjectedForwardYieldListMapReconciler()
 	{
-		Map<Double, List<Double>> projectedForwardYieldListMap = new TreeMap<Double, List<Double>>();
+		Map<Double, List<Double>> timeToProjectedForwardYieldListMap = new TreeMap<Double, List<Double>>();
 
 		List<Double> projected1YForwardYieldList = new ArrayList<Double>();
 
@@ -163,9 +163,9 @@ public class FigureC
 
 		projected1YForwardYieldList.add (0.05496);
 
-		projectedForwardYieldListMap.put (2., projected1YForwardYieldList);
+		timeToProjectedForwardYieldListMap.put (2., projected1YForwardYieldList);
 
-		return projectedForwardYieldListMap;
+		return timeToProjectedForwardYieldListMap;
 	}
 
 	private static final Map<Double, List<Double>> ProjectedBulletBondValueListMapReconciler()
@@ -176,7 +176,7 @@ public class FigureC
 
 		projected1YBulletBondValueList.add (99.567);
 
-		projectedBulletBondValueListMap.put (1., projected1YBulletBondValueList);
+		projectedBulletBondValueListMap.put (0., projected1YBulletBondValueList);
 
 		List<Double> projected2YBulletBondValueList = new ArrayList<Double>();
 
@@ -184,7 +184,7 @@ public class FigureC
 
 		projected2YBulletBondValueList.add (98.582);
 
-		projectedBulletBondValueListMap.put (2., projected2YBulletBondValueList);
+		projectedBulletBondValueListMap.put (1., projected2YBulletBondValueList);
 
 		return projectedBulletBondValueListMap;
 	}
@@ -207,21 +207,23 @@ public class FigureC
 		double bondMaturityTime = 2.;
 		double annualizedForwardVolatility = 0.1;
 
-		KalotayWilliamsFabozziMarket kalotayWilliamsFabozziMarket =
-			new KalotayWilliamsFabozziMarket (BondMarketYieldMapInput(), annualizedForwardVolatility);
+		TreeMap<Double, Double> timeToProjectedBaseForwardYieldMapInput =
+			TimeToProjectedBaseForwardYieldMapInput();
 
-		TreeMap<Double, Double> projectedBaseForwardYieldMapInput = ProjectedBaseForwardYieldMapInput();
+		Map<Double, List<Double>> timeToProjectedForwardYieldListMapReconciler =
+			TimeToProjectedForwardYieldListMapReconciler();
 
-		Map<Double, List<Double>> projectedForwardYieldListMapReconciliation =
-			ProjectedForwardYieldListMapReconciliation();
-
-		KalotayWilliamsFabozziTree kalotayWilliamsFabozziTree = new KalotayWilliamsFabozzi().tree (
-			kalotayWilliamsFabozziMarket,
-			projectedBaseForwardYieldMapInput
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi (
+			TimeToCalibrationYieldMap()
 		);
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeProjectedPeriodStateMap =
-			kalotayWilliamsFabozziTree.timeProjectedPeriodStateMap();
+		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+			annualizedForwardVolatility,
+			timeToProjectedBaseForwardYieldMapInput
+		);
+
+		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
+			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
 
 		ProxyBond proxyBulletBond = ProxyBond.Bullet (bondMaturityTime, bondCoupon);
 
@@ -239,15 +241,15 @@ public class FigureC
 
 		System.out.println ("\t|-----------------------------------------------||");
 
-		for (double time : timeProjectedPeriodStateMap.keySet()) {
-			if (projectedForwardYieldListMapReconciliation.containsKey (time)) {
+		for (double time : timeToProjectedPeriodStateMap.keySet()) {
+			if (timeToProjectedForwardYieldListMapReconciler.containsKey (time)) {
 				String dump = "\t|" + FormatUtil.FormatDouble (time, 1, 0, 1.) + " => ";
 
 				List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
-					timeProjectedPeriodStateMap.get (time);
+					timeToProjectedPeriodStateMap.get (time);
 
 				List<Double> projectedForwardYieldListReconciliation =
-					projectedForwardYieldListMapReconciliation.get (time);
+					timeToProjectedForwardYieldListMapReconciler.get (time);
 
 				for (int i = 0; i < kalotayWilliamsFabozziPeriodStateList.size(); ++i) {
 					dump += FormatUtil.FormatDouble (
@@ -275,7 +277,7 @@ public class FigureC
 			ProjectedBulletBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedBulletBondValueListMap =
-			proxyBulletBond.value (kalotayWilliamsFabozziTree);
+			proxyBulletBond.valueTree (kalotayWilliamsFabozzi);
 
 		System.out.println ("\t|-----------------------------------------------||");
 

@@ -1,0 +1,14 @@
+
+ --------------------------
+ #4 - A Model for Valuing Bonds with Embedded Options
+ --------------------------
+ --------------------------
+	- Transaction Costs
+		- Refinancing Costs on a Call => Debt refinanced on a call - transaction costs
+		- Tree incorporation - Call option exercise should exceed the refinancing costs
+		- Debt Refinancing at Maturity in the tree
+	- After-tax Valuation
+		- Bonds on an After-tax Basis
+		- Scaling the Yield Curve by the Tax Rate => Multiplying the entire on-the-run yield curve by 1-TaxRate
+		- Impact of Volatility in the Tax-adjusted Curve
+ --------------------------

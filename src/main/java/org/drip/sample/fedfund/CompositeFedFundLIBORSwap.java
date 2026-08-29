@@ -31,6 +31,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,216 +116,173 @@ import org.drip.state.inference.*;
 
 /**
  * <i>CompositeFedFundLIBORSwap</i> demonstrates the Construction, the Valuation, and Bloomberg Metrics
- * Analysis for the Composite Fed Fund vs. LIBOR Basis Swaps.
+ * 	Analysis for the Composite Fed Fund vs. LIBOR Basis Swaps.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fedfund/README.md">Overnight/Composite Fed Fund LIBOR</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/fedfund/README.md">Overnight/Composite Fed Fund LIBOR</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CompositeFedFundLIBORSwap {
+public class CompositeFedFundLIBORSwap
+{
 
 	private static final FloatFloatComponent OTCFloatFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strDerivedTenor,
-		final String strMaturityTenor,
-		final double dblBasis)
+		final JulianDate spotDate,
+		final String currency,
+		final String derivedTenor,
+		final String maturityTenor,
+		final double basis)
 	{
-		FloatFloatSwapConvention ffConv = IBORFloatFloatContainer.ConventionFromJurisdiction (strCurrency);
-
-		return ffConv.createFloatFloatComponent (
-			dtSpot,
-			strDerivedTenor,
-			strMaturityTenor,
-			dblBasis,
+		return IBORFloatFloatContainer.ConventionFromJurisdiction (
+			currency
+		).createFloatFloatComponent (
+			spotDate,
+			derivedTenor,
+			maturityTenor,
+			basis,
 			1.
 		);
 	}
 
 	private static final FixFloatComponent OTCOISFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = OvernightFixedFloatContainer.FundConventionFromJurisdiction (
-			strCurrency
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		return OvernightFixedFloatContainer.FundConventionFromJurisdiction (
+			currency
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				OvernightLabel.Create (
-					strCurrency
-				)
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				OvernightLabel.Create (currency)
 			);
+		}
 
-		return aDeposit;
+		return depositArray;
 	}
-
-	/*
-	 * Construct the Array of Overnight Index Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FixFloatComponent[] OISFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOIS[i] = OTCOISFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisArray[maturityIndex] = OTCOISFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
 			);
+		}
 
-		return aOIS;
+		return oisArray;
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Future Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFuturesFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrStartTenor,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] startTenorArray,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOISFutures = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisFuturesArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOISFutures[i] = OTCOISFixFloat (
-				dtSpot.addTenor (astrStartTenor[i]),
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisFuturesArray[maturityIndex] = OTCOISFixFloat (
+				spotDate.addTenor (startTenorArray[maturityIndex]),
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
 			);
+		}
 
-		return aOISFutures;
+		return oisFuturesArray;
 	}
 
 	private static final MergedDiscountForwardCurve OISDiscountCurve (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strHeaderComment)
+		final JulianDate spotDate,
+		final String currency,
+		final String headerComment)
 		throws Exception
 	{
 		System.out.println ("\n\t----------------------------------------------------------------");
 
-		System.out.println ("\t     " + strHeaderComment);
+		System.out.println ("\t     " + headerComment);
 
 		System.out.println ("\t----------------------------------------------------------------");
 
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
-				1, 2, 3
+		SingleStreamComponent[] depositComponentArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
+				1,
+				2,
+				3
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.0004, 0.0004, 0.0004		 // Deposit
+		double[] depositQuoteArray =
+		{
+			0.0004,
+			0.0004,
+			0.0004		 // Deposit
 		};
 
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"   DEPOSIT   ",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of Short End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblShortEndOISQuote = new double[] {
+		double[] shortEndOISQuoteArray =
+		{
 			0.00070,    //   1W
 			0.00069,    //   2W
 			0.00078,    //   3W
 			0.00074     //   1M
 		};
 
-		CalibratableComponent[] aShortEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1W", "2W", "3W", "1M"
+		CalibratableComponent[] shortEndOISComponentArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1W",
+				"2W",
+				"3W",
+				"1M"
 			},
-			adblShortEndOISQuote
+			shortEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Short End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisShortEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"SHORT END OIS",
-			aShortEndOISComp,
-			"SwapRate",
-			adblShortEndOISQuote
-		);
-
-		/*
-		 * Construct the Array of OIS Futures Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblOISFutureQuote = new double[] {
+		double[] oisFuturesQuoteArray =
+		{
 			 0.00046,    //   1M x 1M
 			 0.00016,    //   2M x 1M
 			-0.00007,    //   3M x 1M
@@ -325,34 +290,30 @@ public class CompositeFedFundLIBORSwap {
 			-0.00014     //   5M x 1M
 		};
 
-		CalibratableComponent[] aOISFutureComp = OISFuturesFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1M", "2M", "3M", "4M", "5M"
+		CalibratableComponent[] oisFuturesComponentArray = OISFuturesFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1M",
+				"2M",
+				"3M",
+				"4M",
+				"5M"
 			},
-			new java.lang.String[] {
-				"1M", "1M", "1M", "1M", "1M"
+			new String[]
+				{
+				"1M",
+				"1M",
+				"1M",
+				"1M",
+				"1M"
 			},
-			adblOISFutureQuote
+			oisFuturesQuoteArray
 		);
 
-		/*
-		 * Construct the OIS Future Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisFutureStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			" OIS FUTURE  ",
-			aOISFutureComp,
-			"SwapRate",
-			adblOISFutureQuote
-		);
-
-		/*
-		 * Construct the Array of Long End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblLongEndOISQuote = new double[] {
+		double[] longEndOISQuoteArray =
+		{
 			0.00002,    //  15M
 			0.00008,    //  18M
 			0.00021,    //  21M
@@ -373,85 +334,86 @@ public class CompositeFedFundLIBORSwap {
 			0.02038     //  30Y
 		};
 
-		CalibratableComponent[] aLongEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"15M", "18M", "21M", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+		CalibratableComponent[] longEndOISComponentArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"15M",
+				"18M",
+				"21M",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
 			},
-			adblLongEndOISQuote
+			longEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Long End OIS Instrument Set Stretch Builder
-		 */
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		LatentStateStretchSpec oisLongEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"LONG END OIS ",
-			aLongEndOISComp,
-			"SwapRate",
-			adblLongEndOISQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			oisShortEndStretch,
-			oisFutureStretch,
-			oisLongEndStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
+		MergedDiscountForwardCurve discountCurve = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+			currency,
+			new LinearLatentStateCalibrator (
+				new SegmentCustomBuilderControl (
+					MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+					new PolynomialFunctionSetParams (4),
+					SegmentInelasticDesignControl.Create (2, 2),
+					new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+					null
 				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
+				BoundarySettings.NaturalStandard(),
+				MultiSegmentSequence.CALIBRATE,
+				null,
 				null
 			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit and Swap Stretches.
-		 */
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		MergedDiscountForwardCurve dc = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
-			valParams,
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"   DEPOSIT   ",
+					depositComponentArray,
+					"ForwardRate",
+					depositQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"SHORT END OIS",
+					shortEndOISComponentArray,
+					"SwapRate",
+					shortEndOISQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					" OIS FUTURE  ",
+					oisFuturesComponentArray,
+					"SwapRate",
+					oisFuturesQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"LONG END OIS ",
+					longEndOISComponentArray,
+					"SwapRate",
+					longEndOISQuoteArray
+				)
+			},
+			valuationParams,
 			null,
 			null,
 			null,
 			1.
 		);
 
-		CurveSurfaceQuoteContainer csqs = MarketParamsBuilder.Create (
-			dc,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
 			null,
 			null,
 			null,
@@ -459,11 +421,6 @@ public class CompositeFedFundLIBORSwap {
 			null,
 			null
 		);
-
-		/*
-		 * Cross-Comparison of the Deposit Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
 
 		System.out.println ("\t----------------------------------------------------------------");
 
@@ -471,15 +428,28 @@ public class CompositeFedFundLIBORSwap {
 
 		System.out.println ("\t----------------------------------------------------------------");
 
-		for (int i = 0; i < aDepositComp.length; ++i)
-			System.out.println ("\t[" + aDepositComp[i].effectiveDate() + " => " + aDepositComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aDepositComp[i].measureValue (valParams, null, csqs, null, "Rate"), 1, 6, 1.) +
-				" | " + FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.));
-
-		/*
-		 * Cross-Comparison of the Short End OIS Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		for (int depositIndex = 0; depositIndex < depositComponentArray.length; ++depositIndex) {
+			System.out.println (
+				"\t[" + depositComponentArray[depositIndex].effectiveDate() + " => " +
+					depositComponentArray[depositIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+						depositComponentArray[depositIndex].measureValue (
+							valuationParams,
+							null,
+							curveSurfaceQuoteContainer,
+							null,
+							"Rate"
+						),
+						1,
+						6,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						depositQuoteArray[depositIndex],
+						1,
+						6,
+						1.
+					)
+			);
+		}
 
 		System.out.println ("\n\t----------------------------------------------------------------");
 
@@ -487,30 +457,30 @@ public class CompositeFedFundLIBORSwap {
 
 		System.out.println ("\t----------------------------------------------------------------");
 
-		for (int i = 0; i < aShortEndOISComp.length; ++i) {
-			Map<String, Double> mapCalc = aShortEndOISComp[i].value (
-				valParams,
+		for (int shortEndOISIndex = 0;
+			shortEndOISIndex < shortEndOISComponentArray.length;
+			++shortEndOISIndex)
+		{
+			Map<String, Double> shortEndOISMeasureMap = shortEndOISComponentArray[shortEndOISIndex].value (
+				valuationParams,
 				null,
-				csqs,
+				curveSurfaceQuoteContainer,
 				null
 			);
 
-			double dblCalibSwapRate = mapCalc.get ("CalibSwapRate");
+			double calibrationSwapRate = shortEndOISMeasureMap.get ("CalibSwapRate");
 
-			double dblFairPremium = mapCalc.get ("FairPremium");
+			double fairPremium = shortEndOISMeasureMap.get ("FairPremium");
 
-			System.out.println ("\t[" + aShortEndOISComp[i].effectiveDate() + " => " + aShortEndOISComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (dblCalibSwapRate, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (adblShortEndOISQuote[i], 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblFairPremium, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblFairPremium - dblCalibSwapRate, 1, 2, 10000.)
+			System.out.println (
+				"\t[" + shortEndOISComponentArray[shortEndOISIndex].effectiveDate() + " => " +
+					shortEndOISComponentArray[shortEndOISIndex].maturityDate() + "] = " +
+					FormatUtil.FormatDouble (calibrationSwapRate, 1, 6, 1.) + " | " +
+					FormatUtil.FormatDouble (shortEndOISQuoteArray[shortEndOISIndex], 1, 6, 1.) + " | " +
+					FormatUtil.FormatDouble (fairPremium, 1, 6, 1.) + " | " +
+					FormatUtil.FormatDouble (fairPremium - calibrationSwapRate, 1, 2, 10000.)
 			);
 		}
-
-		/*
-		 * Cross-Comparison of the OIS Future Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
 
 		System.out.println ("\n\t----------------------------------------------------------------");
 
@@ -518,30 +488,27 @@ public class CompositeFedFundLIBORSwap {
 
 		System.out.println ("\t----------------------------------------------------------------");
 
-		for (int i = 0; i < aOISFutureComp.length; ++i) {
-			Map<String, Double> mapCalc = aOISFutureComp[i].value (
-				valParams,
+		for (int oisFuturesIndex = 0; oisFuturesIndex < oisFuturesComponentArray.length; ++oisFuturesIndex) {
+			Map<String, Double> oisFuturesMeasureMap = oisFuturesComponentArray[oisFuturesIndex].value (
+				valuationParams,
 				null,
-				csqs,
+				curveSurfaceQuoteContainer,
 				null
 			);
 
-			double dblSwapRate = mapCalc.get ("SwapRate");
+			double swapRate = oisFuturesMeasureMap.get ("SwapRate");
 
-			double dblFairPremium = mapCalc.get ("FairPremium");
+			double fairPremium = oisFuturesMeasureMap.get ("FairPremium");
 
-			System.out.println ("\t[" + aOISFutureComp[i].effectiveDate() + " => " + aOISFutureComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (dblSwapRate, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (adblOISFutureQuote[i], 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblFairPremium, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblFairPremium - dblSwapRate, 1, 2, 10000.)
+			System.out.println (
+				"\t[" + oisFuturesComponentArray[oisFuturesIndex].effectiveDate() + " => " +
+					oisFuturesComponentArray[oisFuturesIndex].maturityDate() + "] = " +
+				FormatUtil.FormatDouble (swapRate, 1, 6, 1.) + " | " +
+				FormatUtil.FormatDouble (oisFuturesQuoteArray[oisFuturesIndex], 1, 6, 1.) + " | " +
+				FormatUtil.FormatDouble (fairPremium, 1, 6, 1.) + " | " +
+				FormatUtil.FormatDouble (fairPremium - swapRate, 1, 2, 10000.)
 			);
 		}
-
-		/*
-		 * Cross-Comparison of the Long End OIS Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
 
 		System.out.println ("\n\t----------------------------------------------------------------");
 
@@ -549,163 +516,114 @@ public class CompositeFedFundLIBORSwap {
 
 		System.out.println ("\t----------------------------------------------------------------");
 
-		for (int i = 0; i < aLongEndOISComp.length; ++i) {
-			Map<String, Double> mapCalc = aLongEndOISComp[i].value (
-				valParams,
+		for (int longEndOISIndex = 0; longEndOISIndex < longEndOISComponentArray.length; ++longEndOISIndex) {
+			Map<String, Double> longEndOISMeasureMap = longEndOISComponentArray[longEndOISIndex].value (
+				valuationParams,
 				null,
-				csqs,
+				curveSurfaceQuoteContainer,
 				null
 			);
 
-			double dblCalibSwapRate = mapCalc.get ("CalibSwapRate");
+			double calibrationSwapRate = longEndOISMeasureMap.get ("CalibSwapRate");
 
-			double dblFairPremium = mapCalc.get ("FairPremium");
+			double fairPremium = longEndOISMeasureMap.get ("FairPremium");
 
-			System.out.println ("\t[" + aLongEndOISComp[i].effectiveDate() + " => " + aLongEndOISComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (dblCalibSwapRate, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (adblLongEndOISQuote[i], 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblFairPremium, 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (dblFairPremium - dblCalibSwapRate, 1, 2, 10000.)
+			System.out.println (
+				"\t[" + longEndOISComponentArray[longEndOISIndex].effectiveDate() + " => " +
+					longEndOISComponentArray[longEndOISIndex].maturityDate() + "] = " +
+				FormatUtil.FormatDouble (calibrationSwapRate, 1, 6, 1.) + " | " +
+				FormatUtil.FormatDouble (longEndOISQuoteArray[longEndOISIndex], 1, 6, 1.) + " | " +
+				FormatUtil.FormatDouble (fairPremium, 1, 6, 1.) + " | " +
+				FormatUtil.FormatDouble (fairPremium - calibrationSwapRate, 1, 2, 10000.)
 			);
 		}
 
-		return dc;
+		return discountCurve;
 	}
 
-	/*
-	 * Construct an array of float-float swaps from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FloatFloatComponent[] MakexM6MBasisSwap (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final int iTenorInMonths)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final int tenorInMonths)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		String tenor = tenorInMonths + "M";
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFFC[i] = OTCFloatFloat (
-				dtSpot,
-				strCurrency,
-				iTenorInMonths + "M",
-				astrMaturityTenor[i],
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			floatFloatComponentArray[maturityIndex] = OTCFloatFloat (
+				spotDate,
+				currency,
+				tenor,
+				maturityTenorArray[maturityIndex],
 				0.
 			);
+		}
 
-		return aFFC;
+		return floatFloatComponentArray;
 	}
 
 	private static final ForwardCurve MakexMForwardCurve (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final MergedDiscountForwardCurve dc,
-		final int iTenorInMonths,
-		final String[] astrxM6MFwdTenor,
-		final String strManifestMeasure,
-		final double[] adblxM6MBasisSwapQuote)
+		final JulianDate spotDate,
+		final String currency,
+		final MergedDiscountForwardCurve discountCurve,
+		final int tenorInMonths,
+		final String[] xM6MFwdTenorArray,
+		final String manifestMeasure,
+		final double[] xM6MBasisSwapQuoteArray)
 		throws Exception
 	{
-		/*
-		 * Construct the 6M-xM float-float basis swap.
-		 */
-
-		FloatFloatComponent[] aFFC = MakexM6MBasisSwap (
-			dtSpot,
-			strCurrency,
-			astrxM6MFwdTenor,
-			iTenorInMonths
-		);
-
-		String strBasisTenor = iTenorInMonths + "M";
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		/*
-		 * Calculate the starting forward rate off of the discount curve.
-		 */
-
-		double dblStartingFwd = dc.forward (
-			dtSpot.julian(),
-			dtSpot.addTenor (strBasisTenor).julian()
-		);
-
-		/*
-		 * Set the discount curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null
-		);
-
-		/*
-		 * Construct the shape preserving forward curve off of Cubic Polynomial Basis Spline.
-		 */
+		String basisTenor = tenorInMonths + "M";
 
 		return ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
-			"CUBIC_FWD" + strBasisTenor,
-			ForwardLabel.Create (
-				strCurrency,
-				strBasisTenor
-			),
-			valParams,
+			"CUBIC_FWD" + basisTenor,
+			ForwardLabel.Create (currency, basisTenor),
+			new ValuationParams (spotDate, spotDate, currency),
 			null,
-			mktParams,
+			MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
 			null,
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			aFFC,
-			strManifestMeasure,
-			adblxM6MBasisSwapQuote,
-			dblStartingFwd
+			MakexM6MBasisSwap (spotDate, currency, xM6MFwdTenorArray, tenorInMonths),
+			manifestMeasure,
+			xM6MBasisSwapQuoteArray,
+			discountCurve.forward (spotDate.julian(), spotDate.addTenor (basisTenor).julian())
 		);
 	}
 
 	private static final FloatFloatComponent[] FedFundLIBORBasisSwap (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final String[] astrMaturityTenor)
+		final JulianDate effectiveDate,
+		final String currency,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		ComposableFloatingUnitSetting cfusLIBOR = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Standard (strCurrency + "-3M"),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
+		ComposableFloatingUnitSetting liborComposableFloatingUnitSetting =
+			new ComposableFloatingUnitSetting (
+				"3M",
+				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+				null,
+				ForwardLabel.Standard (currency + "-3M"),
+				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+				0.
+			);
 
-		ComposableFloatingUnitSetting cfusFedFund = new ComposableFloatingUnitSetting (
-			"ON",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
-			null,
-			OvernightLabel.Create (
-				strCurrency
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
+		ComposableFloatingUnitSetting fedFundComposableFloatingUnitSetting =
+			new ComposableFloatingUnitSetting (
+				"ON",
+				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
+				null,
+				OvernightLabel.Create (currency),
+				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+				0.
+			);
 
-		CompositePeriodSetting cpsLIBOR = new CompositePeriodSetting (
+		CompositePeriodSetting liborCompositePeriodSetting = new CompositePeriodSetting (
 			4,
 			"3M",
-			strCurrency,
+			currency,
 			null,
 			-1.,
 			null,
@@ -714,10 +632,10 @@ public class CompositeFedFundLIBORSwap {
 			null
 		);
 
-		CompositePeriodSetting cpsFedFund = new CompositePeriodSetting (
+		CompositePeriodSetting fedFundCompositePeriodSetting = new CompositePeriodSetting (
 			4,
 			"3M",
-			strCurrency,
+			currency,
 			null,
 			1.,
 			null,
@@ -726,249 +644,193 @@ public class CompositeFedFundLIBORSwap {
 			null
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			List<Integer> lsReferenceStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				"3M",
-				astrMaturityTenor[i],
-				null
-			);
-
-			List<Integer> lsDerivedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				"3M",
-				astrMaturityTenor[i],
-				null
-			);
-
-			Stream streamLIBOR = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsReferenceStreamEdgeDate,
-					cpsLIBOR,
-					cfusLIBOR
-				)
-			);
-
-			Stream streamFedFund = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsDerivedStreamEdgeDate,
-					cpsFedFund,
-					cfusFedFund
-				)
-			);
-
-			aFFC[i] = new FloatFloatComponent (
-				streamLIBOR,
-				streamFedFund,
-				csp
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			floatFloatComponentArray[maturityIndex] = new FloatFloatComponent (
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							"3M",
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						liborCompositePeriodSetting,
+						liborComposableFloatingUnitSetting
+					)
+				),
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							"3M",
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						fedFundCompositePeriodSetting,
+						fedFundComposableFloatingUnitSetting
+					)
+				),
+				cashSettleParams
 			);
 		}
 
-		return aFFC;
+		return floatFloatComponentArray;
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtEffective,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final String[] maturityTenorArray,
+		final double[] couponArray,
+		final String currency)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, "3M");
 
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
+
+		UnitCouponAccrualSetting fixedUnitCouponAccrualSetting = new UnitCouponAccrualSetting (
 			2,
 			"Act/360",
 			false,
 			"Act/360",
 			false,
-			strCurrency,
+			currency,
 			false,
 			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			java.lang.String strFixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			String fixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[maturityIndex],
 				"6M"
-			) ? astrMaturityTenor[i] : "6M";
+			) ? maturityTenorArray[maturityIndex] : "6M";
 
-			java.lang.String strFloatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+			String floatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[maturityIndex],
 				"3M"
-			) ? astrMaturityTenor[i] : "3M";
-
-			ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-				"3M",
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-				null,
-				ForwardLabel.Create (
-					strCurrency,
-					"3M"
-				),
-				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-				0.
-			);
-
-			ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-				strFixedTenor,
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-				null,
-				adblCoupon[i],
-				0.,
-				strCurrency
-			);
-
-			CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-				4,
-				strFloatingTenor,
-				strCurrency,
-				null,
-				-1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-				2,
-				strFixedTenor,
-				strCurrency,
-				null,
-				1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				strFixedTenor,
-				astrMaturityTenor[i],
-				null
-			);
-
-			List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				strFloatingTenor,
-				astrMaturityTenor[i],
-				null
-			);
-
-			Stream floatingStream = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsFloatingStreamEdgeDate,
-					cpsFloating,
-					cfusFloating
-				)
-			);
-
-			Stream fixedStream = new Stream (
-				CompositePeriodBuilder.FixedCompositeUnit (
-					lsFixedStreamEdgeDate,
-					cpsFixed,
-					ucasFixed,
-					cfusFixed
-				)
-			);
+			) ? maturityTenorArray[maturityIndex] : "3M";
 
 			FixFloatComponent ois = new FixFloatComponent (
-				fixedStream,
-				floatingStream,
-				csp
+				new Stream (
+					CompositePeriodBuilder.FixedCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							fixedTenor,
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							2,
+							fixedTenor,
+							currency,
+							null,
+							1.,
+							null,
+							null,
+							null,
+							null
+						),
+						fixedUnitCouponAccrualSetting,
+						new ComposableFixedUnitSetting (
+							fixedTenor,
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+							null,
+							couponArray[maturityIndex],
+							0.,
+							currency
+						)
+					)
+				),
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							floatingTenor,
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							4,
+							floatingTenor,
+							currency,
+							null,
+							-1.,
+							null,
+							null,
+							null,
+							null
+						),
+						new ComposableFloatingUnitSetting (
+							"3M",
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+							null,
+							forwardLabel,
+							CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+							0.
+						)
+					)
+				),
+				cashSettleParams
 			);
 
-			ois.setPrimaryCode ("OIS." + astrMaturityTenor[i] + "." + strCurrency);
+			ois.setPrimaryCode ("OIS." + maturityTenorArray[maturityIndex] + "." + currency);
 
-			aOIS[i] = ois;
+			oisArray[maturityIndex] = ois;
 		}
 
-		return aOIS;
+		return oisArray;
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
+		String currency = "USD";
 
-		JulianDate dtToday = DateUtil.CreateFromYMD (
-			2012,
-			DateUtil.DECEMBER,
-			11
-		);
+		String[] maturityTenorArray =
+		{
+			"1Y",
+			"2Y",
+			"3Y",
+			"4Y",
+			"5Y",
+			"6Y",
+			"7Y",
+			"8Y",
+			"9Y",
+			"10Y",
+			"11Y",
+			"12Y",
+			"15Y",
+			"20Y",
+			"25Y",
+			"30Y"
+		};
 
-		MergedDiscountForwardCurve dcOIS = OISDiscountCurve (
-			dtToday,
-			strCurrency,
+		JulianDate today = DateUtil.CreateFromYMD (2012, DateUtil.DECEMBER, 11);
+
+		MergedDiscountForwardCurve oisDiscountCurve = OISDiscountCurve (
+			today,
+			currency,
 			"OVERNIGHT INDEX RUN RECONCILIATION"
 		);
 
-		ForwardCurve fc = MakexMForwardCurve (
-			dtToday,
-			strCurrency,
-			dcOIS,
-			3,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-			},
-			"ReferenceParBasisSpread",
-			new double[] {
-				0.00186,    //  1Y
-				0.00127,    //  2Y
-				0.00097,    //  3Y
-				0.00080,    //  4Y
-				0.00067,    //  5Y
-				0.00058,    //  6Y
-				0.00051,    //  7Y
-				0.00046,    //  8Y
-				0.00042,    //  9Y
-				0.00038,    // 10Y
-				0.00035,    // 11Y
-				0.00033,    // 12Y
-				0.00028,    // 15Y
-				0.00022,    // 20Y
-				0.00020,    // 25Y
-				0.00018     // 30Y
-			}
-		);
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dcOIS,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			oisDiscountCurve,
 			null,
 			null,
 			null,
@@ -977,23 +839,66 @@ public class CompositeFedFundLIBORSwap {
 			null
 		);
 
-		mktParams.setForwardState (fc);
-
-		String[] astrMaturityTenor = new String[] {
-			"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-		};
-
-		FloatFloatComponent[] aFedFundLIBORSwap = FedFundLIBORBasisSwap (
-			dtToday,
-			strCurrency,
-			astrMaturityTenor
+		curveSurfaceQuoteContainer.setForwardState (
+			MakexMForwardCurve (
+				today,
+				currency,
+				oisDiscountCurve,
+				3,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				"ReferenceParBasisSpread",
+				new double[]
+				{
+					0.00186,    //  1Y
+					0.00127,    //  2Y
+					0.00097,    //  3Y
+					0.00080,    //  4Y
+					0.00067,    //  5Y
+					0.00058,    //  6Y
+					0.00051,    //  7Y
+					0.00046,    //  8Y
+					0.00042,    //  9Y
+					0.00038,    // 10Y
+					0.00035,    // 11Y
+					0.00033,    // 12Y
+					0.00028,    // 15Y
+					0.00022,    // 20Y
+					0.00020,    // 25Y
+					0.00018     // 30Y
+				}
+			)
 		);
 
-		FixFloatComponent[] aOIS = OISFromMaturityTenor (
-			dtToday,
-			strCurrency,
-			astrMaturityTenor,
-			new double[] {
+		FloatFloatComponent[] fedFundLIBORSwapArray = FedFundLIBORBasisSwap (
+			today,
+			currency,
+			maturityTenorArray
+		);
+
+		FixFloatComponent[] oisArray = OISFromMaturityTenor (
+			today,
+			currency,
+			maturityTenorArray,
+			new double[]
+			{
 				0.00002,
 				0.00036,
 				0.00127,
@@ -1013,10 +918,11 @@ public class CompositeFedFundLIBORSwap {
 			}
 		);
 
-		FixFloatComponent[] aIRS = SwapInstrumentsFromMaturityTenor (
-			dtToday,
-			astrMaturityTenor,
-			new double[] {
+		FixFloatComponent[] irsArray = SwapInstrumentsFromMaturityTenor (
+			today,
+			maturityTenorArray,
+			new double[]
+			{
 				0.00002,
 				0.00036,
 				0.00127,
@@ -1034,14 +940,10 @@ public class CompositeFedFundLIBORSwap {
 				0.02003,
 				0.02038
 			},
-			strCurrency
+			currency
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			strCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (today, today, currency);
 
 		System.out.println ("\n\t--------------------------------------------------------------------------");
 
@@ -1063,35 +965,55 @@ public class CompositeFedFundLIBORSwap {
 
 		System.out.println ("\t--------------------------------------------------------------------------");
 
-		for (int i = 0; i < aFedFundLIBORSwap.length; ++i) {
-			Map<String, Double> mapOIS = aOIS[i].value (
-				valParams,
+		for (int i = 0; i < fedFundLIBORSwapArray.length; ++i) {
+			double oisRate = oisArray[i].value (
+				valuationParams,
 				null,
-				mktParams,
+				curveSurfaceQuoteContainer,
 				null
+			).get (
+				"SwapRate"
 			);
 
-			Map<String, Double> mapIRS = aIRS[i].value (
-				valParams,
+			double irsRate = irsArray[i].value (
+				valuationParams,
 				null,
-				mktParams,
+				curveSurfaceQuoteContainer,
 				null
+			).get (
+				"SwapRate"
 			);
 
-			double dblOISRate = mapOIS.get ("SwapRate");
+			double liborFedFundBasis = irsRate - oisRate;
 
-			double dblIRSRate = mapIRS.get ("SwapRate");
-
-			double dblLIBORFedFundBasis = dblIRSRate - dblOISRate;
-
-			System.out.println ("\t[" +
-				aFedFundLIBORSwap[i].effectiveDate() + " - " +
-				aFedFundLIBORSwap[i].maturityDate() + "] => " +
-				FormatUtil.FormatDouble (dblIRSRate, 1, 4, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblLIBORFedFundBasis, 1, 1, 10000.) + " | " +
-				FormatUtil.FormatDouble (Helper.OISFromLIBORSwapFedFundBasis (dblIRSRate, -dblLIBORFedFundBasis), 1, 4, 100.) + "% | " +
-				FormatUtil.FormatDouble (Helper.OISFromLIBORSwapFedFundBasis2 (dblIRSRate, -dblLIBORFedFundBasis), 1, 4, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblOISRate, 1, 4, 100.) + "%"
+			System.out.println (
+				"\t[" + fedFundLIBORSwapArray[i].effectiveDate() + " - " +
+					fedFundLIBORSwapArray[i].maturityDate() + "] => " + FormatUtil.FormatDouble (
+						irsRate,
+						1,
+						4,
+						100.
+					) + "% | " + FormatUtil.FormatDouble (
+						liborFedFundBasis,
+						1,
+						1,
+						10000.
+					) + " | " + FormatUtil.FormatDouble (
+						Helper.OISFromLIBORSwapFedFundBasis (irsRate, -liborFedFundBasis),
+						1,
+						4,
+						100.
+					) + "% | " + FormatUtil.FormatDouble (
+						Helper.OISFromLIBORSwapFedFundBasis2 (irsRate, -liborFedFundBasis),
+						1,
+						4,
+						100.
+					) + "% | " + FormatUtil.FormatDouble (
+						oisRate,
+						1,
+						4,
+						100.
+					) + "%"
 			);
 		}
 

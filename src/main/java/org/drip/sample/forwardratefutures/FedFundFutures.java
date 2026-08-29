@@ -5,13 +5,10 @@ import java.util.Map;
 
 import org.drip.analytics.date.*;
 import org.drip.param.creator.MarketParamsBuilder;
-import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.valuation.ValuationParams;
 import org.drip.product.creator.SingleStreamComponentBuilder;
-import org.drip.product.rates.SingleStreamComponent;
 import org.drip.sample.forward.OvernightIndexCurve;
 import org.drip.service.env.EnvManager;
-import org.drip.state.discount.MergedDiscountForwardCurve;
 import org.drip.state.identifier.OvernightLabel;
 
 /*
@@ -19,6 +16,14 @@ import org.drip.state.identifier.OvernightLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -96,83 +101,68 @@ import org.drip.state.identifier.OvernightLabel;
 
 /**
  * <i>FedFundFutures</i> contains the demonstration of the construction and the Valuation of the Fed Fund
- * Futures Contract.
+ * 	Futures Contract.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FedFundFutures {
+public class FedFundFutures
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
+		String currency = "USD";
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		MergedDiscountForwardCurve dcOIS = OvernightIndexCurve.MakeDC (
-			dtToday,
-			strCurrency
-		);
-
-		SingleStreamComponent fedFundFutures = SingleStreamComponentBuilder.Deposit (
-			dtToday,
-			dtToday.addTenor ("1M"),
-			OvernightLabel.Create (
-				strCurrency
-			)
-		);
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dcOIS,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			strCurrency
-		);
-
-		Map<String, Double> mapFedFundFuturesOutput = fedFundFutures.value (
-			valParams,
-			null,
-			mktParams,
-			null
-		);
-
-		for (Map.Entry<String, Double> me : mapFedFundFuturesOutput.entrySet())
-			System.out.println ("\t" + me.getKey() + " => " + me.getValue());
+		for (Map.Entry<String, Double> mapEntry : SingleStreamComponentBuilder.Deposit (
+				today,
+				today.addTenor ("1M"),
+				OvernightLabel.Create (currency)
+			).value (
+				new ValuationParams (
+					today,
+					today,
+					currency
+				),
+				null,
+				MarketParamsBuilder.Create (
+					OvernightIndexCurve.MakeDC (today, currency),
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+				),
+				null
+			).entrySet()
+		)
+		{
+			System.out.println ("\t|| " + mapEntry.getKey() + " => " + mapEntry.getValue());
+		}
 
 		EnvManager.TerminateEnv();
 	}

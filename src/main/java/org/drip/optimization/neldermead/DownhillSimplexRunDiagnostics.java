@@ -143,23 +143,23 @@ public class DownhillSimplexRunDiagnostics
 	}
 
 	/**
-	 * Set the Centroid Vertex
+	 * Set the Centroid <i>ObjectiveFunctionCoordinate</i>
 	 * 
 	 * @param iterationIndex Iteration Index
-	 * @param centroidVertex Centroid Vertex
+	 * @param centroidObjectiveFunctionCoordinate Centroid <i>ObjectiveFunctionCoordinate</i>
 	 * 
-	 * @return TRUE - Centroid Vertex successfully set
+	 * @return TRUE - Centroid <i>ObjectiveFunctionCoordinate</i> successfully set
 	 */
 
-	public boolean setCentroidVertex (
+	public boolean setCentroidObjectiveFunctionCoordinate (
 		final int iterationIndex,
-		final double[] centroidVertex)
+		final ObjectiveFunctionCoordinate centroidObjectiveFunctionCoordinate)
 	{
 		if (_downhillSimplexIterationDiagnosticsMap.containsKey (iterationIndex)) {
 			return _downhillSimplexIterationDiagnosticsMap.get (
 				iterationIndex
-			).setCentroidVertex (
-				centroidVertex
+			).setCentroidObjectiveFunctionCoordinate (
+				centroidObjectiveFunctionCoordinate
 			);
 		}
 
@@ -168,7 +168,9 @@ public class DownhillSimplexRunDiagnostics
 
 		_downhillSimplexIterationDiagnosticsMap.put (iterationIndex, downhillSimplexIterationDiagnostics);
 
-		return downhillSimplexIterationDiagnostics.setCentroidVertex (centroidVertex);
+		return downhillSimplexIterationDiagnostics.setCentroidObjectiveFunctionCoordinate (
+			centroidObjectiveFunctionCoordinate
+		);
 	}
 
 	/**

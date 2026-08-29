@@ -1,0 +1,88 @@
+
+ --------------------------
+ #1 - Himmelblau’s Function
+ --------------------------
+ 1.1) Test Function for Optimization Algorithms: f(x,y)=(x^2+y-11)^2+(x+y^2-7)^2
+ 1.2) Local Extrema:
+	- Maximum at: (x=-0.270845, y=-0.923039) with value 181.617 
+	- Minima:
+		- f(3.0,2.0)=0.0
+		- f(-2.805118,3.131312)=0.0
+		- f(-3.779310,-3.283186)=0.0
+		- f(3.584428,-1.848126)=0.0
+ --------------------------
+
+ --------------------------
+ #2 - Rosenbrock’s Function
+ --------------------------
+ 2.1) Overview: f(x,y)=(a-x)^2+b(y-x^2 )^2
+	- Characteristics:
+		- (x,y)=(a,a^2 ) where f(x,y)=0
+		- Typical Parameters: a=1 and b=100
+		- Only in the trivial case where a=0 the function is symmetric and the minimum is at the origin
+ 2.2) Multidimensional Generalizations:
+	- First R^N Variant: Sum of N/2 uncoupled in 2D Rosenbrock problems, defined only for even N‘s - has predictably simple solutions
+		- f(x)=f(x_1,x_2,⋯,x_N )=∑_(i=1)^(N/2)▒[100(〖x_(2i-1)〗^2-x_2i )^2+(x_(2i-1)-1)^2 ] 
+	- Second R^N Variant:
+		- f(x)=f(x_1,x_2,⋯,x_N )=∑_(i=1)^(N-1)▒[100(x_(i+1)-x_i^2 )^2+(1-x_i )^2 ] 
+		- N=3 => One min at (1,1,⋯,1)
+		- 4≤N<7 => Global min at (1,1,⋯,1), local near (-1,1,⋯,1)
+		- Small N: 	Roots bounded in the region |x_i |<2.4
+ --------------------------
+
+ --------------------------
+ #3 - Nelder-Mead Method
+ --------------------------
+ 3.1) Introduction
+	- Also downhill simplex method, amoeba method, or polytope method – numerical method to find a local minimum in a multi-dimensional space
+ 3.2) Implementing a new Variant of the Scheme
+	- Minimize f(x) where x∈R^n The current test points are x_1,⋯,x_(n+1)
+	- Vertex Ordering Step #1:
+		- Order according to the values at the vertices f(x_1 )≤f(x_2 )≤⋯≤f(x_(n+1) )
+	- Centroid Estimation Step #2: Calculate x_0, the centroid of all points except x_(n+1)
+	- Reflection Step #3:
+		- x_r=x_0+α(x_0-x_(n+1) ) with α>0
+		- If f(x_1 )≤f(x_r )≤f(x_n ) => new simplex by replacing the worst point x_(n+1) with x_r and go to step #1
+	- Reflection Step #4:
+		- If f(x_r )<f(x_1 ) compute x_e=x_0+γ(x_r-x_0 ) with γ>1
+		- If f(x_e )<f(x_r ):
+			- new simplex by replacing the worst point x_(n+1) by the expanded point x_e and go to step #1
+			- otherwise, obtain a new simplex by replacing the worst point x_(n+1) with the reflected point x_r and go to step #1
+	- Contraction Step #5: Now f(x_r )<f(x_n )
+		- If f(x_r )<f(x_(n+1) ) compute x_c=x_0+ρ(x_r-x_0 ) with 0<ρ≤0.5
+		- If f(x_c )<f(x_r ) new simplex by replacing x_(n+1) with the contracted point x_c and go to step #1. Otherwise, go to step #6
+		- If f(x_r )≥f(x_(n+1) ) compute x_c=x_0+ρ(x_(n+1)-x_0 ) with 0<ρ≤0.5
+		- If f(x_c )<f(x_(n+1) ) new simplex by replacing x_(n+1) with the contracted point x_c and go to step #1. Otherwise, go to step #6
+	- Shrink Step #6: Replace all points except the best x_1 with x_i=x_1+σ(x_i-x_1 ) and go to step #1
+	- Standard Values for the Coefficients: α=1; γ=2; ρ=1/2; σ=1/2
+ 3.3) Initial Simplex
+	- Nelder-Mead’s Scheme: Given x_1, others are generated with a fixed step along each dimension in turn
+ 3.4) Termination
+	- Nelder-Mead Criterion:
+		- Standard deviation of function values to current simplex below a threshold - stop
+		- Flat function may have almost equal function values over a large domain, so Nash adds the shrinkage criterion
+ --------------------------
+
+ --------------------------
+ #4 - A Model for Valuing Bonds with Embedded Options
+ --------------------------
+ --------------------------
+	- Transaction Costs
+		- Refinancing Costs on a Call => Debt refinanced on a call - transaction costs
+		- Tree incorporation - Call option exercise should exceed the refinancing costs
+		- Debt Refinancing at Maturity in the tree
+	- After-tax Valuation
+		- Bonds on an After-tax Basis
+		- Scaling the Yield Curve by the Tax Rate => Multiplying the entire on-the-run yield curve by 1-TaxRate
+		- Impact of Volatility in the Tax-adjusted Curve
+ --------------------------
+
+ --------------------------
+ #5 - AAA Municipal Curve
+ --------------------------
+ --------------------------
+ 3.1) Overview
+	- Each year for 30 years, and a smoothing extrapolation technique later
+ 3.1) Introduction
+	- Also downhill simplex method, amoeba method, or polytope method – numerical method to find a local minimum in a multi-dimensional space
+ --------------------------

@@ -20,6 +20,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -95,8 +103,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>LinearImpactNoDrift</i> generates the Trade/Holdings List of Optimal Execution Schedule based on the
- * Evolution Walk Parameters specified. The Generation follows a Numerical Optimizer Scheme, as opposed to
- * the Almgren-Chriss Closed Form; it also excludes the Impact of Drift. The References are:
+ * 	Evolution Walk Parameters specified. The Generation follows a Numerical Optimizer Scheme, as opposed to
+ * 	the Almgren-Chriss Closed Form; it also excludes the Impact of Drift. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -122,104 +130,94 @@ import org.drip.service.env.EnvManager;
  *  	</li>
  *  </ul>
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/execution/README.md">Nonlinear Trading Enhanced Market Impact</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/execution/README.md">Nonlinear Trading Enhanced Market Impact</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class LinearImpactNoDrift {
+public class LinearImpactNoDrift
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double dblS0 = 50.;
-		double dblX = 1000000.;
-		double dblT = 5.;
-		int iN = 5;
-		double dblAnnualVolatility = 0.30;
-		double dblAnnualReturns = 0.10;
-		double dblBidAsk = 0.125;
-		double dblDailyVolume = 5.e06;
-		double dblDailyVolumePermanentImpact = 0.1;
-		double dblDailyVolumeTemporaryImpact = 0.01;
-		double dblLambdaU = 1.e-06;
+		int n = 5;
+		double t = 5.;
+		double s0 = 50.;
+		double x = 1000000.;
+		double bidAsk = 0.125;
+		double lambdaU = 1.e-06;
+		double dailyVolume = 5.e06;
+		double annualReturns = 0.10;
+		double annualVolatility = 0.30;
+		double dailyVolumePermanentImpact = 0.1;
+		double dailyVolumeTemporaryImpact = 0.01;
 
-		ArithmeticPriceDynamicsSettings apds = ArithmeticPriceDynamicsSettings.FromAnnualReturnsSettings (
-			dblAnnualReturns,
-			dblAnnualVolatility,
-			0.,
-			dblS0
-		);
-
-		double dblAlpha = apds.drift();
-
-		double dblSigma = apds.epochVolatility();
-
-		PriceMarketImpactLinear pmil = new PriceMarketImpactLinear (
-			new AssetTransactionSettings (
-				dblS0,
-				dblDailyVolume,
-				dblBidAsk
-			),
-			dblDailyVolumePermanentImpact,
-			dblDailyVolumeTemporaryImpact
-		);
-
-		ParticipationRateLinear prlPermanent = (ParticipationRateLinear) pmil.permanentTransactionFunction();
-
-		ParticipationRateLinear prlTemporary = (ParticipationRateLinear) pmil.temporaryTransactionFunction();
-
-		DiscreteTradingTrajectoryControl dttc = DiscreteTradingTrajectoryControl.FixedInterval (
-			new OrderSpecification (
-				dblX,
-				dblT
-			),
-			iN
-		);
-
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
-			new ArithmeticPriceDynamicsSettings (
+		ArithmeticPriceDynamicsSettings arithmeticPriceDynamicsSettings =
+			ArithmeticPriceDynamicsSettings.FromAnnualReturnsSettings (
+				annualReturns,
+				annualVolatility,
 				0.,
-				new Flat (dblSigma),
-				0.
-			),
-			new UniformParticipationRateLinear (prlPermanent),
-			new UniformParticipationRateLinear (prlTemporary)
+				s0
+			);
+
+		double sigma = arithmeticPriceDynamicsSettings.epochVolatility();
+
+		PriceMarketImpactLinear priceMarketImpactLinear = new PriceMarketImpactLinear (
+			new AssetTransactionSettings (s0, dailyVolume, bidAsk),
+			dailyVolumePermanentImpact,
+			dailyVolumeTemporaryImpact
 		);
 
-		EfficientTradingTrajectoryDiscrete ettd = (EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
-			dttc,
-			lpep,
-			new MeanVarianceObjectiveUtility (dblLambdaU)
-		).generate();
+		ParticipationRateLinear permanentTransactionFunction =
+			(ParticipationRateLinear) priceMarketImpactLinear.permanentTransactionFunction();
 
-		double[] adblExecutionTimeNode = ettd.executionTimeNode();
+		ParticipationRateLinear temporaryTransactionFunction =
+			(ParticipationRateLinear) priceMarketImpactLinear.temporaryTransactionFunction();
 
-		double[] adblTradeList = ettd.tradeList();
+		LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+			ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
+				new ArithmeticPriceDynamicsSettings (0., new Flat (sigma), 0.),
+				new UniformParticipationRateLinear (permanentTransactionFunction),
+				new UniformParticipationRateLinear (temporaryTransactionFunction)
+			);
 
-		double[] adblHoldings = ettd.holdings();
+		EfficientTradingTrajectoryDiscrete efficientTradingTrajectoryDiscrete =
+			(EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
+				DiscreteTradingTrajectoryControl.FixedInterval (new OrderSpecification (x, t), n),
+				linearPermanentExpectationParameters,
+				new MeanVarianceObjectiveUtility (lambdaU)
+			).generate();
 
-		LinearImpactTrajectoryEstimator lite = new LinearImpactTrajectoryEstimator (ettd);
+		double[] executionTimeNodeArray = efficientTradingTrajectoryDiscrete.executionTimeNode();
 
-		R1UnivariateNormal r1un = lite.totalCostDistributionSynopsis (lpep);
+		double[] holdingsArray = efficientTradingTrajectoryDiscrete.holdings();
+
+		double[] tradeArray = efficientTradingTrajectoryDiscrete.tradeList();
+
+		R1UnivariateNormal r1UnivariateNormal = new LinearImpactTrajectoryEstimator (
+			efficientTradingTrajectoryDiscrete
+		).totalCostDistributionSynopsis (
+			linearPermanentExpectationParameters
+		);
 
 		System.out.println ("\n\t|---------------------------------------------||");
 
@@ -227,47 +225,51 @@ public class LinearImpactNoDrift {
 
 		System.out.println ("\t|---------------------------------------------||");
 
-		System.out.println ("\t| Initial Stock Price           : " + dblS0);
+		System.out.println ("\t| Initial Stock Price           : " + s0);
 
-		System.out.println ("\t| Initial Holdings              : " + dblX);
+		System.out.println ("\t| Initial Holdings              : " + x);
 
-		System.out.println ("\t| Liquidation Time              : " + dblT);
+		System.out.println ("\t| Liquidation Time              : " + t);
 
-		System.out.println ("\t| Number of Time Periods        : " + iN);
+		System.out.println ("\t| Number of Time Periods        : " + n);
 
-		System.out.println ("\t| Annual Volatility             :" + FormatUtil.FormatDouble (dblAnnualVolatility, 1, 0, 100.) + "%");
+		System.out.println (
+			"\t| Annual Volatility             :" + FormatUtil.FormatDouble (annualVolatility, 1, 0, 100.) +
+				"%"
+		);
 
-		System.out.println ("\t| Annual Growth                 :" + FormatUtil.FormatDouble (dblAnnualReturns, 1, 0, 100.) + "%");
+		System.out.println (
+			"\t| Annual Growth                 :" + FormatUtil.FormatDouble (annualReturns, 1, 0, 100.) + "%"
+		);
 
-		System.out.println ("\t| Bid-Ask Spread                : " + dblBidAsk);
+		System.out.println ("\t| Bid-Ask Spread                : " + bidAsk);
 
-		System.out.println ("\t| Daily Volume                  : " + dblDailyVolume);
+		System.out.println ("\t| Daily Volume                  : " + dailyVolume);
 
-		System.out.println ("\t| Daily Volume Temporary Impact : " + dblDailyVolumeTemporaryImpact);
+		System.out.println ("\t| Daily Volume Temporary Impact : " + dailyVolumeTemporaryImpact);
 
-		System.out.println ("\t| Daily Volume Permanent Impact : " + dblDailyVolumePermanentImpact);
+		System.out.println ("\t| Daily Volume Permanent Impact : " + dailyVolumePermanentImpact);
 
-		System.out.println ("\t| Daily Volume 5 million Shares : " + prlPermanent.slope());
+		System.out.println ("\t| Daily Volume 5 million Shares : " + permanentTransactionFunction.slope());
 
-		System.out.println ("\t| Static Holdings 11,000 Shares : " + dblLambdaU);
+		System.out.println ("\t| Static Holdings 11,000 Shares : " + lambdaU);
 
 		System.out.println ("\t|");
 
 		System.out.println (
-			"\t| Daily Volatility              : " +
-			FormatUtil.FormatDouble (dblSigma, 1, 4, 1.)
+			"\t| Daily Volatility              : " + FormatUtil.FormatDouble (sigma, 1, 4, 1.)
 		);
 
 		System.out.println (
 			"\t| Daily Returns                 : " +
-			FormatUtil.FormatDouble (dblAlpha, 1, 4, 1.)
+				FormatUtil.FormatDouble (arithmeticPriceDynamicsSettings.drift(), 1, 4, 1.)
 		);
 
-		System.out.println ("\t| Temporary Impact Fixed Offset :  " + prlTemporary.offset());
+		System.out.println ("\t| Temporary Impact Fixed Offset :  " + temporaryTransactionFunction.offset());
 
-		System.out.println ("\t| Eta                           :  " + prlTemporary.slope());
+		System.out.println ("\t| Eta                           :  " + temporaryTransactionFunction.slope());
 
-		System.out.println ("\t| Gamma                         :  " + prlPermanent.slope());
+		System.out.println ("\t| Gamma                         :  " + permanentTransactionFunction.slope());
 
 		System.out.println ("\t|---------------------------------------------||");
 
@@ -287,19 +289,25 @@ public class LinearImpactNoDrift {
 
 		System.out.println ("\t|-----------------------------||");
 
-		for (int i = 0; i <= iN; ++i) {
-			if (i == 0)
-				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 0, 1.) + " => " +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (0., 6, 1, 1.) + " ||"
-				);
-			else
-				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 0, 1.) + " => " +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (adblTradeList[i - 1], 6, 1, 1.) + " ||"
-				);
+		for (int executionTimeIndex = 0; executionTimeIndex <= n; ++executionTimeIndex) {
+			System.out.println (
+				"\t|" + FormatUtil.FormatDouble (
+					executionTimeNodeArray[executionTimeIndex],
+					1,
+					0,
+					1.
+				) + " => " + FormatUtil.FormatDouble (
+					holdingsArray[executionTimeIndex],
+					7,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					0 == executionTimeIndex ? 0. : tradeArray[executionTimeIndex - 1],
+					6,
+					1,
+					1.
+				) + " ||"
+			);
 		}
 
 		System.out.println ("\t|-----------------------------||");
@@ -311,15 +319,31 @@ public class LinearImpactNoDrift {
 		System.out.println ("\t|--------------------------------------------------------------||");
 
 		System.out.println (
-			"\t| Transaction Cost Expectation         : " +
-			FormatUtil.FormatDouble (r1un.mean(), 6, 1, 1.) + " | " +
-			FormatUtil.FormatDouble (ettd.transactionCostExpectation(), 6, 1, 1.) + " ||"
+			"\t| Transaction Cost Expectation         : " + FormatUtil.FormatDouble (
+				r1UnivariateNormal.mean(),
+				6,
+				1,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryDiscrete.transactionCostExpectation(),
+				6,
+				1,
+				1.
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Transaction Cost Variance (X 10^-06) : " +
-			FormatUtil.FormatDouble (r1un.variance(), 6, 1, 1.e-06) + " | " +
-			FormatUtil.FormatDouble (ettd.transactionCostVariance(), 6, 1, 1.e-06) + " ||"
+			"\t| Transaction Cost Variance (X 10^-06) : " + FormatUtil.FormatDouble (
+				r1UnivariateNormal.variance(),
+				6,
+				1,
+				1.e-06
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryDiscrete.transactionCostVariance(),
+				6,
+				1,
+				1.e-06
+			) + " ||"
 		);
 
 		System.out.println ("\t|--------------------------------------------------------------||");

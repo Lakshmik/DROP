@@ -191,76 +191,12 @@
  --------------------------
 
  --------------------------
- #6 - Nelder-Mead Method
+ #6 - Levenberg-Marquardt Algorithm [COVERED]
  --------------------------
- 6.1) Introduction
-	- Also downhill simplex method, amoeba method, or polytope method – numerical method to find a local minimum in a multi-dimensional space
- 6.2) Implementing a new Variant of the Scheme
-	- Minimize f(x) where x∈R^n The current test points are x_1,⋯,x_(n+1)
-	- Vertex Ordering Step #1:
-		- Order according to the values at the vertices f(x_1 )≤f(x_2 )≤⋯≤f(x_(n+1) )
-	- Centroid Estimation Step #2: Calculate x_0, the centroid of all points except x_(n+1)
-	- Reflection Step #3:
-		- x_r=x_0+α(x_0-x_(n+1) ) with α>0
-		- If f(x_1 )≤f(x_r )≤f(x_n ) => new simplex by replacing the worst point x_(n+1) with x_r and go to step #1
-	- Reflection Step #4:
-		- If f(x_r )<f(x_1 ) compute x_e=x_0+γ(x_r-x_0 ) with γ>1
-		- If f(x_e )<f(x_r ):
-			- new simplex by replacing the worst point x_(n+1) by the expanded point x_e and go to step #1
-			- otherwise, obtain a new simplex by replacing the worst point x_(n+1) with the reflected point x_r and go to step #1
-	- Contraction Step #5: Now f(x_r )<f(x_n )
-		- If f(x_r )<f(x_(n+1) ) compute x_c=x_0+ρ(x_r-x_0 ) with 0<ρ≤0.5
-		- If f(x_c )<f(x_r ) new simplex by replacing x_(n+1) with the contracted point x_c and go to step #1. Otherwise, go to step #6
-		- If f(x_r )≥f(x_(n+1) ) compute x_c=x_0+ρ(x_(n+1)-x_0 ) with 0<ρ≤0.5
-		- If f(x_c )<f(x_(n+1) ) new simplex by replacing x_(n+1) with the contracted point x_c and go to step #1. Otherwise, go to step #6
-	- Shrink Step #6: Replace all points except the best x_1 with x_i=x_1+σ(x_i-x_1 ) and go to step #1
-	- Standard Values for the Coefficients: α=1; γ=2; ρ=1/2; σ=1/2
- 6.3) Initial Simplex
-	- Nelder-Mead’s Scheme: Given x_1, others are generated with a fixed step along each dimension in turn
- 6.4) Termination
-	- Nelder-Mead Criterion:
-		- Standard deviation of function values to current simplex below a threshold - stop
-		- Flat function may have almost equal function values over a large domain, so Nash adds the shrinkage criterion
- --------------------------
-
- --------------------------
- #7 - Himmelblau’s Function
- --------------------------
- 7.1) Test Function for Optimization Algorithms: f(x,y)=(x^2+y-11)^2+(x+y^2-7)^2
- 7.2) Local Extrema:
-	- Maximum at: (x=-0.270845, y=-0.923039) with value 181.617 
-	- Minima:
-		- f(3.0,2.0)=0.0
-		- f(-2.805118,3.131312)=0.0
-		- f(-3.779310,-3.283186)=0.0
-		- f(3.584428,-1.848126)=0.0
- --------------------------
-
- --------------------------
- #8 - Rosenbrock’s Function
- --------------------------
- 8.1) Overview: f(x,y)=(a-x)^2+b(y-x^2 )^2
-	- Characteristics:
-		- (x,y)=(a,a^2 ) where f(x,y)=0
-		- Typical Parameters: a=1 and b=100
-		- Only in the trivial case where a=0 the function is symmetric and the minimum is at the origin
- 8.2) Multidimensional Generalizations:
-	- First R^N Variant: Sum of N/2 uncoupled in 2D Rosenbrock problems, defined only for even N‘s - has predictably simple solutions
-		- f(x)=f(x_1,x_2,⋯,x_N )=∑_(i=1)^(N/2)▒[100(〖x_(2i-1)〗^2-x_2i )^2+(x_(2i-1)-1)^2 ] 
-	- Second R^N Variant:
-		- f(x)=f(x_1,x_2,⋯,x_N )=∑_(i=1)^(N-1)▒[100(x_(i+1)-x_i^2 )^2+(1-x_i )^2 ] 
-		- N=3 => One min at (1,1,⋯,1)
-		- 4≤N<7 => Global min at (1,1,⋯,1), local near (-1,1,⋯,1)
-		- Small N: 	Roots bounded in the region |x_i |<2.4
- --------------------------
-
- --------------------------
- #9 - Levenberg-Marquardt Algorithm [COVERED]
- --------------------------
- 9.1) Problem:
+ 6.1) Problem:
 	- Inputs: of m empirical pairs (x_i,y_i ) of independent and dependent variables
 	- Minimize Sum of the squares of the deviations S(β) β ̂∈■(arg⁡min@β) S(β)=■(arg⁡min@β) ∑_(i=1)^m▒[y_i-S(x_i,β)]^2 
- 9.2) Solution:
+ 6.2) Solution:
 	- Replacing β by β+δ: In each iteration step, the β is replaced by a new estimate β+δ
 	- Linearizing f(x_i,β+δ): To determine δ, f(x_i,β+δ) is approximated by f(x_i,β+δ)≈f(x_i,β+δ)+J_i δ where J_i=∂f(x_i,β)/∂β
 	- Minima of S(β):
@@ -283,7 +219,7 @@
 		- Marquardt’s algorithm solved a modified problem with each component of the gradient scaled according to the curvature
 		- Larger movement along the directions where the gradient is smaller, which avoids slow convergence in the direction of small gradients
 	- Fletcher’s Modification to the Marquardt’s Algorithm => [J^T J+λ Diag(J^T J)]δ=J^T [y-f(β)]
- 9.3) Choice of Damping Parameters
+ 6.3) Choice of Damping Parameters
 	- Marquardt’s Choice for λ_0/ν: Initial λ_0 and ν>1
 	- Iterative Approach for λ:
 		- Compute the starting S(λ_0, β) and S(λ_0/ν, β)
@@ -302,9 +238,9 @@
  --------------------------
 
  --------------------------
- #10 - Gauss-Newton Algorithm [COVERED]
+ #7 - Gauss-Newton Algorithm [COVERED]
  --------------------------
- 10.1) Description:
+ 7.1) Description:
 	- Iterative Solution for β: S(β)=∑_(i=1)^m▒〖r_i (β)^2 〗 where r=(r_1,⋯,r_m ) and β=(β_1,⋯,β_n ) and m≥n
 	- β_(s+1)=β_s-(J_r^T J_r )^(-1) J_r^T r(β_s )
 	- ∆=β_(s+1)-β_s; ∆=-(J_r^T J_r )^(-1) J_r^T r(β_s ) => J_r^T J_r ∆=-J_r^T r(β_s )
@@ -312,16 +248,16 @@
 	- 1D Newton: If m=n then β_(s+1)=β_s-J_r^(-1) r(β_s )
 	- Model Function f(x,β): r_i (β)=y_i-f(x_i,β)
 		- J_f=-J_r => β_(s+1)=β_s+(J_f^T J_f )^(-1) J_f^T r(β_s )
- 10.2) Notes:
+ 7.2) Notes:
 	- Linear Approximation of r_i => r(β)≈r(β_s )+J_r (β_s )∆ with ∆=β-β_s
 	- Linear Least-Squares Problem: min⁡(‖r(β_s )+J_r (β_s )∆‖_2^2 )
- 10.3) Convergence to a Local Minimum - COnditions:
+ 7.3) Convergence to a Local Minimum - COnditions:
 	- r_1,⋯,r_m are twice continuously differentiable in an open convex set β ̂∈D
 	- J_r (β ̂ ) is of full column rank
 	- Initial iterate β_0 is near β ̂
 	- Local minimum value |S(β ̂ )| is small
 	- The convergence is quadratic if |S(β ̂ )|=0
- 10.4) Derivation from Newton’s Method:
+ 7.4) Derivation from Newton’s Method:
 	- β_(s+1)=β_s-H^(-1) g
 	- g_j=∑_(i=1)^m▒〖r_i  (∂r_i)/(∂β_j )〗
 	- H_jk=2∑_(i=1)^m▒((∂r_i)/(∂β_j )  (∂r_i)/(∂β_k )+r_i  (∂^2 r_i)/(∂β_j ∂β_k )) 
@@ -331,7 +267,7 @@
 	- Approximation Validity: |(∂r_i)/(∂β_j )  (∂r_i)/(∂β_k )|≫|r_i  (∂^2 r_i)/(∂β_j ∂β_k )|
 		- r_i are small in magnitude
 		- Mildly non-linear, that is (∂^2 r_i)/(∂β_j ∂β_k ) is small
- 10.5) Improved Versions:
+ 7.5) Improved Versions:
 	- With the Gauss-Newton method, S may not decrease at every iteration
 	- Since ∆ is descent direction, unless S(β_s ) is a stationary point, it holds that S(β_s+α)<S(β_s ) for small α>0
 		- β_(s+1)=β_s+α∆
@@ -341,10 +277,10 @@
 	- Biasing ∆ Towards Steepest Descent: [J^T J+λD]∆=-J^T r => D is a positive diagonal matrix
 	- When D is I and λ→+∞  λ∆→-J^T r
 	- Choosing λ: Line-search is inefficient. So increase λ until S decreases; retain this λ till S -> 0
- 10.6) Large Scale Optimization:
+ 7.6) Large Scale Optimization:
 	- Sparse Matrix of J_r => Efficxient storage of rows of J_r in a compressed form - makes transposition complicated
 	- c_i => row i of the J_r used in J_r^T J_r p=∑_i▒〖c_i (c_i∙p) 〗
- 10.7) Quasi-Newton Schemes:
+ 7.7) Quasi-Newton Schemes:
 	- Estimate of the full Hessian (∂^2 S)/(∂β_j ∂β_k ) is built up numerically using the first derivatives (∂r_i)/(∂β_j )
 		- After n refinement cycles the method closely approximates Newton’s method in performance
  --------------------------

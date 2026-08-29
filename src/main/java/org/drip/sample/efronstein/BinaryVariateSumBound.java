@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,48 +97,50 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>BinaryVariateSumBound</i> demonstrates the Computation of the Probabilistic Bounds for the Realization
- * of the Values of a Multivariate Function over Random Sequence Values (in this case, sum of the independent
- * Random Variates) using Variants of the Efron-Stein Methodology.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/efronstein/README.md">Efron Stein Sequence Sum Bounds</a></li>
- *  </ul>
- * <br><br>
+ * 	of the Values of a Multivariate Function over Random Sequence Values (in this case, sum of the
+ * 	independent Random Variates) using Variants of the Efron-Stein Methodology.
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/efronstein/README.md">Efron-Stein Sequence Sum Bounds</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BinaryVariateSumBound {
+public class BinaryVariateSumBound
+{
 
 	private static final SingleSequenceAgnosticMetrics[] IIDDraw (
-		final UnivariateSequenceGenerator rsg,
-		final int iNumSample)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final int sampleCount)
 		throws Exception
 	{
-		SingleSequenceAgnosticMetrics[] aSSAM = new SingleSequenceAgnosticMetrics[iNumSample];
+		SingleSequenceAgnosticMetrics[] singleSequenceAgnosticMetricsArray =
+			new SingleSequenceAgnosticMetrics[sampleCount];
 
-		for (int i = 0; i < iNumSample; ++i)
-			aSSAM[i] = rsg.sequence (
-				iNumSample,
-				null
-			);
+		for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
+			singleSequenceAgnosticMetricsArray[sampleIndex] =
+				univariateSequenceGenerator.sequence (sampleCount, null);
+		}
 
-		return aSSAM;
+		return singleSequenceAgnosticMetricsArray;
 	}
 
 	private static final GlivenkoCantelliUniformDeviation BinarySumFunction (
 		final Binary binarySequenceGenerator,
-		final int iNumVariate)
+		final int variateCount)
 		throws Exception
 	{
-		double[] adblWeight = new double[iNumVariate];
+		double[] weightArray = new double[variateCount];
 
-		for (int i = 0; i < iNumVariate; ++i)
-			adblWeight[i] = 1. / iNumVariate;
+		for (int variateIndex = 0; variateIndex < variateCount; ++variateIndex) {
+			weightArray[variateIndex] = 1. / variateCount;
+		}
 
 		return new GlivenkoCantelliUniformDeviation (
 			new BinaryIdempotentUnivariateRandom (
@@ -139,193 +149,153 @@ public class BinaryVariateSumBound {
 				1.,
 				binarySequenceGenerator.positiveProbability()
 			),
-			adblWeight
+			weightArray
 		);
 	}
 
 	private static final void MartingaleDifferencesRun (
 		final Binary binarySequenceGenerator,
-		final int iNumSample,
-		final int iNumSet)
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					BinarySumFunction (binarySequenceGenerator, sampleCount),
+					IIDDraw (binarySequenceGenerator, sampleCount)
+				).martingaleVarianceUpperBound(),
+				1,
+				3,
+				1.
 			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				BinarySumFunction (
-					binarySequenceGenerator,
-					iNumSample
-				),
-				aSSAM
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.martingaleVarianceUpperBound(), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void GhostVariateVarianceRun (
 		final Binary binarySequenceGenerator,
-		final int iNumSample,
-		final int iNumSet)
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
-			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				BinarySumFunction (
-					binarySequenceGenerator,
-					iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					BinarySumFunction (binarySequenceGenerator, sampleCount),
+					IIDDraw (binarySequenceGenerator, sampleCount)
+				).ghostVarianceUpperBound (
+					IIDDraw (binarySequenceGenerator, sampleCount)
 				),
-				aSSAM
+				1,
+				3,
+				1.
 			);
-
-			SingleSequenceAgnosticMetrics[] aSSAMGhost = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.ghostVarianceUpperBound (aSSAMGhost), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void EfronSteinSteeleRun (
 		final Binary binarySequenceGenerator,
-		final int iNumSample,
-		final int iNumSet)
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
-			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				BinarySumFunction (
-					binarySequenceGenerator,
-					iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					BinarySumFunction (binarySequenceGenerator, sampleCount),
+					IIDDraw (binarySequenceGenerator, sampleCount)
+				).efronSteinSteeleBound (
+					IIDDraw (binarySequenceGenerator, sampleCount)
 				),
-				aSSAM
+				1,
+				3,
+				1.
 			);
-
-			SingleSequenceAgnosticMetrics[] aSSAMGhost = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.efronSteinSteeleBound (aSSAMGhost), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void PivotDifferencesRun (
 		final Binary binarySequenceGenerator,
-		final int iNumSample,
-		final int iNumSet)
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			MultivariateRandom func = BinarySumFunction (
-				binarySequenceGenerator,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					BinarySumFunction (binarySequenceGenerator, sampleCount),
+					IIDDraw (binarySequenceGenerator, sampleCount)
+				).pivotVarianceUpperBound (new FlatMultivariateRandom (0.)),
+				1,
+				3,
+				1.
 			);
-
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
-			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				func,
-				aSSAM
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.pivotVarianceUpperBound (new FlatMultivariateRandom (0.)), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void BoundedDifferencesRun (
 		final Binary binarySequenceGenerator,
-		final int iNumSample,
-		final int iNumSet)
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				binarySequenceGenerator,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					BinarySumFunction (binarySequenceGenerator, sampleCount),
+					IIDDraw (binarySequenceGenerator, sampleCount)
+				).boundedVarianceUpperBound(),
+				1,
+				3,
+				1.
 			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				BinarySumFunction (
-					binarySequenceGenerator,
-					iNumSample
-				),
-				aSSAM
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.boundedVarianceUpperBound(), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		int iNumSet = 5;
-
-		int[] aiSampleSize = new int[] {
-			3, 10, 25, 50
+		int setCount = 5;
+		int[] sampleSizeArray =
+		{
+			3,
+			10,
+			25,
+			50
 		};
 
-		Binary bin = new Binary (0.7);
+		Binary binarySequencyGenerator = new Binary (0.7);
 
 		System.out.println ("\n\t|-----------------------------------------------|");
 
@@ -333,12 +303,9 @@ public class BinaryVariateSumBound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			MartingaleDifferencesRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			MartingaleDifferencesRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
@@ -348,17 +315,20 @@ public class BinaryVariateSumBound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			GhostVariateVarianceRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			GhostVariateVarianceRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		aiSampleSize = new int[] {
-			3, 10, 25, 50, 75, 99
+		sampleSizeArray = new int[]
+		{
+			3,
+			10,
+			25,
+			50,
+			75,
+			99
 		};
 
 		System.out.println ("\n\t|-----------------------------------------------|");
@@ -367,12 +337,9 @@ public class BinaryVariateSumBound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			EfronSteinSteeleRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			EfronSteinSteeleRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
@@ -382,12 +349,13 @@ public class BinaryVariateSumBound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
+		for (int sampleSize : sampleSizeArray) {
 			PivotDifferencesRun (
-				bin,
-				iSampleSize,
-				iNumSet
+				binarySequencyGenerator,
+				sampleSize,
+				setCount
 			);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
@@ -397,12 +365,13 @@ public class BinaryVariateSumBound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
+		for (int sampleSize : sampleSizeArray) {
 			BoundedDifferencesRun (
-				bin,
-				iSampleSize,
-				iNumSet
+				binarySequencyGenerator,
+				sampleSize,
+				setCount
 			);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 

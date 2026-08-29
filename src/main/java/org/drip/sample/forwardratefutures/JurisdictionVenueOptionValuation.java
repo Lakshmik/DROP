@@ -10,7 +10,6 @@ import org.drip.param.creator.*;
 import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.valuation.*;
 import org.drip.product.creator.SingleStreamOptionBuilder;
-import org.drip.product.fra.FRAStandardCapFloorlet;
 import org.drip.product.rates.*;
 import org.drip.sample.forward.OvernightIndexCurve;
 import org.drip.service.common.FormatUtil;
@@ -27,6 +26,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,343 +111,309 @@ import org.drip.state.identifier.*;
 
 /**
  * <i>JurisdictionVenueOptionValuation</i> contains the Demonstration of the Construction and the Valuation
- * of the Options on Standardized LIBOR Futures Contract across Jurisdictions and Venues.
+ * 	of the Options on Standardized LIBOR Futures Contract across Jurisdictions and Venues.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class JurisdictionVenueOptionValuation {
+public class JurisdictionVenueOptionValuation
+{
 
 	private static final FloatFloatComponent OTCFloatFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strDerivedTenor,
-		final String strMaturityTenor,
-		final double dblBasis)
+		final JulianDate spotDate,
+		final String currency,
+		final String derivedTenor,
+		final String maturityTenor,
+		final double basis)
 	{
-		FloatFloatSwapConvention ffConv = IBORFloatFloatContainer.ConventionFromJurisdiction (strCurrency);
-
-		return ffConv.createFloatFloatComponent (
-			dtSpot,
-			strDerivedTenor,
-			strMaturityTenor,
-			dblBasis,
+		return IBORFloatFloatContainer.ConventionFromJurisdiction (
+			currency
+		).createFloatFloatComponent (
+			spotDate,
+			derivedTenor,
+			maturityTenor,
+			basis,
 			1.
 		);
 	}
 
-	/*
-	 * Construct an array of float-float swaps from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FloatFloatComponent[] MakexM6MBasisSwap (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final int iTenorInMonths)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final int tenorInMonths)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFFC[i] = OTCFloatFloat (
-				dtSpot,
-				strCurrency,
-				iTenorInMonths + "M",
-				astrMaturityTenor[i],
+		for (int floatFloatComponent = 0;
+			floatFloatComponent < maturityTenorArray.length;
+			++floatFloatComponent)
+		{
+			floatFloatComponentArray[floatFloatComponent] = OTCFloatFloat (
+				spotDate,
+				currency,
+				tenorInMonths + "M",
+				maturityTenorArray[floatFloatComponent],
 				0.
 			);
+		}
 
-		return aFFC;
+		return floatFloatComponentArray;
 	}
 
 	private static final ForwardCurve MakeFC (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final MergedDiscountForwardCurve dc,
-		final int iTenorInMonths,
-		final String[] astrxM6MFwdTenor,
-		final double[] adblxM6MBasisSwapQuote)
+		final JulianDate spotDate,
+		final String currency,
+		final MergedDiscountForwardCurve discountCurve,
+		final int tenorInMonths,
+		final String[] xM6MForwardTenorArray,
+		final double[] xM6MBasisSwapQuoteArray)
 		throws Exception
 	{
-		/*
-		 * Construct the 6M-xM float-float basis swap.
-		 */
-
-		FloatFloatComponent[] aFFC = MakexM6MBasisSwap (
-			dtSpot,
-			strCurrency,
-			astrxM6MFwdTenor,
-			iTenorInMonths
-		);
-
-		String strBasisTenor = iTenorInMonths + "M";
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		/*
-		 * Calculate the starting forward rate off of the discount curve.
-		 */
-
-		double dblStartingFwd = dc.forward (
-			dtSpot.julian(),
-			dtSpot.addTenor (strBasisTenor).julian()
-		);
-
-		/*
-		 * Set the discount curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null
-		);
-
-		/*
-		 * Construct the shape preserving forward curve off of Quartic Polynomial Basis Spline.
-		 */
+		String basisTenor = tenorInMonths + "M";
 
 		return ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
-			"QUARTIC_FWD" + strBasisTenor,
-			ForwardLabel.Create (
-				strCurrency,
-				strBasisTenor
-			),
-			valParams,
+			"QUARTIC_FWD" + basisTenor,
+			ForwardLabel.Create (currency, basisTenor),
+			new ValuationParams (spotDate, spotDate, currency),
 			null,
-			mktParams,
+			MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
 			null,
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (5),
-			aFFC,
+			MakexM6MBasisSwap (spotDate, currency, xM6MForwardTenorArray, tenorInMonths),
 			"DerivedParBasisSpread",
-			adblxM6MBasisSwapQuote,
-			dblStartingFwd
+			xM6MBasisSwapQuoteArray,
+			discountCurve.forward (spotDate.julian(), spotDate.addTenor (basisTenor).julian())
 		);
 	}
 
 	private static final Map<String, ForwardCurve> MakeFC (
-		final JulianDate dt,
-		final String strCurrency,
-		final MergedDiscountForwardCurve dc)
+		final JulianDate date,
+		final String currency,
+		final MergedDiscountForwardCurve discountCurve)
 		throws Exception
 	{
-		Map<String, ForwardCurve> mapFC = new HashMap<String, ForwardCurve>();
+		Map<String, ForwardCurve> forwardCurveMap = new HashMap<String, ForwardCurve>();
 
-		/*
-		 * Build and run the sampling for the 1M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		ForwardCurve fc1M = MakeFC (
-			dt,
-			strCurrency,
-			dc,
-			1,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-			},
-			new double[] {
-				0.00551,    //  1Y
-				0.00387,    //  2Y
-				0.00298,    //  3Y
-				0.00247,    //  4Y
-				0.00211,    //  5Y
-				0.00185,    //  6Y
-				0.00165,    //  7Y
-				0.00150,    //  8Y
-				0.00137,    //  9Y
-				0.00127,    // 10Y
-				0.00119,    // 11Y
-				0.00112,    // 12Y
-				0.00096,    // 15Y
-				0.00079,    // 20Y
-				0.00069,    // 25Y
-				0.00062     // 30Y
-				}
-			);
-
-		mapFC.put (
+		forwardCurveMap.put (
 			"1M",
-			fc1M
+			MakeFC (
+				date,
+				currency,
+				discountCurve,
+				1,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				new double[]
+				{
+					0.00551,    //  1Y
+					0.00387,    //  2Y
+					0.00298,    //  3Y
+					0.00247,    //  4Y
+					0.00211,    //  5Y
+					0.00185,    //  6Y
+					0.00165,    //  7Y
+					0.00150,    //  8Y
+					0.00137,    //  9Y
+					0.00127,    // 10Y
+					0.00119,    // 11Y
+					0.00112,    // 12Y
+					0.00096,    // 15Y
+					0.00079,    // 20Y
+					0.00069,    // 25Y
+					0.00062     // 30Y
+				}
+			)
 		);
 
-		/*
-		 * Build and run the sampling for the 3M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		ForwardCurve fc3M = MakeFC (
-			dt,
-			strCurrency,
-			dc,
-			3,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-			},
-			new double[] {
-				0.00186,    //  1Y
-				0.00127,    //  2Y
-				0.00097,    //  3Y
-				0.00080,    //  4Y
-				0.00067,    //  5Y
-				0.00058,    //  6Y
-				0.00051,    //  7Y
-				0.00046,    //  8Y
-				0.00042,    //  9Y
-				0.00038,    // 10Y
-				0.00035,    // 11Y
-				0.00033,    // 12Y
-				0.00028,    // 15Y
-				0.00022,    // 20Y
-				0.00020,    // 25Y
-				0.00018     // 30Y
-				}
-			);
-
-		mapFC.put (
+		forwardCurveMap.put (
 			"3M",
-			fc3M
-		);
-
-		/*
-		 * Build and run the sampling for the 12M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		ForwardCurve fc12M = MakeFC (
-			dt,
-			strCurrency,
-			dc,
-			12,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y",
-				"35Y", "40Y" // Extrapolated
-			},
-			new double[] {
-				-0.00212,    //  1Y
-				-0.00152,    //  2Y
-				-0.00117,    //  3Y
-				-0.00097,    //  4Y
-				-0.00082,    //  5Y
-				-0.00072,    //  6Y
-				-0.00063,    //  7Y
-				-0.00057,    //  8Y
-				-0.00051,    //  9Y
-				-0.00047,    // 10Y
-				-0.00044,    // 11Y
-				-0.00041,    // 12Y
-				-0.00035,    // 15Y
-				-0.00028,    // 20Y
-				-0.00025,    // 25Y
-				-0.00022,    // 30Y
-				-0.00022,    // 35Y Extrapolated
-				-0.00022,    // 40Y Extrapolated
+			MakeFC (
+				date,
+				currency,
+				discountCurve,
+				3,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				new double[]
+				{
+					0.00186,    //  1Y
+					0.00127,    //  2Y
+					0.00097,    //  3Y
+					0.00080,    //  4Y
+					0.00067,    //  5Y
+					0.00058,    //  6Y
+					0.00051,    //  7Y
+					0.00046,    //  8Y
+					0.00042,    //  9Y
+					0.00038,    // 10Y
+					0.00035,    // 11Y
+					0.00033,    // 12Y
+					0.00028,    // 15Y
+					0.00022,    // 20Y
+					0.00020,    // 25Y
+					0.00018     // 30Y
 				}
-			);
-
-		mapFC.put (
-			"12M",
-			fc12M
+			)
 		);
 
-		return mapFC;
+		forwardCurveMap.put (
+			"12M",
+			MakeFC (
+				date,
+				currency,
+				discountCurve,
+				12,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"35Y",
+					"40Y" // Extrapolated
+				},
+				new double[]
+				{
+					-0.00212,    //  1Y
+					-0.00152,    //  2Y
+					-0.00117,    //  3Y
+					-0.00097,    //  4Y
+					-0.00082,    //  5Y
+					-0.00072,    //  6Y
+					-0.00063,    //  7Y
+					-0.00057,    //  8Y
+					-0.00051,    //  9Y
+					-0.00047,    // 10Y
+					-0.00044,    // 11Y
+					-0.00041,    // 12Y
+					-0.00035,    // 15Y
+					-0.00028,    // 20Y
+					-0.00025,    // 25Y
+					-0.00022,    // 30Y
+					-0.00022,    // 35Y Extrapolated
+					-0.00022,    // 40Y Extrapolated
+				}
+			)
+		);
+
+		return forwardCurveMap;
 	}
 
 	private static final void SetVolCorrelation (
-		final int iValueDate,
-		final CurveSurfaceQuoteContainer mktParams,
-		final ForwardLabel fri,
-		final double dblForwardVol,
-		final double dblFundingVol,
-		final double dblForwardFundingCorr)
+		final int valueDate,
+		final CurveSurfaceQuoteContainer curveSurfaceQuoteContainer,
+		final ForwardLabel forwardLabel,
+		final double forwardVolatility,
+		final double fundingVolatility,
+		final double forwardFundingCorrelation)
 		throws Exception
 	{
-		FundingLabel fundingLabel = FundingLabel.Standard (fri.currency());
+		String currency = forwardLabel.currency();
 
-		mktParams.setForwardVolatility (
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
+
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				iValueDate,
-				VolatilityLabel.Standard (fri),
-				fri.currency(),
-				dblForwardVol
+				valueDate,
+				VolatilityLabel.Standard (forwardLabel),
+				currency,
+				forwardVolatility
 			)
 		);
 
-		mktParams.setFundingVolatility (
+		curveSurfaceQuoteContainer.setFundingVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				iValueDate,
+				valueDate,
 				VolatilityLabel.Standard (fundingLabel),
-				fri.currency(),
-				dblFundingVol
+				forwardLabel.currency(),
+				fundingVolatility
 			)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			forwardLabel,
 			fundingLabel,
-			new Flat (dblForwardFundingCorr)
+			new Flat (forwardFundingCorrelation)
 		);
 	}
 
 	private static final void FuturesOptionMetrics (
-		final String strCurrency,
-		final String strTenor,
-		final JulianDate dtSpot,
-		final String strOptionType,
-		final String strExchange)
+		final String currency,
+		final String tenor,
+		final JulianDate spotDate,
+		final String optionType,
+		final String exchange)
 		throws Exception
 	{
-		MergedDiscountForwardCurve dcOIS = OvernightIndexCurve.MakeDC (
-			dtSpot,
-			strCurrency
-		);
+		MergedDiscountForwardCurve oisDiscountCurve = OvernightIndexCurve.MakeDC (spotDate, currency);
 
-		ForwardLabel forwardLabel = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
+		ForwardCurve forwardCurve = MakeFC (spotDate, currency, oisDiscountCurve).get (tenor);
 
-		Map<String, ForwardCurve> mapFC = MakeFC (
-			dtSpot,
-			strCurrency,
-			dcOIS
-		);
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, tenor);
 
-		ForwardCurve fc = mapFC.get (strTenor);
+		JulianDate dtEffective = spotDate.addTenor ("3M");
 
-		JulianDate dtEffective = dtSpot.addTenor ("3M");
-
-		FRAStandardCapFloorlet liborFuturesOption = SingleStreamOptionBuilder.ExchangeTradedFuturesOption (
-			dtEffective,
-			forwardLabel,
-			fc.forward (dtEffective.addTenor (fc.tenor())),
-			"ParForward",
-			false,
-			strOptionType,
-			strExchange
-		);
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dcOIS,
-			fc,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			oisDiscountCurve,
+			forwardCurve,
 			null,
 			null,
 			null,
@@ -449,142 +422,106 @@ public class JurisdictionVenueOptionValuation {
 			null
 		);
 
-		double dblForwardVol = 0.50;
-		double dblFundingVol = 0.50;
-		double dblForwardFundingCorr = 0.50;
+		double forwardVolatility = 0.5;
+		double fundingVolatility = 0.5;
+		double forwardFundingCorrelation = 0.5;
 
 		SetVolCorrelation (
-			dtSpot.julian(),
-			mktParams,
+			spotDate.julian(),
+			curveSurfaceQuoteContainer,
 			forwardLabel,
-			dblForwardVol,
-			dblFundingVol,
-			dblForwardFundingCorr
+			forwardVolatility,
+			fundingVolatility,
+			forwardFundingCorrelation
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		Map<String, Double> mapOutput = liborFuturesOption.value (
-			valParams,
+		Map<String, Double> futuresOptionMeasureMap = SingleStreamOptionBuilder.ExchangeTradedFuturesOption (
+			dtEffective,
+			forwardLabel,
+			forwardCurve.forward (dtEffective.addTenor (forwardCurve.tenor())),
+			"ParForward",
+			false,
+			optionType,
+			exchange
+		).value (
+			new ValuationParams (spotDate, spotDate, currency),
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		System.out.println ("\t\t" + strExchange + " | " +
-			FormatUtil.FormatDouble (mapOutput.get ("ATMFRA"), 1, 4, 100.) + " % | " +
-			FormatUtil.FormatDouble (mapOutput.get ("Upfront"), 1, 1, 10000.) + " bp | " +
-			forwardLabel.fullyQualifiedName()
+		System.out.println (
+			"\t\t" + exchange + " | " + FormatUtil.FormatDouble (
+				futuresOptionMeasureMap.get ("ATMFRA"),
+				1,
+				4,
+				100.
+			) + " % | " + FormatUtil.FormatDouble (
+				futuresOptionMeasureMap.get ("Upfront"),
+				1,
+				1,
+				10000.
+			) + " bp | " + forwardLabel.fullyQualifiedName()
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		System.out.println ("\tOutput Order - L -> R:");
+		System.out.println ("\t||-----------------------------------------------------");
 
-		System.out.println ("\t\tExchange\n\t\tATM Par FRA Level (%)\n\t\tOption Upfront (bp)\n\t\tFRA Label");
+		System.out.println ("\t||Output Order - L -> R:");
 
-		System.out.println ("\n\t-----------------------------------------------------");
+		System.out.println ("\t||-----------------------------------------------------");
 
-		System.out.println ("\t--------------- MARGIN TYPE OPTION ------------------");
-
-		System.out.println ("\t-----------------------------------------------------");
-
-		FuturesOptionMetrics (
-			"CHF",
-			"3M",
-			dtToday,
-			"MARGIN",
-			"LIFFE"
+		System.out.println (
+			"\t\t|| Exchange\n\t\t|| ATM Par FRA Level (%)\n\t\t|| Option Upfront (bp)\n\t\t|| FRA Label"
 		);
 
-		FuturesOptionMetrics (
-			"GBP",
-			"3M",
-			dtToday,
-			"MARGIN",
-			"LIFFE"
-		);
+		System.out.println ("\n\t||-----------------------------------------------------");
 
-		/* FuturesOptionMetrics (
-			"EUR",
-			"3M",
-			dtToday,
-			"MARGIN",
-			"LIFFE"
-		); */
+		System.out.println ("\t||--------------- MARGIN TYPE OPTION ------------------");
 
-		FuturesOptionMetrics (
-			"USD",
-			"3M",
-			dtToday,
-			"MARGIN",
-			"LIFFE"
-		);
+		System.out.println ("\t||-----------------------------------------------------");
 
-		System.out.println ("\t-----------------------------------------------------");
+		FuturesOptionMetrics ("CHF", "3M", today, "MARGIN", "LIFFE");
 
-		System.out.println ("\t-------------- PREMIUM TYPE OPTION ------------------");
+		FuturesOptionMetrics ("GBP", "3M", today, "MARGIN", "LIFFE");
 
-		System.out.println ("\t-----------------------------------------------------");
+		/* FuturesOptionMetrics ("EUR", "3M", today, "MARGIN", "LIFFE"); */
 
-		FuturesOptionMetrics (
-			"JPY",
-			"3M",
-			dtToday,
-			"PREMIUM",
-			"SGX"
-		);
+		FuturesOptionMetrics ("USD", "3M", today, "MARGIN", "LIFFE");
 
-		FuturesOptionMetrics (
-			"USD",
-			"1M",
-			dtToday,
-			"PREMIUM",
-			"CME"
-		);
+		System.out.println ("\t||-----------------------------------------------------");
 
-		FuturesOptionMetrics (
-			"USD",
-			"3M",
-			dtToday,
-			"PREMIUM",
-			"CME"
-		);
+		System.out.println ("\t||-------------- PREMIUM TYPE OPTION ------------------");
 
-		FuturesOptionMetrics (
-			"USD",
-			"3M",
-			dtToday,
-			"PREMIUM",
-			"SGX"
-		);
+		System.out.println ("\t||-----------------------------------------------------");
 
-		System.out.println ("\t-----------------------------------------------------");
+		FuturesOptionMetrics ("JPY", "3M", today, "PREMIUM", "SGX");
 
-		System.out.println ("\t-----------------------------------------------------");
+		FuturesOptionMetrics ("USD", "1M", today, "PREMIUM", "CME");
+
+		FuturesOptionMetrics ("USD", "3M", today, "PREMIUM", "CME");
+
+		FuturesOptionMetrics ("USD", "3M", today, "PREMIUM", "SGX");
+
+		System.out.println ("\t||-----------------------------------------------------");
+
+		System.out.println ("\t||-----------------------------------------------------");
 
 		EnvManager.TerminateEnv();
 	}

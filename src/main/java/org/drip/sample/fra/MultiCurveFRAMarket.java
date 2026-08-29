@@ -13,8 +13,6 @@ import org.drip.product.fra.FRAMarketComponent;
 import org.drip.sample.forward.*;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.ScenarioDeterministicVolatilityBuilder;
-import org.drip.state.discount.*;
-import org.drip.state.forward.ForwardCurve;
 import org.drip.state.identifier.*;
 
 /*
@@ -22,6 +20,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -100,75 +106,58 @@ import org.drip.state.identifier.*;
 /**
  * <i>MultiCurveFRAMarket</i> contains the demonstration of the Market Multi-Curve FRA Product sample.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fra/README.md">Multi-Curve FRA Market/Standard</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/fra/README.md">Multi-Curve FRA Market/Standard</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiCurveFRAMarket {
+public class MultiCurveFRAMarket
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strTenor = "6M";
-		String strCurrency = "JPY";
-		double dblEURIBOR6MVol = 0.37;
-		double dblEONIAVol = 0.37;
-		double dblEONIAEURIBOR6MCorrelation = 0.8;
+		String tenor = "6M";
+		String currency = "JPY";
+		double eoniaVolatility = 0.37;
+		double euribor6MVolatility = 0.37;
+		double eoniaEURIBOR6MCorrelation = 0.8;
 
-		JulianDate dtToday = DateUtil.Today();
+		JulianDate today = DateUtil.Today();
 
-		MergedDiscountForwardCurve dcEONIA = OvernightIndexCurve.MakeDC (
-			dtToday,
-			strCurrency
-		);
+		int todayJulian = today.julian();
 
-		ForwardCurve fcEURIBOR6M = IBOR6MQuarticPolyVanilla.Make6MForward (
-			dtToday,
-			strCurrency,
-			strTenor
-		);
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
 
-		ForwardLabel fri = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
-
-		FundingLabel fundingLabel = FundingLabel.Standard (strCurrency);
-
-		JulianDate dtForwardStart = dtToday.addTenor (strTenor);
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, tenor);
 
 		FRAMarketComponent fra = SingleStreamComponentBuilder.FRAMarket (
-			dtForwardStart,
-			fri,
+			today.addTenor (tenor),
+			forwardLabel,
 			0.006
 		);
 
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dcEONIA,
-			fcEURIBOR6M,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			OvernightIndexCurve.MakeDC (today, currency),
+			IBOR6MQuarticPolyVanilla.Make6MForward (today, currency, tenor),
 			null,
 			null,
 			null,
@@ -177,45 +166,40 @@ public class MultiCurveFRAMarket {
 			null
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			strCurrency
-		);
-
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
-				VolatilityLabel.Standard (fri),
-				fri.currency(),
-				dblEURIBOR6MVol
+				todayJulian,
+				VolatilityLabel.Standard (forwardLabel),
+				currency,
+				euribor6MVolatility
 			)
 		);
 
-		mktParams.setFundingVolatility (
+		curveSurfaceQuoteContainer.setFundingVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
+				todayJulian,
 				VolatilityLabel.Standard (fundingLabel),
-				fri.currency(),
-				dblEONIAVol
+				currency,
+				eoniaVolatility
 			)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			forwardLabel,
 			fundingLabel,
-			new Flat (dblEONIAEURIBOR6MCorrelation)
+			new Flat (eoniaEURIBOR6MCorrelation)
 		);
 
-		Map<String, Double> mapFRAOutput = fra.value (
-			valParams,
-			null,
-			mktParams,
-			null
-		);
-
-		for (Map.Entry<String, Double> me : mapFRAOutput.entrySet())
-			System.out.println ("\t" + me.getKey() + " => " + me.getValue());
+		for (Map.Entry<String, Double> mapEntry : fra.value (
+				new ValuationParams (today, today, currency),
+				null,
+				curveSurfaceQuoteContainer,
+				null
+			).entrySet()
+		)
+		{
+			System.out.println ("\t|| " + mapEntry.getKey() + " => " + mapEntry.getValue());
+		}
 
 		EnvManager.TerminateEnv();
 	}

@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -86,45 +94,46 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>JurisdictionIRSFuturesDefinition</i> demonstrates the functionality to retrieve the IRS Futures
- * Definitions for the various Jurisdictions.
+ * 	Definitions for the various Jurisdictions.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class JurisdictionIRSFuturesDefinition {
+public class JurisdictionIRSFuturesDefinition
+{
+
 	private static final void DisplayConvention (
-		final String strCurrency,
-		final String strTenor)
+		final String currency,
+		final String tenor)
 	{
-		DeliverableSwapFutures dsf = DeliverableSwapFuturesContainer.ProductInfo (
-			strCurrency,
-			strTenor
+		DeliverableSwapFutures deliverableSwapFutures = DeliverableSwapFuturesContainer.ProductInfo (
+			currency,
+			tenor
 		);
 
-		System.out.println ("\t[" + strCurrency + "-" + strTenor + "] => " +
-			dsf.nominal() + " | " +
-			dsf.rateIncrement() + " | " +
-			dsf.ltds()
+		System.out.println (
+			"\t|| [" + currency + "-" + tenor + "] => " + deliverableSwapFutures.nominal() + " | " +
+				deliverableSwapFutures.rateIncrement() + " | " + deliverableSwapFutures.ltds()
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		final String[] args)
+		final String[] argumentArray)
 	{
 		EnvManager.InitEnv ("");
 

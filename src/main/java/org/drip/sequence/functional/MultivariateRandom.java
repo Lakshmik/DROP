@@ -1,6 +1,9 @@
 
 package org.drip.sequence.functional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -302,7 +305,6 @@ public abstract class MultivariateRandom extends org.drip.function.definition.Rd
 	{
 		if (null == aSSAM || 0 > iTargetVariateIndex) return null;
 
-		int iTargetVariateVarianceIndex = 0;
 		int iNumNonTargetVariate = aSSAM.length - 1;
 
 		if (0 >= iNumNonTargetVariate) return null;
@@ -313,7 +315,7 @@ public abstract class MultivariateRandom extends org.drip.function.definition.Rd
 
 		if (null == sii) return null;
 
-		double[] adblTargetVariateVariance = new double[sii.size()];
+		List<Double> adblTargetVariateVariance = new ArrayList<Double>();
 
 		int[] aiNonTargetVariateSequenceIndex = sii.first();
 
@@ -325,18 +327,11 @@ public abstract class MultivariateRandom extends org.drip.function.definition.Rd
 
 			if (null == ssamConditional) return null;
 
-			adblTargetVariateVariance[iTargetVariateVarianceIndex++] = ssamConditional.empiricalVariance();
+			adblTargetVariateVariance.add (ssamConditional.empiricalVariance());
 
 			aiNonTargetVariateSequenceIndex = sii.next();
 		}
 
-		try {
-			return new org.drip.sequence.metrics.SingleSequenceAgnosticMetrics (adblTargetVariateVariance,
-				null);
-		} catch (java.lang.Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		return org.drip.sequence.metrics.SingleSequenceAgnosticMetrics.Standard (adblTargetVariateVariance);
 	}
 }

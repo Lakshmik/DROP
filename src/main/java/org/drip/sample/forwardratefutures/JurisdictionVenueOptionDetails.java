@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -86,108 +94,90 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>JurisdictionVenueOptionDetails</i> demonstrates the Functionality to retrieve the Futures Options
- * Definitions for the various Jurisdictions and Venues.
+ * 	Definitions for the various Jurisdictions and Venues.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forwardratefutures/README.md">Jurisdiction IRS Futures Options Definition</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class JurisdictionVenueOptionDetails {
+public class JurisdictionVenueOptionDetails
+{
+
 	private static final void DisplayExchangeInfo (
-		final String strFullyQualifiedName,
-		final String strTradingMode)
+		final String fullyQualifiedName,
+		final String tradingMode)
 	{
-		FuturesOptions fo = FuturesOptionsContainer.ExchangeInfo (
-			strFullyQualifiedName,
-			strTradingMode
+		FuturesOptions futuresOptions = FuturesOptionsContainer.ExchangeInfo (
+			fullyQualifiedName,
+			tradingMode
 		);
 
-		String strExchangeLTDS = "";
+		String exchangeLTDS = "";
 
-		for (String strExchange : fo.exchanges()) {
-			strExchangeLTDS += "\n\t[" + strExchange + "=>";
+		for (String exchange : futuresOptions.exchanges()) {
+			exchangeLTDS += "\t|| [" + exchange + "=>";
 
-			for (int i = 0; i < fo.ltdsArray (strExchange).length; ++i) {
-				if (0 != i) strExchangeLTDS += "; ";
+			for (int futuresOptionsIndex = 0;
+				futuresOptionsIndex < futuresOptions.ltdsArray (exchange).length;
+				++futuresOptionsIndex)
+			{
+				if (0 != futuresOptionsIndex) {
+					exchangeLTDS += "; ";
+				}
 
-				strExchangeLTDS += fo.ltdsArray (strExchange)[i];
+				exchangeLTDS += futuresOptions.ltdsArray (exchange)[futuresOptionsIndex];
 			}
 
-			strExchangeLTDS += "]";
+			exchangeLTDS += "]\n";
 		}
 
 		System.out.println (
-			fo.fullyQualifiedName() + " | " +
-			fo.tradingMode() +
-			strExchangeLTDS
+			futuresOptions.fullyQualifiedName() + " | " +
+			futuresOptions.tradingMode() +
+			exchangeLTDS
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		final String[] args)
+		final String[] argumentArray)
 	{
 		EnvManager.InitEnv ("");
 
-		System.out.println ("\n\t---------------\n\t---------------\n");
+		System.out.println ("\t||---------------");
 
-		DisplayExchangeInfo (
-			"CHF-LIBOR-3M",
-			"MARGIN"
-		);
+		DisplayExchangeInfo ("CHF-LIBOR-3M", "MARGIN");
 
-		DisplayExchangeInfo (
-			"GBP-LIBOR-3M",
-			"MARGIN"
-		);
+		DisplayExchangeInfo ("GBP-LIBOR-3M", "MARGIN");
 
-		DisplayExchangeInfo (
-			"EUR-EURIBOR-3M",
-			"MARGIN"
-		);
+		DisplayExchangeInfo ("EUR-EURIBOR-3M", "MARGIN");
 
-		DisplayExchangeInfo (
-			"JPY-LIBOR-3M",
-			"PREMIUM"
-		);
+		DisplayExchangeInfo ("JPY-LIBOR-3M", "PREMIUM");
 
-		DisplayExchangeInfo (
-			"JPY-TIBOR-3M",
-			"PREMIUM"
-		);
+		DisplayExchangeInfo ("JPY-TIBOR-3M", "PREMIUM");
 
-		DisplayExchangeInfo (
-			"JPY-LIBOR-3M",
-			"PREMIUM"
-		);
+		DisplayExchangeInfo ("JPY-LIBOR-3M", "PREMIUM");
 
-		DisplayExchangeInfo (
-			"USD-LIBOR-1M",
-			"PREMIUM"
-		);
+		DisplayExchangeInfo ("USD-LIBOR-1M", "PREMIUM");
 
-		DisplayExchangeInfo (
-			"USD-LIBOR-3M",
-			"MARGIN"
-		);
+		DisplayExchangeInfo ("USD-LIBOR-3M", "MARGIN");
 
-		DisplayExchangeInfo (
-			"USD-LIBOR-3M",
-			"PREMIUM"
-		);
+		DisplayExchangeInfo ("USD-LIBOR-3M", "PREMIUM");
+
+		System.out.println ("\t||---------------");
 
 		EnvManager.TerminateEnv();
 	}

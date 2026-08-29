@@ -4,10 +4,10 @@ package org.drip.sample.kalotaywilliamsfabozzi;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.drip.dynamics.kwf1993.KalotayWilliamsFabozzi;
-import org.drip.dynamics.kwf1993.ZeroVolatilityPeriodState;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
+import org.drip.state.municipal.KalotayWilliamsFabozzi;
+import org.drip.state.municipal.ZeroVolatilityPeriodState;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -142,13 +142,13 @@ public class Table2
 	{
 		EnvManager.InitEnv ("");
 
-		TreeMap<Double, Double> bondMarketYieldMap = new TreeMap<Double, Double>();
+		TreeMap<Double, Double> timeToCalibrationYieldMap = new TreeMap<Double, Double>();
 
-		bondMarketYieldMap.put (1., 0.03500);
+		timeToCalibrationYieldMap.put (1., 0.03500);
 
-		bondMarketYieldMap.put (2., 0.04010);
+		timeToCalibrationYieldMap.put (2., 0.04010);
 
-		bondMarketYieldMap.put (3., 0.04531);
+		timeToCalibrationYieldMap.put (3., 0.04531);
 
 		TreeMap<Double, Double> forwardRateMapReconciliation = new TreeMap<Double, Double>();
 
@@ -158,8 +158,8 @@ public class Table2
 
 		forwardRateMapReconciliation.put (3., 0.05580);
 
-		Map<Double, ZeroVolatilityPeriodState> timeZeroVolatilityPeriodStateMap =
-			new KalotayWilliamsFabozzi().timeZeroVolatilityPeriodStateMap (bondMarketYieldMap);
+		Map<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
+			new KalotayWilliamsFabozzi (timeToCalibrationYieldMap).timeToZeroVolatilityPeriodStateMap();
 
 		System.out.println ("\t|-----------------------------------------------||");
 
@@ -179,9 +179,9 @@ public class Table2
 
 		System.out.println ("\t|-----------------------------------------------||");
 
-		for (double time : timeZeroVolatilityPeriodStateMap.keySet()) {
+		for (double time : timeToZeroVolatilityPeriodStateMap.keySet()) {
 			ZeroVolatilityPeriodState zeroVolatilityPeriodState =
-				timeZeroVolatilityPeriodStateMap.get (time);
+				timeToZeroVolatilityPeriodStateMap.get (time);
 
 			System.out.println (
 				"\t|" + zeroVolatilityPeriodState.period() + " =>" +

@@ -163,6 +163,23 @@ public class ObjectiveFunctionCoordinate
 	}
 
 	/**
+	 * Clone the Instance
+	 * 
+	 * @return The Cloned Instance
+	 */
+
+	@Override public ObjectiveFunctionCoordinate clone()
+	{
+		try {
+			return new ObjectiveFunctionCoordinate (_vertex, _value);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
 	 * 'JSON-ize' the State
 	 * 
 	 * @param prefix The JSON Prefix

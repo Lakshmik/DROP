@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,166 +98,144 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>KernelDensityL1Bound</i> demonstrates the Computation of the Probabilistic Bounds for the L<sub>1</sub>
- * Errors of Kernel Density Estimation using Variants of the Efron-Stein Methodology.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/efronstein/README.md">Efron Stein Sequence Sum Bounds</a></li>
- *  </ul>
- * <br><br>
+ * 	Errors of Kernel Density Estimation using Variants of the Efron-Stein Methodology.
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/efronstein/README.md">Efron-Stein Sequence Sum Bounds</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class KernelDensityL1Bound {
+public class KernelDensityL1Bound
+{
 
 	private static final SingleSequenceAgnosticMetrics[] IIDDraw (
-		final UnivariateSequenceGenerator rsg,
-		final int iNumSample)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final int sampleCount)
 		throws Exception
 	{
-		SingleSequenceAgnosticMetrics[] aSSAM = new SingleSequenceAgnosticMetrics[iNumSample];
+		SingleSequenceAgnosticMetrics[] singleSequenceAgnosticMetricsArray =
+			new SingleSequenceAgnosticMetrics[sampleCount];
 
-		for (int i = 0; i < iNumSample; ++i)
-			aSSAM[i] = rsg.sequence (
-				iNumSample,
-				null
-			);
+		for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
+			singleSequenceAgnosticMetricsArray[sampleIndex] =
+				univariateSequenceGenerator.sequence (sampleCount, null);
+		}
 
-		return aSSAM;
+		return singleSequenceAgnosticMetricsArray;
 	}
 
 	private static final KernelDensityEstimationL1 KernelDensityL1Function (
-		final int iNumVariate)
+		final int variateCount)
 		throws Exception
 	{
-		return new KernelDensityEstimationL1 (
-			new Flat (0.),
-			1.,
-			iNumVariate,
-			new Flat (-2.)
-		);
+		return new KernelDensityEstimationL1 (new Flat (0.), 1., variateCount, new Flat (-2.));
 	}
 
 	private static final void MartingaleDifferencesRun (
-		final Binary bsg,
-		final int iNumSample,
-		final int iNumSet)
+		final Binary binary,
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				bsg,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					KernelDensityL1Function (sampleCount),
+					IIDDraw (binary, sampleCount)
+				).martingaleVarianceUpperBound(),
+				1,
+				3,
+				1.
 			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				KernelDensityL1Function (iNumSample),
-				aSSAM
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.martingaleVarianceUpperBound(), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void GhostVariateVarianceRun (
-		final Binary bsg,
-		final int iNumSample,
-		final int iNumSet)
+		final Binary binary,
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				bsg,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					KernelDensityL1Function (sampleCount),
+					IIDDraw (binary, sampleCount)
+				).ghostVarianceUpperBound (
+					IIDDraw (binary, sampleCount)
+				),
+				1,
+				3,
+				1.
 			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				KernelDensityL1Function (iNumSample),
-				aSSAM
-			);
-
-			SingleSequenceAgnosticMetrics[] aSSAMGhost = IIDDraw (
-				bsg,
-				iNumSample
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.ghostVarianceUpperBound (aSSAMGhost), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void EfronSteinSteeleRun (
-		final Binary bsg,
-		final int iNumSample,
-		final int iNumSet)
+		final Binary binary,
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				bsg,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					KernelDensityL1Function (sampleCount),
+					IIDDraw (binary, sampleCount)
+				).efronSteinSteeleBound (
+					IIDDraw (binary, sampleCount)
+				),
+				1,
+				3,
+				1.
 			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				KernelDensityL1Function (iNumSample),
-				aSSAM
-			);
-
-			SingleSequenceAgnosticMetrics[] aSSAMGhost = IIDDraw (
-				bsg,
-				iNumSample
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.efronSteinSteeleBound (aSSAMGhost), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	private static final void PivotDifferencesRun (
-		final Binary bsg,
-		final int iNumSample,
-		final int iNumSet)
+		final Binary binary,
+		final int sampleCount,
+		final int setCount)
 		throws Exception
 	{
-		String strDump = "\t| " + FormatUtil.FormatDouble (iNumSample, 2, 0, 1.) + " => ";
+		String dump = "\t| " + FormatUtil.FormatDouble (sampleCount, 2, 0, 1.) + " => ";
 
-		for (int j = 0; j < iNumSet; ++j) {
-			SingleSequenceAgnosticMetrics[] aSSAM = IIDDraw (
-				bsg,
-				iNumSample
+		for (int setIndex = 0; setIndex < setCount; ++setIndex) {
+			MultivariateRandom multivariateRandomFunction = KernelDensityL1Function (sampleCount);
+
+			dump += (0 != setIndex ? " |" : "") + FormatUtil.FormatDouble (
+				new EfronSteinMetrics (
+					multivariateRandomFunction,
+					IIDDraw (binary, sampleCount)
+				).pivotVarianceUpperBound (
+					multivariateRandomFunction
+				),
+				1,
+				3,
+				1.
 			);
-
-			EfronSteinMetrics esam = new EfronSteinMetrics (
-				KernelDensityL1Function (iNumSample),
-				aSSAM
-			);
-
-			if (0 != j) strDump += " |";
-
-			strDump += FormatUtil.FormatDouble (esam.pivotVarianceUpperBound (new FlatMultivariateRandom (0.)), 1, 3, 1.);
 		}
 
-		System.out.println (strDump + " |");
+		System.out.println (dump + " |");
 	}
 
 	/**
@@ -266,13 +252,16 @@ public class KernelDensityL1Bound {
 	{
 		EnvManager.InitEnv ("");
 
-		int iNumSet = 5;
-
-		int[] aiSampleSize = new int[] {
-			3, 10, 25, 50
+		int setCount = 5;
+		int[] sampleSizeArray =
+		{
+			3,
+			10,
+			25,
+			50
 		};
 
-		Binary bin = new Binary (0.7);
+		Binary binarySequencyGenerator = new Binary (0.7);
 
 		System.out.println ("\n\t|-----------------------------------------------|");
 
@@ -280,12 +269,9 @@ public class KernelDensityL1Bound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			MartingaleDifferencesRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			MartingaleDifferencesRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
@@ -295,17 +281,20 @@ public class KernelDensityL1Bound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			GhostVariateVarianceRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			GhostVariateVarianceRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		aiSampleSize = new int[] {
-			3, 10, 25, 50, 75, 99
+		sampleSizeArray = new int[]
+		{
+			3,
+			10,
+			25,
+			50,
+			75,
+			99
 		};
 
 		System.out.println ("\n\t|-----------------------------------------------|");
@@ -314,12 +303,9 @@ public class KernelDensityL1Bound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			EfronSteinSteeleRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			EfronSteinSteeleRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 
@@ -329,12 +315,9 @@ public class KernelDensityL1Bound {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		for (int iSampleSize : aiSampleSize)
-			PivotDifferencesRun (
-				bin,
-				iSampleSize,
-				iNumSet
-			);
+		for (int sampleSize : sampleSizeArray) {
+			PivotDifferencesRun (binarySequencyGenerator, sampleSize, setCount);
+		}
 
 		System.out.println ("\t|-----------------------------------------------|");
 

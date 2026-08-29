@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drip.function.definition.RdToR1;
-import org.drip.function.rdtor1.MultidimensionalRosenbrockCoupled;
-import org.drip.function.rdtor1.Rosenbrock;
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -126,6 +124,7 @@ public class DownhillSimplex
 	private boolean _diagnosticsOn = false;
 	private RdToR1 _objectiveFunction = null;
 	private List<double[]> _vertexList = null;
+	private boolean _incorporateCentroid = false;
 	private AmoebaCoefficients _amoebaCoefficients = null;
 
 	/**
@@ -133,6 +132,7 @@ public class DownhillSimplex
 	 * 
 	 * @param objectiveFunction Objective Function
 	 * @param vertexList List of Vertexes
+	 * @param incorporateCentroid TRUE - Centroid is a Candidate for the Vertex List
 	 * @param diagnosticsOn TRUE - Diagnostics has been Turned On
 	 * 
 	 * @return Standard Instance of <i>DownhillSimplex</i>
@@ -141,6 +141,7 @@ public class DownhillSimplex
 	public static final DownhillSimplex Standard (
 		final RdToR1 objectiveFunction,
 		final List<double[]> vertexList,
+		final boolean incorporateCentroid,
 		final boolean diagnosticsOn)
 	{
 		try {
@@ -148,6 +149,7 @@ public class DownhillSimplex
 				objectiveFunction,
 				vertexList,
 				AmoebaCoefficients.Standard(),
+				incorporateCentroid,
 				diagnosticsOn
 			);
 		} catch (Exception e) {
@@ -217,7 +219,7 @@ public class DownhillSimplex
 
 			for (int variateIndex = 0; variateIndex < vertex.length; ++variateIndex) {
 				shrunkVertex[variateIndex] = lowestValueVertex[variateIndex] +
-					shrinkCoefficient * (lowestValueVertex[variateIndex] - shrunkVertex[variateIndex]);
+					shrinkCoefficient * (vertex[variateIndex] - lowestValueVertex[variateIndex]);
 			}
 
 			shrunkVertexList.add (shrunkVertex);
@@ -232,6 +234,7 @@ public class DownhillSimplex
 	 * @param objectiveFunction Objective Function
 	 * @param vertexList List of Vertexes
 	 * @param amoebaCoefficients Nelder-Mead Control (i.e., Ameoba) Coefficients
+	 * @param incorporateCentroid TRUE - Centroid is a Candidate for the Vertex List
 	 * @param diagnosticsOn TRUE - Diagnostics has been Turned On
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
@@ -241,6 +244,7 @@ public class DownhillSimplex
 		final RdToR1 objectiveFunction,
 		final List<double[]> vertexList,
 		final AmoebaCoefficients amoebaCoefficients,
+		final boolean incorporateCentroid,
 		final boolean diagnosticsOn)
 		throws Exception
 	{
@@ -253,6 +257,7 @@ public class DownhillSimplex
 
 		int variateDimension = -1;
 		_diagnosticsOn = diagnosticsOn;
+		_incorporateCentroid = incorporateCentroid;
 
 		for (double[] vertex : _vertexList) {
 			if (null == vertex) {
@@ -307,6 +312,17 @@ public class DownhillSimplex
 	}
 
 	/**
+	 * Indicate if Centroid is a Candidate for the Vertex List
+	 * 
+	 * @return TRUE - Centroid is a Candidate for the Vertex List
+	 */
+
+	public boolean incorporateCentroid()
+	{
+		return _incorporateCentroid;
+	}
+
+	/**
 	 * Indicate if Diagnostics has been Turned On
 	 * 
 	 * @return TRUE - Diagnostics has been Turned On
@@ -341,8 +357,25 @@ public class DownhillSimplex
 		while (!vertexes.convergenceReached()) {
 			double[] centroidVertex = vertexes.centroidVertex();
 
+			double centroidValue = Double.NaN;
+
+			try {
+				centroidValue = _objectiveFunction.evaluate (centroidVertex);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return null;
+			}
+
 			if (run instanceof DownhillSimplexRunDiagnostics) {
-				((DownhillSimplexRunDiagnostics) run).setCentroidVertex (iterationIndex, centroidVertex);
+				try {
+					((DownhillSimplexRunDiagnostics) run).setCentroidObjectiveFunctionCoordinate (
+						iterationIndex,
+						new ObjectiveFunctionCoordinate (centroidVertex, centroidValue)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 			double[] highestValueVertex = vertexes.highestValueVertex();
@@ -372,6 +405,11 @@ public class DownhillSimplex
 				e.printStackTrace();
 
 				return null;
+			}
+
+			if (_incorporateCentroid && centroidValue < reflectedValue) {
+				reflectedValue = centroidValue;
+				reflectedVertex = centroidVertex;
 			}
 
 			if (run instanceof DownhillSimplexRunDiagnostics) {
@@ -591,44 +629,5 @@ public class DownhillSimplex
 	public @Override String toString()
 	{
 		return toString ("");
-	}
-
-	public static final void main (
-		final String[] argumentArray)
-		throws Exception
-	{
-		List<double[]> vertexList = new ArrayList<double[]>();
-
-		vertexList.add (new double[] {-2., -2., -2.});
-
-		vertexList.add (new double[] {-2., -2., 3.});
-
-		vertexList.add (new double[] {-2., 3., -2.});
-
-		vertexList.add (new double[] {-2., 3., 3.});
-
-		vertexList.add (new double[] {3., -2., -2.});
-
-		vertexList.add (new double[] {3., -2., 3.});
-
-		vertexList.add (new double[] {3., 3., -2.});
-
-		vertexList.add (new double[] {3., 3., 3.});
-
-		RdToR1 optimizationFunction = new MultidimensionalRosenbrockCoupled (Rosenbrock.Standard(), 3);
-
-		DownhillSimplex downhillSimplex = DownhillSimplex.Standard (optimizationFunction, vertexList, true);
-
-		DownhillSimplexRun run = downhillSimplex.controlRun();
-
-		ObjectiveFunctionCoordinate optimalCoordinate = run.optimalObjectiveFunctionCoordinate();
-
-		System.out.println ("\t" + optimalCoordinate);
-
-		if (run instanceof DownhillSimplexRunDiagnostics) {
-			System.out.println (
-				"\t" + ((DownhillSimplexRunDiagnostics) run).downhillSimplexIterationDiagnosticsMap()
-			);
-		}
 	}
 }

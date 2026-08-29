@@ -24,6 +24,14 @@ import org.drip.state.volatility.VolatilityCurve;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -101,90 +109,89 @@ import org.drip.state.volatility.VolatilityCurve;
 
 /**
  * <i>MultiCurveFRAMarketAnalysis</i> contains an analysis of the correlation and volatility impact on the
- * Market FRA.
+ * 	Market FRA.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fra/README.md">Multi-Curve FRA Market/Standard</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/fra/README.md">Multi-Curve FRA Market/Standard</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiCurveFRAMarketAnalysis {
-	static class FRAMktConvexityCorrection {
-		double _dblParMktFwd = Double.NaN;
-		double _dblParStdFwd = Double.NaN;
-		double _dblConvexityCorrection = Double.NaN;
+public class MultiCurveFRAMarketAnalysis
+{
+
+	static class FRAMktConvexityCorrection
+	{
+		double _parMarketForward = Double.NaN;
+		double _parStandardForward = Double.NaN;
+		double _convexityCorrection = Double.NaN;
 
 		FRAMktConvexityCorrection (
-			final double dblParMktFwd,
-			final double dblParStdFwd,
-			final double dblConvexityCorrection)
+			final double parMarketForward,
+			final double parStandardForward,
+			final double convexityCorrection)
 		{
-			_dblParMktFwd = dblParMktFwd;
-			_dblParStdFwd = dblParStdFwd;
-			_dblConvexityCorrection = dblConvexityCorrection;
+			_parMarketForward = parMarketForward;
+			_parStandardForward = parStandardForward;
+			_convexityCorrection = convexityCorrection;
 		}
 	}
 
 	private static final VolatilityCurve ATMVolatilityCurve (
-		final JulianDate dtEpoch,
+		final JulianDate epochDate,
 		final VolatilityLabel label,
-		final String strCurrency,
-		final String[] astrTenor,
-		final double[] adblVolatility)
+		final String currency,
+		final String[] tenorArray,
+		final double[] volatilityArray)
 		throws Exception
 	{
-		int[] iPillarDate = new int[astrTenor.length];
+		int[] pillarDateArray = new int[tenorArray.length];
 
-		for (int i = 0; i < iPillarDate.length; ++i)
-			iPillarDate[i] = dtEpoch.addTenor (astrTenor[i]).julian();
+		for (int pillarIndex = 0; pillarIndex < pillarDateArray.length; ++pillarIndex) {
+			pillarDateArray[pillarIndex] = epochDate.addTenor (tenorArray[pillarIndex]).julian();
+		}
 
 		return new FlatForwardVolatilityCurve (
-			dtEpoch.julian(),
+			epochDate.julian(),
 			label,
-			strCurrency,
-			iPillarDate,
-			adblVolatility
+			currency,
+			pillarDateArray,
+			volatilityArray
 		);
 	}
 
 	private static final FRAMktConvexityCorrection FRAMktMetric (
-		final JulianDate dtValue,
-		final MergedDiscountForwardCurve dcEONIA,
-		final ForwardCurve fcEURIBOR6M,
-		final String strForwardStartTenor,
-		final VolatilityCurve vcEONIA,
-		final VolatilityCurve vcEURIBOR6M,
-		final double dblEONIAEURIBOR6MCorrelation)
+		final JulianDate valueDate,
+		final MergedDiscountForwardCurve eoniaDiscountCurve,
+		final ForwardCurve euribor6MForwardCurve,
+		final String forwardStartTenor,
+		final VolatilityCurve eoniaVolatilityCurve,
+		final VolatilityCurve euribor6MVolatilityCurve,
+		final double eoniaEURIBOR6MCorrelation)
 		throws Exception
 	{
-		String strTenor = "6M";
-		String strCurrency = "USD";
+		String tenor = "6M";
+		String currency = "USD";
 
-		ForwardLabel fri = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
 
-		FundingLabel fundingLabel = FundingLabel.Standard (strCurrency);
-
-		JulianDate dtForwardStart = dtValue.addTenor (strForwardStartTenor);
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, tenor);
 
 		FRAMarketComponent fra = SingleStreamComponentBuilder.FRAMarket (
-			dtForwardStart,
-			fri,
+			valueDate.addTenor (forwardStartTenor),
+			forwardLabel,
 			0.006
 		);
 
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dcEONIA,
-			fcEURIBOR6M,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			eoniaDiscountCurve,
+			euribor6MForwardCurve,
 			null,
 			null,
 			null,
@@ -193,71 +200,48 @@ public class MultiCurveFRAMarketAnalysis {
 			null
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtValue,
-			dtValue,
-			strCurrency
-		);
+		curveSurfaceQuoteContainer.setForwardVolatility (euribor6MVolatilityCurve);
 
-		mktParams.setForwardVolatility (vcEURIBOR6M);
+		curveSurfaceQuoteContainer.setFundingVolatility (eoniaVolatilityCurve);
 
-		mktParams.setFundingVolatility (vcEONIA);
-
-		mktParams.setForwardFundingCorrelation (
-			fri,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			forwardLabel,
 			fundingLabel,
-			new Flat (dblEONIAEURIBOR6MCorrelation)
+			new Flat (eoniaEURIBOR6MCorrelation)
 		);
 
-		Map<String, Double> mapFRAOutput = fra.value (
-			valParams,
+		Map<String, Double> fraMeasureMap = fra.value (
+			new ValuationParams (valueDate, valueDate, currency),
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
 		return new FRAMktConvexityCorrection (
-			mapFRAOutput.get ("shiftedlognormalparmarketfra"),
-			mapFRAOutput.get ("parstandardfra"),
-			mapFRAOutput.get ("shiftedlognormalconvexitycorrection")
+			fraMeasureMap.get ("shiftedlognormalparmarketfra"),
+			fraMeasureMap.get ("parstandardfra"),
+			fraMeasureMap.get ("shiftedlognormalconvexitycorrection")
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strTenor = "6M";
-		String strCurrency = "USD";
-
-		JulianDate dtToday = DateUtil.Today().addTenor ("0D");
-
-		MergedDiscountForwardCurve dcEONIA = OvernightIndexCurve.MakeDC (
-			dtToday,
-			strCurrency
-		);
-
-		ForwardCurve fcEURIBOR6M = IBOR6MQuarticPolyVanilla.Make6MForward (
-			dtToday,
-			strCurrency,
-			strTenor
-		);
-
-		String[] astrForwardStartTenor = {
+		String tenor = "6M";
+		String currency = "USD";
+		String[] forwardStartTenorArray =
+		{
 			"6M",
 			"1Y",
 			"2Y",
@@ -269,8 +253,8 @@ public class MultiCurveFRAMarketAnalysis {
 			"8Y",
 			"9Y"
 		};
-
-		double[] adblVolatility = new double[] {
+		double[] volatilityArray =
+		{
 			0.5946, // 6M
 			0.5311,	// 1Y
 			0.3307,	// 2Y
@@ -282,60 +266,58 @@ public class MultiCurveFRAMarketAnalysis {
 			0.1655,	// 8Y
 			0.1574	// 9Y
 		};
+		double eoniaEURIBOR6MCorrelation = 0.8;
 
-		double dblEONIAEURIBOR6MCorrelation = 0.8;
+		JulianDate today = DateUtil.Today().addTenor ("0D");
 
-		VolatilityCurve vcEONIA = ATMVolatilityCurve (
-			dtToday,
-			VolatilityLabel.Standard (FundingLabel.Standard (strCurrency)),
-			strCurrency,
-			astrForwardStartTenor,
-			adblVolatility
+		MergedDiscountForwardCurve eoniaDiscountCurve = OvernightIndexCurve.MakeDC (today, currency);
+
+		ForwardCurve euribor6MForwardCurve = IBOR6MQuarticPolyVanilla.Make6MForward (today, currency, tenor);
+
+		VolatilityCurve eoniaVolatilityCurve = ATMVolatilityCurve (
+			today,
+			VolatilityLabel.Standard (FundingLabel.Standard (currency)),
+			currency,
+			forwardStartTenorArray,
+			volatilityArray
 		);
 
-		VolatilityCurve vEURIBOR6M = ATMVolatilityCurve (
-			dtToday,
-			VolatilityLabel.Standard (
-				ForwardLabel.Create (
-					strCurrency,
-					strTenor
-				)
-			),
-			strCurrency,
-			astrForwardStartTenor,
-			adblVolatility
+		VolatilityCurve eurbor6MVolatilityCurve = ATMVolatilityCurve (
+			today,
+			VolatilityLabel.Standard (ForwardLabel.Create (currency, tenor)),
+			currency,
+			forwardStartTenorArray,
+			volatilityArray
 		);
 
-		System.out.println ("\t---------------------------------");
+		System.out.println ("\t||----------------------------------|");
 
-		System.out.println ("\t---------------------------------");
+		System.out.println ("\t||----------------------------------|");
 
-		System.out.println ("\t---------------------------------");
+		System.out.println ("\t|| TNR =>   MKT  |   STD  |  CONV   |");
 
-		System.out.println ("\t---------------------------------");
+		System.out.println ("\t||----------------------------------|");
 
-		System.out.println ("\tTNR =>   MKT   |   STD   |  CONV ");
-
-		System.out.println ("\t---------------------------------");
-
-		for (String strForwardStartTenor : astrForwardStartTenor) {
+		for (String forwardStartTenor : forwardStartTenorArray) {
 			FRAMktConvexityCorrection fraMktMetric = FRAMktMetric (
-				dtToday,
-				dcEONIA,
-				fcEURIBOR6M,
-				strForwardStartTenor,
-				vcEONIA,
-				vEURIBOR6M,
-				dblEONIAEURIBOR6MCorrelation
+				today,
+				eoniaDiscountCurve,
+				euribor6MForwardCurve,
+				forwardStartTenor,
+				eoniaVolatilityCurve,
+				eurbor6MVolatilityCurve,
+				eoniaEURIBOR6MCorrelation
 			);
 
 			System.out.println (
-				"\t " + strForwardStartTenor + " => " +
-				FormatUtil.FormatDouble (fraMktMetric._dblParMktFwd, 1, 3, 100.) + "% | " +
-				FormatUtil.FormatDouble (fraMktMetric._dblParStdFwd, 1, 3, 100.) + "% | " +
-				FormatUtil.FormatDouble (fraMktMetric._dblConvexityCorrection, 1, 2, 10000.)
+				"\t|| " + forwardStartTenor + " => " +
+				FormatUtil.FormatDouble (fraMktMetric._parMarketForward, 1, 3, 100.) + "% | " +
+				FormatUtil.FormatDouble (fraMktMetric._parStandardForward, 1, 3, 100.) + "% | " +
+				FormatUtil.FormatDouble (fraMktMetric._convexityCorrection, 1, 2, 10000.)
 			);
 		}
+
+		System.out.println ("\t||----------------------------------|");
 
 		EnvManager.TerminateEnv();
 	}

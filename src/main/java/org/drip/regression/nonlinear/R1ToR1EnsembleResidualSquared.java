@@ -3,6 +3,7 @@ package org.drip.regression.nonlinear;
 
 import org.drip.function.definition.RdToR1;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
+import org.drip.regression.function.R1ToR1Parametric;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -123,6 +124,46 @@ public class R1ToR1EnsembleResidualSquared
 	extends RdToR1
 {
 	private R1ToR1Residual[] _r1ToR1ResidualArray = null;
+
+	/**
+	 * Construct a Standard Instance of <i>R1ToR1EnsembleResidualSquared</i>
+	 * 
+	 * @param parametricFunction <i>R1ToR1Parametric</i> Instance
+	 * @param sample <i>R1R1Sample</i> Instance
+	 * 
+	 * @return Standard Instance of <i>R1ToR1EnsembleResidualSquared</i>
+	 */
+
+	public static final R1ToR1EnsembleResidualSquared Standard (
+		final R1ToR1Parametric parametricFunction,
+		final R1R1Sample sample)
+	{
+		if (null == parametricFunction || null == sample) {
+			return null;
+		}
+
+		double[] xArray = sample.xArray();
+
+		double[] yArray = sample.yArray();
+
+		R1ToR1Residual[] residualArray = new R1ToR1Residual[xArray.length];
+
+		try {
+			for (int sampleIndex = 0; sampleIndex < xArray.length; ++sampleIndex) {
+				residualArray[sampleIndex] = new R1ToR1Residual (
+					xArray[sampleIndex],
+					yArray[sampleIndex],
+					parametricFunction
+				);
+			}
+
+			return new R1ToR1EnsembleResidualSquared (residualArray);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	/**
 	 * <i>R1ToR1EnsembleResidualSquared</i> Constructor

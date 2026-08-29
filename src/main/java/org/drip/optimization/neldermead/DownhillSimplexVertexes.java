@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.drip.function.definition.RdToR1;
 import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.service.common.FormatUtil;
 
 /*
@@ -123,7 +124,7 @@ import org.drip.service.common.FormatUtil;
 
 public class DownhillSimplexVertexes
 {
-	private static final double ABSOLUTE_TOLERANCE = 1.e-07;
+	private static final double ABSOLUTE_TOLERANCE = 1.e-06;
 
 	private double[] _centroidVertex = null;
 	private double _objectiveFunctionMean = Double.NaN;
@@ -334,18 +335,7 @@ public class DownhillSimplexVertexes
 
 	public double[] lowestValueVertex()
 	{
-		return _orderedVertexListMap.get (penultimateHighestValue()).get (0);
-	}
-
-	/**
-	 * Retrieve the Vertex with the Highest Value
-	 * 
-	 * @return Vertex with the Highest Value
-	 */
-
-	public double[] highestValueVertex()
-	{
-		return _orderedVertexListMap.lastEntry().getValue().get (0);
+		return _orderedVertexListMap.firstEntry().getValue().get (0);
 	}
 
 	/**
@@ -357,6 +347,17 @@ public class DownhillSimplexVertexes
 	public double highestValue()
 	{
 		return _orderedVertexListMap.lastEntry().getKey();
+	}
+
+	/**
+	 * Retrieve the Vertex with the Highest Value
+	 * 
+	 * @return Vertex with the Highest Value
+	 */
+
+	public double[] highestValueVertex()
+	{
+		return _orderedVertexListMap.lastEntry().getValue().get (0);
 	}
 
 	/**
@@ -398,21 +399,24 @@ public class DownhillSimplexVertexes
 	 * @return The Cloned Instance
 	 */
 
-	public DownhillSimplexVertexes clone()
+	@SuppressWarnings ("unchecked") @Override public DownhillSimplexVertexes clone()
 	{
 		DownhillSimplexVertexes clone = null;
 
 		try {
-			clone = new DownhillSimplexVertexes (_orderedVertexListMap);
+			clone = new DownhillSimplexVertexes (
+				(TreeMap<Double, List<double[]>>) _orderedVertexListMap.clone()
+			);
 		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
+		clone._centroidVertex = R1MatrixUtil.UnsafeClone (_centroidVertex);
+
 		clone._objectiveFunctionStandardError = _objectiveFunctionStandardError;
 		clone._objectiveFunctionMean = _objectiveFunctionMean;
-		clone._centroidVertex = _centroidVertex;
 		return clone;
 	}
 

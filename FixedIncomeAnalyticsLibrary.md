@@ -11,7 +11,7 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome/FixedIncomeAnalytics_v7.76.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome/FixedIncomeAnalytics_v7.96.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -272,9 +272,16 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 	* After-tax Valuation
 	* The Challenge of Implementation
 	* References
- * A Model for Valuing Bonds with Embedded Options
-	* Background
-	* Yield Analysis and Calibration of Scaling Factor
+ * AAA Municipal Curve
+	* Overview
+	* Constituent Selection
+	* References
+ * The Right and the Wrong Models for Evaluating Callable Municipal Bonds
+	* Abstract
+	* Introduction
+	* Types of Term-structure Models and their Roles
+	* Types of Term-structure Models and their Roles - Deterministic 
+	* References
  * Conservative PIK Bond Modeling Strategy
 	* Assumptions and Strategy
 	* Mathematical Proof
@@ -354,6 +361,11 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 	* Arbitrage Problem in the Implied Volatility Formula
 	* Extensions
 	* Simulation
+	* Reference
+ * Mid-Curve Swaptions
+	* Product Definition
+	* Model Inputs
+	* Model Design and Assumption
 	* Reference
  * LMM Calibration and Greeks Overview
 	* Motivation for Robust LMM Calibration

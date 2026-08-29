@@ -1,6 +1,8 @@
 
 package org.drip.sequence.metrics;
 
+import java.util.List;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -89,6 +91,38 @@ public class SingleSequenceAgnosticMetrics {
 	private double _dblEmpiricalVariance = java.lang.Double.NaN;
 	private double _dblEmpiricalExpectation = java.lang.Double.NaN;
 	private org.drip.measure.distribution.R1Continuous _distPopulation = null;
+
+	/**
+	 * Construct a Standard Instance of <i>SingleSequenceAgnosticMetrics</i> from the Sequence List
+	 * 
+	 * @param sequenceList Sequence List
+	 * 
+	 * @return Standard Instance of <i>SingleSequenceAgnosticMetrics</i>
+	 */
+
+	public static final SingleSequenceAgnosticMetrics Standard (
+		final List<Double> sequenceList)
+	{
+		int sequenceSize = null == sequenceList ? 0 : sequenceList.size();
+
+		if (0 == sequenceSize) {
+			return null;
+		}
+
+		double[] sequenceArray = new double[sequenceSize];
+
+		for (int sequenceIndex = 0; sequenceIndex < sequenceSize; ++sequenceIndex) {
+			sequenceArray[sequenceIndex] = sequenceList.get (sequenceIndex);
+		}
+
+		try {
+			return new SingleSequenceAgnosticMetrics (sequenceArray, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	/**
 	 * Build out the Sequence and their Metrics

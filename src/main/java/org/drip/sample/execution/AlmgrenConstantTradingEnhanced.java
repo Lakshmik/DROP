@@ -19,6 +19,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -94,8 +102,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>AlmgrenConstantTradingEnhanced</i> demonstrates the Generation of the Optimal Trading Trajectory under
- * the Condition of Constant Trading Enhanced Volatility using a Numerical Optimization Technique. The
- * References are:
+ * 	the Condition of Constant Trading Enhanced Volatility using a Numerical Optimization Technique. The
+ * 	References are:
  * 
  * <br><br>
  *  <ul>
@@ -118,94 +126,92 @@ import org.drip.service.env.EnvManager;
  * 				Markets</i> <b>1</b> 1-50
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/execution/README.md">Nonlinear Trading Enhanced Market Impact</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/execution/README.md">Nonlinear Trading Enhanced Market Impact</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class AlmgrenConstantTradingEnhanced {
+public class AlmgrenConstantTradingEnhanced
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double dblEta = 5.e-06;
-		double dblAlpha = 1.;
-		double dblSigma = 1.;
-		double dblLambda = 1.e-05;
+		double t = 5.;
+		double alpha = 1.;
+		double sigma = 1.;
+		double x = 100000.;
+		double eta = 5.e-06;
+		double lambda = 1.e-05;
+		int intervalCount = 500;
 
-		double dblX = 100000.;
-		double dblT = 5.;
-		int iNumInterval = 500;
+		ArithmeticPriceEvolutionParameters arithmeticPriceEvolutionParameters =
+			ArithmeticPriceEvolutionParametersBuilder.TradingEnhancedVolatility (
+				sigma,
+				new UniformParticipationRateLinear (ParticipationRateLinear.SlopeOnly (eta)),
+				new UniformParticipationRateLinear (new ParticipationRateLinear (alpha, 0.))
+			);
 
-		DiscreteTradingTrajectoryControl dttc = DiscreteTradingTrajectoryControl.FixedInterval (
-			new OrderSpecification (
-				dblX,
-				dblT
-			),
-			iNumInterval
+		EfficientTradingTrajectoryDiscrete efficientTradingTrajectoryDiscrete =
+			(EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
+				DiscreteTradingTrajectoryControl.FixedInterval (
+					new OrderSpecification (x, t),
+					intervalCount
+				),
+				arithmeticPriceEvolutionParameters,
+				new MeanVarianceObjectiveUtility (lambda)
+			).generate();
+
+		double[] executionTimeNodeArray = efficientTradingTrajectoryDiscrete.executionTimeNode();
+
+		double[] tradeListArray = efficientTradingTrajectoryDiscrete.tradeList();
+
+		double[] holdingsArray = efficientTradingTrajectoryDiscrete.holdings();
+
+		EfficientTradingTrajectoryContinuous efficientTradingTrajectoryContinuous =
+			(EfficientTradingTrajectoryContinuous) ContinuousConstantTradingEnhanced.Standard (
+				x,
+				t,
+				arithmeticPriceEvolutionParameters,
+				lambda
+			).generate();
+
+		R1ToR1 holdingsFunction = efficientTradingTrajectoryContinuous.holdings();
+
+		double[] continuousHoldingsArray = new double[executionTimeNodeArray.length];
+
+		for (int executionTimeIndex = 0;
+			executionTimeIndex < executionTimeNodeArray.length;
+			++executionTimeIndex)
+		{
+			continuousHoldingsArray[executionTimeIndex] =
+				holdingsFunction.evaluate (executionTimeNodeArray[executionTimeIndex]);
+		}
+
+		R1UnivariateNormal r1univariateNormal = new TrajectoryShortfallEstimator (
+			efficientTradingTrajectoryDiscrete
+		).totalCostDistributionSynopsis (
+			arithmeticPriceEvolutionParameters
 		);
-
-		ArithmeticPriceEvolutionParameters apep = ArithmeticPriceEvolutionParametersBuilder.TradingEnhancedVolatility (
-			dblSigma,
-			new UniformParticipationRateLinear (ParticipationRateLinear.SlopeOnly (dblEta)),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					dblAlpha,
-					0.
-				)
-			)
-		);
-
-		EfficientTradingTrajectoryDiscrete ettd = (EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
-			dttc,
-			apep,
-			new MeanVarianceObjectiveUtility (dblLambda)
-		).generate();
-
-		double[] adblExecutionTimeNode = ettd.executionTimeNode();
-
-		double[] adblTradeList = ettd.tradeList();
-
-		double[] adblHoldings = ettd.holdings();
-
-		ContinuousConstantTradingEnhanced ccte = ContinuousConstantTradingEnhanced.Standard (
-			dblX,
-			dblT,
-			apep,
-			dblLambda
-		);
-
-		EfficientTradingTrajectoryContinuous ettc = (EfficientTradingTrajectoryContinuous) ccte.generate();
-
-		R1ToR1 r1ToR1Holdings = ettc.holdings();
-
-		double[] adblHoldingsCF = new double[adblExecutionTimeNode.length];
-
-		for (int i = 0; i < adblExecutionTimeNode.length; ++i)
-			adblHoldingsCF[i] = r1ToR1Holdings.evaluate (adblExecutionTimeNode[i]);
-
-		TrajectoryShortfallEstimator tse = new TrajectoryShortfallEstimator (ettd);
-
-		R1UnivariateNormal r1un = tse.totalCostDistributionSynopsis (apep);
 
 		System.out.println ("\n\t|------------------------------------------------||");
 
@@ -227,39 +233,98 @@ public class AlmgrenConstantTradingEnhanced {
 
 		System.out.println ("\t|------------------------------------------------||");
 
-		for (int i = 1; i < adblExecutionTimeNode.length; ++i) {
-			System.out.println ("\t| " +
-				FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 2, 1.) + " => " +
-				FormatUtil.FormatDouble (adblHoldings[i] / dblX, 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (adblHoldingsCF[i] / dblX, 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (adblTradeList[i - 1] / dblX, 2, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble ((adblHoldingsCF[i] - adblHoldingsCF[i - 1]) / dblX, 2, 2, 100.) + "% ||"
+		for (int executionTimeIndex = 1;
+			executionTimeIndex < executionTimeNodeArray.length;
+			++executionTimeIndex)
+		{
+			System.out.println (
+				"\t| " + FormatUtil.FormatDouble (
+					executionTimeNodeArray[executionTimeIndex],
+					1,
+					2,
+					1.
+				) + " => " + FormatUtil.FormatDouble (
+					holdingsArray[executionTimeIndex] / x,
+					2,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					continuousHoldingsArray[executionTimeIndex] / x,
+					2,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					tradeListArray[executionTimeIndex - 1] / x,
+					2,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					(
+						continuousHoldingsArray[executionTimeIndex] -
+							continuousHoldingsArray[executionTimeIndex - 1]
+					) / x,
+					2,
+					2,
+					100.
+				) + "% ||"
 			);
 		}
 
 		System.out.println ("\t|------------------------------------------------||");
 
-		System.out.println ("\n\t|--------------------------------------------------------------------------||");
-
-		System.out.println ("\t|  TRANSACTION COST RECONCILIATION: EXPLICIT vs. NUMERICAL vs. CLOSED FORM ||");
-
-		System.out.println ("\t|--------------------------------------------------------------------------||");
-
 		System.out.println (
-			"\t| Transaction Cost Expectation         : " +
-			FormatUtil.FormatDouble (r1un.mean(), 6, 1, 1.) + " | " +
-			FormatUtil.FormatDouble (ettd.transactionCostExpectation(), 6, 1, 1.) + " | " +
-			FormatUtil.FormatDouble (ettc.transactionCostExpectation(), 6, 1, 1.) + " ||"
+			"\n\t|--------------------------------------------------------------------------||"
 		);
 
 		System.out.println (
-			"\t| Transaction Cost Variance (X 10^-06) : " +
-			FormatUtil.FormatDouble (r1un.variance(), 6, 1, 1.e-06) + " | " +
-			FormatUtil.FormatDouble (ettd.transactionCostVariance(), 6, 1, 1.e-06) + " | " +
-			FormatUtil.FormatDouble (ettc.transactionCostVariance(), 6, 1, 1.e-06) + " ||"
+			"\t|  TRANSACTION COST RECONCILIATION: EXPLICIT vs. NUMERICAL vs. CLOSED FORM ||"
 		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------||"
+		);
+
+		System.out.println (
+			"\t| Transaction Cost Expectation         : " + FormatUtil.FormatDouble (
+				r1univariateNormal.mean(),
+				6,
+				1,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryDiscrete.transactionCostExpectation(),
+				6,
+				1,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.transactionCostExpectation(),
+				6,
+				1,
+				1.
+			) + " ||"
+		);
+
+		System.out.println (
+			"\t| Transaction Cost Variance (X 10^-06) : " + FormatUtil.FormatDouble (
+				r1univariateNormal.variance(),
+				6,
+				1,
+				1.e-06
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryDiscrete.transactionCostVariance(),
+				6,
+				1,
+				1.e-06
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.transactionCostVariance(),
+				6,
+				1,
+				1.e-06
+			) + " ||"
+		);
+
+		System.out.println (
+			"\t|--------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

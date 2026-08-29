@@ -25,7 +25,6 @@ org.drip.dynamics.hjm
 org.drip.dynamics.hullwhite
 org.drip.dynamics.ito
 org.drip.dynamics.kolmogorov
-org.drip.dynamics.kwf1993
 org.drip.dynamics.lmm
 org.drip.dynamics.meanreverting
 org.drip.dynamics.physical
@@ -327,6 +326,7 @@ org.drip.sample.mporstream
 org.drip.sample.mst
 org.drip.sample.multicurve
 org.drip.sample.municipal
+org.drip.sample.neldermead
 org.drip.sample.netting
 org.drip.sample.newtoncotes
 org.drip.sample.numeraire
@@ -474,6 +474,7 @@ org.drip.state.fx
 org.drip.state.govvie
 org.drip.state.identifier
 org.drip.state.inference
+org.drip.state.municipal
 org.drip.state.nonlinear
 org.drip.state.repo
 org.drip.state.representation

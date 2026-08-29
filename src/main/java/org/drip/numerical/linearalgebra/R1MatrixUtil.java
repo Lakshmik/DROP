@@ -454,6 +454,48 @@ public class R1MatrixUtil
 	}
 
 	/**
+	 * Clone the Input R<sup>1</sup> Array
+	 * 
+	 * @param r1Array Input R<sup>1</sup> Array
+	 * 
+	 * @return Cloned R<sup>1</sup> Array
+	 */
+
+	public static final double[] UnsafeClone (
+		final double[] r1Array)
+	{
+		double[] r1ArrayClone = new double[r1Array.length];
+
+		for (int i = 0; i < r1Array.length; ++i) {
+			r1ArrayClone[i] = r1Array[i];
+		}
+
+		return r1ArrayClone;
+	}
+
+	/**
+	 * Clone the Input R<sup>2</sup> Matrix
+	 * 
+	 * @param r2Array Input R<sup>2</sup> Matrix
+	 * 
+	 * @return Cloned R<sup>2</sup> Matrix
+	 */
+
+	public static final double[][] UnsafeClone (
+		final double[][] r2Array)
+	{
+		double[][] r2ArrayClone = new double[r2Array[0].length][r2Array.length];
+
+		for (int i = 0; i < r2Array[0].length; ++i) {
+			for (int j = 0; j < r2Array.length; ++j) {
+				r2ArrayClone[i][j] = r2Array[j][i];
+			}
+		}
+
+		return r2ArrayClone;
+	}
+
+	/**
 	 * Indicate if the Cell corresponds to Bottom Left Location in the Matrix
 	 * 
 	 * @param rowIndex Row Index

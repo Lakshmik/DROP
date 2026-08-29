@@ -18,6 +18,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,8 +101,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>ConcaveImpactNoDrift</i> generates the Trade/Holdings List of Optimal Execution Schedule based on the
- * Concave Power Law Evolution Walk Parameters specified. The Generation follows a Numerical Optimizer
- * Scheme, as opposed to the Closed Form; it also excludes the Impact of Drift. The References are:
+ * 	Concave Power Law Evolution Walk Parameters specified. The Generation follows a Numerical Optimizer
+ * 	Scheme, as opposed to the Closed Form; it also excludes the Impact of Drift. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -118,19 +126,20 @@ import org.drip.service.env.EnvManager;
  *  	</li>
  *  </ul>
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/execution/README.md">Nonlinear Trading Enhanced Market Impact</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/execution/README.md">Nonlinear Trading Enhanced Market Impact</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ConcaveImpactNoDrift {
+public class ConcaveImpactNoDrift
+{
 
 	/**
 	 * Entry Point
@@ -146,61 +155,55 @@ public class ConcaveImpactNoDrift {
 	{
 		EnvManager.InitEnv ("");
 
-		double dblS0 = 50.;
-		double dblDailyVolume = 1000000.;
-		double dblBidAskSpread = 0.;
-		double dblPermanentImpactFactor = 0.;
-		double dblTemporaryImpactFactor = 0.01;
-		double dblK = 0.5;
-		double dblDailyVolumeExecutionFactor = 0.1;
-		double dblDrift = 0.;
-		double dblVolatility = 1.;
-		double dblX = 100000.;
-		double dblFinishTime = 0.04;
-		int iNumInterval = 2;
-		double dblLambdaU = 3.e-03;
+		double k = 0.5;
+		double s0 = 50.;
+		double drift = 0.;
+		double x = 100000.;
+		double volatility = 1.;
+		int intervalCount = 2;
+		double lambdaU = 3.e-03;
+		double bidAskSpread = 0.;
+		double finishTime = 0.04;
+		double dailyVolume = 1000000.;
+		double permanentImpactFactor = 0.;
+		double temporaryImpactFactor = 0.01;
+		double dailyVolumeExecutionFactor = 0.1;
 
-		PriceMarketImpactPower pmip = new PriceMarketImpactPower (
-			new AssetTransactionSettings (
-				dblS0,
-				dblDailyVolume,
-				dblBidAskSpread
-			),
-			dblPermanentImpactFactor,
-			dblTemporaryImpactFactor,
-			dblDailyVolumeExecutionFactor,
-			dblK
+		PriceMarketImpactPower priceMarketImpactPower = new PriceMarketImpactPower (
+			new AssetTransactionSettings (s0, dailyVolume, bidAskSpread),
+			permanentImpactFactor,
+			temporaryImpactFactor,
+			dailyVolumeExecutionFactor,
+			k
 		);
 
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
-			new ArithmeticPriceDynamicsSettings (
-				dblDrift,
-				new Flat (dblVolatility),
-				0.
-			),
-			new UniformParticipationRateLinear ((ParticipationRateLinear) pmip.permanentTransactionFunction()),
-			new UniformParticipationRate ((ParticipationRatePower) pmip.temporaryTransactionFunction())
-		);
+		EfficientTradingTrajectoryDiscrete efficientTradingTrajectoryDiscrete =
+			(EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
+				DiscreteTradingTrajectoryControl.FixedInterval (
+					new OrderSpecification (x, finishTime),
+					intervalCount
+				),
+				ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
+					new ArithmeticPriceDynamicsSettings (
+						drift,
+						new Flat (volatility),
+						0.
+					),
+					new UniformParticipationRateLinear (
+						(ParticipationRateLinear) priceMarketImpactPower.permanentTransactionFunction()
+					),
+					new UniformParticipationRate (
+						(ParticipationRatePower) priceMarketImpactPower.temporaryTransactionFunction()
+					)
+				),
+				new MeanVarianceObjectiveUtility (lambdaU)
+			).generate();
 
-		DiscreteTradingTrajectoryControl dttc = DiscreteTradingTrajectoryControl.FixedInterval (
-			new OrderSpecification (
-				dblX,
-				dblFinishTime
-			),
-			iNumInterval
-		);
+		double[] executionTimeNodeArray = efficientTradingTrajectoryDiscrete.executionTimeNode();
 
-		EfficientTradingTrajectoryDiscrete ettd = (EfficientTradingTrajectoryDiscrete) new StaticOptimalSchemeDiscrete (
-			dttc,
-			lpep,
-			new MeanVarianceObjectiveUtility (dblLambdaU)
-		).generate();
+		double[] holdingsArray = efficientTradingTrajectoryDiscrete.holdings();
 
-		double[] adblExecutionTimeNode = ettd.executionTimeNode();
-
-		double[] adblTradeList = ettd.tradeList();
-
-		double[] adblHoldings = ettd.holdings();
+		double[] tradeArray = efficientTradingTrajectoryDiscrete.tradeList();
 
 		System.out.println ("\n\t|-----------------------------||");
 
@@ -218,19 +221,25 @@ public class ConcaveImpactNoDrift {
 
 		System.out.println ("\t|-----------------------------||");
 
-		for (int i = 0; i <= iNumInterval; ++i) {
-			if (i == 0)
-				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 3, 1.) + " =>" +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (0., 6, 1, 1.) + " ||"
-				);
-			else
-				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 3, 1.) + " =>" +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (adblTradeList[i - 1], 6, 1, 1.) + " ||"
-				);
+		for (int executionTimeIndex = 0; executionTimeIndex <= intervalCount; ++executionTimeIndex) {
+			System.out.println (
+				"\t|" + FormatUtil.FormatDouble (
+					executionTimeNodeArray[executionTimeIndex],
+					1,
+					3,
+					1.
+				) + " =>" + FormatUtil.FormatDouble (
+					holdingsArray[executionTimeIndex],
+					7,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					0 == executionTimeIndex ? 0. : tradeArray[executionTimeIndex - 1],
+					6,
+					1,
+					1.
+				) + " ||"
+			);
 		}
 
 		System.out.println ("\t|-----------------------------||");

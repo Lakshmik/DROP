@@ -41,21 +41,7 @@
  --------------------------
 
  --------------------------
- #4 - A Model for Valuing Bonds with Embedded Options
- --------------------------
- --------------------------
-	- Transaction Costs
-		- Refinancing Costs on a Call => Debt refinanced on a call - transaction costs
-		- Tree incorporation - Call option exercise should exceed the refinancing costs
-		- Debt Refinancing at Maturity in the tree
-	- After-tax Valuation
-		- Bonds on an After-tax Basis
-		- Scaling the Yield Curve by the Tax Rate => Multiplying the entire on-the-run yield curve by 1-TaxRate
-		- Impact of Volatility in the Tax-adjusted Curve
- --------------------------
-
- --------------------------
- #5 - Conservative PIK Bond Modeling Strategy (COMPLETE)
+ #4 - Conservative PIK Bond Modeling Strategy (COMPLETE)
  --------------------------
  --------------------------
 	- Absolute value of total risks after the application of PIK for each payment period is larger than the cash coupon
@@ -63,7 +49,7 @@
  --------------------------
 
  --------------------------
- #6 - Floating Rate Indexes
+ #5 - Floating Rate Indexes
  --------------------------
  --------------------------
 	- Swap Indexes
@@ -74,7 +60,7 @@
  --------------------------
 
  --------------------------
- #7 - Over-The-Counter Instruments
+ #6 - Over-The-Counter Instruments
  --------------------------
  --------------------------
 	- Forward Rate Agreement
@@ -90,7 +76,7 @@
  --------------------------
 
  --------------------------
- #8 - PnL Explain
+ #7 - PnL Explain
  --------------------------
  --------------------------
 	- Attribution Steps – EOD Revaluation: PnL(T+1B)=V_EOD (T+1B)-V_EOD (T)
@@ -138,7 +124,7 @@
  --------------------------
 
  --------------------------
- #9 - The SABR Model
+ #8 - The SABR Model
  --------------------------
  --------------------------
 	- Introduction
@@ -183,7 +169,7 @@
  --------------------------
 
  --------------------------
- #10 - The SABR Volatility Model
+ #9 - The SABR Volatility Model
  --------------------------
  --------------------------
 	- Dynamics
