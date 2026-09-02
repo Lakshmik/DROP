@@ -138,10 +138,33 @@ public class AffineR2ToR1
 		EnvManager.InitEnv ("");
 
 		double constant = 1.;
-		double[] coefficientArray = new double[] {1., 1.};
+		double[] coefficientArray =
+		{
+			1.,
+			1.
+		};
 
-		double[] xArray = {-50., -33., -17, 0., 17., 33., 50.};
-		double[] yArray = {-50., -33., -17, 0., 17., 33., 50.};
+		double[] xArray =
+		{
+			-50.,
+			-33.,
+			-17,
+			  0.,
+			 17.,
+			 33.,
+			 50.
+			 
+		};
+		double[] yArray =
+		{
+			-50.,
+			-33.,
+			-17,
+			  0.,
+			 17.,
+			 33.,
+			 50.
+		};
 
 		AffineMultivariate affineMultivariate = new AffineMultivariate (coefficientArray, constant);
 
@@ -168,10 +191,27 @@ public class AffineR2ToR1
 		for (double x : xArray) {
 			for (double y : yArray) {
 				System.out.println (
-					"\t| [" + FormatUtil.FormatDouble (x, 2, 2, 1.) + ", " +
-						FormatUtil.FormatDouble (y, 2, 2, 1.) + "] =>" +
-					FormatUtil.FormatDouble (
-						affineMultivariate.conditionNumber (new double[] {x, y}), 3, 6, 1.
+					"\t| [" + FormatUtil.FormatDouble (
+						x,
+						2,
+						2,
+						1.
+					) + ", " + FormatUtil.FormatDouble (
+						y,
+						2,
+						2,
+						1.
+					) + "] =>" + FormatUtil.FormatDouble (
+						affineMultivariate.conditionNumber (
+							new double[]
+							{
+								x,
+								y
+							}
+						),
+						3,
+						6,
+						1.
 					) + " ||"
 				);
 			}

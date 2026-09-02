@@ -142,7 +142,14 @@ public class OperatorFunctions
 	{
 		EnvManager.InitEnv ("");
 
-		double[] xArray = {0., 20., 40., 60., 80., 100.};
+		double[] xArray = {
+			0.,
+			20.,
+			40.,
+			60.,
+			80.,
+			100.
+		};
 
 		Scaler scaler = new Scaler (1.);
 
@@ -150,9 +157,9 @@ public class OperatorFunctions
 
 		Reciprocal reciprocal = new Reciprocal();
 
-		Exponential exponential = new Exponential();
-
 		Polynomial polynomial = new Polynomial (5);
+
+		Exponential exponential = new Exponential();
 
 		NaturalLogarithm naturalLogarithm = new NaturalLogarithm();
 

@@ -3,6 +3,7 @@ package org.drip.sample.cross;
 
 import java.util.*;
 
+import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.*;
 import org.drip.function.r1tor1operator.Flat;
@@ -23,6 +24,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -100,468 +109,427 @@ import org.drip.state.identifier.*;
 
 /**
  * <i>FloatFloatFloatFloat</i> demonstrates the construction, the usage, and the eventual valuation of the
- * Cross Currency Basis Swap built out of a pair of float-float swaps.
+ * 	Cross Currency Basis Swap built out of a pair of float-float swaps.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/cross/README.md">Single/Dual Stream XCCY Component</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/cross/README.md">Single/Dual Stream XCCY Component</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FloatFloatFloatFloat {
+public class FloatFloatFloatFloat
+{
 
 	private static final FloatFloatComponent MakeFloatFloatSwap (
-		final JulianDate dtEffective,
-		final boolean bFXMTM,
-		final String strPayCurrency,
-		final String strCouponCurrency,
-		final String strMaturityTenor,
-		final int iTenorInMonthsReference,
-		final int iTenorInMonthsDerived)
+		final JulianDate effectiveDate,
+		final boolean fxMTM,
+		final String payCurrency,
+		final String couponCurrency,
+		final String maturityTenor,
+		final int tenorInMonthsReference,
+		final int tenorInMonthsDerived)
 		throws Exception
 	{
-		ComposableFloatingUnitSetting cfusReference = new ComposableFloatingUnitSetting (
-			iTenorInMonthsReference + "M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Create (
-				strCouponCurrency,
-				iTenorInMonthsReference + "M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
+		String derivedTenor = tenorInMonthsDerived + "M";
+		String referenceTenor = tenorInMonthsReference + "M";
 
-		ComposableFloatingUnitSetting cfusDerived = new ComposableFloatingUnitSetting (
-			iTenorInMonthsDerived + "M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+		FixingSetting fixingSetting = fxMTM ? null : new FixingSetting (
+			FixingSetting.FIXING_PRESET_STATIC,
 			null,
-			ForwardLabel.Create (
-				strCouponCurrency,
-				iTenorInMonthsDerived + "M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
-
-		CompositePeriodSetting cpsReference = new CompositePeriodSetting (
-			12 / iTenorInMonthsReference,
-			iTenorInMonthsReference + "M",
-			strPayCurrency,
-			null,
-			-1.,
-			null,
-			null,
-			bFXMTM ? null : new FixingSetting (
-				FixingSetting.FIXING_PRESET_STATIC,
-				null,
-				dtEffective.julian()
-			),
-			null
-		);
-
-		CompositePeriodSetting cpsDerived = new CompositePeriodSetting (
-			12 / iTenorInMonthsDerived,
-			iTenorInMonthsDerived + "M",
-			strPayCurrency,
-			null,
-			1.,
-			null,
-			null,
-			bFXMTM ? null : new FixingSetting (
-				FixingSetting.FIXING_PRESET_STATIC,
-				null,
-				dtEffective.julian()
-			),
-			null
-		);
-
-		List<Integer> lsReferenceStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			iTenorInMonthsReference + "M",
-			strMaturityTenor,
-			null
-		);
-
-		List<Integer> lsDerivedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			iTenorInMonthsDerived + "M",
-			strMaturityTenor,
-			null
-		);
-
-		Stream referenceStream = new Stream (
-			CompositePeriodBuilder.FloatingCompositeUnit (
-				lsReferenceStreamEdgeDate,
-				cpsReference,
-				cfusReference
-			)
-		);
-
-		Stream derivedStream = new Stream (
-			CompositePeriodBuilder.FloatingCompositeUnit (
-				lsDerivedStreamEdgeDate,
-				cpsDerived,
-				cfusDerived
-			)
-		);
-
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strPayCurrency,
-			0
+			effectiveDate.julian()
 		);
 
 		return new FloatFloatComponent (
-			referenceStream,
-			derivedStream,
-			csp
+			new Stream (
+				CompositePeriodBuilder.FloatingCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						referenceTenor,
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						12 / tenorInMonthsReference,
+						referenceTenor,
+						payCurrency,
+						null,
+						-1.,
+						null,
+						null,
+						fixingSetting,
+						null
+					),
+					new ComposableFloatingUnitSetting (
+						referenceTenor,
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						ForwardLabel.Create (couponCurrency, tenorInMonthsReference + "M"),
+						CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+						0.
+					)
+				)
+			),
+			new Stream (
+				CompositePeriodBuilder.FloatingCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						derivedTenor,
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						12 / tenorInMonthsDerived,
+						derivedTenor,
+						payCurrency,
+						null,
+						1.,
+						null,
+						null,
+						fixingSetting,
+						null
+					),
+					new ComposableFloatingUnitSetting (
+						derivedTenor,
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						ForwardLabel.Create (couponCurrency, derivedTenor),
+						CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+						0.
+					)
+				)
+			),
+			new CashSettleParams (0, payCurrency, 0)
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		String strReferenceCurrency = "USD";
-		String strDerivedCurrency = "EUR";
-
-		double dblReference3MForwardRate = 0.00750;
-		double dblReference6MForwardRate = 0.01000;
-		double dblDerived3MForwardRate = 0.00375;
-		double dblDerived6MForwardRate = 0.00625;
-		double dblReferenceFundingRate = 0.02;
-		double dblReferenceDerivedFXRate = 1. / 1.28;
-
-		double dblReference3MForwardVol = 0.3;
-		double dblReference6MForwardVol = 0.3;
-		double dblDerived3MForwardVol = 0.3;
-		double dblDerived6MForwardVol = 0.3;
-		double dblReferenceFundingVol = 0.3;
-		double dblReferenceDerivedFXVol = 0.3;
-
-		double dblReference3MForwardFundingCorr = 0.15;
-		double dblReference6MForwardFundingCorr = 0.15;
-		double dblDerived3MForwardFundingCorr = 0.15;
-		double dblDerived6MForwardFundingCorr = 0.15;
-
-		double dblReference3MForwardFXCorr = 0.15;
-		double dblReference6MForwardFXCorr = 0.15;
-		double dblDerived3MForwardFXCorr = 0.15;
-		double dblDerived6MForwardFXCorr = 0.15;
-
-		double dblFundingFXCorr = 0.15;
-
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = org.drip.analytics.date.DateUtil.Today();
+		String derivedCurrency = "EUR";
+		String referenceCurrency = "USD";
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			strReferenceCurrency
-		);
+		double referenceFundingRate = 0.02;
+		double derived3MForwardRate = 0.00375;
+		double derived6MForwardRate = 0.00625;
+		double reference3MForwardRate = 0.00750;
+		double reference6MForwardRate = 0.01000;
+		double referenceDerivedFXRate = 1. / 1.28;
 
-		ForwardLabel fri3MReference = ForwardLabel.Create (
-			strReferenceCurrency,
-			"3M"
-		);
+		double derived3MForwardVolatility = 0.3;
+		double derived6MForwardVolatility = 0.3;
+		double referenceFundingVolatility = 0.3;
+		double reference3MForwardVolatility = 0.3;
+		double reference6MForwardVolatility = 0.3;
+		double referenceDerivedFXVolatility = 0.3;
 
-		ForwardLabel fri6MReference = ForwardLabel.Create (
-			strReferenceCurrency,
-			"6M"
-		);
+		double derived3MForwardFundingCorrelation = 0.15;
+		double derived6MForwardFundingCorrelation = 0.15;
+		double reference3MForwardFundingCorrelation = 0.15;
+		double reference6MForwardFundingCorrelation = 0.15;
 
-		ForwardLabel fri3MDerived = ForwardLabel.Create (
-			strDerivedCurrency,
-			"3M"
-		);
+		double derived3MForwardFXCorrelation = 0.15;
+		double derived6MForwardFXCorrelation = 0.15;
+		double reference3MForwardFXCorrelation = 0.15;
+		double reference6MForwardFXCorrelation = 0.15;
 
-		ForwardLabel fri6MDerived = ForwardLabel.Create (
-			strDerivedCurrency,
-			"6M"
-		);
+		double fundingFXCorrelation = 0.15;
 
-		FundingLabel fundingLabelReference = FundingLabel.Standard (strReferenceCurrency);
+		JulianDate today = DateUtil.Today();
 
-		CurrencyPair cp = CurrencyPair.FromCode (strReferenceCurrency + "/" + strDerivedCurrency);
+		FundingLabel fundingLabelReference = FundingLabel.Standard (referenceCurrency);
 
-		FXLabel fxLabel = FXLabel.Standard (cp);
+		ForwardLabel derived3MForwardLabel = ForwardLabel.Create (derivedCurrency, "3M");
 
-		FloatFloatComponent floatFloatReference = MakeFloatFloatSwap (
-			dtToday,
+		ForwardLabel derived6MForwardLabel = ForwardLabel.Create (derivedCurrency, "6M");
+
+		ForwardLabel reference3MForwardLabel = ForwardLabel.Create (referenceCurrency, "3M");
+
+		ForwardLabel reference6MForwardLabel = ForwardLabel.Create (referenceCurrency, "6M");
+
+		ValuationParams valuationParams = new ValuationParams (today, today, referenceCurrency);
+
+		CurrencyPair currencyPair = CurrencyPair.FromCode (referenceCurrency + "/" + derivedCurrency);
+
+		FloatFloatComponent nonMTMReferencefloatFloat = MakeFloatFloatSwap (
+			today,
 			false,
-			strReferenceCurrency,
-			strReferenceCurrency,
+			referenceCurrency,
+			referenceCurrency,
 			"2Y",
 			6,
 			3
 		);
 
-		floatFloatReference.setPrimaryCode (
-			"FLOAT::FLOAT::" + strReferenceCurrency + "::" + strReferenceCurrency + "_3M::" + strReferenceCurrency + "_6M::2Y"
+		nonMTMReferencefloatFloat.setPrimaryCode (
+			"FLOAT::FLOAT::" + referenceCurrency + "::" + referenceCurrency + "_3M::" + referenceCurrency +
+				"_6M::2Y"
 		);
 
-		FloatFloatComponent floatFloatDerivedMTM = MakeFloatFloatSwap (
-			dtToday,
+		FloatFloatComponent mtmDerivedFloatFloat = MakeFloatFloatSwap (
+			today,
 			true,
-			strReferenceCurrency,
-			strDerivedCurrency,
+			referenceCurrency,
+			derivedCurrency,
 			"2Y",
 			6,
 			3
 		);
 
-		floatFloatDerivedMTM.setPrimaryCode (
-			"FLOAT::FLOAT::MTM::" + strReferenceCurrency + "::" + strDerivedCurrency + "_3M::" + strDerivedCurrency + "_6M::2Y"
-		);
-
-		ComponentPair cpMTM = new ComponentPair (
-			"FFFF_MTM",
-			floatFloatReference,
-			floatFloatDerivedMTM,
-			null
+		mtmDerivedFloatFloat.setPrimaryCode (
+			"FLOAT::FLOAT::MTM::" + referenceCurrency + "::" + derivedCurrency + "_3M::" + derivedCurrency +
+				"_6M::2Y"
 		);
 
 		FloatFloatComponent floatFloatDerivedNonMTM = MakeFloatFloatSwap (
-			dtToday,
+			today,
 			false,
-			strReferenceCurrency,
-			strDerivedCurrency,
+			referenceCurrency,
+			derivedCurrency,
 			"2Y",
 			6,
 			3
 		);
 
 		floatFloatDerivedNonMTM.setPrimaryCode (
-			"FLOAT::FLOAT::NONMTM::" + strReferenceCurrency + "::" + strDerivedCurrency + "_3M::" + strDerivedCurrency + "_6M::2Y"
+			"FLOAT::FLOAT::NONMTM::" + referenceCurrency + "::" + derivedCurrency + "_3M::" + derivedCurrency
+				+ "_6M::2Y"
 		);
 
-		ComponentPair cpNonMTM = new ComponentPair (
-			"FFFF_NonMTM",
-			floatFloatReference,
-			floatFloatDerivedNonMTM,
-			null
-		);
+		int todayJulian = today.julian();
 
-		CurveSurfaceQuoteContainer mktParams = new CurveSurfaceQuoteContainer();
+		FXLabel fxLabel = FXLabel.Standard (currencyPair);
 
-		mktParams.setFixing (
-			dtToday,
-			fxLabel,
-			dblReferenceDerivedFXRate
-		);
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		mktParams.setForwardState (
+		curveSurfaceQuoteContainer.setFixing (today, fxLabel, referenceDerivedFXRate);
+
+		curveSurfaceQuoteContainer.setForwardState (
 			ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-				dtToday,
-				fri3MReference,
-				dblReference3MForwardRate
+				today,
+				reference3MForwardLabel,
+				reference3MForwardRate
 			)
 		);
 
-		mktParams.setForwardState (
+		curveSurfaceQuoteContainer.setForwardState (
 			ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-				dtToday,
-				fri6MReference,
-				dblReference6MForwardRate
+				today,
+				reference6MForwardLabel,
+				reference6MForwardRate
 			)
 		);
 
-		mktParams.setForwardState (
+		curveSurfaceQuoteContainer.setForwardState (
 			ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-				dtToday,
-				fri3MDerived,
-				dblDerived3MForwardRate
+				today,
+				derived3MForwardLabel,
+				derived3MForwardRate
 			)
 		);
 
-		mktParams.setForwardState (
+		curveSurfaceQuoteContainer.setForwardState (
 			ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-				dtToday,
-				fri6MDerived,
-				dblDerived6MForwardRate
+				today,
+				derived6MForwardLabel,
+				derived6MForwardRate
 			)
 		);
 
-		mktParams.setFundingState (
+		curveSurfaceQuoteContainer.setFundingState (
 			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-				dtToday,
-				strReferenceCurrency,
-				dblReferenceFundingRate
+				today,
+				referenceCurrency,
+				referenceFundingRate
 			)
 		);
 
-		mktParams.setFXState (
+		curveSurfaceQuoteContainer.setFXState (
 			ScenarioFXCurveBuilder.CubicPolynomialCurve (
 				fxLabel.fullyQualifiedName(),
-				dtToday,
-				cp,
-				new String[] {"10Y"},
-				new double[] {dblReferenceDerivedFXRate},
-				dblReferenceDerivedFXRate
+				today,
+				currencyPair,
+				new String[]
+				{
+					"10Y"
+				},
+				new double[]
+				{
+					referenceDerivedFXRate
+				},
+				referenceDerivedFXRate
 			)
 		);
 
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
-				VolatilityLabel.Standard (fri3MReference),
-				fri3MReference.currency(),
-				dblReference3MForwardVol
+				todayJulian,
+				VolatilityLabel.Standard (reference3MForwardLabel),
+				reference3MForwardLabel.currency(),
+				reference3MForwardVolatility
 			)
 		);
 
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
-				VolatilityLabel.Standard (fri6MReference),
-				fri6MReference.currency(),
-				dblReference6MForwardVol
+				todayJulian,
+				VolatilityLabel.Standard (reference6MForwardLabel),
+				reference6MForwardLabel.currency(),
+				reference6MForwardVolatility
 			)
 		);
 
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
-				VolatilityLabel.Standard (fri3MDerived),
-				fri3MDerived.currency(),
-				dblDerived3MForwardVol
+				todayJulian,
+				VolatilityLabel.Standard (derived3MForwardLabel),
+				derived3MForwardLabel.currency(),
+				derived3MForwardVolatility
 			)
 		);
 
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
-				VolatilityLabel.Standard (fri6MDerived),
-				fri6MDerived.currency(),
-				dblDerived6MForwardVol
+				todayJulian,
+				VolatilityLabel.Standard (derived6MForwardLabel),
+				derived6MForwardLabel.currency(),
+				derived6MForwardVolatility
 			)
 		);
 
-		mktParams.setFundingVolatility (
+		curveSurfaceQuoteContainer.setFundingVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
+				todayJulian,
 				VolatilityLabel.Standard (fundingLabelReference),
-				strReferenceCurrency,
-				dblReferenceFundingVol
+				referenceCurrency,
+				referenceFundingVolatility
 			)
 		);
 
-		mktParams.setFXVolatility (
+		curveSurfaceQuoteContainer.setFXVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtToday.julian(),
+				todayJulian,
 				VolatilityLabel.Standard (fxLabel),
-				strDerivedCurrency,
-				dblReferenceDerivedFXVol
+				derivedCurrency,
+				referenceDerivedFXVolatility
 			)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri3MReference,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			reference3MForwardLabel,
 			fundingLabelReference,
-			new Flat (dblReference3MForwardFundingCorr)
+			new Flat (reference3MForwardFundingCorrelation)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri6MReference,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			reference6MForwardLabel,
 			fundingLabelReference,
-			new Flat (dblReference6MForwardFundingCorr)
+			new Flat (reference6MForwardFundingCorrelation)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri3MDerived,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			derived3MForwardLabel,
 			fundingLabelReference,
-			new Flat (dblDerived3MForwardFundingCorr)
+			new Flat (derived3MForwardFundingCorrelation)
 		);
 
-		mktParams.setForwardFundingCorrelation (
-			fri6MDerived,
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			derived6MForwardLabel,
 			fundingLabelReference,
-			new Flat (dblDerived6MForwardFundingCorr)
+			new Flat (derived6MForwardFundingCorrelation)
 		);
 
-		mktParams.setForwardFXCorrelation (
-			fri3MReference,
+		curveSurfaceQuoteContainer.setForwardFXCorrelation (
+			reference3MForwardLabel,
 			fxLabel,
-			new Flat (dblReference3MForwardFXCorr)
+			new Flat (reference3MForwardFXCorrelation)
 		);
 
-		mktParams.setForwardFXCorrelation (
-			fri6MReference,
+		curveSurfaceQuoteContainer.setForwardFXCorrelation (
+			reference6MForwardLabel,
 			fxLabel,
-			new Flat (dblReference6MForwardFXCorr)
+			new Flat (reference6MForwardFXCorrelation)
 		);
 
-		mktParams.setForwardFXCorrelation (
-			fri3MDerived,
+		curveSurfaceQuoteContainer.setForwardFXCorrelation (
+			derived3MForwardLabel,
 			fxLabel,
-			new Flat (dblDerived3MForwardFXCorr)
+			new Flat (derived3MForwardFXCorrelation)
 		);
 
-		mktParams.setForwardFXCorrelation (
-			fri6MDerived,
+		curveSurfaceQuoteContainer.setForwardFXCorrelation (
+			derived6MForwardLabel,
 			fxLabel,
-			new Flat (dblDerived6MForwardFXCorr)
+			new Flat (derived6MForwardFXCorrelation)
 		);
 
-		mktParams.setFundingFXCorrelation (
+		curveSurfaceQuoteContainer.setFundingFXCorrelation (
 			fundingLabelReference,
 			fxLabel,
-			new Flat (dblFundingFXCorr)
+			new Flat (fundingFXCorrelation)
 		);
 
-		CaseInsensitiveTreeMap<Double> mapMTMOutput = cpMTM.value (
-			valParams,
+		CaseInsensitiveTreeMap<Double> nonMTMMeasureMap = new ComponentPair (
+			"FFFF_NonMTM",
+			nonMTMReferencefloatFloat,
+			floatFloatDerivedNonMTM,
+			null
+		).value (
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		CaseInsensitiveTreeMap<Double> mapNonMTMOutput = cpNonMTM.value (
-			valParams,
-			null,
-			mktParams,
-			null
-		);
+		for (Map.Entry<String, Double> measureMap : new ComponentPair (
+				"FFFF_MTM",
+				nonMTMReferencefloatFloat,
+				mtmDerivedFloatFloat,
+				null
+			).value (
+				valuationParams,
+				null,
+				curveSurfaceQuoteContainer,
+				null
+			).entrySet()
+		)
+		{
+			String key = measureMap.getKey();
 
-		for (Map.Entry<String, Double> me : mapMTMOutput.entrySet()) {
-			String strKey = me.getKey();
+			Double value = measureMap.getValue();
 
-			if (null != me.getValue() && null != mapNonMTMOutput.get (strKey)) {
-				double dblMTMMeasure = me.getValue();
+			if (null != value && null != nonMTMMeasureMap.get (key)) {
+				double mtmMeasure = value;
 
-				double dblNonMTMMeasure = mapNonMTMOutput.get (strKey);
+				double nonMTMMeasure = nonMTMMeasureMap.get (key);
 
-				String strReconcile = NumberUtil.WithinTolerance (
-					dblMTMMeasure,
-					dblNonMTMMeasure,
-					1.e-08,
-					1.e-04
-				) ? "RECONCILES" : "DOES NOT RECONCILE";
-
-				System.out.println ("\t" +
-					FormatUtil.FormatDouble (dblMTMMeasure, 1, 8, 1.) + " | " +
-					FormatUtil.FormatDouble (dblNonMTMMeasure, 1, 8, 1.) + " | " +
-					strReconcile + " <= " + strKey);
+				System.out.println (
+					"\t|| " + FormatUtil.FormatDouble (mtmMeasure, 1, 8, 1.) + " | " +
+					FormatUtil.FormatDouble (nonMTMMeasure, 1, 8, 1.) + " | " + (
+						NumberUtil.WithinTolerance (
+							mtmMeasure,
+							nonMTMMeasure,
+							1.e-08,
+							1.e-04
+						) ? "RECONCILES" : "DOES NOT RECONCILE"
+					) + " <= " + key
+				);
 			}
 		}
 

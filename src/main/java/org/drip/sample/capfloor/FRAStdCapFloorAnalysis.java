@@ -171,48 +171,34 @@ public class FRAStdCapFloorAnalysis
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
 		final JulianDate effectiveDate,
-		final int[] daysCount,
+		final int[] daysArray,
 		final int futuresCount,
 		final String currency)
 		throws Exception
 	{
 		CalibratableComponent[] calibratableComponentArray =
-			new CalibratableComponent[daysCount.length + futuresCount];
+			new CalibratableComponent[daysArray.length + futuresCount];
 
-		for (int daysIndex = 0; daysIndex < daysCount.length; ++daysIndex) {
+		for (int daysIndex = 0; daysIndex < daysArray.length; ++daysIndex) {
 			calibratableComponentArray[daysIndex] = SingleStreamComponentBuilder.Deposit (
 				effectiveDate,
-				effectiveDate.addBusDays (daysCount[daysIndex], currency),
+				effectiveDate.addBusDays (daysArray[daysIndex], currency),
 				ForwardLabel.Create (currency, "3M")
 			);
 		}
 
-		CalibratableComponent[] edfComponentArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			effectiveDate,
-			futuresCount,
-			currency
-		);
+		CalibratableComponent[] edfCalibratableComponentArray =
+			SingleStreamComponentBuilder.ForwardRateFuturesPack (effectiveDate, futuresCount, currency);
 
-		for (int daysIndex = daysCount.length; daysIndex < daysCount.length + futuresCount; ++daysIndex) {
-			calibratableComponentArray[daysIndex] = edfComponentArray[daysIndex - daysCount.length];
+		for (int daysIndex = daysArray.length; daysIndex < daysArray.length + futuresCount; ++daysIndex) {
+			calibratableComponentArray[daysIndex] =
+				edfCalibratableComponentArray[daysIndex - daysArray.length];
 		}
 
 		return calibratableComponentArray;
 	}
-
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
 		final JulianDate spotDate,
@@ -238,67 +224,13 @@ public class FRAStdCapFloorAnalysis
 		return irsFixFloatComponentArray;
 	}
 
-	/*
-	 * Construct the discount curve using the following steps:
-	 * 	- Construct the array of cash instruments and their quotes.
-	 * 	- Construct the array of swap instruments and their quotes.
-	 * 	- Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final MergedDiscountForwardCurve MakeDC (
 		final JulianDate spotDate,
 		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the array of Deposit instruments and their quotes.
-		 */
-
-		CalibratableComponent[] depositComponentArray = DepositInstrumentsFromMaturityDays (
-			spotDate,
-			new int[] {
-				1,
-				2,
-				3,
-				7,
-				14,
-				21,
-				30,
-				60
-			},
-			0,
-			currency
-		);
-
-		double[] depositQuoteArray = new double[] {
-			0.01200,
-			0.01200,
-			0.01200,
-			0.01450,
-			0.01550,
-			0.01600,
-			0.01660,
-			0.01850
-		};
-
-		String[] depositManifestMeasureArray = new String[] {
-			"ForwardRate",
-			"ForwardRate",
-			"ForwardRate",
-			"ForwardRate",
-			"ForwardRate",
-			"ForwardRate",
-			"ForwardRate",
-			"ForwardRate"
-		};
-
-		/*
-		 * Construct the array of Swap instruments and their quotes.
-		 */
-
-		double[] irsFixFloatQuoteArray = new double[] {
+		double[] irsFixFloatComponentQuoteArray =
+		{
 			0.02604,    //  4Y
 			0.02808,    //  5Y
 			0.02983,    //  6Y
@@ -316,69 +248,92 @@ public class FRAStdCapFloorAnalysis
 			0.03145     // 50Y
 		};
 
-		String[] irsFixFloatManifestMeasureArray = new String[] {
-			"SwapRate",    //  4Y
-			"SwapRate",    //  5Y
-			"SwapRate",    //  6Y
-			"SwapRate",    //  7Y
-			"SwapRate",    //  8Y
-			"SwapRate",    //  9Y
-			"SwapRate",    // 10Y
-			"SwapRate",    // 11Y
-			"SwapRate",    // 12Y
-			"SwapRate",    // 15Y
-			"SwapRate",    // 20Y
-			"SwapRate",    // 25Y
-			"SwapRate",    // 30Y
-			"SwapRate",    // 40Y
-			"SwapRate"     // 50Y
-		};
-
-		CalibratableComponent[] irsFixFloatComponentArray = SwapInstrumentsFromMaturityTenor (
-			spotDate,
-			currency,
-			new String[] {
-				"4Y",
-				"5Y",
-				"6Y",
-				"7Y",
-				"8Y",
-				"9Y",
-				"10Y",
-				"11Y",
-				"12Y",
-				"15Y",
-				"20Y",
-				"25Y",
-				"30Y",
-				"40Y",
-				"50Y"
-			},
-			irsFixFloatQuoteArray
-		);
-
-		/*
-		 * Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-		 */
-
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
-			new ValuationParams (spotDate, spotDate, "USD"),
-			depositComponentArray,
-			depositQuoteArray,
-			depositManifestMeasureArray,
-			irsFixFloatComponentArray,
-			irsFixFloatQuoteArray,
-			irsFixFloatManifestMeasureArray,
+			new ValuationParams (spotDate, spotDate, currency),
+			DepositInstrumentsFromMaturityDays (
+				spotDate,
+				new int[]
+				{
+					1,
+					2,
+					3,
+					7,
+					14,
+					21,
+					30,
+					60
+				},
+				0,
+				currency
+			),
+			new double[]
+			{
+				0.0120,
+				0.0120,
+				0.0120,
+				0.0145,
+				0.0155,
+				0.0160,
+				0.0166,
+				0.0185
+			},
+			new String[]
+			{
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate"
+			},
+			SwapInstrumentsFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"40Y",
+					"50Y"
+				},
+				irsFixFloatComponentQuoteArray
+			),
+			irsFixFloatComponentQuoteArray,
+			new String[]
+			{
+				"SwapRate",    //  4Y
+				"SwapRate",    //  5Y
+				"SwapRate",    //  6Y
+				"SwapRate",    //  7Y
+				"SwapRate",    //  8Y
+				"SwapRate",    //  9Y
+				"SwapRate",    // 10Y
+				"SwapRate",    // 11Y
+				"SwapRate",    // 12Y
+				"SwapRate",    // 15Y
+				"SwapRate",    // 20Y
+				"SwapRate",    // 25Y
+				"SwapRate",    // 30Y
+				"SwapRate",    // 40Y
+				"SwapRate"     // 50Y
+			},
 			false
 		);
 	}
-
-	/*
-	 * Construct an array of float-float swaps from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FloatFloatComponent[] MakexM6MBasisSwap (
 		final JulianDate spotDate,
@@ -410,63 +365,25 @@ public class FRAStdCapFloorAnalysis
 		final String currency,
 		final MergedDiscountForwardCurve discountCurve,
 		final int tenorInMonths,
-		final String[] xM6MForwardTenorArray,
+		final String[] xM6MFwdTenorArray,
 		final double[] xM6MBasisSwapQuoteArray)
 		throws Exception
 	{
-		/*
-		 * Construct the 6M-xM float-float basis swap.
-		 */
-
-		FloatFloatComponent[] floatFloatComponentArray = MakexM6MBasisSwap (
-			spotDate,
-			currency,
-			xM6MForwardTenorArray,
-			tenorInMonths
-		);
-
 		String basisTenor = tenorInMonths + "M";
-
-		/*
-		 * Calculate the starting forward rate off of the discount curve.
-		 */
-
-		double startingForward = discountCurve.forward (
-			spotDate.julian(),
-			spotDate.addTenor (basisTenor).julian()
-		);
-
-		/*
-		 * Set the discount curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
-			discountCurve,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null
-		);
-
-		/*
-		 * Construct the shape preserving forward curve off of Quartic Polynomial Basis Spline.
-		 */
 
 		return ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
 			"QUARTIC_FWD" + basisTenor,
 			ForwardLabel.Create (currency, basisTenor),
 			new ValuationParams (spotDate, spotDate, currency),
 			null,
-			curveSurfaceQuoteContainer,
+			MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
 			null,
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (5),
-			floatFloatComponentArray,
+			MakexM6MBasisSwap (spotDate, currency, xM6MFwdTenorArray, tenorInMonths),
 			"DerivedParBasisSpread",
 			xM6MBasisSwapQuoteArray,
-			startingForward
+			discountCurve.forward (spotDate.julian(), spotDate.addTenor (basisTenor).julian())
 		);
 	}
 
@@ -478,156 +395,153 @@ public class FRAStdCapFloorAnalysis
 	{
 		Map<String, ForwardCurve> forwardCurveMap = new HashMap<String, ForwardCurve>();
 
-		/*
-		 * Build and run the sampling for the 1M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		ForwardCurve forwardCurve1M = MakeFC (
-			date,
-			currency,
-			discountCurve,
-			1,
-			new String[] {
-				"1Y",
-				"2Y",
-				"3Y",
-				"4Y",
-				"5Y",
-				"6Y",
-				"7Y",
-				"8Y",
-				"9Y",
-				"10Y",
-				"11Y",
-				"12Y",
-				"15Y",
-				"20Y",
-				"25Y",
-				"30Y"
-			},
-			new double[] {
-				0.00551,    //  1Y
-				0.00387,    //  2Y
-				0.00298,    //  3Y
-				0.00247,    //  4Y
-				0.00211,    //  5Y
-				0.00185,    //  6Y
-				0.00165,    //  7Y
-				0.00150,    //  8Y
-				0.00137,    //  9Y
-				0.00127,    // 10Y
-				0.00119,    // 11Y
-				0.00112,    // 12Y
-				0.00096,    // 15Y
-				0.00079,    // 20Y
-				0.00069,    // 25Y
-				0.00062     // 30Y
-			}
+		forwardCurveMap.put (
+			"1M",
+			MakeFC (
+				date,
+				currency,
+				discountCurve,
+				1,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				new double[]
+				{
+					0.00551,    //  1Y
+					0.00387,    //  2Y
+					0.00298,    //  3Y
+					0.00247,    //  4Y
+					0.00211,    //  5Y
+					0.00185,    //  6Y
+					0.00165,    //  7Y
+					0.00150,    //  8Y
+					0.00137,    //  9Y
+					0.00127,    // 10Y
+					0.00119,    // 11Y
+					0.00112,    // 12Y
+					0.00096,    // 15Y
+					0.00079,    // 20Y
+					0.00069,    // 25Y
+					0.00062     // 30Y
+				}
+			)
 		);
 
-		forwardCurveMap.put ("1M", forwardCurve1M);
-
-		/*
-		 * Build and run the sampling for the 3M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		ForwardCurve forwardCurve3M = MakeFC (
-			date,
-			currency,
-			discountCurve,
-			3,
-			new String[] {
-				"1Y",
-				"2Y",
-				"3Y",
-				"4Y",
-				"5Y",
-				"6Y",
-				"7Y",
-				"8Y",
-				"9Y",
-				"10Y",
-				"11Y",
-				"12Y",
-				"15Y",
-				"20Y",
-				"25Y",
-				"30Y"
-			},
-			new double[] {
-				0.00186,    //  1Y
-				0.00127,    //  2Y
-				0.00097,    //  3Y
-				0.00080,    //  4Y
-				0.00067,    //  5Y
-				0.00058,    //  6Y
-				0.00051,    //  7Y
-				0.00046,    //  8Y
-				0.00042,    //  9Y
-				0.00038,    // 10Y
-				0.00035,    // 11Y
-				0.00033,    // 12Y
-				0.00028,    // 15Y
-				0.00022,    // 20Y
-				0.00020,    // 25Y
-				0.00018     // 30Y
-			}
+		forwardCurveMap.put (
+			"3M",
+			MakeFC (
+				date,
+				currency,
+				discountCurve,
+				3,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				new double[]
+				{
+					0.00186,    //  1Y
+					0.00127,    //  2Y
+					0.00097,    //  3Y
+					0.00080,    //  4Y
+					0.00067,    //  5Y
+					0.00058,    //  6Y
+					0.00051,    //  7Y
+					0.00046,    //  8Y
+					0.00042,    //  9Y
+					0.00038,    // 10Y
+					0.00035,    // 11Y
+					0.00033,    // 12Y
+					0.00028,    // 15Y
+					0.00022,    // 20Y
+					0.00020,    // 25Y
+					0.00018     // 30Y
+				}
+			)
 		);
 
-		forwardCurveMap.put ("3M", forwardCurve3M);
-
-		/*
-		 * Build and run the sampling for the 12M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		ForwardCurve forwardCurve12M = MakeFC (
-			date,
-			currency,
-			discountCurve,
-			12,
-			new String[] {
-				"1Y",
-				"2Y",
-				"3Y",
-				"4Y",
-				"5Y",
-				"6Y",
-				"7Y",
-				"8Y",
-				"9Y",
-				"10Y",
-				"11Y",
-				"12Y",
-				"15Y",
-				"20Y",
-				"25Y",
-				"30Y",
-				"35Y",
-				"40Y" // Extrapolated
-			},
-			new double[] {
-				-0.00212,    //  1Y
-				-0.00152,    //  2Y
-				-0.00117,    //  3Y
-				-0.00097,    //  4Y
-				-0.00082,    //  5Y
-				-0.00072,    //  6Y
-				-0.00063,    //  7Y
-				-0.00057,    //  8Y
-				-0.00051,    //  9Y
-				-0.00047,    // 10Y
-				-0.00044,    // 11Y
-				-0.00041,    // 12Y
-				-0.00035,    // 15Y
-				-0.00028,    // 20Y
-				-0.00025,    // 25Y
-				-0.00022,    // 30Y
-				-0.00022,    // 35Y Extrapolated
-				-0.00022,    // 40Y Extrapolated
-			}
+		forwardCurveMap.put (
+			"12M",
+			MakeFC (
+				date,
+				currency,
+				discountCurve,
+				12,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"35Y",
+					"40Y" // Extrapolated
+				},
+				new double[]
+				{
+					-0.00212,    //  1Y
+					-0.00152,    //  2Y
+					-0.00117,    //  3Y
+					-0.00097,    //  4Y
+					-0.00082,    //  5Y
+					-0.00072,    //  6Y
+					-0.00063,    //  7Y
+					-0.00057,    //  8Y
+					-0.00051,    //  9Y
+					-0.00047,    // 10Y
+					-0.00044,    // 11Y
+					-0.00041,    // 12Y
+					-0.00035,    // 15Y
+					-0.00028,    // 20Y
+					-0.00025,    // 25Y
+					-0.00022,    // 30Y
+					-0.00022,    // 35Y Extrapolated
+					-0.00022,    // 40Y Extrapolated
+				}
+			)
 		);
-
-		forwardCurveMap.put ("12M", forwardCurve12M);
 
 		return forwardCurveMap;
 	}
@@ -641,13 +555,15 @@ public class FRAStdCapFloorAnalysis
 		final double forwardFundingCorrelation)
 		throws Exception
 	{
-		FundingLabel fundingLabel = FundingLabel.Standard (forwardLabel.currency());
+		String currency = forwardLabel.currency();
+
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
 
 		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
 				valueDate,
 				VolatilityLabel.Standard (forwardLabel),
-				forwardLabel.currency(),
+				currency,
 				forwardVolatility
 			)
 		);
@@ -656,7 +572,7 @@ public class FRAStdCapFloorAnalysis
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
 				valueDate,
 				VolatilityLabel.Standard (fundingLabel),
-				forwardLabel.currency(),
+				currency,
 				fundingVolatility
 			)
 		);
@@ -680,23 +596,40 @@ public class FRAStdCapFloorAnalysis
 		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
 		double strike = 0.02;
-		String currency = "USD";
 		String fraTenor = "3M";
+		String currency = "USD";
 		String maturityTenor = "4Y";
 		String manifestMeasure = "QuantoAdjustedParForward";
 
-		JulianDate today = DateUtil.Today().addTenor ("0D");
+		double[] forwardSigmaArray =
+		{
+			0.1,
+			0.2,
+			0.3,
+			0.4,
+			0.5
+		};
+		double[] sigmaForwardToDomXArray =
+		{
+			0.10,
+			0.15,
+			0.20,
+			0.25,
+			0.30
+		};
+		double[] correlationForwardForwardToDomXArray =
+		{
+			-0.99,
+			-0.50,
+			 0.00,
+			 0.50,
+			 0.99
+		 };
 
-		/*
-		 * Construct the Discount Curve using its instruments and quotes
-		 */
+		JulianDate today = DateUtil.Today().addTenor ("0D");
 
 		MergedDiscountForwardCurve discountCurve = MakeDC (today, currency);
 
@@ -706,6 +639,12 @@ public class FRAStdCapFloorAnalysis
 
 		JulianDate effectiveDate = today.addTenor (fraTenor);
 
+		LastTradingDateSetting lastTradingDateSetting = new LastTradingDateSetting (
+			LastTradingDateSetting.MID_CURVE_OPTION_QUARTERLY,
+			"",
+			Integer.MIN_VALUE
+		);
+
 		Stream floatStream = new Stream (
 			CompositePeriodBuilder.FloatingCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
@@ -714,7 +653,17 @@ public class FRAStdCapFloorAnalysis
 					maturityTenor,
 					null
 				),
-				new CompositePeriodSetting (4, fraTenor, currency, null, 1.,null, null, null, null),
+				new CompositePeriodSetting (
+					4,
+					fraTenor,
+					currency,
+					null,
+					1.,
+					null,
+					null,
+					null,
+					null
+				),
 				new ComposableFloatingUnitSetting (
 					fraTenor,
 					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
@@ -732,11 +681,7 @@ public class FRAStdCapFloorAnalysis
 			manifestMeasure,
 			true,
 			strike,
-			new LastTradingDateSetting (
-				LastTradingDateSetting.MID_CURVE_OPTION_QUARTERLY,
-				"",
-				Integer.MIN_VALUE
-			),
+			lastTradingDateSetting,
 			null,
 			new BlackScholesAlgorithm()
 		);
@@ -747,11 +692,7 @@ public class FRAStdCapFloorAnalysis
 			manifestMeasure,
 			false,
 			strike,
-			new LastTradingDateSetting (
-				LastTradingDateSetting.MID_CURVE_OPTION_QUARTERLY,
-				"",
-				Integer.MIN_VALUE
-			),
+			lastTradingDateSetting,
 			null,
 			new BlackScholesAlgorithm()
 		);
@@ -769,23 +710,19 @@ public class FRAStdCapFloorAnalysis
 
 		ValuationParams valuationParams = new ValuationParams (today, today, currency);
 
-		double[] forwardSigmaArray = new double[] {0.1, 0.2, 0.3, 0.4, 0.5};
-		double[] sigmaForwardToDomXArray = new double[] {0.10, 0.15, 0.20, 0.25, 0.30};
-		double[] correlationForwardForwardToDomXArray = new double[] {-0.99, -0.50, 0.00, 0.50, 0.99};
+		System.out.println ("\t||-------------------------------------------------------------");
 
-		System.out.println ("\tPrinting the Cap/Floor Output in Order (Left -> Right):");
+		System.out.println ("\t|| Printing the Cap/Floor Output in Order (Left -> Right):");
 
-		System.out.println ("\t\tCap Price");
+		System.out.println ("\t|| \tCap Price");
 
-		System.out.println ("\t\tCap Flat Price Vol (%)");
+		System.out.println ("\t|| \tCap Flat Price Vol (%)");
 
-		System.out.println ("\t\tFloor Price");
+		System.out.println ("\t|| \tFloor Price");
 
-		System.out.println ("\t\tFloor Flat Price Vol (%)");
+		System.out.println ("\t|| \tFloor Flat Price Vol (%)");
 
-		System.out.println ("\t-------------------------------------------------------------");
-
-		System.out.println ("\t-------------------------------------------------------------");
+		System.out.println ("\t||-------------------------------------------------------------");
 
 		for (double forwardSigma : forwardSigmaArray) {
 			for (double sigmaForwardToDomX : sigmaForwardToDomXArray) {
@@ -814,7 +751,7 @@ public class FRAStdCapFloorAnalysis
 					);
 
 					System.out.println (
-						"\t[" + FormatUtil.FormatDouble (forwardSigma, 2, 0, 100.) + "%," +
+						"\t|| [" + FormatUtil.FormatDouble (forwardSigma, 2, 0, 100.) + "%," +
 						FormatUtil.FormatDouble (sigmaForwardToDomX, 2, 0, 100.) + "%," +
 						FormatUtil.FormatDouble (correlationForwardForwardToDomX, 2, 0, 100.) + "%] =" +
 						FormatUtil.FormatDouble (fraCapOutputMap.get ("Price"), 1, 4, 1.) + " | " +
@@ -827,9 +764,7 @@ public class FRAStdCapFloorAnalysis
 			}
 		}
 
-		System.out.println ("\t-------------------------------------------------------------");
-
-		System.out.println ("\t-------------------------------------------------------------");
+		System.out.println ("\t||-------------------------------------------------------------");
 
 		EnvManager.TerminateEnv();
 	}

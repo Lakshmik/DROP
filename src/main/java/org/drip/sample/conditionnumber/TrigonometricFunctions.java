@@ -142,7 +142,34 @@ public class TrigonometricFunctions
 	{
 		EnvManager.InitEnv ("");
 
-		double[] x1Array = {0.01, 0.10, 0.20, 0.30, 0.40, 0.49, 0.51, 0.60, 0.70, 0.80, 0.90, 0.99};
+		double[] x1Array =
+		{
+			0.01,
+			0.10,
+			0.20,
+			0.30,
+			0.40,
+			0.49,
+			0.51,
+			0.60,
+			0.70,
+			0.80,
+			0.90,
+			0.99
+		};
+		double[] x2Array =
+		{
+			-0.99,
+			-0.75,
+			-0.50,
+			-0.25,
+			-0.01,
+			 0.01,
+			 0.25,
+			 0.50,
+			 0.75,
+			 0.99
+		 };
 
 		Sine sine = new Sine();
 
@@ -184,8 +211,6 @@ public class TrigonometricFunctions
 		System.out.println ("\t|---------------------------------------------||");
 
 		System.out.println();
-
-		double[] x2Array = {-0.99, -0.75, -0.50, -0.25, -0.01, 0.01, 0.25, 0.50, 0.75, 0.99};
 
 		InverseSine inverseSine = new InverseSine();
 

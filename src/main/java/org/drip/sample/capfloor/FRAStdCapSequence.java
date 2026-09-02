@@ -167,11 +167,13 @@ public class FRAStdCapSequence
 		CalibratableComponent[] calibratableComponentArray =
 			new CalibratableComponent[daysArray.length + futuresCount];
 
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, "3M");
+
 		for (int daysIndex = 0; daysIndex < daysArray.length; ++daysIndex) {
 			calibratableComponentArray[daysIndex] = SingleStreamComponentBuilder.Deposit (
 				effectiveDate,
 				effectiveDate.addBusDays (daysArray[daysIndex], currency),
-				ForwardLabel.Create (currency, "3M")
+				forwardLabel
 			);
 		}
 
@@ -217,88 +219,108 @@ public class FRAStdCapSequence
 		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the array of Deposit instruments and their quotes.
-		 */
-
-		CalibratableComponent[] depositComponentArray = DepositInstrumentsFromMaturityDays (
-			spotDate,
-			new int[] {
-				30,
-				60,
-				91,
-				182,
-				273
-			},
-			0,
-			currency
-		);
-
-		double[] depositQuoteArray = new double[] {
-			0.0668750,	//  30D
-			0.0675000,	//  60D
-			0.0678125,	//  91D
-			0.0712500,	// 182D
-			0.0750000	// 273D
+		double[] irsFixFloatComponentQuoteArray =
+		{
+			0.02604,    //  4Y
+			0.02808,    //  5Y
+			0.02983,    //  6Y
+			0.03136,    //  7Y
+			0.03268,    //  8Y
+			0.03383,    //  9Y
+			0.03488,    // 10Y
+			0.03583,    // 11Y
+			0.03668,    // 12Y
+			0.03833,    // 15Y
+			0.03854,    // 20Y
+			0.03672,    // 25Y
+			0.03510,    // 30Y
+			0.03266,    // 40Y
+			0.03145     // 50Y
 		};
-
-		String[] depositManifestMeasureArray = new String[] {
-			"ForwardRate", //  30D
-			"ForwardRate", //  60D
-			"ForwardRate", //  91D
-			"ForwardRate", // 182D
-			"ForwardRate"  // 273D
-		};
-
-		/*
-		 * Construct the array of Swap instruments and their quotes.
-		 */
-
-		double[] fixFloatComponentQuoteArray = new double[] {
-			0.08265,    //  2Y
-			0.08550,    //  3Y
-			0.08655,    //  4Y
-			0.08770,    //  5Y
-			0.08910,    //  7Y
-			0.08920     // 10Y
-		};
-
-		String[] fixFloatComponentManifestMeasureArray = new String[] {
-			"SwapRate",    //  2Y
-			"SwapRate",    //  3Y
-			"SwapRate",    //  4Y
-			"SwapRate",    //  5Y
-			"SwapRate",    //  7Y
-			"SwapRate"     // 10Y
-		};
-
-		CalibratableComponent[] fixFloatComponentArray = SwapInstrumentsFromMaturityTenor (
-			spotDate,
-			currency,
-			new String[] {
-				"2Y",
-				"3Y",
-				"4Y",
-				"5Y",
-				"7Y",
-				"10Y"
-			},
-			fixFloatComponentQuoteArray
-		);
-
-		/*
-		 * Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-		 */
 
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
 			new ValuationParams (spotDate, spotDate, currency),
-			depositComponentArray,
-			depositQuoteArray,
-			depositManifestMeasureArray,
-			fixFloatComponentArray,
-			fixFloatComponentQuoteArray,
-			fixFloatComponentManifestMeasureArray,
+			DepositInstrumentsFromMaturityDays (
+				spotDate,
+				new int[]
+				{
+					1,
+					2,
+					3,
+					7,
+					14,
+					21,
+					30,
+					60
+				},
+				0,
+				currency
+			),
+			new double[]
+			{
+				0.0120,
+				0.0120,
+				0.0120,
+				0.0145,
+				0.0155,
+				0.0160,
+				0.0166,
+				0.0185
+			},
+			new String[]
+			{
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate"
+			},
+			SwapInstrumentsFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"40Y",
+					"50Y"
+				},
+				irsFixFloatComponentQuoteArray
+			),
+			irsFixFloatComponentQuoteArray,
+			new String[]
+			{
+				"SwapRate",    //  4Y
+				"SwapRate",    //  5Y
+				"SwapRate",    //  6Y
+				"SwapRate",    //  7Y
+				"SwapRate",    //  8Y
+				"SwapRate",    //  9Y
+				"SwapRate",    // 10Y
+				"SwapRate",    // 11Y
+				"SwapRate",    // 12Y
+				"SwapRate",    // 15Y
+				"SwapRate",    // 20Y
+				"SwapRate",    // 25Y
+				"SwapRate",    // 30Y
+				"SwapRate",    // 40Y
+				"SwapRate"     // 50Y
+			},
 			false
 		);
 	}
@@ -369,11 +391,55 @@ public class FRAStdCapSequence
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate spotDate = DateUtil.CreateFromYMD (1995, DateUtil.FEBRUARY, 3);
-
 		String fraTenor = "3M";
 		String currency = "GBP";
 		String strManifestMeasure = "ParForward";
+
+		String[] maturityTenorArray =
+		{
+			 "1Y",
+			 "2Y",
+			 "3Y",
+			 "4Y",
+			 "5Y",
+			 "7Y",
+			"10Y"
+		};
+
+		double[] atmStrikeArray =
+		{
+			0.0788, //  "1Y",
+			0.0839, // 	"2Y",
+			0.0864, //  "3Y",
+			0.0869, //  "4Y",
+			0.0879, //  "5Y",
+			0.0890, //  "7Y",
+			0.0889  // "10Y"
+		};
+
+		double[] atmVolatilityArray =
+		{
+			0.1550, //  "1Y",
+			0.1775, // 	"2Y",
+			0.1800, //  "3Y",
+			0.1775, //  "4Y",
+			0.1775, //  "5Y",
+			0.1650, //  "7Y",
+			0.1550  // "10Y"
+		};
+
+		double[] atmPriceArray =
+		{
+			0.0027, //  "1Y",
+			0.0100, // 	"2Y",
+			0.0185, //  "3Y",
+			0.0267, //  "4Y",
+			0.0360, //  "5Y",
+			0.0511, //  "7Y",
+			0.0703  // "10Y"
+		};
+
+		JulianDate spotDate = DateUtil.CreateFromYMD (1995, DateUtil.FEBRUARY, 3);
 
 		ForwardLabel forwardLabel = ForwardLabel.Create (currency, fraTenor);
 
@@ -391,36 +457,6 @@ public class FRAStdCapSequence
 			null,
 			null
 		);
-
-		String[] maturityTenorArray = new String[] {
-			 "1Y",
-			 "2Y",
-			 "3Y",
-			 "4Y",
-			 "5Y",
-			 "7Y",
-			"10Y"
-		};
-
-		double[] atmStrikeArray = new double[] {
-			0.0788, //  "1Y",
-			0.0839, // 	"2Y",
-			0.0864, //  "3Y",
-			0.0869, //  "4Y",
-			0.0879, //  "5Y",
-			0.0890, //  "7Y",
-			0.0889  // "10Y"
-		};
-
-		double[] atmVolatilityArray = new double[] {
-			0.1550, //  "1Y",
-			0.1775, // 	"2Y",
-			0.1800, //  "3Y",
-			0.1775, //  "4Y",
-			0.1775, //  "5Y",
-			0.1650, //  "7Y",
-			0.1550  // "10Y"
-		};
 
 		Map<JulianDate, Double> dateToVolatilityMap = new TreeMap<JulianDate, Double>();
 
@@ -446,7 +482,7 @@ public class FRAStdCapSequence
 			);
 
 			System.out.println (
-				"\tCap  " + fraCap.maturityDate() + " | " +
+				"\t|| Cap  " + fraCap.maturityDate() + " | " +
 				FormatUtil.FormatDouble (
 					fraCap.stream().value (
 						valuationParams,
@@ -476,9 +512,17 @@ public class FRAStdCapSequence
 					1,
 					2,
 					100.
-				) + "% |" + FormatUtil.FormatDouble (fraCap.strike(), 1, 2, 100.) + "% |" +
-				FormatUtil.FormatDouble (atmVolatilityArray[maturityTenorIndex], 2, 2, 100.) + "% |" +
-				FormatUtil.FormatDouble (
+				) + "% |" + FormatUtil.FormatDouble (
+					fraCap.strike(),
+					1,
+					2,
+					100.
+				) + "% |" + FormatUtil.FormatDouble (
+					atmVolatilityArray[maturityTenorIndex],
+					2,
+					2,
+					100.
+				) + "% |" + FormatUtil.FormatDouble (
 					fraCap.priceFromFlatVolatility (
 						valuationParams,
 						null,
@@ -493,32 +537,23 @@ public class FRAStdCapSequence
 			);
 		}
 
-		System.out.println ("\n\n\t---------------------------------------------------");
+		System.out.println ("\n\n\t||---------------------------------------------------");
 
-		System.out.println ("\t-----  CALIBRATED FORWARD VOLATILITY NODES --------");
+		System.out.println ("\t||-----  CALIBRATED FORWARD VOLATILITY NODES --------");
 
-		System.out.println ("\t---------------------------------------------------\n");
+		System.out.println ("\t||---------------------------------------------------\n");
 
-		for (Map.Entry<JulianDate, Double> dateToVolatilityMapEntry : dateToVolatilityMap.entrySet())
+		for (Map.Entry<JulianDate, Double> dateToVolatilityMapEntry : dateToVolatilityMap.entrySet()) {
 			System.out.println (
-				"\t" +
+				"\t||" +
 				dateToVolatilityMapEntry.getKey() + " => " +
 				FormatUtil.FormatDouble (dateToVolatilityMapEntry.getValue(), 2, 2, 100.) + "%  ||"
 			);
+		}
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		System.out.println ("\t---------------------------------------------------------------");
-
-		double[] atmPriceArray = new double[] {
-			0.0027, //  "1Y",
-			0.0100, // 	"2Y",
-			0.0185, //  "3Y",
-			0.0267, //  "4Y",
-			0.0360, //  "5Y",
-			0.0511, //  "7Y",
-			0.0703  // "10Y"
-		};
+		System.out.println ("\n\t||---------------------------------------------------------------");
 
 		for (int maturityTenorIndex = 0;
 			maturityTenorIndex < maturityTenorArray.length;
@@ -533,7 +568,7 @@ public class FRAStdCapSequence
 			);
 
 			System.out.println (
-				"\tCap ATM Volatility  " + fraCap.maturityDate() + " | " +
+				"\t|| Cap ATM Volatility => " + fraCap.maturityDate() + " | " +
 				FormatUtil.FormatDouble (atmPriceArray[maturityTenorIndex], 2, 2, 100.) + "% |" +
 				FormatUtil.FormatDouble (
 					fraCap.stream().value (
@@ -562,9 +597,7 @@ public class FRAStdCapSequence
 			);
 		}
 
-		System.out.println ("\t---------------------------------------------------------------");
-
-		System.out.println ("\t---------------------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------------------");
 
 		EnvManager.TerminateEnv();
 	}

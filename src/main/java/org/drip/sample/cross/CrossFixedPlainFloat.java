@@ -3,6 +3,7 @@ package org.drip.sample.cross;
 
 import java.util.*;
 
+import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.*;
 import org.drip.function.r1tor1operator.Flat;
@@ -15,15 +16,24 @@ import org.drip.product.rates.*;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.*;
-import org.drip.state.discount.*;
-import org.drip.state.forward.ForwardCurve;
-import org.drip.state.identifier.*;
+import org.drip.state.identifier.FXLabel;
+import org.drip.state.identifier.ForwardLabel;
+import org.drip.state.identifier.FundingLabel;
+import org.drip.state.identifier.VolatilityLabel;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -101,336 +111,277 @@ import org.drip.state.identifier.*;
 
 /**
  * <i>CrossFixedPlainFloat</i> demonstrates the construction, usage, and eventual valuation of a fix-float
- * swap with a EUR Fixed leg that pays in USD, and a USD Floating Leg. Comparison is done across MTM and
- * non-MTM fixed Leg Counterparts.
+ * 	swap with a EUR Fixed leg that pays in USD, and a USD Floating Leg. Comparison is done across MTM and
+ * 	non-MTM fixed Leg Counterparts.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/cross/README.md">Single/Dual Stream XCCY Component</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/cross/README.md">Single/Dual Stream XCCY Component</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CrossFixedPlainFloat {
+public class CrossFixedPlainFloat
+{
 
 	private static final FixFloatComponent MakeFixFloatSwap (
-		final JulianDate dtEffective,
-		final boolean bFXMTM,
-		final String strPayCurrency,
-		final String strFixedCouponCurrency,
-		final String strMaturityTenor,
-		final int iTenorInMonths)
+		final JulianDate effectiveDate,
+		final boolean fxMTM,
+		final String payCurrency,
+		final String fixedCouponCurrency,
+		final String maturityTenor,
+		final int tenorInMonths)
 		throws Exception
 	{
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
-			2,
-			"Act/360",
-			false,
-			"Act/360",
-			false,
-			strFixedCouponCurrency,
-			false,
-			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
-		);
+		String tenor = tenorInMonths + "M";
 
-		ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-			iTenorInMonths + "M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Create (
-				strPayCurrency,
-				iTenorInMonths + "M"
+		return new FixFloatComponent (
+			new Stream (
+				CompositePeriodBuilder.FixedCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						"6M",
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						2,
+						"6M",
+						payCurrency,
+						null,
+						1.,
+						null,
+						null,
+						fxMTM ? null : new FixingSetting (
+							FixingSetting.FIXING_PRESET_STATIC,
+							null,
+							effectiveDate.julian()
+						),
+						null
+					),
+					new UnitCouponAccrualSetting (
+						2,
+						"Act/360",
+						false,
+						"Act/360",
+						false,
+						fixedCouponCurrency,
+						false,
+						CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
+					),
+					new ComposableFixedUnitSetting (
+						"6M",
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						0.02,
+						0.,
+						fixedCouponCurrency
+					)
+				)
 			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
-
-		ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-			"6M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			0.02,
-			0.,
-			strFixedCouponCurrency
-		);
-
-		CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-			12 / iTenorInMonths,
-			iTenorInMonths + "M",
-			strPayCurrency,
-			null,
-			-1.,
-			null,
-			null,
-			null,
-			null
-		);
-
-		CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-			2,
-			"6M",
-			strPayCurrency,
-			null,
-			1.,
-			null,
-			null,
-			bFXMTM ? null : new FixingSetting (
-				FixingSetting.FIXING_PRESET_STATIC,
-				null,
-				dtEffective.julian()
+			new Stream (
+				CompositePeriodBuilder.FloatingCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						tenor,
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						12 / tenorInMonths,
+						tenor,
+						payCurrency,
+						null,
+						-1.,
+						null,
+						null,
+						null,
+						null
+					),
+					new ComposableFloatingUnitSetting (
+						tenor,
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						ForwardLabel.Create (payCurrency, tenor),
+						CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+						0.
+					)
+				)
 			),
-			null
+			new CashSettleParams (0, payCurrency, 0)
 		);
-
-		List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			iTenorInMonths + "M",
-			strMaturityTenor,
-			null
-		);
-
-		List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			"6M",
-			strMaturityTenor,
-			null
-		);
-
-		Stream floatingStream = new Stream (
-			CompositePeriodBuilder.FloatingCompositeUnit (
-				lsFloatingStreamEdgeDate,
-				cpsFloating,
-				cfusFloating
-			)
-		);
-
-		Stream fixedStream = new Stream (
-			CompositePeriodBuilder.FixedCompositeUnit (
-				lsFixedStreamEdgeDate,
-				cpsFixed,
-				ucasFixed,
-				cfusFixed
-			)
-		);
-
-		/*
-		 * The fix-float swap instance
-		 */
-
-		FixFloatComponent fixFloat = new FixFloatComponent (
-			fixedStream,
-			floatingStream,
-			new CashSettleParams (
-				0,
-				strPayCurrency,
-				0
-			)
-		);
-
-		return fixFloat;
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		double dblUSDCollateralRate = 0.03;
-		double dblEURCollateralRate = 0.02;
-		double dblUSD3MForwardRate = 0.02;
-		double dblUSDEURFXRate = 1. / 1.35;
-
-		double dblUSDFundingVol = 0.1;
-		double dblUSD3MVol = 0.1;
-		double dblUSD3MUSDFundingCorr = 0.1;
-
-		double dblEURFundingVol = 0.1;
-		double dblUSDEURFXVol = 0.3;
-		double dblUSDFundingUSDEURFXCorr = 0.3;
-
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = org.drip.analytics.date.DateUtil.Today();
+		double usd3MForwardRate = 0.02;
+		double eurCollateralRate = 0.02;
+		double usdCollateralRate = 0.03;
+		double usdEURFXRate = 1. / 1.35;
 
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			"USD"
+		double usd3MVolatility = 0.1;
+		double usdFundingVolatility = 0.1;
+		double usd3MUSDFundingCorrelation = 0.1;
+
+		double usdEURFXVolatility = 0.3;
+		double eurFundingVolatility = 0.1;
+		double usdFundingUSDEURFXCorrelation = 0.3;
+
+		JulianDate today = DateUtil.Today();
+
+		FundingLabel usdFundingLabel = FundingLabel.Standard ("USD");
+
+		CurrencyPair currencyPair = CurrencyPair.FromCode ("USD/EUR");
+
+		ForwardLabel usd3MForwardLabel = ForwardLabel.Create ("USD", "3M");
+
+		ValuationParams valuationParams = new ValuationParams (today, today, "USD");
+
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
+
+		FXLabel fxLabel = FXLabel.Standard (currencyPair);
+
+		curveSurfaceQuoteContainer.setFundingState (
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (today, "USD", usdCollateralRate)
 		);
 
-		ForwardLabel fri3MUSD = ForwardLabel.Create (
-			"USD",
-			"3M"
+		curveSurfaceQuoteContainer.setForwardState (
+			ScenarioForwardCurveBuilder.FlatForwardForwardCurve (today, usd3MForwardLabel, usd3MForwardRate)
 		);
 
-		MergedDiscountForwardCurve dcUSDCollatDomestic = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			"USD",
-			dblUSDCollateralRate
+		int valuationDate = valuationParams.valueDate();
+
+		curveSurfaceQuoteContainer.setForwardVolatility (
+			ScenarioDeterministicVolatilityBuilder.FlatForward (
+				valuationDate,
+				VolatilityLabel.Standard (usd3MForwardLabel),
+				"USD",
+				usd3MVolatility
+			)
 		);
 
-		MergedDiscountForwardCurve dcEURCollatDomestic = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			"EUR",
-			dblEURCollateralRate
+		curveSurfaceQuoteContainer.setFundingVolatility (
+			ScenarioDeterministicVolatilityBuilder.FlatForward (
+				valuationDate,
+				VolatilityLabel.Standard (usdFundingLabel),
+				"USD",
+				usdFundingVolatility
+			)
 		);
 
-		ForwardCurve fc3MUSD = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-			dtToday,
-			fri3MUSD,
-			dblUSD3MForwardRate
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
+			usd3MForwardLabel,
+			usdFundingLabel,
+			new Flat (usd3MUSDFundingCorrelation)
 		);
 
-		CurrencyPair cp = CurrencyPair.FromCode ("USD/EUR");
-
-		FixFloatComponent fixMTMFloat = MakeFixFloatSwap (
-			dtToday,
-			true,
-			"USD",
-			"EUR",
-			"2Y",
-			3
+		curveSurfaceQuoteContainer.setFundingState (
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (today, "EUR", eurCollateralRate)
 		);
 
-		FixFloatComponent fixNonMTMFloat = MakeFixFloatSwap (
-			dtToday,
+		curveSurfaceQuoteContainer.setFXState (
+			ScenarioFXCurveBuilder.CubicPolynomialCurve (
+				fxLabel.fullyQualifiedName(),
+				today,
+				currencyPair,
+				new String[]
+				{
+					"10Y"
+				},
+				new double[]
+				{
+					usdEURFXRate
+				},
+				usdEURFXRate
+			)
+		);
+
+		curveSurfaceQuoteContainer.setFixing (today, fxLabel, usdEURFXRate);
+
+		curveSurfaceQuoteContainer.setFundingVolatility (
+			ScenarioDeterministicVolatilityBuilder.FlatForward (
+				valuationDate,
+				VolatilityLabel.Standard (FundingLabel.Standard ("EUR")),
+				"EUR",
+				eurFundingVolatility
+			)
+		);
+
+		curveSurfaceQuoteContainer.setFXVolatility (
+			ScenarioDeterministicVolatilityBuilder.FlatForward (
+				valuationDate,
+				VolatilityLabel.Standard (fxLabel),
+				"USD",
+				usdEURFXVolatility
+			)
+		);
+
+		curveSurfaceQuoteContainer.setFundingFXCorrelation (
+			usdFundingLabel,
+			fxLabel,
+			new Flat (usdFundingUSDEURFXCorrelation)
+		);
+
+		CaseInsensitiveTreeMap<Double> nonMTMFixFloatMeasureMap = MakeFixFloatSwap (
+			today,
 			false,
 			"USD",
 			"EUR",
 			"2Y",
 			3
+		).value (
+			valuationParams,
+			null,
+			curveSurfaceQuoteContainer,
+			null
 		);
 
-		FXLabel fxLabel = FXLabel.Standard (cp);
-
-		FundingLabel fundingLabelUSD = org.drip.state.identifier.FundingLabel.Standard ("USD");
-
-		FundingLabel fundingLabelEUR = org.drip.state.identifier.FundingLabel.Standard ("EUR");
-
-		CurveSurfaceQuoteContainer mktParams = new CurveSurfaceQuoteContainer();
-
-		mktParams.setFundingState (dcUSDCollatDomestic);
-
-		mktParams.setForwardState (fc3MUSD);
-
-		mktParams.setForwardVolatility (
-			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				valParams.valueDate(),
-				VolatilityLabel.Standard (fri3MUSD),
+		for (Map.Entry<String, Double> measureMap : MakeFixFloatSwap (
+				today,
+				true,
 				"USD",
-				dblUSD3MVol
-			)
-		);
-
-		mktParams.setFundingVolatility (
-			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				valParams.valueDate(),
-				VolatilityLabel.Standard (fundingLabelUSD),
-				"USD",
-				dblUSDFundingVol
-			)
-		);
-
-		mktParams.setForwardFundingCorrelation (
-			fri3MUSD,
-			fundingLabelUSD,
-			new Flat (dblUSD3MUSDFundingCorr)
-		);
-
-		mktParams.setFundingState (dcEURCollatDomestic);
-
-		mktParams.setFXState (
-			ScenarioFXCurveBuilder.CubicPolynomialCurve (
-				fxLabel.fullyQualifiedName(),
-				dtToday,
-				cp,
-				new String[] {"10Y"},
-				new double[] {dblUSDEURFXRate},
-				dblUSDEURFXRate
-			)
-		);
-
-		mktParams.setFixing (
-			dtToday,
-			fxLabel,
-			dblUSDEURFXRate
-		);
-
-		mktParams.setFundingVolatility (
-			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				valParams.valueDate(),
-				VolatilityLabel.Standard (fundingLabelEUR),
 				"EUR",
-				dblEURFundingVol
-			)
-		);
+				"2Y",
+				3
+			).value (
+				valuationParams,
+				null,
+				curveSurfaceQuoteContainer,
+				null
+			).entrySet()
+		)
+		{
+			String key = measureMap.getKey();
 
-		mktParams.setFXVolatility (
-			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				valParams.valueDate(),
-				VolatilityLabel.Standard (fxLabel),
-				"USD",
-				dblUSDEURFXVol
-			)
-		);
+			if (null != measureMap.getValue() && null != nonMTMFixFloatMeasureMap.get (key)) {
+				double mtmMeasure = measureMap.getValue();
 
-		mktParams.setFundingFXCorrelation (
-			fundingLabelUSD,
-			fxLabel,
-			new Flat (dblUSDFundingUSDEURFXCorr)
-		);
+				double nonMTMMeasure = nonMTMFixFloatMeasureMap.get (key);
 
-		CaseInsensitiveTreeMap<Double> mapMTMOutput = fixMTMFloat.value (
-			valParams,
-			null,
-			mktParams,
-			null
-		);
-
-		CaseInsensitiveTreeMap<Double> mapNonMTMOutput = fixNonMTMFloat.value (
-			valParams,
-			null,
-			mktParams,
-			null
-		);
-
-		for (Map.Entry<String, Double> me : mapMTMOutput.entrySet()) {
-			String strKey = me.getKey();
-
-			if (null != me.getValue() && null != mapNonMTMOutput.get (strKey)) {
-				double dblMTMMeasure = me.getValue();
-
-				double dblNonMTMMeasure = mapNonMTMOutput.get (strKey);
-
-				String strReconcile = NumberUtil.WithinTolerance (
-					dblMTMMeasure,
-					dblNonMTMMeasure,
-					1.e-08,
-					1.e-04
-				) ?
-				"RECONCILES" :
-				"DOES NOT RECONCILE";
-
-				System.out.println ("\t" +
-					FormatUtil.FormatDouble (dblMTMMeasure, 1, 8, 1.) + " | " +
-					FormatUtil.FormatDouble (dblNonMTMMeasure, 1, 8, 1.) + " | " +
-					strReconcile + " <= " + strKey);
+				System.out.println (
+					"\t|| " + FormatUtil.FormatDouble (mtmMeasure, 1, 8, 1.) + " | " +
+					FormatUtil.FormatDouble (nonMTMMeasure, 1, 8, 1.) + " | " + (
+						NumberUtil.WithinTolerance (mtmMeasure, nonMTMMeasure, 1.e-08, 1.e-04) ?
+							"RECONCILES" : "DOES NOT RECONCILE"
+					) + " <= " + key
+				);
 			}
 		}
 

@@ -1,8 +1,6 @@
 
 package org.drip.sample.cms;
 
-import java.util.List;
-
 import org.drip.analytics.date.*;
 import org.drip.analytics.support.*;
 import org.drip.function.r1tor1operator.Flat;
@@ -24,6 +22,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -100,127 +106,106 @@ import org.drip.state.identifier.*;
 
 /**
  * <i>FloatFloatVarianceAnalysis</i> demonstrates the Construction and Valuation Impact of Volatility and
- * Correlation on the CMS Float-Float Swap.
+ * 	Correlation on the CMS Float-Float Swap.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/cms/README.md">Dual Stream Constant Maturity Swap</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/cms/README.md">Dual Stream Constant Maturity Swap</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FloatFloatVarianceAnalysis {
+public class FloatFloatVarianceAnalysis
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final int[] aiDay,
-		final int iNumFutures,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final int[] maturityDaysArray,
+		final int futuresCount,
+		final String currency)
 		throws Exception
 	{
-		CalibratableComponent[] aCalibComp = new CalibratableComponent[aiDay.length + iNumFutures];
+		CalibratableComponent[] calibratableComponentArray =
+			new CalibratableComponent[maturityDaysArray.length + futuresCount];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aCalibComp[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					strCurrency,
-					"3M"
-				)
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			calibratableComponentArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				ForwardLabel.Create (currency, "3M")
 			);
-
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtEffective,
-			iNumFutures,
-			strCurrency
-		);
-
-		for (int i = aiDay.length; i < aiDay.length + iNumFutures; ++i)
-			aCalibComp[i] = aEDF[i - aiDay.length];
-
-		return aCalibComp;
-	}
-
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
-		throws Exception
-	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			FixFloatComponent irs = OTCIRS (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
-			);
-
-			irs.setPrimaryCode ("IRS." + astrMaturityTenor[i] + "." + strCurrency);
-
-			aIRS[i] = irs;
 		}
 
-		return aIRS;
+		CalibratableComponent[] futuresArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
+			effectiveDate,
+			futuresCount,
+			currency
+		);
+
+		for (int componentIndex = maturityDaysArray.length;
+			componentIndex < maturityDaysArray.length + futuresCount;
+			++componentIndex)
+		{
+			calibratableComponentArray[componentIndex] =
+				futuresArray[componentIndex - maturityDaysArray.length];
+		}
+
+		return calibratableComponentArray;
+	}
+
+	private static final CalibratableComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
+		throws Exception
+	{
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
+
+		for (int irsIndex = 0; irsIndex < maturityTenorArray.length; ++irsIndex) {
+			irsArray[irsIndex] = OTCIRS (
+				spotDate,
+				currency,
+				maturityTenorArray[irsIndex],
+				couponArray[irsIndex]
+			);
+		}
+
+		return irsArray;
 	}
 
 	private static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-
-		CalibratableComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			new int[] {
-				1, 2, 3, 7, 14, 21, 30, 60
-			},
-			0,
-			strCurrency
-		);
-
-		double[] adblDepositQuote = new double[] {
-			0.01200, 0.01200, 0.01200, 0.01450, 0.01550, 0.01600, 0.01660, 0.01850
-		};
-
-		String[] astrDepositManifestMeasure = new String[] {
-			"ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate", "ForwardRate"
-		};
-
-		double[] adblSwapQuote = new double[] {
+		double[] swapQuoteArray =
+		{
 			0.02604,    //  4Y
 			0.02808,    //  5Y
 			0.02983,    //  6Y
@@ -238,302 +223,316 @@ public class FloatFloatVarianceAnalysis {
 			0.03145     // 50Y
 		};
 
-		String[] astrSwapManifestMeasure = new String[] {
-			"SwapRate",    //  4Y
-			"SwapRate",    //  5Y
-			"SwapRate",    //  6Y
-			"SwapRate",    //  7Y
-			"SwapRate",    //  8Y
-			"SwapRate",    //  9Y
-			"SwapRate",    // 10Y
-			"SwapRate",    // 11Y
-			"SwapRate",    // 12Y
-			"SwapRate",    // 15Y
-			"SwapRate",    // 20Y
-			"SwapRate",    // 25Y
-			"SwapRate",    // 30Y
-			"SwapRate",    // 40Y
-			"SwapRate"     // 50Y
-		};
-
-		CalibratableComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
-			},
-			adblSwapQuote
-		);
-
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
+			new ValuationParams (spotDate, spotDate, currency),
+			DepositInstrumentsFromMaturityDays (
+				spotDate,
+				new int[]
+				{
+					1,
+					2,
+					3,
+					7,
+					14,
+					21,
+					30,
+					60
+				},
+				0,
+				currency
 			),
-			aDepositComp,
-			adblDepositQuote,
-			astrDepositManifestMeasure,
-			aSwapComp,
-			adblSwapQuote,
-			astrSwapManifestMeasure,
-			true
+			new double[]
+			{
+				0.0120,
+				0.0120,
+				0.0120,
+				0.0145,
+				0.0155,
+				0.0160,
+				0.0166,
+				0.0185
+			},
+			new String[]
+			{
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate"
+			},
+			SwapInstrumentsFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"40Y",
+					"50Y"
+				},
+				swapQuoteArray
+			),
+			swapQuoteArray,
+			new String[]
+			{
+				"SwapRate",    //  4Y
+				"SwapRate",    //  5Y
+				"SwapRate",    //  6Y
+				"SwapRate",    //  7Y
+				"SwapRate",    //  8Y
+				"SwapRate",    //  9Y
+				"SwapRate",    // 10Y
+				"SwapRate",    // 11Y
+				"SwapRate",    // 12Y
+				"SwapRate",    // 15Y
+				"SwapRate",    // 20Y
+				"SwapRate",    // 25Y
+				"SwapRate",    // 30Y
+				"SwapRate",    // 40Y
+				"SwapRate"     // 50Y
+			},
+			false
 		);
 	}
 
 	private static final FloatFloatComponent MakeFloatFloatSwap (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final ForwardLabel forwardLabel,
-		final String strMaturityTenor,
-		final boolean bInArrears)
+		final JulianDate effectiveDate,
+		final String currency,
+		final String floaterTenor,
+		final String maturityTenor,
+		final boolean inArrears)
 		throws Exception
 	{
-		ComposableFloatingUnitSetting cfusReference = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Create (
-				strCurrency,
-				"3M"
+		return new FloatFloatComponent (
+			new Stream (
+				CompositePeriodBuilder.FloatingCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						"3M",
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						4,
+						"3M",
+						currency,
+						null,
+						1.,
+						null,
+						null,
+						null,
+						null
+					),
+					new ComposableFloatingUnitSetting (
+						"3M",
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						ForwardLabel.Create (currency, "3M"),
+						CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+						0.
+					)
+				)
 			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
+			new Stream (
+				CompositePeriodBuilder.FloatingCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						"3M",
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						4,
+						"3M",
+						currency,
+						null,
+						-1.,
+						null,
+						null,
+						null,
+						null
+					),
+					new ComposableFloatingUnitSetting (
+						"3M",
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						ForwardLabel.Create (currency, floaterTenor),
+						inArrears ?
+							CompositePeriodBuilder.REFERENCE_PERIOD_IN_ARREARS :
+							CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+						0.
+					)
+				)
+			),
+			new CashSettleParams (0, currency, 0)
 		);
-
-		ComposableFloatingUnitSetting cfusDerived = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			forwardLabel,
-			bInArrears ? CompositePeriodBuilder.REFERENCE_PERIOD_IN_ARREARS : CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
-
-		CompositePeriodSetting cpsReference = new CompositePeriodSetting (
-			4,
-			"3M",
-			strCurrency,
-			null,
-			1.,
-			null,
-			null,
-			null,
-			null
-		);
-
-		CompositePeriodSetting cpsDerived = new CompositePeriodSetting (
-			4,
-			"3M",
-			strCurrency,
-			null,
-			-1.,
-			null,
-			null,
-			null,
-			null
-		);
-
-		List<Integer> lsReferenceStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			"3M",
-			strMaturityTenor,
-			null
-		);
-
-		List<Integer> lsDerivedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			"3M",
-			strMaturityTenor,
-			null
-		);
-
-		Stream referenceStream = new Stream (
-			CompositePeriodBuilder.FloatingCompositeUnit (
-				lsReferenceStreamEdgeDate,
-				cpsReference,
-				cfusReference
-			)
-		);
-
-		Stream derivedStream = new Stream (
-			CompositePeriodBuilder.FloatingCompositeUnit (
-				lsDerivedStreamEdgeDate,
-				cpsDerived,
-				cfusDerived
-			)
-		);
-
-		FloatFloatComponent floatFloat = new FloatFloatComponent (
-			referenceStream,
-			derivedStream,
-			new CashSettleParams (0, strCurrency, 0)
-		);
-
-		return floatFloat;
 	}
 
 	private static final void SetMarketParams (
-		final int iValueDate,
-		final CurveSurfaceQuoteContainer mktParams,
+		final int valuationDate,
+		final CurveSurfaceQuoteContainer curveSurfaceQuoteContainer,
 		final ForwardLabel forwardLabel,
 		final FundingLabel fundingLabel,
-		final double dblFundingVol,
-		final double dblForwardVol,
-		final double dblForwardFundingCorr)
+		final double fundingVolatility,
+		final double forwardVolatility,
+		final double forwardFundingCorrelation)
 		throws Exception
 	{
-		mktParams.setForwardVolatility (
+		curveSurfaceQuoteContainer.setForwardVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				iValueDate,
+				valuationDate,
 				VolatilityLabel.Standard (forwardLabel),
 				forwardLabel.currency(),
-				dblForwardVol
+				forwardVolatility
 			)
 		);
 
-		mktParams.setFundingVolatility (
+		curveSurfaceQuoteContainer.setFundingVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				iValueDate,
+				valuationDate,
 				VolatilityLabel.Standard (fundingLabel),
 				forwardLabel.currency(),
-				dblFundingVol
+				fundingVolatility
 			)
 		);
 
-		mktParams.setForwardFundingCorrelation (
+		curveSurfaceQuoteContainer.setForwardFundingCorrelation (
 			forwardLabel,
 			fundingLabel,
-			new Flat (dblForwardFundingCorr)
+			new Flat (forwardFundingCorrelation)
 		);
 	}
 
 	private static final void VolCorrScenario (
-		final FloatFloatComponent[] aCMSFloatFloat,
-		final ValuationParams valParams,
-		final CurveSurfaceQuoteContainer mktParams,
+		final FloatFloatComponent[] cmsArray,
+		final ValuationParams valuationParams,
+		final CurveSurfaceQuoteContainer curveSurfaceQuoteContainer,
 		final ForwardLabel forwardLabel,
 		final FundingLabel fundingLabel,
-		final double dblForwardVol,
-		final double dblFundingVol,
-		final double dblForwardFundingCorr,
-		final double dblBaseReferenceParBasisSpread)
+		final double forwardVolatility,
+		final double fundingVolatility,
+		final double forwardFundingCorrelation,
+		final double baseReferenceParBasisSpread)
 		throws Exception
 	{
 		SetMarketParams (
-			valParams.valueDate(),
-			mktParams,
+			valuationParams.valueDate(),
+			curveSurfaceQuoteContainer,
 			forwardLabel,
 			fundingLabel,
-			dblForwardVol,
-			dblFundingVol,
-			dblForwardFundingCorr
+			forwardVolatility,
+			fundingVolatility,
+			forwardFundingCorrelation
 		);
 
-		String strDump = "\t[" +
-			FormatUtil.FormatDouble (dblForwardVol, 2, 0, 100.) + "%," +
-			FormatUtil.FormatDouble (dblFundingVol, 2, 0, 100.) + "%," +
-			FormatUtil.FormatDouble (dblForwardFundingCorr, 2, 0, 100.) + "%] = ";
+		String dump = "\t[" + FormatUtil.FormatDouble (forwardVolatility, 2, 0, 100.) + "%," +
+			FormatUtil.FormatDouble (fundingVolatility, 2, 0, 100.) + "%," +
+			FormatUtil.FormatDouble (forwardFundingCorrelation, 2, 0, 100.) + "%] = ";
 
-		for (int i = 0; i < aCMSFloatFloat.length; ++i) {
-			CaseInsensitiveTreeMap<Double> mapOutput = aCMSFloatFloat[i].value (
-				valParams,
+		for (int cmsIndex = 0; cmsIndex < cmsArray.length; ++cmsIndex) {
+			CaseInsensitiveTreeMap<Double> mapOutput = cmsArray[cmsIndex].value (
+				valuationParams,
 				null,
-				mktParams,
+				curveSurfaceQuoteContainer,
 				null
 			);
 
-			if (0 != i) strDump += " || ";
+			double referenceParBasisSpread = mapOutput.get ("ReferenceParBasisSpread");
 
-			double dblReferenceParBasisSpread = mapOutput.get ("ReferenceParBasisSpread");
-
-			strDump +=
-				FormatUtil.FormatDouble (dblReferenceParBasisSpread, 2, 1, 1.) + " | " +
-				FormatUtil.FormatDouble (dblReferenceParBasisSpread - dblBaseReferenceParBasisSpread, 2, 1, 1.);
+			dump += (0 != cmsIndex ? " || " : "") +
+				FormatUtil.FormatDouble (referenceParBasisSpread, 2, 1, 1.) + " | " +
+				FormatUtil.FormatDouble (referenceParBasisSpread - baseReferenceParBasisSpread, 2, 1, 1.);
 		}
 
-		System.out.println (strDump + "  |");
+		System.out.println (dump + "  |");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strTenor = "6M";
-		String strCurrency = "USD";
-		String strMaturityTenor = "5Y";
+		String tenor = "6M";
+		String currency = "USD";
+		String maturityTenor = "5Y";
+		double[] forwardVolatilityArray =
+		{
+			0.1,
+			0.3,
+			0.5
+		};
+		double[] fundingVolatilityArray =
+		{
+			0.1,
+			0.3,
+			0.5
+		};
+		double[] forwardFundingCorrelationArray =
+		{
+			-0.10,
+			 0.25
+		};
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2012,
-			DateUtil.DECEMBER,
-			11
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2012, DateUtil.DECEMBER, 11);
 
-		MergedDiscountForwardCurve dc = MakeDC (
-			dtSpot,
-			strCurrency
-		);
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		ForwardLabel forwardLabel = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		CurveSurfaceQuoteContainer mktParams = new CurveSurfaceQuoteContainer();
+		curveSurfaceQuoteContainer.setFundingState (MakeDC (spotDate, currency));
 
-		mktParams.setFundingState (dc);
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, tenor);
+
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
 
 		FloatFloatComponent cmsInAdvance = MakeFloatFloatSwap (
-			dtSpot,
-			strCurrency,
-			forwardLabel,
-			strMaturityTenor,
+			spotDate,
+			currency,
+			tenor,
+			maturityTenor,
 			false
 		);
 
 		FloatFloatComponent cmsInArrears = MakeFloatFloatSwap (
-			dtSpot,
-			strCurrency,
-			forwardLabel,
-			strMaturityTenor,
+			spotDate,
+			currency,
+			tenor,
+			maturityTenor,
 			true
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		double dblBaseReferenceParBasisSpread = cmsInAdvance.value (
-			valParams,
+		double baseReferenceParBasisSpread = cmsInAdvance.value (
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null
-		).get ("ReferenceParBasisSpread");
-
-		double[] adblForwardVol = new double[] {
-			0.10, 0.30, 0.50
-		};
-
-		double[] adblFundingVol = new double[] {
-			0.10, 0.30, 0.50
-		};
-
-		double[] adblForwardFundingCorr = new double[] {
-			-0.10, 0.25
-		};
+		).get (
+			"ReferenceParBasisSpread"
+		);
 
 		System.out.println ("\n\n\t|--------------------------------------------------|");
 
@@ -571,22 +570,22 @@ public class FloatFloatVarianceAnalysis {
 
 		System.out.println ("\t|--------------------------------------------------|");
 
-		for (double dblForwardVol : adblForwardVol) {
-			for (double dblFundingVol : adblFundingVol) {
-				for (double dblForwardFundingCorr : adblForwardFundingCorr) {
+		for (double forwardVolatility : forwardVolatilityArray) {
+			for (double fundingVolatility : fundingVolatilityArray) {
+				for (double forwardFundingCorrelation : forwardFundingCorrelationArray) {
 					VolCorrScenario (
 						new FloatFloatComponent[] {
 							cmsInAdvance,
 							cmsInArrears
 						},
-						valParams,
-						mktParams,
+						valuationParams,
+						curveSurfaceQuoteContainer,
 						forwardLabel,
-						FundingLabel.Standard (strCurrency),
-						dblForwardVol,
-						dblFundingVol,
-						dblForwardFundingCorr,
-						dblBaseReferenceParBasisSpread
+						fundingLabel,
+						forwardVolatility,
+						fundingVolatility,
+						forwardFundingCorrelation,
+						baseReferenceParBasisSpread
 					);
 				}
 			}
