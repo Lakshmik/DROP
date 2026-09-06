@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,9 +99,9 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>AdaptiveOptimalHJBTrajectory</i> simulates the Outstanding Holdings and the Trade Rate from the Sample
- * Realization of the HJB Based Adaptive Cost Strategy using the Market State Trajectory the follows the Zero
- * Mean Ornstein-Uhlenbeck Evolution Dynamics. The Initial Dynamics is derived from the "Mean Market State"
- * Initial Static Trajectory. The References are:
+ * 	Realization of the HJB Based Adaptive Cost Strategy using the Market State Trajectory the follows the
+ *  Zero Mean Ornstein-Uhlenbeck Evolution Dynamics. The Initial Dynamics is derived from the "Mean Market
+ *  State" Initial Static Trajectory. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -118,47 +126,45 @@ import org.drip.service.env.EnvManager;
  * 				University</b>
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class AdaptiveOptimalHJBTrajectory {
+public class AdaptiveOptimalHJBTrajectory
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblSize = 1.;
-		int iNumTimeNode = 41;
-		double dblBurstiness = 1.;
-		double dblExecutionTime = 10.;
-		double dblRelaxationTime = 1.;
-		double dblReferenceLiquidity = 1.;
-		double dblReferenceVolatility = 1.;
-		double dblInitialMarketState = -0.5;
-		double dblRiskAversion = 0.5;
+		double size = 1.;
+		double burstiness = 1.;
+		int timeNodeCount = 41;
+		double riskAversion = 0.5;
+		double executionTime = 10.;
+		double relaxationTime = 1.;
+		double referenceLiquidity = 1.;
+		double referenceVolatility = 1.;
+		double initialMarketState = -0.5;
 
 		System.out.println();
 
@@ -170,85 +176,77 @@ public class AdaptiveOptimalHJBTrajectory {
 
 		System.out.println (
 			"\t|| Order Size                                 =>  " +
-			FormatUtil.FormatDouble (dblSize, 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (size, 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Order Execution Time                       => " +
-			FormatUtil.FormatDouble (dblExecutionTime, 2, 0, 1.) + "      ||"
+			FormatUtil.FormatDouble (executionTime, 2, 0, 1.) + "      ||"
 		);
 
 		System.out.println (
 			"\t|| Ornstein Uhlenbeck Burstiness              =>  " +
-			FormatUtil.FormatDouble (dblBurstiness, 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (burstiness, 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Ornstein Uhlenbeck Relaxation Time         =>  " +
-			FormatUtil.FormatDouble (dblRelaxationTime, 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (relaxationTime, 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Coordinated Variation Reference Liquidity  =>  " +
-			FormatUtil.FormatDouble (dblReferenceLiquidity, 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (referenceLiquidity, 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Coordinated Variation Reference Volatility =>  " +
-			FormatUtil.FormatDouble (dblReferenceVolatility, 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (referenceVolatility, 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Mean Variance Risk Aversion                =>  " +
-			FormatUtil.FormatDouble (dblReferenceVolatility, 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (referenceVolatility, 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Number of Evolution Nodes                  => " +
-			FormatUtil.FormatDouble (iNumTimeNode - 1, 2, 0, 1.) + "      ||"
+			FormatUtil.FormatDouble (timeNodeCount - 1, 2, 0, 1.) + "      ||"
 		);
 
 		System.out.println ("\t||--------------------------------------------------------||");
 
 		System.out.println();
 
-		double dblNonDimensionalTimeInterval = dblExecutionTime / (iNumTimeNode - 1) / dblRelaxationTime;
+		double nonDimensionalTimeInterval = executionTime / (timeNodeCount - 1) / relaxationTime;
 
-		OrderSpecification os = new OrderSpecification (
-			dblSize,
-			dblExecutionTime
-		);
+		DiffusionEvaluatorOrnsteinUhlenbeck diffusionEvaluatorOrnsteinUhlenbeck =
+			DiffusionEvaluatorOrnsteinUhlenbeck.ZeroMean (burstiness, relaxationTime);
 
-		CoordinatedVariation cv = new CoordinatedVariation (
-			dblReferenceVolatility,
-			dblReferenceLiquidity
-		);
-
-		DiffusionEvaluatorOrnsteinUhlenbeck deou = DiffusionEvaluatorOrnsteinUhlenbeck.ZeroMean (
-			dblBurstiness,
-			dblRelaxationTime
-		);
-
-		MarketState[] aMS = OrnsteinUhlenbeckSequence.Systemic (
-			deou,
-			dblNonDimensionalTimeInterval * dblRelaxationTime,
-			dblInitialMarketState,
-			iNumTimeNode
+		MarketState[] marketStateArray = OrnsteinUhlenbeckSequence.Systemic (
+			diffusionEvaluatorOrnsteinUhlenbeck,
+			nonDimensionalTimeInterval * relaxationTime,
+			initialMarketState,
+			timeNodeCount
 		).realizedMarketState();
 
-		CoordinatedVariationDynamic cvd = new CoordinatedVariationTrajectoryGenerator (
-			os,
-			cv,
-			new MeanVarianceObjectiveUtility (dblRiskAversion),
-			NonDimensionalCostEvolverSystemic.Standard (deou),
-			CoordinatedVariationTrajectoryGenerator.TRADE_RATE_STATIC_INITIALIZATION
-		).adaptive (aMS);
+		CoordinatedVariationDynamic coordinatedVariationDynamic =
+			new CoordinatedVariationTrajectoryGenerator (
+				new OrderSpecification (size, executionTime),
+				new CoordinatedVariation (referenceVolatility, referenceLiquidity),
+				new MeanVarianceObjectiveUtility (riskAversion),
+				NonDimensionalCostEvolverSystemic.Standard (diffusionEvaluatorOrnsteinUhlenbeck),
+				CoordinatedVariationTrajectoryGenerator.TRADE_RATE_STATIC_INITIALIZATION
+			).adaptive (
+				marketStateArray
+			);
 
-		double[] adblNonDimensionalHoldings = cvd.nonDimensionalHoldings();
+		double[] nonDimensionalHoldingsArray = coordinatedVariationDynamic.nonDimensionalHoldings();
 
-		double[] adblNonDimensionalTradeRate = cvd.scaledNonDimensionalTradeRate();
+		double[] scaledNonDimensionalTradeRateArray =
+			coordinatedVariationDynamic.scaledNonDimensionalTradeRate();
 
-		NonDimensionalCost[] aNDC = cvd.nonDimensionalCost();
+		NonDimensionalCost[] nonDimensionalCostArray = coordinatedVariationDynamic.nonDimensionalCost();
 
 		System.out.println ("\t||-------------------------------------||");
 
@@ -268,23 +266,38 @@ public class AdaptiveOptimalHJBTrajectory {
 
 		System.out.println ("\t||-------------------------------------||");
 
-		for (int i = 0; i < iNumTimeNode - 1; ++i) {
-			String strDump = "\t|| " + FormatUtil.FormatDouble (i * dblNonDimensionalTimeInterval * dblRelaxationTime, 1, 2, 1.);
-
-			strDump = strDump + " | " + FormatUtil.FormatDouble (adblNonDimensionalHoldings[i], 1, 4, 1.);
-
-			strDump = strDump + " | " + FormatUtil.FormatDouble (adblNonDimensionalTradeRate[i], 1, 4, 1.);
-
-			strDump = strDump + " | " + FormatUtil.FormatDouble (aNDC[i].realization(), 1, 4, 1.);
-
-			System.out.println (strDump + " ||");
+		for (int timeNodeIndex = 0; timeNodeIndex < timeNodeCount - 1; ++timeNodeIndex) {
+			System.out.println (
+				"\t|| " + FormatUtil.FormatDouble (
+					timeNodeIndex * nonDimensionalTimeInterval * relaxationTime,
+					1,
+					2,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					nonDimensionalHoldingsArray[timeNodeIndex],
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					scaledNonDimensionalTradeRateArray[timeNodeIndex],
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					nonDimensionalCostArray[timeNodeIndex].realization(),
+					1,
+					4,
+					1.
+				) + " ||"
+			);
 		}
 
 		System.out.println ("\t||-------------------------------------||");
 
 		System.out.println();
 
-		CoordinatedVariationTrajectoryDeterminant cvtd = cvd.determinant();
+		CoordinatedVariationTrajectoryDeterminant coordinatedVariationTrajectoryDeterminant =
+			coordinatedVariationDynamic.determinant();
 
 		System.out.println ("\t||---------------------------------||");
 
@@ -294,32 +307,39 @@ public class AdaptiveOptimalHJBTrajectory {
 
 		System.out.println (
 			"\t|| Time Scale          =>  " +
-			FormatUtil.FormatDouble (cvtd.timeScale(), 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (coordinatedVariationTrajectoryDeterminant.timeScale(), 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Trade Rate Scale    =>  " +
-			FormatUtil.FormatDouble (cvtd.tradeRateScale(), 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (coordinatedVariationTrajectoryDeterminant.tradeRateScale(), 1, 4, 1.) +
+				" ||"
 		);
 
 		System.out.println (
 			"\t|| Cost Scale          =>  " +
-			FormatUtil.FormatDouble (cvtd.costScale(), 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (coordinatedVariationTrajectoryDeterminant.costScale(), 1, 4, 1.) + " ||"
 		);
 
 		System.out.println (
 			"\t|| Mean Market Urgency =>  " +
-			FormatUtil.FormatDouble (cvtd.meanMarketUrgency(), 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (coordinatedVariationTrajectoryDeterminant.meanMarketUrgency(), 1, 4, 1.)
+				+ " ||"
 		);
 
 		System.out.println (
 			"\t|| Market Power        =>  " +
-			FormatUtil.FormatDouble (cvtd.marketPower(), 1, 4, 1.) + " ||"
+			FormatUtil.FormatDouble (coordinatedVariationTrajectoryDeterminant.marketPower(), 1, 4, 1.) +
+				" ||"
 		);
 
 		System.out.println (
-			"\t|| Risk Aversion Scale =>  " +
-			FormatUtil.FormatDouble (cvtd.nonDimensionalRiskAversion(), 1, 4, 1.) + " ||"
+			"\t|| Risk Aversion Scale =>  " + FormatUtil.FormatDouble (
+				coordinatedVariationTrajectoryDeterminant.nonDimensionalRiskAversion(),
+				1,
+				4,
+				1.
+			) + " ||"
 		);
 
 		System.out.println ("\t||---------------------------------||");

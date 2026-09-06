@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,8 +99,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>TrajectoryComparisonNoDrift</i> compares different Optimal Trading Trajectories computed in accordance
- * with the Specification of Almgren and Chriss (2000) for a Set of Risk Aversion Parameters, excluding the
- * Asset Drift. The References are:
+ * 	with the Specification of Almgren and Chriss (2000) for a Set of Risk Aversion Parameters, excluding the
+ * 	Asset Drift. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -117,65 +125,65 @@ import org.drip.service.env.EnvManager;
  * 				265-292
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgrenchriss/README.md">Almgren Chriss Efficient Frontier Trajectories</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgrenchriss/README.md">Almgren Chriss Efficient Frontier Trajectories</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class TrajectoryComparisonNoDrift {
+public class TrajectoryComparisonNoDrift
+{
 
 	private static final void DisplayTrajectory (
-		final AlmgrenChrissDiscrete acd,
-		final double dblLambda,
-		final double dblX)
+		final AlmgrenChrissDiscrete almgrenChrissDiscrete,
+		final double lambda,
+		final double x)
 		throws Exception
 	{
-		double[] adblHoldings = acd.holdings();
+		double[] holdingsArray = almgrenChrissDiscrete.holdings();
 
-		String strHoldings = "\t| [LAMBDA = " + FormatUtil.FormatDouble (dblLambda, 1, 3, dblX) + "]";
+		String holdings = "\t| [LAMBDA = " + FormatUtil.FormatDouble (lambda, 1, 3, x) + "]";
 
-		for (int i = 0; i < adblHoldings.length; ++i)
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (adblHoldings[i] / dblX, 2, 3, 100.);
+		for (int holdingsIndex = 0; holdingsIndex < holdingsArray.length; ++holdingsIndex) {
+			holdings += " | " + FormatUtil.FormatDouble (holdingsArray[holdingsIndex] / x, 2, 3, 100.);
+		}
 
-		System.out.println (strHoldings + " ||");
+		System.out.println (holdings + " ||");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblS0 = 50.;
-		double dblX = 1000000.;
-		double dblT = 5.;
-		int iN = 5;
-		double dblAnnualVolatility = 0.30;
-		double dblAnnualReturns = 0.10;
-		double dblBidAsk = 0.125;
-		double dblDailyVolume = 5.e06;
-		double dblDailyVolumePermanentImpact = 0.1;
-		double dblDailyVolumeTemporaryImpact = 0.01;
-		double[] adblLambdaU = {
+		int n = 5;
+		double t = 5.;
+		double s0 = 50.;
+		double x = 1000000.;
+		double bidAsk = 0.125;
+		double annualReturns = 0.1;
+		double dailyVolume = 5.e06;
+		double annualVolatility = 0.3;
+		double dailyVolumePermanentImpact = 0.1;
+		double dailyVolumeTemporaryImpact = 0.01;
+		double[] lambdaUArray =
+		{
 			0.001e-06,
 			0.250e-06,
 			0.500e-06,
@@ -195,40 +203,38 @@ public class TrajectoryComparisonNoDrift {
 			4.000e-06
 		};
 
-		ArithmeticPriceDynamicsSettings apds = ArithmeticPriceDynamicsSettings.FromAnnualReturnsSettings (
-			dblAnnualReturns,
-			dblAnnualVolatility,
-			0.,
-			dblS0
+		ArithmeticPriceDynamicsSettings arithmeticPriceDynamicsSettings =
+			ArithmeticPriceDynamicsSettings.FromAnnualReturnsSettings (
+				annualReturns,
+				annualVolatility,
+				0.,
+				s0
+			);
+
+		double alpha = arithmeticPriceDynamicsSettings.drift();
+
+		double sigma = arithmeticPriceDynamicsSettings.epochVolatility();
+
+		PriceMarketImpactLinear priceMarketImpactLinear = new PriceMarketImpactLinear (
+			new AssetTransactionSettings (s0, dailyVolume, bidAsk),
+			dailyVolumePermanentImpact,
+			dailyVolumeTemporaryImpact
 		);
 
-		double dblAlpha = apds.drift();
+		ParticipationRateLinear permanentTransactionFunction =
+			(ParticipationRateLinear) priceMarketImpactLinear.permanentTransactionFunction();
 
-		double dblSigma = apds.epochVolatility();
+		ParticipationRateLinear temporaryTransactionFunction =
+			(ParticipationRateLinear) priceMarketImpactLinear.temporaryTransactionFunction();
 
-		PriceMarketImpactLinear pmil = new PriceMarketImpactLinear (
-			new AssetTransactionSettings (
-				dblS0,
-				dblDailyVolume,
-				dblBidAsk
-			),
-			dblDailyVolumePermanentImpact,
-			dblDailyVolumeTemporaryImpact
-		);
+		LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+			ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
+				new ArithmeticPriceDynamicsSettings (alpha, new Flat (sigma), 0.),
+				new UniformParticipationRateLinear (permanentTransactionFunction),
+				new UniformParticipationRateLinear (temporaryTransactionFunction)
+			);
 
-		ParticipationRateLinear prlPermanent = (ParticipationRateLinear) pmil.permanentTransactionFunction();
-
-		ParticipationRateLinear prlTemporary = (ParticipationRateLinear) pmil.temporaryTransactionFunction();
-
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
-			new ArithmeticPriceDynamicsSettings (
-				dblAlpha,
-				new Flat (dblSigma),
-				0.
-			),
-			new UniformParticipationRateLinear (prlPermanent),
-			new UniformParticipationRateLinear (prlTemporary)
-		);
+		double permanentTransactionFunctionSlope = permanentTransactionFunction.slope();
 
 		System.out.println ("\n\t|---------------------------------------------||");
 
@@ -236,66 +242,78 @@ public class TrajectoryComparisonNoDrift {
 
 		System.out.println ("\t|---------------------------------------------||");
 
-		System.out.println ("\t| Initial Stock Price           : " + dblS0);
+		System.out.println ("\t| Initial Stock Price           : " + s0);
 
-		System.out.println ("\t| Initial Holdings              : " + dblX);
+		System.out.println ("\t| Initial Holdings              : " + x);
 
-		System.out.println ("\t| Liquidation Time              : " + dblT);
+		System.out.println ("\t| Liquidation Time              : " + t);
 
-		System.out.println ("\t| Number of Time Periods        : " + iN);
+		System.out.println ("\t| Number of Time Periods        : " + n);
 
-		System.out.println ("\t| Annual Volatility             :" + FormatUtil.FormatDouble (dblAnnualVolatility, 1, 0, 100.) + "%");
+		System.out.println (
+			"\t| Annual Volatility             :" +
+				FormatUtil.FormatDouble (annualVolatility, 1, 0, 100.) + "%"
+		);
 
-		System.out.println ("\t| Annual Growth                 :" + FormatUtil.FormatDouble (dblAnnualReturns, 1, 0, 100.) + "%");
+		System.out.println (
+			"\t| Annual Growth                 :" + FormatUtil.FormatDouble (annualReturns, 1, 0, 100.) + "%"
+		);
 
-		System.out.println ("\t| Bid-Ask Spread                : " + dblBidAsk);
+		System.out.println ("\t| Bid-Ask Spread                : " + bidAsk);
 
-		System.out.println ("\t| Daily Volume                  : " + dblDailyVolume);
+		System.out.println ("\t| Daily Volume                  : " + dailyVolume);
 
-		System.out.println ("\t| Daily Volume Temporary Impact : " + dblDailyVolumeTemporaryImpact);
+		System.out.println ("\t| Daily Volume Temporary Impact : " + dailyVolumeTemporaryImpact);
 
-		System.out.println ("\t| Daily Volume Permanent Impact : " + dblDailyVolumePermanentImpact);
+		System.out.println ("\t| Daily Volume Permanent Impact : " + dailyVolumePermanentImpact);
 
-		System.out.println ("\t| Daily Volume 5 million Shares : " + prlPermanent.slope());
+		System.out.println ("\t| Daily Volume 5 million Shares : " + permanentTransactionFunctionSlope);
 
 		System.out.println ("\t|");
 
 		System.out.println (
 			"\t| Daily Volatility              : " +
-			FormatUtil.FormatDouble (dblSigma, 1, 4, 1.)
+			FormatUtil.FormatDouble (sigma, 1, 4, 1.)
 		);
 
 		System.out.println (
 			"\t| Daily Returns                 : " +
-			FormatUtil.FormatDouble (dblAlpha, 1, 4, 1.)
+			FormatUtil.FormatDouble (alpha, 1, 4, 1.)
 		);
 
-		System.out.println ("\t| Temporary Impact Fixed Offset :  " + prlTemporary.offset());
+		System.out.println ("\t| Temporary Impact Fixed Offset :  " + temporaryTransactionFunction.offset());
 
-		System.out.println ("\t| Eta                           :  " + prlTemporary.slope());
+		System.out.println ("\t| Eta                           :  " + temporaryTransactionFunction.slope());
 
-		System.out.println ("\t| Gamma                         :  " + prlPermanent.slope());
+		System.out.println ("\t| Gamma                         :  " + permanentTransactionFunctionSlope);
 
 		System.out.println ("\t|---------------------------------------------||");
 
-		System.out.println ("\n\t|--------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|--------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|             OPTIMAL TRADING TRAJECTORY FOR DIFFERENT RISK AVERSION             ||");
+		System.out.println (
+			"\t|             OPTIMAL TRADING TRAJECTORY FOR DIFFERENT RISK AVERSION             ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------||"
+		);
 
-		for (double dblLambdaU : adblLambdaU)
+		for (double lambdaU : lambdaUArray) {
 			DisplayTrajectory (
 				(AlmgrenChrissDiscrete) DiscreteAlmgrenChriss.Standard (
-					dblX,
-					dblT,
-					iN,
-					lpep,
-					dblLambdaU
+					x,
+					t,
+					n,
+					linearPermanentExpectationParameters,
+					lambdaU
 				).generate(),
-				dblLambdaU,
-				dblX
+				lambdaU,
+				x
 			);
+		}
 
 		System.out.println ("\t|--------------------------------------------------------------------------------||");
 

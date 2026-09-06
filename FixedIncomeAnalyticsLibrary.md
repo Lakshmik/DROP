@@ -11,7 +11,7 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome/FixedIncomeAnalytics_v7.96.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome/FixedIncomeAnalytics_v7.97.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncome) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -281,6 +281,11 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 	* Introduction
 	* Types of Term-structure Models and their Roles
 	* Types of Term-structure Models and their Roles - Deterministic 
+	* Types of Term-structure Models and their Roles - Pricing Models
+	* Types of Term-structure Models and their Roles - Real-world Models
+	* Pricing Models – Problems Specific to the Municipal Market
+	* Characteristics of a Good Model for Analyzing Municipal Bond Call Features
+	* Introduction to Expected Present Value – EPV – Savings
 	* References
  * Conservative PIK Bond Modeling Strategy
 	* Assumptions and Strategy

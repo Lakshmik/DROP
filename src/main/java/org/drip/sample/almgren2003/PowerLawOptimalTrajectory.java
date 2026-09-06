@@ -17,6 +17,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,7 +100,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>PowerLawOptimalTrajectory</i> sketches out the Optimal Trajectories for 3 different values of k -
- * representing Concave, Linear, and Convex Power's respectively. The References are:
+ * 	representing Concave, Linear, and Convex Power's respectively. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -119,36 +127,38 @@ import org.drip.service.env.EnvManager;
  * 				Markets</i> <b>1</b> 1-50
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class PowerLawOptimalTrajectory {
+public class PowerLawOptimalTrajectory
+{
 
 	private static final void RiskAversionRun (
-		final double dblLambda)
+		final double lambda)
 		throws Exception
 	{
-		double dblGamma = 0.;
-		double dblHRef = 0.50;
-		double dblVRef = 100000.;
-		double dblDrift = 0.;
-		double dblVolatility = 1.;
-		double dblSerialCorrelation = 0.;
-		double dblX = 100000.;
-		double dblFinishTime = 10.;
-		int iNumInterval = 10;
+		double drift = 0.;
+		double gamma = 0.;
+		double hRef = 0.50;
+		double x = 100000.;
+		double vRef = 100000.;
+		double volatility = 1.;
+		int intervalCount = 10;
+		double finishTime = 10.;
+		double serialCorrelation = 0.;
 
-		double[] adblK = new double[] {
+		double[] kArray =
+		{
 			0.25,
 			0.50,
 			0.75,
@@ -163,9 +173,14 @@ public class PowerLawOptimalTrajectory {
 			3.00
 		};
 
-		System.out.println ("\n\t|------------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\n\t|------------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|\tPOWER LAW OPTIMAL TRAJECTORY; RISK TOLERANCE (thousands) => " + FormatUtil.FormatDouble (1. / dblLambda, 1, 0, 1.e-03));
+		System.out.println (
+			"\t|\tPOWER LAW OPTIMAL TRAJECTORY; RISK TOLERANCE (thousands) => " +
+				FormatUtil.FormatDouble (1. / lambda, 1, 0, 1.e-03)
+		);
 
 		System.out.println ("\t|");
 
@@ -181,73 +196,93 @@ public class PowerLawOptimalTrajectory {
 
 		System.out.println ("\t|\t\t\tTransaction Cost Variance (Thousands)");
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------------||");
-
-		ArithmeticPriceDynamicsSettings apds = new ArithmeticPriceDynamicsSettings (
-			dblDrift,
-			new Flat (dblVolatility),
-			dblSerialCorrelation
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------------||"
 		);
 
-		ParticipationRateLinear prlPermanent = new ParticipationRateLinear (
-			0.,
-			dblGamma
-		);
+		ArithmeticPriceDynamicsSettings arithmeticPriceDynamicsSettings =
+			new ArithmeticPriceDynamicsSettings (drift, new Flat (volatility), serialCorrelation);
 
-		double[] adblExecutionTime = new double[iNumInterval];
+		ParticipationRateLinear permanentParticipationRateLinear = new ParticipationRateLinear (0., gamma);
 
-		for (int i = 1; i <= iNumInterval; ++i)
-			adblExecutionTime[i - 1] = ((double) i) / ((double) iNumInterval);
+		double inverseX = 1. / x;
+		double inverseIntervalCount = 1. / intervalCount;
+		double[] executionTimeArray = new double[intervalCount];
 
-		for (int i = 0; i < adblK.length; ++i) {
-			double dblEta = dblHRef / java.lang.Math.pow (dblVRef, adblK[i]);
+		for (int intervalIndex = 1; intervalIndex <= intervalCount; ++intervalIndex) {
+			executionTimeArray[intervalIndex - 1] = inverseIntervalCount * intervalIndex;
+		}
 
-			LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
-				apds,
-				new UniformParticipationRateLinear (prlPermanent),
-				new UniformParticipationRate (
-					new ParticipationRatePower (
-						dblEta,
-						adblK[i]
-					)
-				)
-			);
-
-			ContinuousPowerImpact cpi = ContinuousPowerImpact.Standard (
-				dblX,
-				dblFinishTime,
-				lpep,
-				dblLambda
-			);
-
-			PowerImpactContinuous pic = (PowerImpactContinuous) cpi.generate();
+		for (int i = 0; i < kArray.length; ++i) {
+			PowerImpactContinuous powerImpactContinuous =
+				(PowerImpactContinuous) ContinuousPowerImpact.Standard (
+					x,
+					finishTime,
+					ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
+						arithmeticPriceDynamicsSettings,
+						new UniformParticipationRateLinear (permanentParticipationRateLinear),
+						new UniformParticipationRate (
+							new ParticipationRatePower (hRef / Math.pow (vRef, kArray[i]), kArray[i])
+						)
+					),
+					lambda
+				).generate();
 
 			if (0 == i) {
-				String strExecutionTime = "\t|          |  ";
+				String executionTime = "\t|          |  ";
 
-				for (int j = 0; j < adblExecutionTime.length; ++j)
-					strExecutionTime = strExecutionTime + "   " + FormatUtil.FormatDouble (adblExecutionTime[j], 1, 2, 1.);
+				for (int executionTimeIndex = 0;
+					executionTimeIndex < executionTimeArray.length;
+					++executionTimeIndex)
+				{
+					executionTime +=
+						"   " + FormatUtil.FormatDouble (executionTimeArray[executionTimeIndex], 1, 2, 1.);
+				}
 
-				System.out.println (strExecutionTime);
+				System.out.println (executionTime);
 
-				System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------------||");
+				System.out.println (
+					"\t|------------------------------------------------------------------------------------------------------------------------------------||"
+				);
 			}
 
-			R1ToR1 r1ToR1Holdings = pic.holdings();
+			R1ToR1 holdingsFunction = powerImpactContinuous.holdings();
 
-			String strHoldings = "\t| k =" + FormatUtil.FormatDouble (adblK[i], 1, 2, 1.) + " | ";
+			String holdingsDump = "\t| k =" + FormatUtil.FormatDouble (kArray[i], 1, 2, 1.) + " | ";
 
-			for (int j = 0; j < iNumInterval; ++j)
-				strHoldings = strHoldings + "  " + FormatUtil.FormatDouble (r1ToR1Holdings.evaluate (adblExecutionTime[j]) / dblX, 2, 2, 100.);
+			for (int intervalIndex = 0; intervalIndex < intervalCount; ++intervalIndex) {
+				holdingsDump += "  " + FormatUtil.FormatDouble (
+					holdingsFunction.evaluate (executionTimeArray[intervalIndex]) * inverseX,
+					2,
+					2,
+					100.
+				);
+			}
 
-			double dblExecutionTimeUpperBound = pic.executionTimeUpperBound();
+			double executionTimeUpperBound = powerImpactContinuous.executionTimeUpperBound();
 
 			System.out.println (
-				strHoldings + " | " +
-				FormatUtil.FormatDouble (pic.characteristicTime(), 2, 1, 1.) + " | " +
-				FormatUtil.FormatDouble (Double.isNaN (dblExecutionTimeUpperBound) ? 0. : dblExecutionTimeUpperBound, 2, 1, 1.) + " | " +
-				FormatUtil.FormatDouble (pic.transactionCostExpectation(), 3, 0, 1.e-03) + " | " +
-				FormatUtil.FormatDouble (Math.sqrt (pic.transactionCostVariance()), 3, 0, 1.e-03) + " ||"
+				holdingsDump + " | " + FormatUtil.FormatDouble (
+					powerImpactContinuous.characteristicTime(),
+					2,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					Double.isNaN (executionTimeUpperBound) ? 0. : executionTimeUpperBound,
+					2,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					powerImpactContinuous.transactionCostExpectation(),
+					3,
+					0,
+					1.e-03
+				) + " | " + FormatUtil.FormatDouble (
+					Math.sqrt (powerImpactContinuous.transactionCostVariance()),
+					3,
+					0,
+					1.e-03
+				) + " ||"
 			);
 		}
 
@@ -257,28 +292,27 @@ public class PowerLawOptimalTrajectory {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double[] adblLambda = new double[] {
+		double[] lambdaArray =
+		{
 			1.e-04,
 			5.e-06,
 			5.e-07
 		};
 
-		for (double dblLambda : adblLambda)
-			RiskAversionRun (dblLambda);
+		for (double lambda : lambdaArray) {
+			RiskAversionRun (lambda);
+		}
 
 		EnvManager.TerminateEnv();
 	}

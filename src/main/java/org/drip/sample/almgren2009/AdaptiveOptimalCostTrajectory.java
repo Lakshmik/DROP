@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -88,8 +96,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>AdaptiveOptimalCostTrajectory</i> traces a Sample Realization of the Adaptive Cost Strategy using the
- * Market State Trajectory the follows the Zero Mean Ornstein-Uhlenbeck Evolution Dynamics. The References
- * are:
+ * 	Market State Trajectory the follows the Zero Mean Ornstein-Uhlenbeck Evolution Dynamics. The References
+ * 	are:
  * 
  * <br><br>
  *  <ul>
@@ -114,78 +122,75 @@ import org.drip.service.env.EnvManager;
  * 				University</b>
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class AdaptiveOptimalCostTrajectory {
+public class AdaptiveOptimalCostTrajectory
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblTime = 0.;
-		double dblBurstiness = 1.;
-		double dblDimensionlessRiskAversion = 0.1;
-		double dblRelaxationTime = 1.;
-		double dblSimulationTime = 10.;
-		double dblTimeInterval = 0.25;
-		double dblInitialMarketState = -0.5;
+		double time = 0.;
+		double burstiness = 1.;
+		double relaxationTime = 1.;
+		double simulationTime = 10.;
+		double timeInterval = 0.25;
+		double initialMarketState = -0.5;
+		double dimensionlessRiskAversion = 0.1;
 
-		double dblNonDimensionalHoldings = 1.;
-		int iNumTimeNode = (int) (dblSimulationTime / dblTimeInterval);
-		MarketStateSystemic[] aMSS = new MarketStateSystemic[iNumTimeNode + 1];
+		double nonDimensionalHoldings = 1.;
+		int timeNodeCount = (int) (simulationTime / timeInterval);
+		MarketStateSystemic[] marketStateSystemicArray = new MarketStateSystemic[timeNodeCount + 1];
 
-		aMSS[0] = new MarketStateSystemic (dblInitialMarketState);
+		marketStateSystemicArray[0] = new MarketStateSystemic (initialMarketState);
 
-		DiffusionEvaluatorOrnsteinUhlenbeck deou = DiffusionEvaluatorOrnsteinUhlenbeck.ZeroMean (
-			dblBurstiness,
-			dblRelaxationTime
-		);
+		DiffusionEvaluatorOrnsteinUhlenbeck diffusionEvaluatorOrnsteinUhlenbeck =
+			DiffusionEvaluatorOrnsteinUhlenbeck.ZeroMean (burstiness, relaxationTime);
 
-		DiffusionEvolver oup1D = new DiffusionEvolver (deou);
+		DiffusionEvolver diffusionEvolver1D = new DiffusionEvolver (diffusionEvaluatorOrnsteinUhlenbeck);
 
-		for (int i = 0; i < iNumTimeNode; ++i) {
-			JumpDiffusionEdge gi = oup1D.weinerIncrement (
-				new JumpDiffusionVertex (
-					dblTime,
-					aMSS[i].common(),
-					0.,
-					false
-				),
-				dblTimeInterval
+		for (int timeNodeIndex = 0; timeNodeIndex < timeNodeCount; ++timeNodeIndex) {
+			double commonMarketState = marketStateSystemicArray[timeNodeIndex].common();
+
+			JumpDiffusionEdge jumpDiffusionEdge = diffusionEvolver1D.weinerIncrement (
+				new JumpDiffusionVertex (time, commonMarketState, 0., false),
+				timeInterval
 			);
 
-			dblTime += dblTimeInterval;
+			time += timeInterval;
 
-			aMSS[i + 1] = new MarketStateSystemic (aMSS[i].common() + gi.deterministic() + gi.diffusionStochastic());
+			marketStateSystemicArray[timeNodeIndex + 1] = new MarketStateSystemic (
+				commonMarketState + jumpDiffusionEdge.deterministic() +
+					jumpDiffusionEdge.diffusionStochastic()
+			);
 		}
 
-		NonDimensionalCostEvolverSystemic ndces = NonDimensionalCostEvolverSystemic.Standard (deou);
+		NonDimensionalCostEvolverSystemic nonDimensionalCostEvolverSystemic =
+			NonDimensionalCostEvolverSystemic.Standard (diffusionEvaluatorOrnsteinUhlenbeck);
 
-		NonDimensionalCostSystemic ndcs = NonDimensionalCostSystemic.Zero();
+		NonDimensionalCostSystemic nonDimensionalCostSystemic = NonDimensionalCostSystemic.Zero();
 
 		System.out.println();
 
@@ -209,37 +214,39 @@ public class AdaptiveOptimalCostTrajectory {
 
 		System.out.println ("\t||-------------------------------------------------------------------||");
 
-		System.out.println ("\t||" + 
-			FormatUtil.FormatDouble (0., 1, 2, 1.) + " => " +
-			FormatUtil.FormatDouble (aMSS[0].common(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (ndcs.realization(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (ndcs.gradient(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (ndcs.jacobian(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (ndcs.nonDimensionalTradeRate(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (dblNonDimensionalHoldings, 1, 4, 1.) + " ||"
+		System.out.println (
+			"\t||" + FormatUtil.FormatDouble (0., 1, 2, 1.) + " => " +
+			FormatUtil.FormatDouble (marketStateSystemicArray[0].common(), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (nonDimensionalCostSystemic.realization(), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (nonDimensionalCostSystemic.gradient(), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (nonDimensionalCostSystemic.jacobian(), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (nonDimensionalCostSystemic.nonDimensionalTradeRate(), 1, 4, 1.) + " | "
+			+ FormatUtil.FormatDouble (nonDimensionalHoldings, 1, 4, 1.) + " ||"
 		);
 
-		for (int i = 1; i < iNumTimeNode; ++i) {
-			ndcs = (NonDimensionalCostSystemic) ndces.evolve (
-				ndcs,
-				aMSS[i],
-				dblDimensionlessRiskAversion,
-				(iNumTimeNode - i) * dblTimeInterval,
-				dblTimeInterval
-			);
+		for (int timeNodeIndex = 1; timeNodeIndex < timeNodeCount; ++timeNodeIndex) {
+			nonDimensionalCostSystemic =
+				(NonDimensionalCostSystemic) nonDimensionalCostEvolverSystemic.evolve (
+					nonDimensionalCostSystemic,
+					marketStateSystemicArray[timeNodeIndex],
+					dimensionlessRiskAversion,
+					(timeNodeCount - timeNodeIndex) * timeInterval,
+					timeInterval
+				);
 
-			double dblNonDimensionalTradeRate = dblNonDimensionalHoldings * ndcs.nonDimensionalTradeRate();
+			double nonDimensionalTradeRate =
+				nonDimensionalHoldings * nonDimensionalCostSystemic.nonDimensionalTradeRate();
 
-			dblNonDimensionalHoldings = dblNonDimensionalHoldings - dblNonDimensionalTradeRate * dblTimeInterval;
+			nonDimensionalHoldings = nonDimensionalHoldings - nonDimensionalTradeRate * timeInterval;
 
 			System.out.println ("\t||" + 
-				FormatUtil.FormatDouble (dblTimeInterval * i, 1, 2, 1.) + " => " +
-				FormatUtil.FormatDouble (aMSS[i].common(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (ndcs.realization(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (ndcs.gradient(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (ndcs.jacobian(), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (dblNonDimensionalTradeRate, 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (dblNonDimensionalHoldings, 1, 4, 1.) + " ||"
+				FormatUtil.FormatDouble (timeInterval * timeNodeIndex, 1, 2, 1.) + " => " +
+				FormatUtil.FormatDouble (marketStateSystemicArray[timeNodeIndex].common(), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (nonDimensionalCostSystemic.realization(), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (nonDimensionalCostSystemic.gradient(), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (nonDimensionalCostSystemic.jacobian(), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (nonDimensionalTradeRate, 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (nonDimensionalHoldings, 1, 4, 1.) + " ||"
 			);
 		}
 

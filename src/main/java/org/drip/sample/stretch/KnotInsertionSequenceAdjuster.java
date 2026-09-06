@@ -13,6 +13,14 @@ import org.drip.spline.stretch.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -99,298 +107,309 @@ import org.drip.spline.stretch.*;
  *  	preserved, and b) Continuity across the predictor ordinate for the implied response value is also
  *  	preserved.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class KnotInsertionSequenceAdjuster {
-
-	/*
-	 * Build Polynomial Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class KnotInsertionSequenceAdjuster
+{
 
 	private static final SegmentCustomBuilderControl PolynomialSegmentControlParams (
-		final int iNumBasis,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final int basisCount,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (iNumBasis),
-			sdic,
-			rssc,
+			new PolynomialFunctionSetParams (basisCount),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Basis Spline Stretch Test Sample. Performs the following:
-	 * 	- Construct the Array of Segment Builder Parameters - one per segment.
-	 *  - Construct the Stretch instance.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final MultiSegmentSequence BasisSplineStretchTest (
-		final double[] adblX,
-		final double[] adblY,
-		final SegmentCustomBuilderControl scbc)
+		final double[] xArray,
+		final double[] yArray,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl)
 		throws Exception
 	{
-		/*
-		 * Array of Segment Builder Parameters - one per segment
-		 */
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[segmentCount]; 
 
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
-
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
-
-		/*
-		 * Construct a Stretch instance 
-		 */
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentCustomBuilderControlArray[segmentIndex] = segmentCustomBuilderControl;
+		}
 
 		return MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
-			"SPLINE_STRETCH",
-			adblX, // predictors
-			adblY, // responses
-			aSCBC, // Basis Segment Builder parameters
-			null,
+			"SPLINE_STRETCH", 					// Name
+			xArray, 							// predictors
+			yArray, 							// responses
+			segmentCustomBuilderControlArray, 	// Basis Segment Builder parameters
+			null,  								// NULL segment Best Fit Response
 			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
+			MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
 		);
 	}
-
-	/*
-	 * The Stretch Adjuster Test - this brings it altogether.
-	 */
 
 	private static final void StretchAdjusterTest()
 		throws Exception
 	{
-		/*
-		 * X predictors
-		 */
+		int k = 2;
+		int polynomialBasisCount = 4;
+		double shapeControllerTension = 1.;
+		int roughnessPenaltyDerivativeOrder = 2;
+		double[] xArray =
+		{
+			 1.0,
+			 1.5,
+			 2.0,
+			 3.0,
+			 4.0,
+			 5.0,
+			 6.5,
+			 8.0,
+			10.0
+		};
+		double[] yArray =
+		{
+			25.00,
+			20.25,
+			16.00,
+			 9.00,
+			 4.00,
+			 1.00,
+			 0.25,
+			 4.00,
+			16.00
+		};
 
-		double[] adblX = new double[] { 1.00,  1.50,  2.00, 3.00, 4.00, 5.00, 6.50, 8.00, 10.00};
+		System.out.println();
 
-		/*
-		 * Y responses
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		double[] adblY = new double[] {25.00, 20.25, 16.00, 9.00, 4.00, 1.00, 0.25, 4.00, 16.00};
+		System.out.println ("\t||  POLYNOMIAL");
 
-		/*
-		 * Construct a rational shape controller with the shape controller tension of 1.
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		double dblShapeControllerTension = 1.;
-
-		ResponseScalingShapeControl rssc = new ResponseScalingShapeControl (
-			false,
-			new QuadraticRationalShapeControl (dblShapeControllerTension)
+		MultiSegmentSequence baseMultiSegmentSequence = BasisSplineStretchTest (
+			xArray,
+			yArray,
+			PolynomialSegmentControlParams (
+				polynomialBasisCount,
+				SegmentInelasticDesignControl.Create (k, roughnessPenaltyDerivativeOrder),
+				new ResponseScalingShapeControl (
+					false,
+					new QuadraticRationalShapeControl (shapeControllerTension)
+				)
+			)
 		);
 
-		/*
-		 * Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with 2nd order
-		 * 	roughness penalty derivative, and without constraint
-		 */
+		double x = baseMultiSegmentSequence.getLeftPredictorOrdinateEdge();
 
-		int iK = 2;
-		int iRoughnessPenaltyDerivativeOrder = 2;
+		double xMaximum = baseMultiSegmentSequence.getRightPredictorOrdinateEdge();
 
-		SegmentInelasticDesignControl sdic = SegmentInelasticDesignControl.Create (
-			iK,
-			iRoughnessPenaltyDerivativeOrder
-		);
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t||  Y[" + x + "] " + FormatUtil.FormatDouble (
+					baseMultiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + baseMultiSegmentSequence.monotoneType (x)
+			);
 
-		/*
-		 * Build the polynomial basis spline segment control parameters, and set up the stretch
-		 */
+			System.out.println (
+				"\t||  Jacobian Y[" + x + "]: " +
+					baseMultiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+			);
 
-		System.out.println (" \n---------- \n POLYNOMIAL \n ---------- \n");
-
-		int iPolyNumBasis = 4;
-
-		SegmentCustomBuilderControl scbc = PolynomialSegmentControlParams (
-			iPolyNumBasis,
-			sdic,
-			rssc
-		);
-
-		MultiSegmentSequence mssBase = BasisSplineStretchTest (
-			adblX,
-			adblY,
-			scbc
-		);
-
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-		 */
-
-		double dblX = mssBase.getLeftPredictorOrdinateEdge();
-
-		double dblXMax = mssBase.getRightPredictorOrdinateEdge();
-
-		while (dblX <= dblXMax) {
-			System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mssBase.responseValue (dblX), 1, 2, 1.) + " | "
-				+ mssBase.monotoneType (dblX));
-
-			System.out.println ("Jacobian Y[" + dblX + "]=" + mssBase.jackDResponseDCalibrationInput (dblX, 1).displayString());
-
-			dblX += 1.;
+			x += 1.;
 		}
 
-		/*
-		 * Clip part of the stretch left of the specified predictor ordinate
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println ("\tSPLINE_STRETCH_BASE DPE: " + mssBase.curvatureDPE());
+		System.out.println ("\t||  SPLINE_STRETCH_BASE DPE: " + baseMultiSegmentSequence.curvatureDPE());
 
-		System.out.println (" \n---------- \n LEFT CLIPPED \n ---------- \n");
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		MultiSegmentSequence mssLeftClipped = mssBase.clipLeft (
-			"LEFT_CLIP",
-			1.66
-		);
+		System.out.println();
 
-		dblX = mssBase.getLeftPredictorOrdinateEdge();
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian of the left clipped stretch
-		 */
+		System.out.println ("\t||  LEFT CLIPPED");
 
-		while (dblX <= dblXMax) {
-			if (mssLeftClipped.in (dblX)) {
-				System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mssLeftClipped.responseValue (dblX), 1, 2, 1.) + " | "
-					+ mssLeftClipped.monotoneType (dblX));
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-				System.out.println ("Jacobian Y[" + dblX + "]=" + mssLeftClipped.jackDResponseDCalibrationInput (dblX, 1).displayString());
+		MultiSegmentSequence leftClippedMultiSegmentSequence =
+			baseMultiSegmentSequence.clipLeft ("LEFT_CLIP", 1.66);
+
+		x = baseMultiSegmentSequence.getLeftPredictorOrdinateEdge();
+
+		while (x <= xMaximum) {
+			if (leftClippedMultiSegmentSequence.in (x)) {
+				System.out.println (
+					"\t|| Y[" + x + "] " + FormatUtil.FormatDouble (
+						leftClippedMultiSegmentSequence.responseValue (x),
+						1,
+						2,
+						1.
+					) + " | " + leftClippedMultiSegmentSequence.monotoneType (x)
+				);
+
+				System.out.println (
+					"\t|| Jacobian Y[" + x + "]: " +
+						leftClippedMultiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+				);
 			}
 
-			dblX += 1.;
+			x += 1.;
 		}
 
-		/*
-		 * Left clipped stretch DPE
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println ("\tSPLINE_STRETCH_LEFT DPE: " + mssLeftClipped.curvatureDPE());
+		System.out.println (
+			"\t|| SPLINE_STRETCH_LEFT DPE: " + leftClippedMultiSegmentSequence.curvatureDPE()
+		);
 
-		/*
-		 * Clip part of the stretch right of the specified predictor ordinate
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  RIGHT CLIPPED");
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 
 		System.out.println (" \n---------- \n RIGHT CLIPPED \n ---------- \n");
 
-		MultiSegmentSequence mssRightClipped = mssBase.clipRight (
+		MultiSegmentSequence rightClippedMultiSegmentSequence = baseMultiSegmentSequence.clipRight (
 			"RIGHT_CLIP",
 			7.48
 		);
 
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian of the right clipped stretch
-		 */
+		x = baseMultiSegmentSequence.getLeftPredictorOrdinateEdge();
 
-		dblX = mssBase.getLeftPredictorOrdinateEdge();
+		while (x <= xMaximum) {
+			if (rightClippedMultiSegmentSequence.in (x)) {
+				System.out.println (
+					"\t|| Y[" + x + "] " + FormatUtil.FormatDouble (
+						rightClippedMultiSegmentSequence.responseValue (x),
+						1,
+						2,
+						1.
+					) + " | " + rightClippedMultiSegmentSequence.monotoneType (x)
+				);
 
-		while (dblX <= dblXMax) {
-			if (mssRightClipped.in (dblX)) {
-				System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mssRightClipped.responseValue (dblX), 1, 2, 1.) + " | "
-					+ mssRightClipped.monotoneType (dblX));
-
-				System.out.println ("Jacobian Y[" + dblX + "]=" + mssRightClipped.jackDResponseDCalibrationInput (dblX, 1).displayString());
+				System.out.println (
+					"\t|| Jacobian Y[" + x + "]: " +
+						rightClippedMultiSegmentSequence.jackDResponseDCalibrationInput (
+							x,
+							1
+						).displayString()
+				);
 			}
 
-			dblX += 1.;
+			x += 1.;
 		}
 
-		/*
-		 * Right clipped stretch DPE
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println ("\tSPLINE_STRETCH_RIGHT DPE: " + mssRightClipped.curvatureDPE());
+		System.out.println (
+			"\t|| SPLINE_STRETCH_RIGHT DPE: " + rightClippedMultiSegmentSequence.curvatureDPE()
+		);
 
-		/*
-		 * Ordered Side by side Comparison of left clipped - unclipped - right clipped response values
-		 */
+		x = baseMultiSegmentSequence.getLeftPredictorOrdinateEdge();
 
-		dblX = mssBase.getLeftPredictorOrdinateEdge();
+		xMaximum = baseMultiSegmentSequence.getRightPredictorOrdinateEdge();
 
-		dblXMax = mssBase.getRightPredictorOrdinateEdge();
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println ("\n-----------------------------------------------------------------------------------------------------");
+		System.out.println();
 
-		System.out.println ("                           BASE         ||      LEFT CLIPPED           ||      RIGHT CLIPPED");
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------"
+		);
 
-		System.out.println ("-----------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t||                           BASE         ||      LEFT CLIPPED           ||      RIGHT CLIPPED"
+		);
 
-		while (dblX <= dblXMax) {
-			java.lang.String strLeftClippedValue = "         ";
-			java.lang.String strRightClippedValue = "         ";
-			java.lang.String strLeftClippedMonotonocity = "             ";
-			java.lang.String strRightClippedMonotonocity = "             ";
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------"
+		);
 
-			/*
-			 * Unclipped
-			 */
+		while (x <= xMaximum) {
+			String leftClippedValue = "\t||         ";
+			String rightClippedValue = "\t||         ";
+			String leftClippedMonotonocity = "\t||             ";
+			String rightClippedMonotonocity = "\t||             ";
 
-			java.lang.String strDisplay = "Y[" + FormatUtil.FormatDouble (dblX, 2, 3, 1.) + "] => "
-				+ FormatUtil.FormatDouble (mssBase.responseValue (dblX), 2, 6, 1.) + " | "
-				+ mssBase.monotoneType (dblX);
+			if (leftClippedMultiSegmentSequence.in (x)) {
+				leftClippedValue = FormatUtil.FormatDouble (
+					leftClippedMultiSegmentSequence.responseValue (x),
+					2,
+					6,
+					1.
+				);
 
-			/*
-			 * Left clipped
-			 */
-
-			if (mssLeftClipped.in (dblX)) {
-				strLeftClippedValue = FormatUtil.FormatDouble (mssLeftClipped.responseValue (dblX), 2, 6, 1.);
-
-				strLeftClippedMonotonocity = mssLeftClipped.monotoneType (dblX).toString();
+				leftClippedMonotonocity = leftClippedMultiSegmentSequence.monotoneType (x).toString();
 			}
 
-			/*
-			 * Right clipped
-			 */
+			if (rightClippedMultiSegmentSequence.in (x)) {
+				rightClippedValue = FormatUtil.FormatDouble (
+					rightClippedMultiSegmentSequence.responseValue (x),
+					2,
+					6,
+					1.
+				);
 
-			if (mssRightClipped.in (dblX)) {
-				strRightClippedValue = FormatUtil.FormatDouble (mssRightClipped.responseValue (dblX), 2, 6, 1.);
-
-				strRightClippedMonotonocity = mssRightClipped.monotoneType (dblX).toString();
+				rightClippedMonotonocity = rightClippedMultiSegmentSequence.monotoneType (x).toString();
 			}
 
-			System.out.println (strDisplay + "  ||  " + strLeftClippedValue + " | " + strLeftClippedMonotonocity +
-				"  ||  " + strRightClippedValue + " | " + strRightClippedMonotonocity);
+			System.out.println (
+				"\t|| Y[" + FormatUtil.FormatDouble (
+					x,
+					2,
+					3,
+					1.
+				) + "] => " + FormatUtil.FormatDouble (
+					baseMultiSegmentSequence.responseValue (x),
+					2,
+					6,
+					1.
+				) + " | " + baseMultiSegmentSequence.monotoneType (x) + "  ||  " + leftClippedValue + " | " +
+				leftClippedMonotonocity + "  ||  " + rightClippedValue + " | " + rightClippedMonotonocity
+			);
 
-			dblX += 0.5;
+			x += 0.5;
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		StretchAdjusterTest();
 

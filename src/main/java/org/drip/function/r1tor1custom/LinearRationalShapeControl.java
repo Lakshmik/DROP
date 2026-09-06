@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,89 +95,138 @@ package org.drip.function.r1tor1custom;
 
 /**
  * <i>LinearRationalShapeControl</i> implements the deterministic rational shape control functionality on top
- * of the estimator basis splines inside - [0,...,1) - Globally [x_0,...,x_1):
+ * 	of the estimator basis splines inside - [0,...,1) - Globally [x_0,...,x_1):
  *	<br><br>
  * 			y = 1 / [1 + lambda * x]
  *	<br><br>
- *		where is the normalized ordinate mapped as
+ *		where x is the normalized ordinate mapped as
  * 
  * 			x === (x - x_i-1) / (x_i - x_i-1)
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>LinearRationalShapeControl</i> Constructor</li>
+ * 		<li>Evaluate for the Given x</li>
+ * 		<li>Calculate the Derivative as a Double</li>
+ * 		<li>Integrate over the given Range</li>
+ * 		<li>Retrieve the Shape Control Coefficient</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *  
  * @author Lakshmi Krishnamurthy
  */
 
-public class LinearRationalShapeControl extends org.drip.function.definition.R1ToR1 {
-	private double _dblLambda = java.lang.Double.NaN;
+public class LinearRationalShapeControl
+	extends R1ToR1
+{
+	private double _lambda = Double.NaN;
 
 	/**
-	 * LinearRationalShapeControl constructor
+	 * <i>LinearRationalShapeControl</i> Constructor
 	 * 
-	 * @param dblLambda Tension Parameter
+	 * @param lambda Tension Parameter
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public LinearRationalShapeControl (
-		final double dblLambda)
-		throws java.lang.Exception
+		final double lambda)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblLambda = dblLambda))
-			throw new java.lang.Exception ("LinearRationalShapeControl ctr: Invalid tension");
-	}
-
-	@Override public double evaluate (
-		final double dblX)
-		throws java.lang.Exception
-	{
-		return 1. / (1. + _dblLambda * dblX);
-	}
-
-	@Override public double derivative (
-		final double dblX,
-		final int iOrder)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblX))
-			throw new java.lang.Exception ("LinearRationalShapeControl::derivative => Invalid Inputs");
-
-		double dblDerivative = 1. / (1. + _dblLambda * dblX);
-
-		for (int i = 0; i < iOrder; ++i)
-			dblDerivative *= (-1. * _dblLambda / (1. + _dblLambda * dblX));
-
-		return dblDerivative;
-	}
-
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("LinearRationalShapeControl::integrate => Invalid Inputs");
-
-		return (java.lang.Math.log ((1. + _dblLambda * dblEnd) / (1. + _dblLambda * dblBegin))) / _dblLambda;
+		if (!NumberUtil.IsValid (_lambda = lambda)) {
+			throw new Exception ("LinearRationalShapeControl Constructor: Invalid tension");
+		}
 	}
 
 	/**
-	 * Retrieve the shape control coefficient
+	 * Evaluate for the Given x
 	 * 
-	 * @return Shape control coefficient
+	 * @param x x
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
-	public double getShapeControlCoefficient()
+	@Override public double evaluate (
+		final double x)
+		throws Exception
 	{
-		return _dblLambda;
+		return 1. / (1. + _lambda * x);
+	}
+
+	/**
+	 * Calculate the Derivative as a Double
+	 * 
+	 * @param x x at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
+
+	@Override public double derivative (
+		final double x,
+		final int order)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (x)) {
+			throw new Exception ("LinearRationalShapeControl::derivative => Invalid Inputs");
+		}
+
+		double derivativeScaler = 1. / (1. + _lambda * x);
+		double derivative = derivativeScaler;
+
+		for (int subDerivativeIndex = 0; subDerivativeIndex < order; ++subDerivativeIndex) {
+			derivative *= (-1. * _lambda * derivativeScaler);
+		}
+
+		return derivative;
+	}
+
+	/**
+	 * Integrate over the given Range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("LinearRationalShapeControl::integrate => Invalid Inputs");
+		}
+
+		return (Math.log ((1. + _lambda * end) / (1. + _lambda * begin))) / _lambda;
+	}
+
+	/**
+	 * Retrieve the Shape Control Coefficient
+	 * 
+	 * @return Shape Control Coefficient
+	 */
+
+	public double shapeControlCoefficient()
+	{
+		return _lambda;
 	}
 }

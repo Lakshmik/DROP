@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,7 +93,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>EnhancedEulerScheme</i> demonstrates the Enhancement used by Almgren (2009, 2012) to deal with Time
- * Evolution under Singular Initial Conditions. The References are:
+ * 	Evolution under Singular Initial Conditions. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -110,56 +118,51 @@ import org.drip.service.env.EnvManager;
  * 				University</b>
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class EnhancedEulerScheme {
+public class EnhancedEulerScheme
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblA = 2.;
-		double dblB = 1.;
-		double dblTimeIncrement = 0.1;
-		double dblSimulationTime = 1.0;
-		int iK = 2;
+		int k = 2;
+		double a = 2.;
+		double b = 1.;
+		double simulationTime = 1.;
+		double timeIncrement = 0.1;
 
-		int iNumSimulationSteps = (int) (dblSimulationTime / dblTimeIncrement);
-		double dblInitialOrder0 = 1. / (iK * dblTimeIncrement);
-		double dblInitialOrder1 = dblInitialOrder0 + 0.5 * (dblA + dblB);
-		double dblOrder0Euler = dblInitialOrder0;
-		double dblOrder1Euler = dblInitialOrder1;
-		double dblOrder0EnhancedEuler = dblInitialOrder0;
-		double dblOrder1EnhancedEuler = dblInitialOrder1;
+		double initialOrder0 = 1. / (k * timeIncrement);
+		double initialOrder1 = initialOrder0 + 0.5 * (a + b);
+		int simulationStepCount = (int) (simulationTime / timeIncrement);
+		double order1EnhancedEuler = initialOrder1;
+		double order0EnhancedEuler = initialOrder0;
+		double order1Euler = initialOrder1;
+		double order0Euler = initialOrder0;
 
-		AlmgrenEnhancedEulerUpdate aeeu = new AlmgrenEnhancedEulerUpdate (
-			dblA,
-			dblB
-		);
+		AlmgrenEnhancedEulerUpdate almgrenEnhancedEulerUpdate = new AlmgrenEnhancedEulerUpdate (a, b);
 
 		System.out.println();
 
@@ -181,29 +184,26 @@ public class EnhancedEulerScheme {
 
 		System.out.println ("\t||----------------------------------------------------||");
 
-		for (int i = iK; i <= iNumSimulationSteps; ++i) {
-			double dblTime = i * dblTimeIncrement;
+		for (int simulationIndex = k; simulationIndex <= simulationStepCount; ++simulationIndex) {
+			double time = simulationIndex * timeIncrement;
 
 			System.out.println (
 				"\t|| " +
-				FormatUtil.FormatDouble (dblTime, 1, 1, 1.) + " => " +
-				FormatUtil.FormatDouble (aeeu.evaluate (dblTime), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (dblOrder1EnhancedEuler, 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (dblOrder0EnhancedEuler, 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (dblOrder1Euler, 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (dblOrder0Euler, 1, 3, 1.) + " ||"
+				FormatUtil.FormatDouble (time, 1, 1, 1.) + " => " +
+				FormatUtil.FormatDouble (almgrenEnhancedEulerUpdate.evaluate (time), 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (order1EnhancedEuler, 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (order0EnhancedEuler, 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (order1Euler, 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (order0Euler, 1, 3, 1.) + " ||"
 			);
 
-			double dblOrder0EulerIncrement = -1. * (dblOrder0Euler - dblA) * (dblOrder0Euler - dblB) * dblTimeIncrement;
-			double dblOrder1EulerIncrement = -1. * (dblOrder1Euler - dblA) * (dblOrder1Euler - dblB) * dblTimeIncrement;
-			dblOrder0Euler = dblOrder0Euler + dblOrder0EulerIncrement;
-			dblOrder1Euler = dblOrder1Euler + dblOrder1EulerIncrement;
-			double dblOrder0EnhancedEulerIncrement = -1. * (dblOrder0EnhancedEuler - dblA) * (dblOrder0EnhancedEuler - dblB)
-				* dblTimeIncrement * iK / (iK + 1);
-			dblOrder0EnhancedEuler = dblOrder0EnhancedEuler + dblOrder0EnhancedEulerIncrement;
-			double dblOrder1EnhancedEulerIncrement = -1. * (dblOrder1EnhancedEuler - dblA) * (dblOrder1EnhancedEuler - dblB)
-				* dblTimeIncrement * iK / (iK + 1);
-			dblOrder1EnhancedEuler = dblOrder1EnhancedEuler + dblOrder1EnhancedEulerIncrement;
+			double timeIncrementScaler = timeIncrement * k / (k + 1);
+			order0Euler = order0Euler - (order0Euler - a) * (order0Euler - b) * timeIncrement;
+			order1Euler = order1Euler - (order1Euler - a) * (order1Euler - b) * timeIncrement;
+			order0EnhancedEuler = order0EnhancedEuler - (order0EnhancedEuler - a) * (order0EnhancedEuler - b)
+				* timeIncrementScaler;
+			order1EnhancedEuler = order1EnhancedEuler - (order1EnhancedEuler - a) * (order1EnhancedEuler - b)
+				* timeIncrementScaler;
 		}
 
 		System.out.println ("\t||----------------------------------------------------||");

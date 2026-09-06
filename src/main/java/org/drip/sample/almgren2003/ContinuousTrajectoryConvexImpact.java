@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,12 +99,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>ContinuousTrajectoryConvexImpact</i> reconciles the Characteristic Times of the Optimal Continuous
- * Trading Trajectory resulting from the Application of the Almgren (2003) Scheme to a Convex Power Law
- * Temporary Market Impact Function. The Power Exponent Considered here is
- * 
- * k = 2.0
- * 
- * The References are:
+ * 	Trading Trajectory resulting from the Application of the Almgren (2003) Scheme to a Convex Power Law
+ * 	Temporary Market Impact Function. The Power Exponent Considered here is k = 2.0 The References are:
  * 
  * <br><br>
  *  <ul>
@@ -123,53 +127,52 @@ import org.drip.service.env.EnvManager;
  * 				Markets</i> <b>1</b> 1-50
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ContinuousTrajectoryConvexImpact {
+public class ContinuousTrajectoryConvexImpact
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblS0 = 50.;
-		double dblDailyVolume = 1000000.;
-		double dblBidAskSpread = 0.;
-		double dblPermanentImpactFactor = 0.;
-		double dblTemporaryImpactFactor = 0.01;
-		double dblK = 2.0;
-		double dblGamma = 0.;
-		double dblDailyVolumeExecutionFactor = 0.1;
-		double dblDrift = 0.;
-		double dblVolatility = 1.;
-		double dblSerialCorrelation = 0.;
-		double dblX = 100000.;
-		double dblFinishTime = 1.;
+		double k = 2.0;
+		double s0 = 50.;
+		double gamma = 0.;
+		double drift = 0.;
+		double x = 100000.;
+		double finishTime = 1.;
+		double volatility = 1.;
+		double bidAskSpread = 0.;
+		double dailyVolume = 1000000.;
+		double serialCorrelation = 0.;
+		double permanentImpactFactor = 0.;
+		double temporaryImpactFactor = 0.01;
+		double dailyVolumeExecutionFactor = 0.1;
 
-		double[] adblLambda = new double[] {
+		double[] lambdaArray =
+		{
 			1.e-03,
 			1.e-04,
 			1.e-05,
@@ -177,39 +180,56 @@ public class ContinuousTrajectoryConvexImpact {
 			1.e-07
 		};
 
-		double[][] aadblAlmgren2003Reconciler = new double[][] {
-			{0.22, 462.,  30.},
-			{0.46,  99.,  45.},
-			{1.00,  21.,  65.},
-			{2.15,   5.,  96.},
-			{4.64,   1., 141.}
+		double[][] almgren2003ReconcilerGrid =
+		{
+			{
+				  0.22,
+				462.00,
+				 30.00
+			},
+			{
+				  0.46,
+				 99.00,
+				 45.00
+			},
+			{
+				  1.00,
+				 21.00,
+				 65.00
+			},
+			{
+				  2.15,
+				  5.00,
+				 96.00
+			},
+			{
+				  4.64,
+				  1.00,
+				141.00
+			}
 		};
-
-		PriceMarketImpactPower pmip = new PriceMarketImpactPower (
-			new AssetTransactionSettings (
-				dblS0,
-				dblDailyVolume,
-				dblBidAskSpread
-			),
-			dblPermanentImpactFactor,
-			dblTemporaryImpactFactor,
-			dblDailyVolumeExecutionFactor,
-			dblK
-		);
 
 		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.Almgren2003 (
 			new ArithmeticPriceDynamicsSettings (
-				dblDrift,
-				new Flat (dblVolatility),
-				dblSerialCorrelation
+				drift,
+				new Flat (volatility),
+				serialCorrelation
 			),
 			new UniformParticipationRateLinear (
 				new ParticipationRateLinear (
 					0.,
-					dblGamma
+					gamma
 				)
 			),
-			new UniformParticipationRate ((ParticipationRatePower) pmip.temporaryTransactionFunction())
+			new UniformParticipationRate (
+				(ParticipationRatePower) new PriceMarketImpactPower (
+					new AssetTransactionSettings (s0, dailyVolume, bidAskSpread),
+					permanentImpactFactor,
+					temporaryImpactFactor,
+					dailyVolumeExecutionFactor,
+					k
+				).temporaryTransactionFunction()
+			)
 		);
 
 		System.out.println ("\n\t|-------------------------------------------||");
@@ -222,18 +242,16 @@ public class ContinuousTrajectoryConvexImpact {
 
 		System.out.println ("\t|-------------------------------------------||");
 
-		for (int i = 0; i < adblLambda.length; ++i) {
-			ContinuousPowerImpact cpi = ContinuousPowerImpact.Standard (
-				dblX,
-				dblFinishTime,
+		for (int lambdaIndex = 0; lambdaIndex < lambdaArray.length; ++lambdaIndex) {
+			PowerImpactContinuous pic = (PowerImpactContinuous) ContinuousPowerImpact.Standard (
+				x,
+				finishTime,
 				lpep,
-				adblLambda[i]
-			);
+				lambdaArray[lambdaIndex]
+			).generate();
 
-			PowerImpactContinuous pic = (PowerImpactContinuous) cpi.generate();
-
-			System.out.println ("\t|  " +
-				FormatUtil.FormatDouble (1. / adblLambda[i], 5, 0, 1.e-03) + "   || " +
+			System.out.println (
+				"\t|  " + FormatUtil.FormatDouble (1. / lambdaArray[lambdaIndex], 5, 0, 1.e-03) + "   || " +
 				FormatUtil.FormatDouble (pic.characteristicTime(), 1, 2, 1.) + "      " +
 				FormatUtil.FormatDouble (pic.transactionCostExpectation(), 3, 0, 1.e-03) + "       " +
 				FormatUtil.FormatDouble (Math.sqrt (pic.transactionCostVariance()), 3, 0, 1.e-03) + "   ||"
@@ -252,13 +270,14 @@ public class ContinuousTrajectoryConvexImpact {
 
 		System.out.println ("\t|-------------------------------------------||");
 
-		for (int i = 0; i < adblLambda.length; ++i)
-			System.out.println ("\t|  " +
-				FormatUtil.FormatDouble (1. / adblLambda[i], 5, 0, 1.e-03) + "   || " +
-				FormatUtil.FormatDouble (aadblAlmgren2003Reconciler[i][0], 1, 2, 1.) + "      " +
-				FormatUtil.FormatDouble (aadblAlmgren2003Reconciler[i][1], 3, 0, 1.) + "       " +
-				FormatUtil.FormatDouble (aadblAlmgren2003Reconciler[i][2], 3, 0, 1.) + "   ||"
+		for (int lambdaIndex = 0; lambdaIndex < lambdaArray.length; ++lambdaIndex) {
+			System.out.println (
+				"\t|  " + FormatUtil.FormatDouble (1. / lambdaArray[lambdaIndex], 5, 0, 1.e-03) + "   || " +
+				FormatUtil.FormatDouble (almgren2003ReconcilerGrid[lambdaIndex][0], 1, 2, 1.) + "      " +
+				FormatUtil.FormatDouble (almgren2003ReconcilerGrid[lambdaIndex][1], 3, 0, 1.) + "       " +
+				FormatUtil.FormatDouble (almgren2003ReconcilerGrid[lambdaIndex][2], 3, 0, 1.) + "   ||"
 			);
+		}
 
 		System.out.println ("\t|-------------------------------------------||");
 

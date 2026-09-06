@@ -13,6 +13,14 @@ import org.drip.spline.stretch.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -98,322 +106,293 @@ import org.drip.spline.stretch.*;
  * 		builder control parameters.
  * 	- Complete the full tension stretch estimation sample test.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class KnotInsertionTensionEstimator {
-
-	/*
-	 * Build KLK Exponential Tension Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class KnotInsertionTensionEstimator
+{
 
 	private static final SegmentCustomBuilderControl KLKExponentialTensionSegmentControlParams (
-		final double dblTension,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final double tension,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_EXPONENTIAL_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			sdic,
-			rssc,
+			new ExponentialTensionSetParams (tension),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build KLK Hyperbolic Tension Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl KLKHyperbolicTensionSegmentControlParams (
-		final double dblTension,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final double tension,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			sdic,
-			rssc,
+			new ExponentialTensionSetParams (tension),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build KLK Rational Linear Tension Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl KLKRationalLinearTensionSegmentControlParams (
-		final double dblTension,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final double tension,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_RATIONAL_LINEAR_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			sdic,
-			rssc,
+			new ExponentialTensionSetParams (tension),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build KLK Rational Quadratic Tension Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl KLKRationalQuadraticTensionSegmentControlParams (
-		final double dblTension,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final double tension,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_RATIONAL_QUADRATIC_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			sdic,
-			rssc,
+			new ExponentialTensionSetParams (tension),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Tension Basis Spline Test using the specified predictor/response set and the array of segment custom
-	 * 	builder control parameters. It consists of the following steps:
-	 * 	- Array of Segment Builder Parameters - one per segment
-	 *  - Construct a Stretch instance
-	 *  - Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-	 *  - Construct a new Stretch instance by inserting a pair of of predictor/response knots
-	 *  - Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void BasisSplineStretchTest (
-		final double[] adblX,
-		final double[] adblY,
-		final SegmentCustomBuilderControl scbc)
+		final double[] xArray,
+		final double[] yArray,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl)
 		throws Exception
 	{
-		double dblX = 1.;
-		double dblXMax = 10.;
+		double x = 1.;
+		double xMaximum = 10.;
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[segmentCount]; 
 
-		/*
-		 * Array of Segment Builder Parameters - one per segment
-		 */
-
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
-
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
-
-		/*
-		 * Construct a Stretch instance 
-		 */
-
-		MultiSegmentSequence mss = MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
-			"SPLINE_STRETCH",
-			adblX, // predictors
-			adblY, // responses
-			aSCBC, // Basis Segment Builder parameters
-			null, 
-			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
-		);
-
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-		 */
-
-		while (dblX <= dblXMax) {
-			System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mss.responseValue (dblX), 1, 2, 1.) + " | " +
-				mss.monotoneType (dblX));
-
-			System.out.println ("\tJacobian Y[" + dblX + "]=" + mss.jackDResponseDCalibrationInput (dblX, 1).displayString());
-
-			dblX += 1.;
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentCustomBuilderControlArray[segmentIndex] = segmentCustomBuilderControl;
 		}
 
-		System.out.println ("\t\tSPLINE_STRETCH DPE: " + mss.curvatureDPE());
+		MultiSegmentSequence multiSegmentSequence =
+			MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
+				"SPLINE_STRETCH",
+				xArray, 							// predictors
+				yArray, 							// responses
+				segmentCustomBuilderControlArray, 	// Basis Segment Builder parameters
+				null, 
+				BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
+			);
 
-		/*
-		 * Construct a new Stretch instance by inserting a pair of of predictor/response knots
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		MultiSegmentSequence mssInsert = MultiSegmentSequenceModifier.InsertKnot (mss,
-			9.,
-			10.,
-			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
-		);
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Y[" + x + "] " + FormatUtil.FormatDouble (
+					multiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + multiSegmentSequence.monotoneType (x)
+			);
 
-		dblX = 1.;
+			System.out.println (
+				"\t|| Jacobian Y[" + x + "]: " +
+					multiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+			);
 
-		/*
-		 * Estimate, compute the sgement-by-segment monotonicty and the Stretch Jacobian
-		 */
-
-		while (dblX <= dblXMax) {
-			System.out.println ("Inserted Y[" + dblX + "] " + FormatUtil.FormatDouble (mssInsert.responseValue (dblX), 1, 2, 1.)
-				+ " | " + mssInsert.monotoneType (dblX));
-
-			dblX += 1.;
+			x += 1.;
 		}
 
-		System.out.println ("\t\tSPLINE_STRETCH_INSERT DPE: " + mssInsert.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t|| SPLINE_STRETCH DPE: " + multiSegmentSequence.curvatureDPE());
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		MultiSegmentSequence insertedMultiSegmentSequence =
+			MultiSegmentSequenceModifier.InsertKnot (
+				multiSegmentSequence,
+				9.,
+				10.,
+				BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
+			);
+
+		x = 1.;
+
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Inserted Y[" + x + "] " + FormatUtil.FormatDouble (
+					insertedMultiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + insertedMultiSegmentSequence.monotoneType (x)
+			);
+
+			x += 1.;
+		}
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println (
+			"\t||  SPLINE_STRETCH_INSERT DPE: " + insertedMultiSegmentSequence.curvatureDPE()
+		);
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 	}
-
-	/*
-	 * Complete the full tension stretch estimation sample test by doing the following:
-	 * 	- Composing the array of predictor/responses
-	 * 	- Construct a rational shape controller with the desired shape controller tension
-	 * 	- Construct the Segment Inelastic Parameter that is C2 (iK = 2 sets it to C2), with Second Order
-	 * 		Curvature Penalty Derivative, and without constraint
-	 * 	- KLK Hyperbolic Tension Basis Spline Stretch Test
-	 * 	- KLK Exponential Tension Basis Spline Stretch Test
-	 * 	- KLK Rational Linear Tension Basis Spline Stretch Test
-	 * 	- KLK Rational Quadratic Tension Basis Spline Stretch Test
-	 */
 
 	private static final void TensionStretchEstimationSample()
 		throws Exception
 	{
-		/*
-		 * X predictors
-		 */
+		int k = 2;
+		double klkTension = 1.;
+		double shapeControllerTension = 1.;
+		int curvaturePenaltyDerivativeOrder = 2;
+		double[] xArray =
+		{
+			 1.0,
+			 1.5,
+			 2.0,
+			 3.0,
+			 4.0,
+			 5.0,
+			 6.5,
+			 8.0,
+			10.0
+		};
+		double[] yArray =
+		{
+			25.00,
+			20.25,
+			16.00,
+			 9.00,
+			 4.00,
+			 1.00,
+			 0.25,
+			 4.00,
+			16.00
+		};
 
-		double[] adblX = new double[] { 1.00,  1.50,  2.00, 3.00, 4.00, 5.00, 6.50, 8.00, 10.00};
-
-		/*
-		 * Y responses
-		 */
-
-		double[] adblY = new double[] {25.00, 20.25, 16.00, 9.00, 4.00, 1.00, 0.25, 4.00, 16.00};
-
-		/*
-		 * Construct a rational shape controller with the shape controller tension of 1.
-		 */
-
-		double dblShapeControllerTension = 1.;
-
-		ResponseScalingShapeControl rssc = new ResponseScalingShapeControl (
+		ResponseScalingShapeControl responseScalingShapeControl = new ResponseScalingShapeControl (
 			false,
-			new LinearRationalShapeControl (dblShapeControllerTension)
+			new LinearRationalShapeControl (shapeControllerTension)
 		);
 
-		/*
-		 * Construct the Segment Inelastic Parameter that is C2 (iK = 2 sets it to C2), with Second Order
-		 * 	Curvature Penalty Derivative, and without constraint
-		 */
-
-		int iK = 2;
-		int iCurvaturePenaltyDerivativeOrder= 2;
-
-		SegmentInelasticDesignControl segParams = SegmentInelasticDesignControl.Create (
-			iK,
-			iCurvaturePenaltyDerivativeOrder
+		SegmentInelasticDesignControl segmentInelasticDesignControl = SegmentInelasticDesignControl.Create (
+			k,
+			curvaturePenaltyDerivativeOrder
 		);
 
-		double dblKLKTension = 1.;
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/*
-		 * KLK Hyperbolic Tension Basis Spline Stretch Test
-		 */
-
-		System.out.println (" \n---------- \n KLK HYPERBOLIC TENSION \n ---------- \n");
+		System.out.println ("\t||    KLK HYPERBOLIC TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			KLKHyperbolicTensionSegmentControlParams (
-				dblKLKTension,
-				segParams,
-				rssc
+				klkTension,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * KLK Exponential Tension Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n KLK EXPONENTIAL TENSION \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||    KLK EXPONENTIAL TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			KLKExponentialTensionSegmentControlParams (
-				dblKLKTension,
-				segParams,
-				rssc
+				klkTension,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * KLK Rational Linear Tension Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n KLK RATIONAL LINEAR TENSION \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||    KLK RATIONAL LINEAR TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			KLKRationalLinearTensionSegmentControlParams (
-				dblKLKTension,
-				segParams,
-				rssc
+				klkTension,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * KLK Rational Quadratic Tension Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n KLK RATIONAL QUADRATIC TENSION \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||    KLK RATIONAL QUADRATIC TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			KLKRationalQuadraticTensionSegmentControlParams (
-				dblKLKTension,
-				segParams,
-				rssc
+				klkTension,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		TensionStretchEstimationSample();
 

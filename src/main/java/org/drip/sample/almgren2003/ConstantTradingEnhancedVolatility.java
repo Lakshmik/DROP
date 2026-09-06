@@ -18,6 +18,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,7 +101,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>ConstantTradingEnhancedVolatility</i> demonstrates the Generation of the Optimal Trading Trajectory
- * under the Condition of Constant Trading Enhanced Volatility. The References are:
+ * 	under the Condition of Constant Trading Enhanced Volatility. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -120,93 +128,93 @@ import org.drip.service.env.EnvManager;
  * 				Markets</i> <b>1</b> 1-50
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ConstantTradingEnhancedVolatility {
+public class ConstantTradingEnhancedVolatility
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblEta = 5.e-06;
-		double dblAlpha = 1.;
-		double dblSigma = 1.;
-		double dblLambda = 1.e-05;
-		double dblX = 100000.;
-		double dblT = 5.;
-		int iNumInterval = 50000;
+		double t = 5.;
+		double alpha = 1.;
+		double sigma = 1.;
+		double x = 100000.;
+		double eta = 5.e-06;
+		double lambda = 1.e-05;
+		int intervalCount = 50000;
 
-		ArithmeticPriceEvolutionParameters apep = ArithmeticPriceEvolutionParametersBuilder.TradingEnhancedVolatility (
-			dblSigma,
-			new UniformParticipationRateLinear (ParticipationRateLinear.SlopeOnly (dblEta)),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					dblAlpha,
-					0.
-				)
-			)
-		);
+		double inverseX = 1. / x;
+		double inverseIntervalCount = 1. / intervalCount;
 
-		ContinuousConstantTradingEnhanced ccte = ContinuousConstantTradingEnhanced.Standard (
-			dblX,
-			dblT,
-			apep,
-			dblLambda
-		);
+		ArithmeticPriceEvolutionParameters arithmeticPriceEvolutionParameters =
+			ArithmeticPriceEvolutionParametersBuilder.TradingEnhancedVolatility (
+				sigma,
+				new UniformParticipationRateLinear (ParticipationRateLinear.SlopeOnly (eta)),
+				new UniformParticipationRateLinear (new ParticipationRateLinear (alpha, 0.))
+			);
 
-		EfficientTradingTrajectoryContinuous ettc = (EfficientTradingTrajectoryContinuous) ccte.generate();
+		EfficientTradingTrajectoryContinuous efficientTradingTrajectoryContinuous =
+			(EfficientTradingTrajectoryContinuous) ContinuousConstantTradingEnhanced.Standard (
+				x,
+				t,
+				arithmeticPriceEvolutionParameters,
+				lambda
+			).generate();
 
-		R1ToR1 r1ToR1Holdings = ettc.holdings();
+		R1ToR1 holdingsFunction = efficientTradingTrajectoryContinuous.holdings();
 
-		double[] adblHoldings = new double[iNumInterval];
-		double[] adblExecutionTime = new double[iNumInterval];
+		double[] executionTimeArray = new double[intervalCount];
+		double[] holdingsArray = new double[intervalCount];
 
-		for (int i = 1; i <= iNumInterval; ++i) {
-			adblExecutionTime[i - 1] = dblT * i / iNumInterval;
-
-			adblHoldings[i - 1] = r1ToR1Holdings.evaluate (adblExecutionTime[i - 1]);
+		for (int intervalIndex = 1; intervalIndex <= intervalCount; ++intervalIndex) {
+			holdingsArray[intervalIndex - 1] = holdingsFunction.evaluate (
+				executionTimeArray[intervalIndex - 1] = t * intervalIndex * inverseIntervalCount
+			);
 		}
 
-		DiscreteTradingTrajectory dtt = DiscreteTradingTrajectory.Standard (
-			adblExecutionTime,
-			adblHoldings
+		DiscreteTradingTrajectory discreteTradingTrajectory =
+			DiscreteTradingTrajectory.Standard (executionTimeArray, holdingsArray);
+
+		R1UnivariateNormal r1UnivariateNormal = new TrajectoryShortfallEstimator (
+			discreteTradingTrajectory
+		).totalCostDistributionSynopsis (
+			arithmeticPriceEvolutionParameters
 		);
 
-		TrajectoryShortfallEstimator tse = new TrajectoryShortfallEstimator (dtt);
+		double[] tradeArray = discreteTradingTrajectory.tradeList();
 
-		R1UnivariateNormal r1un = tse.totalCostDistributionSynopsis (apep);
-
-		double[] adblTradeList = dtt.tradeList();
-
-		for (int i = 1; i < adblExecutionTime.length; ++i) {
-			System.out.println ("\t| " +
-				FormatUtil.FormatDouble (adblExecutionTime[i], 1, 4, 1.) + " => " +
-				FormatUtil.FormatDouble (adblHoldings[i] / dblX, 2, 4, 100.) + "% | " +
-				FormatUtil.FormatDouble (adblTradeList[i - 1] / dblX, 1, 4, 100.) + "% ||"
+		for (int executionTimeIndex = 1;
+			executionTimeIndex < executionTimeArray.length;
+			++executionTimeIndex)
+		{
+			System.out.println (
+				"\t| " + FormatUtil.FormatDouble (executionTimeArray[executionTimeIndex], 1, 4, 1.) + " => "
+				+ FormatUtil.FormatDouble (holdingsArray[executionTimeIndex] * inverseX, 2, 4, 100.) + "% | "
+				+ FormatUtil.FormatDouble (tradeArray[executionTimeIndex - 1] * inverseX, 1, 4, 100.) +
+					"% ||"
 			);
 		}
 
@@ -219,15 +227,31 @@ public class ConstantTradingEnhancedVolatility {
 		System.out.println ("\t|--------------------------------------------------------------||");
 
 		System.out.println (
-			"\t| Transaction Cost Expectation         : " +
-			FormatUtil.FormatDouble (r1un.mean(), 6, 1, 1.) + " | " +
-			FormatUtil.FormatDouble (ettc.transactionCostExpectation(), 6, 1, 1.) + " ||"
+			"\t| Transaction Cost Expectation         : " + FormatUtil.FormatDouble (
+				r1UnivariateNormal.mean(),
+				6,
+				1,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.transactionCostExpectation(),
+				6,
+				1,
+				1.
+			) + " ||"
 		);
 
 		System.out.println (
-			"\t| Transaction Cost Variance (X 10^-06) : " +
-			FormatUtil.FormatDouble (r1un.variance(), 6, 1, 1.e-06) + " | " +
-			FormatUtil.FormatDouble (ettc.transactionCostVariance(), 6, 1, 1.e-06) + " ||"
+			"\t| Transaction Cost Variance (X 10^-06) : " + FormatUtil.FormatDouble (
+				r1UnivariateNormal.variance(),
+				6,
+				1,
+				1.e-06
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.transactionCostVariance(),
+				6,
+				1,
+				1.e-06
+			) + " ||"
 		);
 
 		System.out.println ("\t|--------------------------------------------------------------||");

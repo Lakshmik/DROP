@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.r1tor1.ExponentialTension;
+import org.drip.function.r1tor1operator.Convolution;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,47 +95,46 @@ package org.drip.function.r1tor1custom;
 
 /**
  * <i>LinearRationalTensionExponential</i> provides the evaluation of the Convolution of the Linear Rational
- * and the Tension Exponential Functions and its derivatives for a specified variate.
+ * 	and the Tension Exponential Functions and its derivatives for a specified variate. It exposes the
+ *  following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li>Construct a <i>LinearRationalTensionExponential</i> Instance</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *  
  * @author Lakshmi Krishnamurthy
  */
 
-public class LinearRationalTensionExponential extends org.drip.function.r1tor1operator.Convolution {
+public class LinearRationalTensionExponential
+	extends Convolution
+{
 
 	/**
-	 * Construct a LinearRationalTensionExponential instance
+	 * Construct a <i>LinearRationalTensionExponential</i> Instance
 	 * 
-	 * @param dblExponentialTension Exponential Tension Parameter
-	 * @param dblRationalTension Rational Tension Parameter
+	 * @param exponentialTension Exponential Tension Parameter
+	 * @param rationalTension Rational Tension Parameter
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public LinearRationalTensionExponential (
-		final double dblExponentialTension,
-		final double dblRationalTension)
-		throws java.lang.Exception
+		final double exponentialTension,
+		final double rationalTension)
+		throws Exception
 	{
-		super (new org.drip.function.r1tor1.ExponentialTension (java.lang.Math.E, dblExponentialTension), new
-			org.drip.function.r1tor1custom.LinearRationalShapeControl (dblRationalTension));
+		super (
+			new ExponentialTension (Math.E, exponentialTension),
+			new LinearRationalShapeControl (rationalTension)
+		);
 	}
-
-	/* public static final void main (
-		final java.lang.String[] astrArgs)
-		throws java.lang.Exception
-	{
-		LinearRationalTensionExponential lret = new LinearRationalTensionExponential (-1., 1.);
-
-		System.out.println ("LRET[0.00] = " + lret.evaluate (0.00));
-
-		System.out.println ("LRETDeriv[0.00] = " + lret.derivative (0.00, 1));
-	} */
 }

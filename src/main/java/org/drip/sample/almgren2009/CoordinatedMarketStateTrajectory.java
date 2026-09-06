@@ -12,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -87,7 +95,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>CoordinatedMarketStateTrajectory</i> traces a Sample Realization of the Market State Trajectory the
- * follows the Zero Mean Ornstein-Uhlenbeck Evolution Dynamics. The References are:
+ * 	follows the Zero Mean Ornstein-Uhlenbeck Evolution Dynamics. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -112,65 +120,57 @@ import org.drip.service.env.EnvManager;
  * 				University</b>
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2009/README.md">Almgren (2009) Optimal Adaptive HJB</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CoordinatedMarketStateTrajectory {
+public class CoordinatedMarketStateTrajectory
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-				"",
-				true
-			);
+		EnvManager.InitEnv ("", true);
 
-		double dblBurstiness = 1.;
-		double dblRelaxationTime = 1.;
-		double dblSimulationTime = 9.75;
-		int iNumSimulation = 39;
-		double dblReferenceLiquidity = 1.0;
-		double dblReferenceVolatility = 1.0;
-		double dblInitialMarketState = -0.5;
+		int simulationCount = 39;
+		double burstiness = 1.;
+		double relaxationTime = 1.;
+		double simulationTime = 9.75;
+		double referenceLiquidity = 1.;
+		double referenceVolatility = 1.;
+		double initialMarketState = -0.5;
 
-		double dblTime = 0.;
-		double dblMarketState = dblInitialMarketState;
-		double dblTimeInterval = dblSimulationTime / iNumSimulation;
+		double time = 0.;
+		double marketState = initialMarketState;
+		double timeInterval = simulationTime / simulationCount;
 
-		DiffusionEvaluatorOrnsteinUhlenbeck oup1D = DiffusionEvaluatorOrnsteinUhlenbeck.ZeroMean (
-			dblBurstiness,
-			dblRelaxationTime
+		DiffusionEvolver diffusionEvolver = new DiffusionEvolver (
+			DiffusionEvaluatorOrnsteinUhlenbeck.ZeroMean (burstiness, relaxationTime)
 		);
 
-		DiffusionEvolver de = new DiffusionEvolver (oup1D);
-
-		CoordinatedMarketState cms = new CoordinatedMarketState (
-			new CoordinatedVariation (
-				dblReferenceVolatility,
-				dblReferenceLiquidity
-			)
+		CoordinatedMarketState coordinatedMarketState = new CoordinatedMarketState (
+			new CoordinatedVariation (referenceVolatility, referenceLiquidity)
 		);
 
-		double dblLiquidity = cms.liquidity (dblMarketState);
+		double liquidity = coordinatedMarketState.liquidity (marketState);
 
 		System.out.println();
 
@@ -188,47 +188,34 @@ public class CoordinatedMarketStateTrajectory {
 
 		System.out.println ("\t||------------------------------------------------------------------||");
 
-		System.out.println ("\t|| [" + 
-			FormatUtil.FormatDouble (0., 1, 2, 1.) + "] => " +
-			FormatUtil.FormatDouble (dblMarketState, 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (cms.volatility (dblMarketState), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (cms.liquidity (dblMarketState), 1, 4, 1.) + " | " +
-			(
-				dblLiquidity < dblReferenceLiquidity ?
-				"  LIQUID,     VOLATILE " :
-				"ILLIQUID, NON-VOLATILE "
-			) +
-			" ||"
+		System.out.println (
+			"\t|| [" + FormatUtil.FormatDouble (0., 1, 2, 1.) + "] => " +
+			FormatUtil.FormatDouble (marketState, 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (coordinatedMarketState.volatility (marketState), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (coordinatedMarketState.liquidity (marketState), 1, 4, 1.) + " | " + (
+				liquidity < referenceLiquidity ? "  LIQUID,     VOLATILE " : "ILLIQUID, NON-VOLATILE "
+			) + " ||"
 		);
 
-		for (int i = 0; i < iNumSimulation; ++i) {
-			JumpDiffusionEdge gi = de.weinerIncrement (
-				new JumpDiffusionVertex (
-					dblTime,
-					dblMarketState,
-					0.,
-					false
-				),
-				dblTimeInterval
+		for (int simulationIndex = 0; simulationIndex < simulationCount; ++simulationIndex) {
+			JumpDiffusionEdge jumpDiffusionEdge = diffusionEvolver.weinerIncrement (
+				new JumpDiffusionVertex (time, marketState, 0., false),
+				timeInterval
 			);
 
-			dblTime += dblTimeInterval;
+			time += timeInterval;
 
-			dblMarketState += gi.deterministic() + gi.diffusionStochastic();
+			marketState += jumpDiffusionEdge.deterministic() + jumpDiffusionEdge.diffusionStochastic();
 
-			dblLiquidity = cms.liquidity (dblMarketState);
+			liquidity = coordinatedMarketState.liquidity (marketState);
 
-			System.out.println ("\t|| [" + 
-				FormatUtil.FormatDouble (dblTimeInterval * (i + 1), 1, 2, 1.) + "] => " +
-				FormatUtil.FormatDouble (dblMarketState, 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (cms.volatility (dblMarketState), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (dblLiquidity, 1, 4, 1.) + " | " +
-				(
-					dblLiquidity < dblReferenceLiquidity ?
-					"  LIQUID,     VOLATILE " :
-					"ILLIQUID, NON-VOLATILE "
-				) +
-				" ||"
+			System.out.println (
+				"\t|| [" + FormatUtil.FormatDouble (timeInterval * (simulationIndex + 1), 1, 2, 1.) + "] => "
+				+ FormatUtil.FormatDouble (marketState, 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (coordinatedMarketState.volatility (marketState), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (liquidity, 1, 4, 1.) + " | " + (
+					liquidity < referenceLiquidity ? "  LIQUID,     VOLATILE " : "ILLIQUID, NON-VOLATILE "
+				) + " ||"
 			);
 		}
 

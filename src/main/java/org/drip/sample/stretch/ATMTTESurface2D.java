@@ -4,6 +4,7 @@ package org.drip.sample.stretch;
 import java.util.TreeMap;
 
 import org.drip.service.common.FormatUtil;
+import org.drip.service.common.StringUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.spline.basis.PolynomialFunctionSetParams;
 import org.drip.spline.grid.*;
@@ -16,6 +17,14 @@ import org.drip.spline.stretch.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -94,186 +103,266 @@ import org.drip.spline.stretch.*;
 /**
  * <i>ATMTTESurface2D</i> demonstrates the Surface 2D ATM/TTE (X/Y) Stretch Construction and usage API.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ATMTTESurface2D {
+public class ATMTTESurface2D
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		double[] adblATMFactor = new double[] {
-			0.8, 0.9, 1.0, 1.1, 1.2
+		double[] atmFactorArray =
+		{
+			0.8,
+			0.9,
+			1.0,
+			1.1,
+			1.2
 		};
-		double[] adblTTE = new double[] {
-			1., 2., 3., 4., 5.
+		double[] tteArray =
+		{
+			1.,
+			2.,
+			3.,
+			4.,
+			5.
+		};
+		double[][] impliedVolatilityGrid =
+		{
+			{
+				0.44,
+				0.38,
+				0.33,
+				0.27,
+				0.25
+			},
+			{
+				0.41,
+				0.34,
+				0.30,
+				0.22,
+				0.27
+			},
+			{
+				0.36,
+				0.31,
+				0.28,
+				0.30,
+				0.37
+			},
+			{
+				0.38,
+				0.31,
+				0.34,
+				0.40,
+				0.47
+			},
+			{
+				0.43,
+				0.46,
+				0.48,
+				0.52,
+				0.57
+			}
 		};
 
-		double[][] aadblImpliedVolatility = new double[][] {
-			{0.44, 0.38, 0.33, 0.27, 0.25},
-			{0.41, 0.34, 0.30, 0.22, 0.27},
-			{0.36, 0.31, 0.28, 0.30, 0.37},
-			{0.38, 0.31, 0.34, 0.40, 0.47},
-			{0.43, 0.46, 0.48, 0.52, 0.57}
-		};
-
-		SegmentCustomBuilderControl scbcSpan = new SegmentCustomBuilderControl (
+		SegmentCustomBuilderControl spanSegmentCustomBuilderControl = new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
 			null,
 			null
 		);
 
-		TreeMap<Double, Span> mapSpan = new TreeMap<Double, Span>();
+		TreeMap<Double, Span> spanMap = new TreeMap<Double, Span>();
 
-		SegmentCustomBuilderControl[] aSCBCSpan = new SegmentCustomBuilderControl[adblATMFactor.length - 1];
+		SegmentCustomBuilderControl[] spanSegmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[atmFactorArray.length - 1];
 
-		for (int i = 0; i < aSCBCSpan.length; ++i)
-			aSCBCSpan[i] = scbcSpan;
+		for (int atmSpanIndex = 0;
+			atmSpanIndex < spanSegmentCustomBuilderControlArray.length;
+			++atmSpanIndex)
+		{
+			spanSegmentCustomBuilderControlArray[atmSpanIndex] = spanSegmentCustomBuilderControl;
+		}
 
-		for (int i = 0; i < adblATMFactor.length; ++i)
-			mapSpan.put (adblATMFactor[i], new OverlappingStretchSpan (
-				MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
-					"Stretch@" + adblTTE + "@" + org.drip.service.common.StringUtil.GUID(),
-					adblTTE,
-					aadblImpliedVolatility[i],
-					aSCBCSpan,
-					null,
-					BoundarySettings.NaturalStandard(),
-					MultiSegmentSequence.CALIBRATE
+		for (int atmSpanIndex = 0; atmSpanIndex < atmFactorArray.length; ++atmSpanIndex) {
+			spanMap.put (
+				atmFactorArray[atmSpanIndex],
+				new OverlappingStretchSpan (
+					MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
+						"Stretch@" + tteArray + "@" + StringUtil.GUID(),
+						tteArray,
+						impliedVolatilityGrid[atmSpanIndex],
+						spanSegmentCustomBuilderControlArray,
+						null,
+						BoundarySettings.NaturalStandard(),
+						MultiSegmentSequence.CALIBRATE
+					)
 				)
-			)
-		);
+			);
+		}
 
-		SegmentCustomBuilderControl scbcSurface = new SegmentCustomBuilderControl (
-			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
+		WireSurfaceStretch wireSurfaceStretch = new WireSurfaceStretch (
+			"SurfaceStretch@" + StringUtil.GUID(),
+			new SegmentCustomBuilderControl (
+				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+				new PolynomialFunctionSetParams (4),
+				SegmentInelasticDesignControl.Create (2, 2),
+				null,
+				null
 			),
-			null,
-			null
-		);
-
-		WireSurfaceStretch ss = new WireSurfaceStretch (
-			"SurfaceStretch@" + org.drip.service.common.StringUtil.GUID(),
-			scbcSurface,
-			mapSpan
+			spanMap
 		);
 
 		System.out.println ("\n\t|------------------------------------------------------------|");
 
 		System.out.println ("\t|----------------- INPUT  SURFACE  RECOVERY -----------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		for (double dblTTE : adblTTE)
-			System.out.print ("   " + FormatUtil.FormatDouble (dblTTE, 1, 2, 1.) + " ");
+		for (double tte : tteArray) {
+			System.out.print ("   " + FormatUtil.FormatDouble (tte, 1, 2, 1.) + " ");
+		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblATMFactor : adblATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblATMFactor, 1, 2, 1.) + "    =>");
+		for (double atmFactor : atmFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (atmFactor, 1, 2, 1.) + "    =>");
 
-			for (double dblTTE : adblTTE)
-				System.out.print ("  " +
-					FormatUtil.FormatDouble (ss.responseValue (
-						dblATMFactor,
-						dblTTE
-					), 2, 2, 100.) + "%");
+			for (double tte : tteArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (
+						wireSurfaceStretch.responseValue (atmFactor, tte),
+						2,
+						2,
+						100.
+					) + "%"
+				);
+			}
 
 			System.out.print ("  |\n");
 		}
 
 		System.out.println ("\t|------------------------------------------------------------|");
 
-		adblATMFactor = new double[] {
-			0.850, 0.925, 1.000, 1.075, 1.15
+		atmFactorArray = new double[]
+		{
+			0.850,
+			0.925,
+			1.000,
+			1.075,
+			1.150
 		};
-		adblTTE = new double[] {
-			1.50, 2.25, 3., 3.75, 4.50
+		tteArray = new double[]
+		{
+			1.50,
+			2.25,
+			3.00,
+			3.75,
+			4.50
 		};
 
 		System.out.println ("\n\t|------------------------------------------------------------|");
 
 		System.out.println ("\t|------------- IN-SURFACE RESPONSE CALCULATION --------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		for (double dblTTE : adblTTE)
-			System.out.print ("   " + FormatUtil.FormatDouble (dblTTE, 1, 2, 1.) + " ");
+		for (double tte : tteArray) {
+			System.out.print ("   " + FormatUtil.FormatDouble (tte, 1, 2, 1.) + " ");
+		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblATMFactor : adblATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblATMFactor, 1, 2, 1.) + "    =>");
+		for (double atmFactor : atmFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (atmFactor, 1, 2, 1.) + "    =>");
 
-			for (double dblTTE : adblTTE)
-				System.out.print ("  " +
-					FormatUtil.FormatDouble (
-						ss.responseValue (
-							dblATMFactor,
-							dblTTE
-						), 2, 2, 100.) + "%");
+			for (double tte : tteArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (
+						wireSurfaceStretch.responseValue (atmFactor, tte),
+						2,
+						2,
+						100.
+					) + "%"
+				);
+			}
 
 			System.out.print ("  |\n");
 		}
 
 		System.out.println ("\t|------------------------------------------------------------|");
 
-		adblATMFactor = new double[] {
-			0.70, 0.85, 1.00, 1.15, 1.30
+		atmFactorArray = new double[]
+		{
+			0.70,
+			0.85,
+			1.00,
+			1.15,
+			1.30
 		};
-		adblTTE = new double[] {
-			0.50, 1.75, 3.00, 4.25, 5.50
+		tteArray = new double[]
+		{
+			0.50,
+			1.75,
+			3.00,
+			4.25,
+			5.50
 		};
 
 		System.out.println ("\n\t|------------------------------------------------------------|");
 
 		System.out.println ("\t|------------- OFF-SURFACE RESPONSE CALCULATION -------------|");
 
-		System.out.print ("\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>");
+		System.out.print (
+			"\t|------------------------------------------------------------|\n\t|  ATM/TTE  =>"
+		);
 
-		for (double dblTTE : adblTTE)
-			System.out.print ("   " + FormatUtil.FormatDouble (dblTTE, 1, 2, 1.) + " ");
+		for (double tte : tteArray) {
+			System.out.print ("   " + FormatUtil.FormatDouble (tte, 1, 2, 1.) + " ");
+		}
 
 		System.out.println ("  |\n\t|------------------------------------------------------------|");
 
-		for (double dblATMFactor : adblATMFactor) {
-			System.out.print ("\t|  " + FormatUtil.FormatDouble (dblATMFactor, 1, 2, 1.) + "    =>");
+		for (double atmFactor : atmFactorArray) {
+			System.out.print ("\t|  " + FormatUtil.FormatDouble (atmFactor, 1, 2, 1.) + "    =>");
 
-			for (double dblTTE : adblTTE)
-				System.out.print ("  " + FormatUtil.FormatDouble (
-					ss.responseValue (
-						dblATMFactor,
-						dblTTE
-					), 2, 2, 100.) + "%");
+			for (double tte : tteArray) {
+				System.out.print (
+					"  " + FormatUtil.FormatDouble (
+						wireSurfaceStretch.responseValue (atmFactor, tte),
+						2,
+						2,
+						100.
+					) + "%"
+				);
+			}
 
 			System.out.print ("  |\n");
 		}

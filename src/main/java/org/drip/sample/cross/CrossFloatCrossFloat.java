@@ -217,7 +217,7 @@ public class CrossFloatCrossFloat
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");

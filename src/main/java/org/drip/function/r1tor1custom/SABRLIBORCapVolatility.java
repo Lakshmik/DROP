@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +93,8 @@ package org.drip.function.r1tor1custom;
  */
 
 /**
- * <i>SABRLIBORCapVolatility</i> implements the Deterministic, Non-local Cap Volatility Scheme detailed in:
+ * <i>SABRLIBORCapVolatility</i> implements the Deterministic, Non-local Cap Volatility Scheme detailed in
+ * 	Rebonato, McKay, and White (2009). The Reference is:
  * 
  * <br><br>
  * 	<ul>
@@ -92,64 +104,92 @@ package org.drip.function.r1tor1custom;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li><i>SABRLIBORCapVolatility</i> Constructor</li>
+ * 		<li>Evaluate for the Given x</li>
+ * 		<li>Return "A"</li>
+ * 		<li>Return "B"</li>
+ * 		<li>Return "C"</li>
+ * 		<li>Return "D"</li>
+ * 		<li>Return the Epoch</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class SABRLIBORCapVolatility extends org.drip.function.definition.R1ToR1 {
-	private double _dblA = java.lang.Double.NaN;
-	private double _dblB = java.lang.Double.NaN;
-	private double _dblC = java.lang.Double.NaN;
-	private double _dblD = java.lang.Double.NaN;
-	private double _dblEpoch = java.lang.Double.NaN;
+public class SABRLIBORCapVolatility
+	extends R1ToR1
+{
+	private double _a = Double.NaN;
+	private double _b = Double.NaN;
+	private double _c = Double.NaN;
+	private double _d = Double.NaN;
+	private double _epoch = Double.NaN;
 
 	/**
-	 * SABRLIBORCapVolatility Constructor
+	 * <i>SABRLIBORCapVolatility</i> Constructor
 	 * 
-	 * @param dblEpoch Epoch
-	 * @param dblA A
-	 * @param dblB B
-	 * @param dblC C
-	 * @param dblD D
+	 * @param epoch Epoch
+	 * @param a A
+	 * @param b B
+	 * @param c C
+	 * @param d D
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public SABRLIBORCapVolatility (
-		final double dblEpoch,
-		final double dblA,
-		final double dblB,
-		final double dblC,
-		final double dblD)
-		throws java.lang.Exception
+		final double epoch,
+		final double a,
+		final double b,
+		final double c,
+		final double d)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblEpoch = dblEpoch) ||
-				!org.drip.numerical.common.NumberUtil.IsValid (_dblA = dblA) ||
-					!org.drip.numerical.common.NumberUtil.IsValid (_dblB = dblB) ||
-						!org.drip.numerical.common.NumberUtil.IsValid (_dblC = dblC) ||
-							!org.drip.numerical.common.NumberUtil.IsValid (_dblD = dblD))
-			throw new java.lang.Exception ("SABRLIBORCapVolatility ctr: Invalid Inputs");
+		if (!NumberUtil.IsValid (_epoch = epoch) ||
+			!NumberUtil.IsValid (_a = a) ||
+			!NumberUtil.IsValid (_b = b) ||
+			!NumberUtil.IsValid (_c = c) ||
+			!NumberUtil.IsValid (_d = d))
+		{
+			throw new Exception ("SABRLIBORCapVolatility Constructor => Invalid Inputs");
+		}
 	}
 
+	/**
+	 * Evaluate for the Given x
+	 * 
+	 * @param x x
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double x)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("SABRLIBORCapVolatility::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (x)) {
+			throw new Exception ("SABRLIBORCapVolatility::evaluate => Invalid Inputs");
+		}
 
-		double dblDateGap = dblVariate - _dblEpoch;
+		double dateGap = x - _epoch;
 
-		return (_dblB * dblDateGap + _dblA) * java.lang.Math.exp (-1. * _dblC * dblDateGap) + _dblD;
+		return (_b * dateGap + _a) * Math.exp (-1. * _c * dateGap) + _d;
 	}
 
 	/**
@@ -160,7 +200,7 @@ public class SABRLIBORCapVolatility extends org.drip.function.definition.R1ToR1 
 
 	public double A()
 	{
-		return _dblA;
+		return _a;
 	}
 
 	/**
@@ -171,7 +211,7 @@ public class SABRLIBORCapVolatility extends org.drip.function.definition.R1ToR1 
 
 	public double B()
 	{
-		return _dblB;
+		return _b;
 	}
 
 	/**
@@ -182,7 +222,7 @@ public class SABRLIBORCapVolatility extends org.drip.function.definition.R1ToR1 
 
 	public double C()
 	{
-		return _dblC;
+		return _c;
 	}
 
 	/**
@@ -193,7 +233,7 @@ public class SABRLIBORCapVolatility extends org.drip.function.definition.R1ToR1 
 
 	public double D()
 	{
-		return _dblD;
+		return _d;
 	}
 
 	/**
@@ -204,6 +244,6 @@ public class SABRLIBORCapVolatility extends org.drip.function.definition.R1ToR1 
 
 	public double epoch()
 	{
-		return _dblEpoch;
+		return _epoch;
 	}
 }

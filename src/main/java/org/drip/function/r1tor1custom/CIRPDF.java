@@ -1,11 +1,24 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.dynamics.meanreverting.CKLSParameters;
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.specialfunction.gamma.NemesAnalytic;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,55 +117,58 @@ package org.drip.function.r1tor1custom;
  * 		</li>
  *  </ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/dynamics/README.md">HJM, Hull White, LMM, and SABR Dynamic Evolution Models</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li>Construct a Standard Instance of <i>CIRPDF</i></li>
+ * 		<li><i>CIRPDF</i> Constructor</li>
+ * 		<li>Retrieve Alpha</li>
+ * 		<li>Retrieve Beta</li>
+ * 		<li>Retrieve the Gamma Function</li>
+ * 		<li>Evaluate for the given r</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class CIRPDF extends org.drip.function.definition.R1ToR1
+public class CIRPDF
+	extends R1ToR1
 {
-	private double _beta = java.lang.Double.NaN;
-	private double _alpha = java.lang.Double.NaN;
-	private org.drip.function.definition.R1ToR1 _gammaFunction = null;
+	private double _beta = Double.NaN;
+	private double _alpha = Double.NaN;
+	private R1ToR1 _gammaFunction = null;
 
 	/**
-	 * Construct a Standard Instance of CIR PDF
+	 * Construct a Standard Instance of <i>CIRPDF</i>
 	 * 
 	 * @param cklsParameters The CKLS Parameters
 	 * 
-	 * @return Standard Instance of R1UnivariateCIRPDF
+	 * @return Standard Instance of <i>CIRPDF</i>
 	 */
 
 	public static final CIRPDF Standard (
-		final org.drip.dynamics.meanreverting.CKLSParameters cklsParameters)
+		final CKLSParameters cklsParameters)
 	{
-		if (null == cklsParameters)
-		{
+		if (null == cklsParameters) {
 			return null;
 		}
 
-		double volatility = cklsParameters.volatilityCoefficient();
+		double inverseVolatility = 1. / cklsParameters.volatilityCoefficient();
 
-		double beta = 2. * cklsParameters.meanReversionSpeed() / volatility / volatility;
+		double beta = 2. * cklsParameters.meanReversionSpeed()* inverseVolatility * inverseVolatility;
 
-		try
-		{
-			return new CIRPDF (
-				beta * cklsParameters.meanReversionLevel(),
-				beta,
-				new org.drip.specialfunction.gamma.NemesAnalytic (
-					null
-				)
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new CIRPDF (beta * cklsParameters.meanReversionLevel(), beta, new NemesAnalytic (null));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -160,35 +176,27 @@ public class CIRPDF extends org.drip.function.definition.R1ToR1
 	}
 
 	/**
-	 * CIRPDF Constructor
+	 * <i>CIRPDF</i> Constructor
 	 * 
 	 * @param alpha The Alpha
 	 * @param beta The Beta
 	 * @param gammaFunction The Gamma Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public CIRPDF (
 		final double alpha,
 		final double beta,
-		final org.drip.function.definition.R1ToR1 gammaFunction)
-		throws java.lang.Exception
+		final R1ToR1 gammaFunction)
+		throws Exception
 	{
-		super (
-			null
-		);
+		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				_alpha = alpha
-			) || !org.drip.numerical.common.NumberUtil.IsValid (
-				_beta = beta
-			) || null == (_gammaFunction = gammaFunction)
-		)
+		if (!NumberUtil.IsValid (_alpha = alpha) || !NumberUtil.IsValid (_beta = beta) ||
+			null == (_gammaFunction = gammaFunction))
 		{
-			throw new java.lang.Exception (
-				"CIRPDF CVonstructor => Invalid Inputs"
-			);
+			throw new Exception ("CIRPDF Constructor => Invalid Inputs");
 		}
 	}
 
@@ -220,34 +228,30 @@ public class CIRPDF extends org.drip.function.definition.R1ToR1
 	 * @return The Gamma Function
 	 */
 
-	public org.drip.function.definition.R1ToR1 gammaFunction()
+	public R1ToR1 gammaFunction()
 	{
 		return _gammaFunction;
 	}
 
+	/**
+	 * Evaluate for the given r
+	 * 
+	 * @param r R
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
 	@Override public double evaluate (
 		final double r)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-			r
-		))
-		{
-			throw new java.lang.Exception (
-				"CIRPDF::evaluate => Invalid Inputs"
-			);
+		if (!NumberUtil.IsValid (r)) {
+			throw new Exception ("CIRPDF::evaluate => Invalid Inputs");
 		}
 
-		return java.lang.Math.pow (
-			_beta,
-			_alpha
-		) * java.lang.Math.pow (
-			r,
-			_alpha - 1.
-		) * java.lang.Math.exp (
-			-1. * _beta * r
-		) / _gammaFunction.evaluate (
-			_alpha
-		);
+		return Math.pow (_beta, _alpha) * Math.pow (r, _alpha - 1.) * Math.exp (-1. * _beta * r) /
+			_gammaFunction.evaluate (_alpha);
 	}
 }

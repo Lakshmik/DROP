@@ -16,6 +16,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,9 +99,9 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>EfficientFrontierNoDrift</i> constructs the Efficient Frontier over a Sequence of Risk Aversion
- * Parameters for Optimal Trading Trajectories computed in accordance with the Specification of Almgren and
- * Chriss (2000), and calculates the corresponding Execution Half Life and the Trajectory Penalty without
- * regard to the Drift. The References are:
+ * 	Parameters for Optimal Trading Trajectories computed in accordance with the Specification of Almgren and
+ * 	Chriss (2000), and calculates the corresponding Execution Half Life and the Trajectory Penalty without
+ * 	regard to the Drift. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -118,59 +126,47 @@ import org.drip.service.env.EnvManager;
  * 				265-292
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgrenchriss/README.md">Almgren Chriss Efficient Frontier Trajectories</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgrenchriss/README.md">Almgren Chriss Efficient Frontier Trajectories</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class EfficientFrontierNoDrift {
+public class EfficientFrontierNoDrift
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblS0 = 50.;
-		double dblX = 1000000.;
-		double dblT = 5.;
-		int iN = 5;
-		double dblSigma = 0.95;
-		double dblAlpha = 0.02;
-		double dblEpsilon = 0.0625;
-		double dblGamma = 2.5e-07;
-		double dblEta = 2.5e-06;
-		double[] adblLambdaShortEndU = {
-			0.001e-06,
-			0.002e-06,
-			0.003e-06,
-			0.004e-06,
-			0.005e-06,
-			0.006e-06,
-			0.007e-06,
-			0.008e-06,
-			0.009e-06
-		};
-		double[] adblLambdaLongEndU = {
+		int n = 5;
+		double t = 5.;
+		double s0 = 50.;
+		double x = 1000000.;
+		double alpha = 0.02;
+		double sigma = 0.95;
+		double eta = 2.5e-06;
+		double gamma = 2.5e-07;
+		double epsilon = 0.0625;
+		double[] lambdaLongEndUArray =
+		{
 			0.250e-06,
 			0.500e-06,
 			0.750e-06,
@@ -188,26 +184,25 @@ public class EfficientFrontierNoDrift {
 			3.750e-06,
 			4.000e-06
 		};
+		double[] lambdaShortEndUArray =
+		{
+			0.001e-06,
+			0.002e-06,
+			0.003e-06,
+			0.004e-06,
+			0.005e-06,
+			0.006e-06,
+			0.007e-06,
+			0.008e-06,
+			0.009e-06
+		};
 
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
-			new ArithmeticPriceDynamicsSettings (
-				dblAlpha,
-				new Flat (dblSigma),
-				0.
-			),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					0.,
-					dblGamma
-				)
-			),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					dblEpsilon,
-					dblEta
-				)
-			)
-		);
+		LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+			ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
+				new ArithmeticPriceDynamicsSettings (alpha, new Flat (sigma), 0.),
+				new UniformParticipationRateLinear (new ParticipationRateLinear (0., gamma)),
+				new UniformParticipationRateLinear (new ParticipationRateLinear (epsilon, eta))
+			);
 
 		System.out.println ("\n\t|---------------------------------------------||");
 
@@ -215,23 +210,23 @@ public class EfficientFrontierNoDrift {
 
 		System.out.println ("\t|---------------------------------------------||");
 
-		System.out.println ("\t| Initial Stock Price           : " + dblS0);
+		System.out.println ("\t| Initial Stock Price           : " + s0);
 
-		System.out.println ("\t| Initial Holdings              : " + dblX);
+		System.out.println ("\t| Initial Holdings              : " + x);
 
-		System.out.println ("\t| Liquidation Time              : " + dblT);
+		System.out.println ("\t| Liquidation Time              : " + t);
 
-		System.out.println ("\t| Number of Time Periods        : " + iN);
+		System.out.println ("\t| Number of Time Periods        : " + n);
 
-		System.out.println ("\t| 30% Annual Volatility         : " + dblSigma);
+		System.out.println ("\t| 30% Annual Volatility         : " + sigma);
 
-		System.out.println ("\t| 10% Annual Growth             : " + dblAlpha);
+		System.out.println ("\t| 10% Annual Growth             : " + alpha);
 
-		System.out.println ("\t| Bid-Ask Spread = 1/8          : " + dblEpsilon);
+		System.out.println ("\t| Bid-Ask Spread = 1/8          : " + epsilon);
 
-		System.out.println ("\t| Daily Volume 5 million Shares : " + dblGamma);
+		System.out.println ("\t| Daily Volume 5 million Shares : " + gamma);
 
-		System.out.println ("\t| Impact at 1% of Market        : " + dblEta);
+		System.out.println ("\t| Impact at 1% of Market        : " + eta);
 
 		System.out.println ("\t|---------------------------------------------||");
 
@@ -245,32 +240,48 @@ public class EfficientFrontierNoDrift {
 
 		System.out.println ("\t|------------------------------------------------------------||");
 
-		for (double dblLambda : adblLambdaShortEndU) {
-			AlmgrenChrissDiscrete acd = (AlmgrenChrissDiscrete) DiscreteAlmgrenChriss.Standard (
-				dblX,
-				dblT,
-				iN,
-				lpep,
-				dblLambda
-			).generate();
-	
-			String strHoldings = "\t| [LAMBDA = " + FormatUtil.FormatDouble (dblLambda, 1, 3, dblX) + "]";
+		for (double lambdaShortEndU : lambdaShortEndUArray) {
+			AlmgrenChrissDiscrete almgrenChrissDiscrete =
+				(AlmgrenChrissDiscrete) DiscreteAlmgrenChriss.Standard (
+					x,
+					t,
+					n,
+					linearPermanentExpectationParameters,
+					lambdaShortEndU
+				).generate();
 
-			double dblTransactionCostExpectation = acd.transactionCostExpectation();
+			double transactionCostExpectation = almgrenChrissDiscrete.transactionCostExpectation();
 
-			double dblTransactionCostVariance = acd.transactionCostVariance();
+			double transactionCostVariance = almgrenChrissDiscrete.transactionCostVariance();
 
-			double dblTransactionCostPenalty = dblTransactionCostExpectation + dblLambda * dblTransactionCostVariance;
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (dblTransactionCostExpectation / dblX, 1, 4, 1.);
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (dblTransactionCostVariance / dblX / dblX, 1, 4, 1.);
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (dblTransactionCostPenalty / dblX, 1, 4, 1.);
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (acd.halfLife(), 2, 2, 1.);
-
-			System.out.println (strHoldings + "   ||");
+			System.out.println (
+				"\t| [LAMBDA = " + FormatUtil.FormatDouble (
+						lambdaShortEndU,
+						1,
+						3,
+						x
+					) + "] | " + FormatUtil.FormatDouble (
+						transactionCostExpectation / x,
+						1,
+						4,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						transactionCostVariance / x / x,
+						1,
+						4,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						transactionCostExpectation + lambdaShortEndU * transactionCostVariance / x,
+						1,
+						4,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						almgrenChrissDiscrete.halfLife(),
+						2,
+						2,
+						1.
+					) + "   ||"
+			);
 		}
 
 		System.out.println ("\t|------------------------------------------------------------||");
@@ -285,32 +296,47 @@ public class EfficientFrontierNoDrift {
 
 		System.out.println ("\t|------------------------------------------------------------||");
 
-		for (double dblLambda : adblLambdaLongEndU) {
+		for (double lambdaLongEndU : lambdaLongEndUArray) {
 			AlmgrenChrissDiscrete acd = (AlmgrenChrissDiscrete) DiscreteAlmgrenChriss.Standard (
-				dblX,
-				dblT,
-				iN,
-				lpep,
-				dblLambda
+				x,
+				t,
+				n,
+				linearPermanentExpectationParameters,
+				lambdaLongEndU
 			).generate();
-	
-			String strHoldings = "\t| [LAMBDA = " + FormatUtil.FormatDouble (dblLambda, 1, 3, dblX) + "]";
 
-			double dblTransactionCostExpectation = acd.transactionCostExpectation();
+			double transactionCostExpectation = acd.transactionCostExpectation();
 
-			double dblTransactionCostVariance = acd.transactionCostVariance();
+			double transactionCostVariance = acd.transactionCostVariance();
 
-			double dblTransactionCostPenalty = dblTransactionCostExpectation + dblLambda * dblTransactionCostVariance;
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (dblTransactionCostExpectation / dblX, 1, 4, 1.);
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (dblTransactionCostVariance / dblX / dblX, 1, 4, 1.);
-
-			strHoldings = strHoldings + " | " + FormatUtil.FormatDouble (dblTransactionCostPenalty / dblX, 1, 4, 1.);
-
-			strHoldings = strHoldings + " |  " + FormatUtil.FormatDouble (acd.halfLife(), 1, 2, 1.);
-
-			System.out.println (strHoldings + "   ||");
+			System.out.println (
+				"\t| [LAMBDA = " + FormatUtil.FormatDouble (
+					lambdaLongEndU,
+					1,
+					3,
+					x
+				) + "] | " + FormatUtil.FormatDouble (
+					transactionCostExpectation / x,
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					transactionCostVariance / x / x,
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					transactionCostExpectation + lambdaLongEndU * transactionCostVariance / x,
+					1,
+					4,
+					1.
+				) + " |  " + FormatUtil.FormatDouble (
+					acd.halfLife(),
+					1,
+					2,
+					1.
+				) + "   ||"
+			);
 		}
 
 		System.out.println ("\t|------------------------------------------------------------||");

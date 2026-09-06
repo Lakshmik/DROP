@@ -120,6 +120,7 @@ public class BuildManager
 
 		try {
 			_buildRecordArray = new BuildRecord[] {
+				new BuildRecord ("7.98.0", "15.0.1+9-18", "Sat Sep 05 22:09:06 EST 2026"),
 				new BuildRecord ("7.97.0", "15.0.1+9-18", "Fri Aug 28 21:39:20 EST 2026"),
 				new BuildRecord ("7.96.0", "15.0.1+9-18", "Sat Aug 22 17:07:40 EST 2026"),
 				new BuildRecord ("7.95.0", "15.0.1+9-18", "Sat Aug 08 13:36:34 EST 2026"),

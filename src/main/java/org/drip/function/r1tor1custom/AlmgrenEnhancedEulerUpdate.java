@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -81,7 +92,7 @@ package org.drip.function.r1tor1custom;
 
 /**
  * <i>AlmgrenEnhancedEulerUpdate</i> is a R<sup>1</sup> To R<sup>1</sup> Function that is used in Almgren
- * (2009, 2012) to illustrate the Construction of the Enhanced Euler Update Scheme. The References are:
+ * 	(2009, 2012) to illustrate the Construction of the Enhanced Euler Update Scheme. The References are:
  * 
  * <br>
  * 	<ul>
@@ -99,40 +110,52 @@ package org.drip.function.r1tor1custom;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li><i>AlmgrenEnhancedEulerUpdate</i> Constructor</li>
+ * 		<li>Retrieve the "A" Parameter</li>
+ * 		<li>Retrieve the "B" Parameter</li>
+ * 		<li>Evaluate for the given t</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class AlmgrenEnhancedEulerUpdate extends org.drip.function.definition.R1ToR1 {
-	private double _dblA = java.lang.Double.NaN;
-	private double _dblB = java.lang.Double.NaN;
+public class AlmgrenEnhancedEulerUpdate
+	extends R1ToR1
+{
+	private double _a = Double.NaN;
+	private double _b = Double.NaN;
 
 	/**
-	 * AlmgrenEnhancedEulerUpdate Constructor
+	 * <i>AlmgrenEnhancedEulerUpdate</i> Constructor
 	 * 
-	 * @param dblA The "A" Parameter
-	 * @param dblB The "B" Parameter
+	 * @param a The "A" Parameter
+	 * @param b The "B" Parameter
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public AlmgrenEnhancedEulerUpdate (
-		final double dblA,
-		final double dblB)
-		throws java.lang.Exception
+		final double a,
+		final double b)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblA = dblA) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblB = dblB) || _dblA == _dblB)
-			throw new java.lang.Exception ("AlmgrenEnhancedEulerUpdate Constructor => Inbalid Inputs");
+		if (!NumberUtil.IsValid (_a = a) || !NumberUtil.IsValid (_b = b) || _a == _b) {
+			throw new Exception ("AlmgrenEnhancedEulerUpdate Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -143,7 +166,7 @@ public class AlmgrenEnhancedEulerUpdate extends org.drip.function.definition.R1T
 
 	public double a()
 	{
-		return _dblA;
+		return _a;
 	}
 
 	/**
@@ -154,20 +177,32 @@ public class AlmgrenEnhancedEulerUpdate extends org.drip.function.definition.R1T
 
 	public double b()
 	{
-		return _dblB;
+		return _b;
 	}
 
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param t T
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
 	@Override public double evaluate (
-		final double dblT)
-		throws java.lang.Exception
+		final double t)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblT))
-			throw new java.lang.Exception ("AlmgrenEnhancedEulerUpdate::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (t)) {
+			throw new Exception ("AlmgrenEnhancedEulerUpdate::evaluate => Invalid Inputs");
+		}
 
-		double dblInvExpAT = java.lang.Math.exp (-1. * _dblA * dblT);
+		double inverseExponentialAT = Math.exp (-1. * _a * t);
 
-		double dblInvExpBT = java.lang.Math.exp (-1. * _dblB * dblT);
+		double inverseExponentialBT = Math.exp (-1. * _b * t);
 
-		return (_dblA * dblInvExpBT - _dblB * dblInvExpAT) / (dblInvExpBT - dblInvExpAT);
+		return (_a * inverseExponentialBT - _b * inverseExponentialAT) /
+			(inverseExponentialBT - inverseExponentialAT);
 	}
 }

@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -79,7 +90,7 @@ package org.drip.function.r1tor1custom;
 
 /**
  * <i>ISDABucketCurvatureTenorScaler</i> generates the ISDA SIMM Tenor Scaling Factor for a given Bucket
- * Curvature. The References are:
+ * 	Curvature. The References are:
  * 
  * <br><br>
  * 	<ul>
@@ -107,18 +118,28 @@ package org.drip.function.r1tor1custom;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li>Construct the Standard ISDA Bucket Curvature Tenor Scaler</li>
+ * 		<li><i>ISDABucketCurvatureTenorScaler</i> Constructor</li>
+ * 		<li>Evaluate for the given t</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ISDABucketCurvatureTenorScaler extends org.drip.function.definition.R1ToR1
+public class ISDABucketCurvatureTenorScaler
+	extends R1ToR1
 {
 	private static final int STANDARD_BUCKET_CURVATURE_SCALER_MPOR = 14;
 
@@ -132,12 +153,9 @@ public class ISDABucketCurvatureTenorScaler extends org.drip.function.definition
 
 	public static final ISDABucketCurvatureTenorScaler Standard()
 	{
-		try
-		{
+		try {
 			return new ISDABucketCurvatureTenorScaler (STANDARD_BUCKET_CURVATURE_SCALER_MPOR);
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -145,38 +163,43 @@ public class ISDABucketCurvatureTenorScaler extends org.drip.function.definition
 	}
 
 	/**
-	 * ISDABucketCurvatureTenorScaler Constructor
+	 * <i>ISDABucketCurvatureTenorScaler</i> Constructor
 	 * 
 	 * @param mporCalendarDays The MPoR Calendar Days
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ISDABucketCurvatureTenorScaler (
 		final int mporCalendarDays)
-		throws java.lang.Exception
+		throws Exception
 	{
 		super (null);
 
-		if (0 >= (_mporCalendarDays = mporCalendarDays))
-		{
-			throw new java.lang.Exception ("ISDABucketCurvatureTenorScaler Constructor => Invalid Inputs");
+		if (0 >= (_mporCalendarDays = mporCalendarDays)) {
+			throw new Exception ("ISDABucketCurvatureTenorScaler Constructor => Invalid Inputs");
 		}
 	}
 
+	/**
+	 * Evaluate for the given t
+	 * 
+	 * @param t t
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
 	@Override public double evaluate (
 		final double t)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (t) || 0 >= t)
-		{
-			throw new java.lang.Exception ("ISDABucketCurvatureTenorScaler::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (t) || 0 >= t) {
+			throw new Exception ("ISDABucketCurvatureTenorScaler::evaluate => Invalid Inputs");
 		}
 
-		return 0.5 * java.lang.Math.min (
-			1.,
-			((double) _mporCalendarDays) / t
-		);
+		return 0.5 * Math.min (1., ((double) _mporCalendarDays) / t);
 	}
 
 	/**

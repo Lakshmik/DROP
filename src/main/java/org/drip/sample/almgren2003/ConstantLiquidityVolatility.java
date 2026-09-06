@@ -15,6 +15,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,7 +98,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>ConstantLiquidityVolatility</i> demonstrates the Dependence of the Optimal Trading Trajectory as a
- * Function of Constant Trading Enhanced Volatilities. The References are:
+ * 	Function of Constant Trading Enhanced Volatilities. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -117,98 +125,102 @@ import org.drip.service.env.EnvManager;
  * 				Markets</i> <b>1</b> 1-50
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgren2003/README.md">Almgren (2003) Power Law Liquidity</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ConstantLiquidityVolatility {
+public class ConstantLiquidityVolatility
+{
 
 	private static final void AlphaRun (
-		final double dblAlpha,
-		final double dblT,
-		final int iNumInterval)
+		final double alpha,
+		final double t,
+		final int intervalCount)
 		throws Exception
 	{
-		double dblEta = 5.e-06;
-		double dblSigma = 1.;
-		double dblLambda = 1.e-05;
-		double dblX = 100000.;
+		double sigma = 1.;
+		double x = 100000.;
+		double eta = 5.e-06;
+		double lambda = 1.e-05;
 
-		ArithmeticPriceEvolutionParameters apep = ArithmeticPriceEvolutionParametersBuilder.TradingEnhancedVolatility (
-			dblSigma,
-			new UniformParticipationRateLinear (ParticipationRateLinear.SlopeOnly (dblEta)),
-			new UniformParticipationRateLinear (
-				new ParticipationRateLinear (
-					dblAlpha,
-					0.
-				)
-			)
-		);
+		double inverseX = 1. / x;
 
-		ContinuousConstantTradingEnhanced ccte = ContinuousConstantTradingEnhanced.Standard (
-			dblX,
-			dblT,
-			apep,
-			dblLambda
-		);
+		EfficientTradingTrajectoryContinuous efficientTradingTrajectoryContinuous =
+			(EfficientTradingTrajectoryContinuous) ContinuousConstantTradingEnhanced.Standard (
+				x,
+				t,
+				ArithmeticPriceEvolutionParametersBuilder.TradingEnhancedVolatility (
+					sigma,
+					new UniformParticipationRateLinear (ParticipationRateLinear.SlopeOnly (eta)),
+					new UniformParticipationRateLinear (new ParticipationRateLinear (alpha, 0.))
+				),
+				lambda
+			).generate();
 
-		EfficientTradingTrajectoryContinuous ettc = (EfficientTradingTrajectoryContinuous) ccte.generate();
+		R1ToR1 holdingsFunction = efficientTradingTrajectoryContinuous.holdings();
 
-		R1ToR1 r1ToR1Holdings = ettc.holdings();
+		double[] executionTimeArray = new double[intervalCount];
+		double[] holdingsArray = new double[intervalCount];
 
-		double[] adblHoldings = new double[iNumInterval];
-		double[] adblExecutionTime = new double[iNumInterval];
-
-		for (int i = 1; i <= iNumInterval; ++i) {
-			adblExecutionTime[i - 1] = dblT * i / iNumInterval;
-
-			adblHoldings[i - 1] = r1ToR1Holdings.evaluate (adblExecutionTime[i - 1]);
+		for (int intervalIndex = 1; intervalIndex <= intervalCount; ++intervalIndex) {
+			holdingsArray[intervalIndex - 1] = holdingsFunction.evaluate (
+				executionTimeArray[intervalIndex - 1] = t * intervalIndex / intervalCount
+			);
 		}
 
-		String strDump = "\t|" + FormatUtil.FormatDouble (dblAlpha, 1, 1, 1.) + " =>";
+		String dump = "\t|" + FormatUtil.FormatDouble (alpha, 1, 1, 1.) + " =>";
 
-		for (int i = 0; i < adblExecutionTime.length; ++i)
-			strDump = strDump + FormatUtil.FormatDouble (adblHoldings[i] / dblX, 2, 1, 100.) + "% ";
+		for (int intervalIndex = 0; intervalIndex < executionTimeArray.length; ++intervalIndex) {
+			dump += FormatUtil.FormatDouble (holdingsArray[intervalIndex] * inverseX, 2, 1, 100.) + "% |";
+		}
 
-		strDump = strDump + FormatUtil.FormatDouble (ettc.transactionCostExpectation(), 5, 0, 1.) + " | ";
-
-		strDump = strDump + FormatUtil.FormatDouble (ettc.transactionCostVariance(), 5, 0, 1.e-06) + " | ";
-
-		strDump = strDump + FormatUtil.FormatDouble (ettc.characteristicTime(), 1, 3, 1.) + " ||";
-
-		System.out.println (strDump);
+		System.out.println (
+			dump + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.transactionCostExpectation(),
+				5,
+				0,
+				1.
+			) + " |" + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.transactionCostVariance(),
+				5,
+				0,
+				1.e-06
+			) + " | " + FormatUtil.FormatDouble (
+				efficientTradingTrajectoryContinuous.characteristicTime(),
+				1,
+				3,
+				1.
+			) + " ||"
+		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblT = 5.;
-		int iNumInterval = 10;
-
-		double[] adblAlpha = new double[] {
+		double t = 5.;
+		int intervalCount = 10;
+		double[] alphaArray =
+		{
 			0.0,
 			0.1,
 			0.2,
@@ -234,43 +246,65 @@ public class ConstantLiquidityVolatility {
 
 		System.out.println();
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                   ALMGREN (2003) CONSTANT TEMPORARY IMPACT VOLATILITY - OFFSET DEPENDENCE                    ||");
+		System.out.println (
+			"\t|                   ALMGREN (2003) CONSTANT TEMPORARY IMPACT VOLATILITY - OFFSET DEPENDENCE                     ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|      L -> R:                                                                                                 ||");
+		System.out.println (
+			"\t|      L -> R:                                                                                                  ||"
+		);
 
-		System.out.println ("\t|              Alpha Level                                                                                     ||");
+		System.out.println (
+			"\t|              Alpha Level                                                                                      ||"
+		);
 
-		System.out.println ("\t|              Outstanding Trajectory (%)                                                                      ||");
+		System.out.println (
+			"\t|              Outstanding Trajectory (%)                                                                       ||"
+		);
 
-		System.out.println ("\t|              Transaction Cost Expectation                                                                    ||");
+		System.out.println (
+			"\t|              Transaction Cost Expectation                                                                     ||"
+		);
 
-		System.out.println ("\t|              Transaction Cost Variance (X 10^-06)                                                            ||");
+		System.out.println (
+			"\t|              Transaction Cost Variance (X 10^-06)                                                             ||"
+		);
 
-		System.out.println ("\t|              Characteristic Time (Days)                                                                      ||");
+		System.out.println (
+			"\t|              Characteristic Time (Days)                                                                       ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------||"
+		);
 
-		String strTimeNode = "\t|        ";
+		String timeNode = "\t|        ";
 
-		for (int i = 0; i <= iNumInterval; ++i)
-			strTimeNode = strTimeNode + FormatUtil.FormatDouble (dblT * i / iNumInterval, 1, 2, 1.) + "  ";
+		for (int intervalIndex = 0; intervalIndex <= intervalCount; ++intervalIndex) {
+			timeNode += FormatUtil.FormatDouble (t * intervalIndex / intervalCount, 1, 2, 1.) + "  |";
+		}
 
-		System.out.println (strTimeNode);
+		System.out.println (timeNode);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double dblAlpha : adblAlpha)
-			AlphaRun (
-				dblAlpha,
-				dblT,
-				iNumInterval
-			);
+		for (double alpha : alphaArray) {
+			AlphaRun (alpha, t, intervalCount);
+		}
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

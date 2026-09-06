@@ -1,11 +1,23 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.r1tor1.ExponentialDecay;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,7 +94,8 @@ package org.drip.function.r1tor1custom;
  */
 
 /**
- * <i>AndersenPiterbargMeanReverter</i> implements the mean-reverting Univariate Function detailed in:
+ * <i>AndersenPiterbargMeanReverter</i> implements the mean-reverting Univariate Function detailed in
+ *  Andersen and Piterbarg (2010).
  * 
  * <br>
  * 	<ul>
@@ -91,48 +104,73 @@ package org.drip.function.r1tor1custom;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li><i>AndersenPiterbargMeanReverter</i> Constructor</li>
+ * 		<li>Evaluate for the given variate</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class AndersenPiterbargMeanReverter extends org.drip.function.definition.R1ToR1 {
-	private org.drip.function.r1tor1.ExponentialDecay _auExpDecay = null;
-	private org.drip.function.definition.R1ToR1 _auSteadyState = null;
+public class AndersenPiterbargMeanReverter
+	extends R1ToR1
+{
+	private R1ToR1 _steadyStateFunction = null;
+	private ExponentialDecay _exponentialDecayFunction = null;
 
 	/**
-	 * AndersenPiterbargMeanReverter constructor
+	 * <i>AndersenPiterbargMeanReverter</i> Constructor
 	 * 
-	 * @param auExpDecay The Exponential Decay Univariate Function
-	 * @param auSteadyState The Steady State (i.e., Infinite Time) Undamped Behavior Univariate Function
+	 * @param exponentialDecayFunction The Exponential Decay Univariate Function
+	 * @param steadyStateFunction The Steady State (i.e., Infinite Time) Undamped Behavior Univariate
+	 * 								Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public AndersenPiterbargMeanReverter (
-		final org.drip.function.r1tor1.ExponentialDecay auExpDecay,
-		final org.drip.function.definition.R1ToR1 auSteadyState)
-		throws java.lang.Exception
+		final ExponentialDecay exponentialDecayFunction,
+		final R1ToR1 steadyStateFunction)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_auExpDecay = auExpDecay) || null == (_auSteadyState = auSteadyState))
-			throw new java.lang.Exception ("AndersenPiterbargMeanReverter ctr => Invalid Inputs");
+		if (null == (_exponentialDecayFunction = exponentialDecayFunction) ||
+			null == (_steadyStateFunction = steadyStateFunction))
+		{
+			throw new Exception ("AndersenPiterbargMeanReverter Constructor => Invalid Inputs");
+		}
 	}
 
-	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("AndersenPiterbargMeanReverter::evaluate => Invalid Inputs");
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return (1. - _auExpDecay.evaluate (dblVariate)) * _auSteadyState.evaluate (dblVariate);
+	@Override public double evaluate (
+		final double variate)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("AndersenPiterbargMeanReverter::evaluate => Invalid Inputs");
+		}
+
+		return (1. - _exponentialDecayFunction.evaluate (variate)) * _steadyStateFunction.evaluate (variate);
 	}
 }

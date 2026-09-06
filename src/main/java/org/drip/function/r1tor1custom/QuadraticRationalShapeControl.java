@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1custom;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,106 +95,150 @@ package org.drip.function.r1tor1custom;
 
 /**
  * <i>QuadraticRationalShapeControl</i> implements the deterministic rational shape control functionality on
- * top of the estimator basis splines inside - [0,...,1) - Globally [x_0,...,x_1):
- * <br><br>
+ * 	top of the estimator basis splines inside - [0,...,1) - Globally [x_0,...,x_1):
+ * 	<br><br>
  * 			y = 1 / [1 + lambda * x * (1-x)]
- * <br><br>
- *		where is the normalized ordinate mapped as
- * <br><br>
+ * 	<br><br>
+ *		where x is the normalized ordinate mapped as
+ * 	<br><br>
  * 			x ==== (x - x_i-1) / (x_i - x_i-1)
  *
- *	<br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></li>
+ * 		<li><i>QuadraticRationalShapeControl</i> Constructor</li>
+ * 		<li>Evaluate for the Given x</li>
+ * 		<li>Calculate the Derivative as a Double</li>
+ * 		<li>Integrate over the given Range</li>
+ * 		<li>Retrieve the Shape Control Coefficient</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1custom/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Custom Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class QuadraticRationalShapeControl extends org.drip.function.definition.R1ToR1 {
-	private double _dblLambda = java.lang.Double.NaN;
+public class QuadraticRationalShapeControl
+	extends R1ToR1
+{
+	private double _lambda = Double.NaN;
 
 	/**
-	 * QuadraticRationalShapeControl constructor
+	 * <i>QuadraticRationalShapeControl</i> Constructor
 	 * 
-	 * @param dblLambda Tension Parameter
+	 * @param lambda Tension Parameter
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public QuadraticRationalShapeControl (
-		final double dblLambda)
-		throws java.lang.Exception
+		final double lambda)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblLambda = dblLambda))
-			throw new java.lang.Exception ("QuadraticRationalShapeControl ctr: Invalid tension");
-	}
-
-	@Override public double evaluate (
-		final double dblX)
-		throws java.lang.Exception
-	{
-		return 1. / (1. + _dblLambda * dblX * (1. - dblX));
-	}
-
-	@Override public double derivative (
-		final double dblX,
-		final int iOrder)
-		throws java.lang.Exception
-	{
-		if (0. == _dblLambda) return 0.;
-
-		double dblD2BetaDX2 = -2. * _dblLambda;
-		double dblDBetaDX = _dblLambda * (1. - 2. * dblX);
-		double dblBeta = 1. + _dblLambda * dblX * (1. - dblX);
-
-		if (1 == iOrder) return -1. * dblDBetaDX / (dblBeta * dblBeta);
-
-		if (2 == iOrder)
-			return (2. * dblDBetaDX * dblDBetaDX - dblBeta * dblD2BetaDX2) / (dblBeta * dblBeta * dblBeta);
-
-		return super.derivative (dblX, iOrder);
-	}
-
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("QuadraticRationalShapeControl::integrate => Invalid Inputs");
-
-		double dblAlpha = java.lang.Math.sqrt (0.25 * (_dblLambda + 4.) / _dblLambda);
-
-		return -0.5 * (java.lang.Math.log ((dblEnd - dblAlpha - 0.5) * (dblBegin + dblAlpha - 0.5) /
-			(dblEnd + dblAlpha - 0.5) / (dblBegin - dblAlpha - 0.5))) / dblAlpha / _dblLambda;
+		if (!NumberUtil.IsValid (_lambda = lambda)) {
+			throw new Exception ("QuadraticRationalShapeControl Constructor => Invalid Tension");
+		}
 	}
 
 	/**
-	 * Retrieve the shape control coefficient
+	 * Evaluate for the Given x
 	 * 
-	 * @return Shape control coefficient
+	 * @param x x
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
-	public double getShapeControlCoefficient()
+	@Override public double evaluate (
+		final double x)
+		throws Exception
 	{
-		return _dblLambda;
+		return 1. / (1. + _lambda * x * (1. - x));
 	}
 
-	/* public static final void main (
-		final java.lang.String[] astrArgs)
-		throws java.lang.Exception
+	/**
+	 * Calculate the Derivative as a Double
+	 * 
+	 * @param x x at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
+
+	@Override public double derivative (
+		final double x,
+		final int order)
+		throws Exception
 	{
-		QuadraticRationalShapeControl qrsc = new QuadraticRationalShapeControl (1.);
+		if (0. == _lambda) {
+			return 0.;
+		}
 
-		System.out.println (qrsc.derivative (0., 2));
+		double beta = 1. + _lambda * x * (1. - x);
+		double dBetaDX = _lambda * (1. - 2. * x);
+		double inverseBeta = 1. / beta;
+		double inverseBetaSquared = inverseBeta * inverseBeta;
 
-		System.out.println (qrsc.derivative (1., 2));
-	} */
+		if (1 == order) {
+			return -1. * dBetaDX * inverseBetaSquared;
+		}
+
+		if (2 == order) {
+			return (2. * dBetaDX * dBetaDX + 2. * beta * _lambda) * inverseBeta * inverseBetaSquared;
+		}
+
+		return super.derivative (x, order);
+	}
+
+	/**
+	 * Integrate over the given Range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if the Evaluation cannot be done
+	 */
+
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("QuadraticRationalShapeControl::integrate => Invalid Inputs");
+		}
+
+		double alpha = Math.sqrt (0.25 * (_lambda + 4.) / _lambda);
+
+		return -0.5 * (
+			Math.log (
+				(end - alpha - 0.5) * (begin + alpha - 0.5) / (end + alpha - 0.5) / (begin - alpha - 0.5)
+			)
+		) / alpha / _lambda;
+	}
+
+	/**
+	 * Retrieve the Shape Control Coefficient
+	 * 
+	 * @return Shape Control Coefficient
+	 */
+
+	public double shapeControlCoefficient()
+	{
+		return _lambda;
+	}
 }

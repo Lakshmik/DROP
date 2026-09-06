@@ -15,6 +15,14 @@ import org.drip.spline.stretch.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -94,36 +102,32 @@ import org.drip.spline.stretch.*;
  * <i>MultiSpanAggregationEstimator</i> demonstrates the Construction and Usage of the Multiple Span
  * 	Aggregation Functionality.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiSpanAggregationEstimator {
-
-	/*
-	 * Build Polynomial Segment Control Parameters.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class MultiSpanAggregationEstimator
+{
 
 	private static final SegmentCustomBuilderControl PolynomialSegmentControlParams (
-		final int iNumBasis,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final int basisCount,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (iNumBasis),
-			sdic,
-			rssc,
+			new PolynomialFunctionSetParams (basisCount),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
@@ -131,88 +135,128 @@ public class MultiSpanAggregationEstimator {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
-		double[] adblX = new double[] { 1.00,  1.50,  2.00, 3.00, 4.00, 5.00, 6.50, 8.00, 10.00};
-		double[] adblY1 = new double[] {25.00, 20.25, 16.00, 9.00, 4.00, 1.00, 0.25, 4.00, 16.00};
-		double[] adblY2 = new double[] {27.00, 22.25, 18.00, 11.00, 6.00, 3.00, 2.25, 6.00, 18.00};
+		double[] xArray =
+		{
+			 1.0,
+			 1.5,
+			 2.0,
+			 3.0,
+			 4.0,
+			 5.0,
+			 6.5,
+			 8.0,
+			10.0
+		};
+		double[] y1Array =
+		{
+			25.00,
+			20.25,
+			16.00,
+			 9.00,
+			 4.00,
+			 1.00,
+			 0.25,
+			 4.00,
+			16.00
+		};
+		double[] y2Array = 
+		{
+			27.00,
+			22.25,
+			18.00,
+			11.00,
+			 6.00,
+			 3.00,
+			 2.25,
+			 6.00,
+			18.00
+		};
 
-		SegmentCustomBuilderControl scbc = PolynomialSegmentControlParams (
+		SegmentCustomBuilderControl segmentCustomBuilderControl = PolynomialSegmentControlParams (
 			4,
 			SegmentInelasticDesignControl.Create (2, 2),
 			null
 		);
 
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[segmentCount]; 
 
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			aSCBC[segmentIndex] = segmentCustomBuilderControl;
+		}
 
-		MultiSegmentSequence mss1 = MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
-			"SPLINE_STRETCH_1", // Name
-			adblX, // predictors
-			adblY1, // responses
-			aSCBC, // Basis Segment Builder parameters
-			null,  // NULL segment Best Fit Response
-			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
-		);
-
-		Span span1 = new OverlappingStretchSpan (mss1);
-
-		MultiSegmentSequence mss2 = MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
-			"SPLINE_STRETCH_2", // Name
-			adblX, // predictors
-			adblY2, // responses
-			aSCBC, // Basis Segment Builder parameters
-			null,  // NULL segment Best Fit Response
-			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
-		);
-
-		Span span2 = new OverlappingStretchSpan (mss2);
-
-		List<Double> lsWeight = new ArrayList<Double>();
-
-		lsWeight.add (0.14);
-
-		lsWeight.add (0.71);
-
-		List<Span> lsSpan = new ArrayList<Span>();
-
-		lsSpan.add (span1);
-
-		lsSpan.add (span2);
-
-		AggregatedSpan ass = new AggregatedSpan (
-			lsSpan,
-			lsWeight
-		);
-
-		double dblX = 1.;
-		double dblXMax = 10.;
-
-		while (dblX <= dblXMax) {
-			double dblStretchResponse = 0.14 * mss1.responseValue (dblX) + 0.71 * mss2.responseValue (dblX);
-
-			System.out.println ("Y[" + dblX + "] " +
-				FormatUtil.FormatDouble (ass.calcResponseValue (dblX), 2, 2, 1.) + " | " +
-				FormatUtil.FormatDouble (dblStretchResponse, 2, 2, 1.)
+		MultiSegmentSequence multiSegmentSequence1 =
+			MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
+				"SPLINE_STRETCH_1", 				// Name
+				xArray, 							// predictors
+				y1Array, 							// responses
+				aSCBC, 								// Basis Segment Builder parameters
+				null,  								// NULL segment Best Fit Response
+				BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
 			);
 
-			dblX += 1.;
+		MultiSegmentSequence multiSegmentSequence2 =
+			MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
+				"SPLINE_STRETCH_2", 				// Name
+				xArray, 							// predictors
+				y2Array, 							// responses
+				aSCBC, 								// Basis Segment Builder parameters
+				null,  								// NULL segment Best Fit Response
+				BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
+			);
+
+		List<Double> weightList = new ArrayList<Double>();
+
+		weightList.add (0.14);
+
+		weightList.add (0.71);
+
+		List<Span> spanList = new ArrayList<Span>();
+
+		spanList.add (new OverlappingStretchSpan (multiSegmentSequence1));
+
+		spanList.add (new OverlappingStretchSpan (multiSegmentSequence2));
+
+		AggregatedSpan aggregatedSpan = new AggregatedSpan (spanList, weightList);
+
+		double x = 1.;
+		double xMaximum = 10.;
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Y[" + x + "] =>" + FormatUtil.FormatDouble (
+					aggregatedSpan.calcResponseValue (x),
+					2,
+					2,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					0.14 * multiSegmentSequence1.responseValue (x) +
+						0.71 * multiSegmentSequence2.responseValue (x),
+					2,
+					2,
+					1.
+				)
+			);
+
+			x += 1.;
 		}
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 
 		EnvManager.TerminateEnv();
 	}

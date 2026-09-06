@@ -18,6 +18,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,8 +101,8 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>OptimalSerialCorrelationImpact</i> estimates the Optimal Adjustment to the Optimal Trading Trajectory
- * attributable to Serial Correlation in accordance with the Specification of Almgren and Chriss (2000) for
- * the given Risk Aversion Parameter without the Asset Drift. The References are:
+ * 	attributable to Serial Correlation in accordance with the Specification of Almgren and Chriss (2000) for
+ * 	the given Risk Aversion Parameter without the Asset Drift. The References are:
  * 
  * <br><br>
  *  <ul>
@@ -119,105 +127,101 @@ import org.drip.service.env.EnvManager;
  * 				265-292
  *  	</li>
  *  </ul>
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/almgrenchriss/README.md">Almgren Chriss Efficient Frontier Trajectories</a></li>
- *  </ul>
- * <br><br>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/TransactionCostAnalyticsLibrary.md">Transaction Cost Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/almgrenchriss/README.md">Almgren Chriss Efficient Frontier Trajectories</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class OptimalSerialCorrelationImpact {
+public class OptimalSerialCorrelationImpact
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		double dblS0 = 50.;
-		double dblX = 1000000.;
-		double dblT = 5.;
-		int iN = 5;
-		double dblAnnualVolatility = 0.30;
-		double dblAnnualReturns = 0.10;
-		double dblBidAsk = 0.125;
-		double dblDailyVolume = 5.e06;
-		double dblDailyVolumePermanentImpact = 0.1;
-		double dblDailyVolumeTemporaryImpact = 0.01;
-		double dblLambdaU = 1.e-06;
-		double dblSerialCorrelation = 0.1;
+		int n = 5;
+		double t = 5.;
+		double s0 = 50.;
+		double x = 1000000.;
+		double bidAsk = 0.125;
+		double lambdaU = 1.e-06;
+		double annualReturns = 0.1;
+		double dailyVolume = 5.e06;
+		double annualVolatility = 0.3;
+		double serialCorrelation = 0.1;
+		double dailyVolumePermanentImpact = 0.1;
+		double dailyVolumeTemporaryImpact = 0.01;
 
-		ArithmeticPriceDynamicsSettings apds = ArithmeticPriceDynamicsSettings.FromAnnualReturnsSettings (
-			dblAnnualReturns,
-			dblAnnualVolatility,
-			0.,
-			dblS0
-		);
-
-		double dblAlpha = apds.drift();
-
-		double dblSigma = apds.epochVolatility();
-
-		PriceMarketImpactLinear pmil = new PriceMarketImpactLinear (
-			new AssetTransactionSettings (
-				dblS0,
-				dblDailyVolume,
-				dblBidAsk
-			),
-			dblDailyVolumePermanentImpact,
-			dblDailyVolumeTemporaryImpact
-		);
-
-		ParticipationRateLinear prlPermanent = (ParticipationRateLinear) pmil.permanentTransactionFunction();
-
-		ParticipationRateLinear prlTemporary = (ParticipationRateLinear) pmil.temporaryTransactionFunction();
-
-		LinearPermanentExpectationParameters lpep = ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
-			new ArithmeticPriceDynamicsSettings (
+		ArithmeticPriceDynamicsSettings arithmeticPriceDynamicsSettings =
+			ArithmeticPriceDynamicsSettings.FromAnnualReturnsSettings (
+				annualReturns,
+				annualVolatility,
 				0.,
-				new Flat (dblSigma),
-				dblSerialCorrelation
-			),
-			new UniformParticipationRateLinear (prlPermanent),
-			new UniformParticipationRateLinear (prlTemporary)
+				s0
+			);
+
+		double sigma = arithmeticPriceDynamicsSettings.epochVolatility();
+
+		PriceMarketImpactLinear priceMarketImpactLinear = new PriceMarketImpactLinear (
+			new AssetTransactionSettings (s0, dailyVolume, bidAsk),
+			dailyVolumePermanentImpact,
+			dailyVolumeTemporaryImpact
 		);
 
-		DiscreteAlmgrenChriss dac = DiscreteAlmgrenChriss.Standard (
-			dblX,
-			dblT,
-			iN,
-			lpep,
-			dblLambdaU
-		);
+		ParticipationRateLinear permanentTransactionFunction =
+			(ParticipationRateLinear) priceMarketImpactLinear.permanentTransactionFunction();
 
-		AlmgrenChrissDiscrete acd = (AlmgrenChrissDiscrete) dac.generate();
+		ParticipationRateLinear temporaryTransactionFunction =
+			(ParticipationRateLinear) priceMarketImpactLinear.temporaryTransactionFunction();
 
-		double[] adblExecutionTimeNode = acd.executionTimeNode();
+		LinearPermanentExpectationParameters linearPermanentExpectationParameters =
+			ArithmeticPriceEvolutionParametersBuilder.LinearExpectation (
+				new ArithmeticPriceDynamicsSettings (0., new Flat (sigma), serialCorrelation),
+				new UniformParticipationRateLinear (permanentTransactionFunction),
+				new UniformParticipationRateLinear (temporaryTransactionFunction)
+			);
 
-		double[] adblTradeList = acd.tradeList();
+		AlmgrenChrissDiscrete almgrenChrissDiscrete =
+			(AlmgrenChrissDiscrete) DiscreteAlmgrenChriss.Standard (
+				x,
+				t,
+				n,
+				linearPermanentExpectationParameters,
+				lambdaU
+			).generate();
 
-		double[] adblHoldings = acd.holdings();
+		OptimalSerialCorrelationAdjustment[] optimalSerialCorrelationAdjustmentArray =
+			new TrajectoryShortfallEstimator (
+				almgrenChrissDiscrete
+			).serialCorrelationAdjustment (
+				linearPermanentExpectationParameters
+			);
 
-		TrajectoryShortfallEstimator tse = new TrajectoryShortfallEstimator (acd);
+		double permanentTransactionFunctionSlope = permanentTransactionFunction.slope();
 
-		OptimalSerialCorrelationAdjustment[] aOSCA = tse.serialCorrelationAdjustment (lpep);
+		double[] executionTimeNodeArray = almgrenChrissDiscrete.executionTimeNode();
+
+		double[] holdingsArray = almgrenChrissDiscrete.holdings();
+
+		double[] tradeArray = almgrenChrissDiscrete.tradeList();
 
 		System.out.println ("\n\t|---------------------------------------------||");
 
@@ -225,47 +229,52 @@ public class OptimalSerialCorrelationImpact {
 
 		System.out.println ("\t|---------------------------------------------||");
 
-		System.out.println ("\t| Initial Stock Price           : " + dblS0);
+		System.out.println ("\t| Initial Stock Price           : " + s0);
 
-		System.out.println ("\t| Initial Holdings              : " + dblX);
+		System.out.println ("\t| Initial Holdings              : " + x);
 
-		System.out.println ("\t| Liquidation Time              : " + dblT);
+		System.out.println ("\t| Liquidation Time              : " + t);
 
-		System.out.println ("\t| Number of Time Periods        : " + iN);
+		System.out.println ("\t| Number of Time Periods        : " + n);
 
-		System.out.println ("\t| Annual Volatility             :" + FormatUtil.FormatDouble (dblAnnualVolatility, 1, 0, 100.) + "%");
+		System.out.println (
+			"\t| Annual Volatility             :" +
+				FormatUtil.FormatDouble (annualVolatility, 1, 0, 100.) + "%"
+		);
 
-		System.out.println ("\t| Annual Growth                 :" + FormatUtil.FormatDouble (dblAnnualReturns, 1, 0, 100.) + "%");
+		System.out.println (
+			"\t| Annual Growth                 :" + FormatUtil.FormatDouble (annualReturns, 1, 0, 100.) + "%"
+		);
 
-		System.out.println ("\t| Bid-Ask Spread                : " + dblBidAsk);
+		System.out.println ("\t| Bid-Ask Spread                : " + bidAsk);
 
-		System.out.println ("\t| Daily Volume                  : " + dblDailyVolume);
+		System.out.println ("\t| Daily Volume                  : " + dailyVolume);
 
-		System.out.println ("\t| Daily Volume Temporary Impact : " + dblDailyVolumeTemporaryImpact);
+		System.out.println ("\t| Daily Volume Temporary Impact : " + dailyVolumeTemporaryImpact);
 
-		System.out.println ("\t| Daily Volume Permanent Impact : " + dblDailyVolumePermanentImpact);
+		System.out.println ("\t| Daily Volume Permanent Impact : " + dailyVolumePermanentImpact);
 
-		System.out.println ("\t| Daily Volume 5 million Shares : " + prlPermanent.slope());
+		System.out.println ("\t| Daily Volume 5 million Shares : " + permanentTransactionFunctionSlope);
 
-		System.out.println ("\t| Static Holdings 11,000 Shares : " + dblLambdaU);
+		System.out.println ("\t| Static Holdings 11,000 Shares : " + lambdaU);
 
 		System.out.println ("\t|");
 
 		System.out.println (
 			"\t| Daily Volatility              : " +
-			FormatUtil.FormatDouble (dblSigma, 1, 4, 1.)
+			FormatUtil.FormatDouble (sigma, 1, 4, 1.)
 		);
 
 		System.out.println (
 			"\t| Daily Returns                 : " +
-			FormatUtil.FormatDouble (dblAlpha, 1, 4, 1.)
+			FormatUtil.FormatDouble (arithmeticPriceDynamicsSettings.drift(), 1, 4, 1.)
 		);
 
-		System.out.println ("\t| Temporary Impact Fixed Offset :  " + prlTemporary.offset());
+		System.out.println ("\t| Temporary Impact Fixed Offset :  " + temporaryTransactionFunction.offset());
 
-		System.out.println ("\t| Eta                           :  " + prlTemporary.slope());
+		System.out.println ("\t| Eta                           :  " + temporaryTransactionFunction.slope());
 
-		System.out.println ("\t| Gamma                         :  " + prlPermanent.slope());
+		System.out.println ("\t| Gamma                         :  " + permanentTransactionFunctionSlope);
 
 		System.out.println ("\t|---------------------------------------------||");
 
@@ -289,23 +298,35 @@ public class OptimalSerialCorrelationImpact {
 
 		System.out.println ("\t|-------------------------------------------------||");
 
-		for (int i = 0; i <= iN; ++i) {
-			if (i == 0)
-				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 0, 1.) + " => " +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (0., 6, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (aOSCA[i].holdingsShift(), 5, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (aOSCA[i].gain(), 3, 1, 1.) + " ||"
-				);
-			else
-				System.out.println (
-					"\t|" + FormatUtil.FormatDouble (adblExecutionTimeNode[i], 1, 0, 1.) + " => " +
-					FormatUtil.FormatDouble (adblHoldings[i], 7, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (adblTradeList[i - 1], 6, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (aOSCA[i].holdingsShift(), 5, 1, 1.) + " | " +
-					FormatUtil.FormatDouble (aOSCA[i].gain(), 3, 1, 1.) + " ||"
-				);
+		for (int executionTimeIndex = 0; executionTimeIndex <= n; ++executionTimeIndex) {
+			System.out.println (
+				"\t|" + FormatUtil.FormatDouble (
+					executionTimeNodeArray[executionTimeIndex],
+					1,
+					0,
+					1.
+				) + " => " + FormatUtil.FormatDouble (
+					holdingsArray[executionTimeIndex],
+					7,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					0 == executionTimeIndex ? 0. : tradeArray[executionTimeIndex - 1],
+					6,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalSerialCorrelationAdjustmentArray[executionTimeIndex].holdingsShift(),
+					5,
+					1,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					optimalSerialCorrelationAdjustmentArray[executionTimeIndex].gain(),
+					3,
+					1,
+					1.
+				) + " ||"
+			);
 		}
 
 		System.out.println ("\t|-------------------------------------------------||");

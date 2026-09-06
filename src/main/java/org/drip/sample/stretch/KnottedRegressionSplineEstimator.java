@@ -12,6 +12,14 @@ import org.drip.spline.stretch.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,176 +100,159 @@ import org.drip.spline.stretch.*;
  * 	Splines. It demonstrates construction of the segment's predictor ordinate/response value combination, and
  * 	eventual calibration.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class KnottedRegressionSplineEstimator {
-
-	/*
-	 * Build Polynomial Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class KnottedRegressionSplineEstimator
+{
 
 	private static final SegmentCustomBuilderControl PolynomialSegmentControlParams (
-		final int iNumBasis,
-		final SegmentInelasticDesignControl sdic)
+		final int basisCount,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (iNumBasis),
-			sdic,
+			new PolynomialFunctionSetParams (basisCount),
+			segmentInelasticDesignControl,
 			null,
 			null
 		);
 	}
 
-	/*
-	 * Basis Spline Stretch Test Sample. Performs the following:
-	 * 	- Construct the Array of Segment Builder Parameters - one per segment.
-	 *  - Construct a Stretch instance using the predictor ordinate array and the Segment Best Fit Response Values.
-	 *  - Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-	 *  - Compute the Segment Curvature Penalty Estimate.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void BasisSplineStretchTest (
-		final double[] adblX,
-		final SegmentCustomBuilderControl scbc,
-		final StretchBestFitResponse sbfr)
+		final double[] xArray,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final StretchBestFitResponse stretchBestFitResponse)
 		throws Exception
 	{
-		double dblX = 1.;
-		double dblXMax = 10.;
+		double x = 1.;
+		double xMaximum = 10.;
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[segmentCount]; 
 
-		/*
-		 * Array of Segment Builder Parameters - one per segment
-		 */
-
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
-
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
-
-		/*
-		 * Construct a Stretch instance using the predictor ordinate array and the Segment Best Fit Response Values
-		 */
-
-		MultiSegmentSequence mss = MultiSegmentSequenceBuilder.CreateRegressionSplineEstimator (
-			"SPLINE_STRETCH",
-			adblX, // predictors
-			aSCBC, // Basis Segment Builder parameters
-			sbfr,
-			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
-		);
-
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-		 */
-
-		while (dblX <= dblXMax) {
-			System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mss.responseValue (dblX), 1, 2, 1.) + " | " +
-				mss.monotoneType (dblX));
-
-			System.out.println ("\t\tJacobian Y[" + dblX + "]=" + mss.jackDResponseDCalibrationInput (dblX, 1).displayString());
-
-			dblX += 1.;
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentCustomBuilderControlArray[segmentIndex] = segmentCustomBuilderControl;
 		}
 
-		/*
-		 * Compute the Segment Curvature Penalty Estimate
-		 */
+		MultiSegmentSequence multiSegmentSequence =
+			MultiSegmentSequenceBuilder.CreateRegressionSplineEstimator (
+				"SPLINE_STRETCH",
+				xArray, 							// predictors
+				segmentCustomBuilderControlArray, 	// Basis Segment Builder parameters
+				stretchBestFitResponse,
+				BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
+			);
 
-		System.out.println ("\tSPLINE_STRETCH DPE: " + mss.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Y[" + x + "] " + FormatUtil.FormatDouble (
+					multiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + multiSegmentSequence.monotoneType (x)
+			);
+
+			System.out.println (
+				"\t|| Jacobian Y[" + x + "]: " +
+					multiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+			);
+
+			x += 1.;
+		}
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t|| SPLINE_STRETCH DPE: " + multiSegmentSequence.curvatureDPE());
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 	}
-
-	/*
-	 * Bring together to compose the Regression Spline Estimator Test. It is made up of the following steps:
-	 * 	- Set the Predictor Ordinate Knot Points.
-	 * 	- Construct a set of Predictor Ordinates, their Responses, and corresponding Weights to serve as
-	 * 		weighted closeness of fit.
-	 * 	- Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with 2nd order
-	 * 		roughness penalty derivative, and without constraint.
-	 * 	- Basis Spline Stretch Test Using the Segment Best Fit Response.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
 
 	private static final void RegressionSplineEstimatorTest()
 		throws Exception
 	{
-		/*
-		 * Set the Knot Points
-		 */
-
-		double[] adblX = new double[] { 1.00,  5.00, 10.00};
-
-		/*
-		 * Construct a set of Predictor Ordinates, their Responses, and corresponding Weights to serve as
-		 *  weighted closeness of fit.
-		 */
-
-		StretchBestFitResponse sbfr = StretchBestFitResponse.Create (
-			new double[] { 2.28,  2.52,  2.73, 3.00,  5.50, 8.44,  8.76,  9.08,  9.80,  9.92},
-			new double[] {14.27, 12.36, 10.61, 9.25, -0.50, 7.92, 10.07, 12.23, 15.51, 16.36},
-			new double[] { 1.09,  0.82,  1.34, 1.10,  0.50, 0.79,  0.65,  0.49,  0.24,  0.21}
-		);
-
-		/*
-		 * Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with 2nd order
-		 * 	roughness penalty derivative, and without constraint
-		 */
-
-		int iK = 2;
-		int iRoughnessPenaltyDerivativeOrder = 2;
-
-		SegmentInelasticDesignControl sdic = SegmentInelasticDesignControl.Create (
-			iK,
-			iRoughnessPenaltyDerivativeOrder
-		);
-
-		int iPolyNumBasis = 4;
-
-		/*
-		 * Basis Spline Stretch Test Using the Segment Best Fit Response
-		 */
-
 		BasisSplineStretchTest (
-			adblX,
+			new double[]
+			{
+				 1.,
+				 5.,
+				10.
+			},
 			PolynomialSegmentControlParams (
-				iPolyNumBasis,
-				sdic
+				4,
+				SegmentInelasticDesignControl.Create (2, 2)
 			),
-			sbfr
+			StretchBestFitResponse.Create (
+				new double[]
+				{
+					2.28,
+					2.52,
+					2.73,
+					3.00,
+					5.50,
+					8.44,
+					8.76,
+					9.08,
+					9.80,
+					9.92
+				},
+				new double[]
+				{
+					14.27,
+					12.36,
+					10.61,
+					 9.25,
+					-0.50,
+					 7.92,
+					10.07,
+					12.23,
+					15.51,
+					16.36
+				},
+				new double[]
+				{
+					1.09,
+					0.82,
+					1.34,
+					1.10,
+					0.50,
+					0.79,
+					0.65,
+					0.49,
+					0.24,
+					0.21
+				}
+			)
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		RegressionSplineEstimatorTest();
 

@@ -14,6 +14,14 @@ import org.drip.spline.stretch.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -105,963 +113,901 @@ import org.drip.spline.stretch.*;
  * 	- Demonstrate the construction, the calibration, and the usage of Lagrange Polynomial Stretch.
  * 	- Demonstrate the construction, the calibration, and the usage of C1 Stretch with the desired customization.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/stretch/README.md">Knot Insertion Curvature Roughness Penalty</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class KnotInsertionPolynomialEstimator {
-
-	/*
-	 * Build Polynomial Segment Control Parameters.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class KnotInsertionPolynomialEstimator
+{
 
 	private static final SegmentCustomBuilderControl PolynomialSegmentControlParams (
-		final int iNumBasis,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final int basisCount,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (iNumBasis),
-			sdic,
-			rssc,
+			new PolynomialFunctionSetParams (basisCount),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build Bernstein Polynomial Segment Control Parameters.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl BernsteinPolynomialSegmentControlParams (
-		final int iNumBasis,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final int basisCount,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_BERNSTEIN_POLYNOMIAL,
-			new PolynomialFunctionSetParams (iNumBasis),
-			sdic,
-			rssc,
+			new PolynomialFunctionSetParams (basisCount),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build Exponential Tension Segment Control Parameters.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl ExponentialTensionSegmentControlParams (
-		final double dblTension,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final double tension,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_EXPONENTIAL_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			sdic,
-			rssc,
+			new ExponentialTensionSetParams (tension),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build Hyperbolic Tension Segment Control Parameters.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl HyperbolicTensionSegmentControlParams (
-		final double dblTension,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final double tension,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_HYPERBOLIC_TENSION,
-			new ExponentialTensionSetParams (dblTension),
-			sdic,
-			rssc,
+			new ExponentialTensionSetParams (tension),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Build Kaklis-Pandelis Segment Control Parameters
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final SegmentCustomBuilderControl KaklisPandelisSegmentControlParams (
-		final int iKPTensionDegree,
-		final SegmentInelasticDesignControl sdic,
-		final ResponseScalingShapeControl rssc)
+		final int tensionDegree,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl,
+		final ResponseScalingShapeControl responseScalingShapeControl)
 		throws Exception
 	{
 		return new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_KAKLIS_PANDELIS,
-			new KaklisPandelisSetParams (iKPTensionDegree),
-			sdic,
-			rssc,
+			new KaklisPandelisSetParams (tensionDegree),
+			segmentInelasticDesignControl,
+			responseScalingShapeControl,
 			null
 		);
 	}
 
-	/*
-	 * Perform the following sequence of tests for a given segment control for a predictor/response range
-	 * 	- Estimate
-	 *  - Compute the segment-by-segment monotonicity
-	 *  - Stretch Jacobian
-	 *  - Stretch knot insertion
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void BasisSplineStretchTest (
-		final double[] adblX,
-		final double[] adblY,
-		final SegmentCustomBuilderControl scbc)
+		final double[] xArray,
+		final double[] yArray,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl)
 		throws Exception
 	{
-		double dblX = 1.;
-		double dblXMax = 10.;
+		double x = 1.;
+		double xMaximum = 10.;
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[segmentCount]; 
 
-		/*
-		 * Assign the array of Segment Builder Parameters - one per segment
-		 */
-
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
-
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
-
-		/*
-		 * Construct a Stretch instance 
-		 */
-
-		MultiSegmentSequence mss = MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
-			"SPLINE_STRETCH", // Name
-			adblX, // predictors
-			adblY, // responses
-			aSCBC, // Basis Segment Builder parameters
-			null,  // NULL segment Best Fit Response
-			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE // Calibrate the Stretch predictors to the responses
-		);
-
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-		 */
-
-		while (dblX <= dblXMax) {
-			System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mss.responseValue (dblX), 1, 2, 1.) + " | " +
-				mss.monotoneType (dblX));
-
-			System.out.println ("Jacobian Y[" + dblX + "]=" + mss.jackDResponseDCalibrationInput (dblX, 1).displayString());
-
-			dblX += 1.;
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentCustomBuilderControlArray[segmentIndex] = segmentCustomBuilderControl;
 		}
 
-		System.out.println ("SPLINE_STRETCH DPE: " + mss.curvatureDPE());
+		MultiSegmentSequence multiSegmentSequence =
+			MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
+				"SPLINE_STRETCH", 					// Name
+				xArray, 							// predictors
+				yArray, 							// responses
+				segmentCustomBuilderControlArray, 	// Basis Segment Builder parameters
+				null,  								// NULL segment Best Fit Response
+				BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
+			);
 
-		/*
-		 * Construct a new Stretch instance by inserting a pair of of predictor/response knots
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		MultiSegmentSequence mssInsert = MultiSegmentSequenceModifier.InsertKnot (
-			mss, 								// The Original MSS
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Y[" + x + "] " + FormatUtil.FormatDouble (
+					multiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + multiSegmentSequence.monotoneType (x)
+			);
+
+			System.out.println (
+				"\t\t|| Jacobian Y[" + x + "]: " +
+					multiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+			);
+
+			x += 1.;
+		}
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t|| SPLINE_STRETCH DPE: " + multiSegmentSequence.curvatureDPE());
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		MultiSegmentSequence insertedMultiSegmentSequence = MultiSegmentSequenceModifier.InsertKnot (
+			multiSegmentSequence, 				// The Original MSS
 			9.,  								// Predictor Ordinate at which the Insertion is to be made
 			10., 								// Response Value to be inserted
 			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE 	// Calibrate the Stretch predictors to the responses
+			MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
 		);
 
-		dblX = 1.;
+		x = 1.;
 
-		/*
-		 * Estimate, compute the sgement-by-segment monotonicty and the Stretch Jacobian
-		 */
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Inserted Y[" + x + "] " + FormatUtil.FormatDouble (
+					insertedMultiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + insertedMultiSegmentSequence.monotoneType (x)
+			);
 
-		while (dblX <= dblXMax) {
-			System.out.println ("Inserted Y[" + dblX + "] " + FormatUtil.FormatDouble (mssInsert.responseValue (dblX), 1, 2, 1.)
-				+ " | " + mssInsert.monotoneType (dblX));
-
-			dblX += 1.;
+			x += 1.;
 		}
 
-		System.out.println ("SPLINE_STRETCH_INSERT DPE: " + mssInsert.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println (
+			"\t||  SPLINE_STRETCH_INSERT DPE: " + insertedMultiSegmentSequence.curvatureDPE()
+		);
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 	}
 
-	/*
-	 * This function demonstrates the construction, the calibration, and the usage of Local Control Segment Spline.
-	 * 	It does the following:
-	 * 	- Set up the predictor/response values, the shape controller, and the basis spline (in this case polynomial)
-	 *  - Create the left and the right segment edge derivative parameters for each segment
-	 * 	- Construct the C1 Hermite Polynomial Spline based Stretch Estimator by using the following steps:
-	 * 		- Set up the Stretch Builder Parameter
-	 * 		- Set the array of Segment Builder Parameters - one per segment
-	 * 		- Construct the Stretch
-	 * 		- Set up the left and the local control Parameters - in this case the derivatives
-	 * 		- Calibrate the Stretch and compute the Jacobian
-	 * 		- Display the Estimated Y and the Stretch Jacobian across the variates
-	 * 	- Insert the Local Control spline point(s) for the following variants:
-	 * 		- Local Control Explicit Hermite Point
-	 * 		- Local Control Explicit Cardinal Point
-	 * 		- Local Control Explicit Catmull-Rom Point
-	 * 	- In each of the above instances perform the following tests:
-	 * 		- Set up the left and the right segment edge parameters
-	 * 		- Insert the pair of edge parameters at the chosen variate node.
-	 * 		- Compute the Estimated segment value and the motonicity across a suitable variate range.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void TestHermiteCatmullRomCardinal()
-		throws java.lang.Exception
+		throws Exception
 	{
-		/*
-		 * X predictors
-		 */
+		int k = 1;
+		int basisCount = 4;
+		double shapeControllerTension = 1.;
+		int roughnessPenaltyDerivativeOrder = 2;
+		double[] xArray = {
+			0.,
+			1.,
+			2.,
+			3.,
+			4.
+		};
+		double[] yArray = {
+			 1.,
+			 4.,
+			15.,
+			40.,
+			85.
+		};
+		double[] dYdXArray = {
+			 1.,
+			 6.,
+			17.,
+			34.,
+			57.
+		};
 
-		double[] adblX = new double[] {0.00, 1.00,  2.00,  3.00,  4.00};
-
-		/*
-		 * Y responses
-		 */
-
-		double[] adblY = new double[] {1.00, 4.00, 15.00, 40.00, 85.00};
-
-		/*
-		 * DY/DX explicit local shape control for the responses
-		 */
-
-		double[] adblDYDX = new double[] {1.00, 6.00, 17.00, 34.00, 57.00};
-
-		/*
-		 * Construct a rational shape controller with the shape controller tension of 1.
-		 */
-
-		double dblShapeControllerTension = 1.;
-
-		ResponseScalingShapeControl rssc = new ResponseScalingShapeControl (
-			true,
-			new QuadraticRationalShapeControl (dblShapeControllerTension)
-		);
-
-		/*
-		 * Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with 2nd order
-		 * 	roughness penalty derivative, and without constraint
-		 */
-
-		int iK = 1;
-		int iRoughnessPenaltyDerivativeOrder = 2;
-
-		SegmentInelasticDesignControl sdic = SegmentInelasticDesignControl.Create (
-			iK,
-			iRoughnessPenaltyDerivativeOrder
-		);
-
-		/* 
-		 * Construct the C1 Hermite Polynomial Spline based Stretch Estimator by using the following steps:
-		 * 
-		 * - 1) Set up the Stretch Builder Parameter
-		 */
-
-		int iNumBasis = 4;
-
-		SegmentCustomBuilderControl scbc = new SegmentCustomBuilderControl (
+		SegmentCustomBuilderControl segmentCustomBuilderControl = new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (iNumBasis),
-			sdic,
-			rssc,
+			new PolynomialFunctionSetParams (basisCount),
+			SegmentInelasticDesignControl.Create (k, roughnessPenaltyDerivativeOrder),
+			new ResponseScalingShapeControl (
+				true,
+				new QuadraticRationalShapeControl (shapeControllerTension)
+			),
 			null
 		);
 
-		/*
-		 *	- 2a) Set the array of Segment Builder Parameters - one per segment
-		 */
+		double x = 0.;
+		double xMaximum = 4.;
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[segmentCount];
+		SegmentPredictorResponseDerivative[] segmentPredictorResponseDerivativeLeftArray =
+			new SegmentPredictorResponseDerivative[segmentCount];
+		SegmentPredictorResponseDerivative[] segmentPredictorResponseDerivativeRightArray =
+			new SegmentPredictorResponseDerivative[segmentCount];
 
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
-
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
-
-		/* 
-		 * - 2b) Construct the Stretch
-		 */
-
-		MultiSegmentSequence mss = MultiSegmentSequenceBuilder.CreateUncalibratedStretchEstimator (
-			"SPLINE_STRETCH",
-			adblX,
-			aSCBC
-		);
-
-		SegmentPredictorResponseDerivative[] aSPRDLeft = new SegmentPredictorResponseDerivative[adblY.length - 1];
-		SegmentPredictorResponseDerivative[] aSPRDRight = new SegmentPredictorResponseDerivative[adblY.length - 1];
-
-		 /* 
-		  * - 3) Set up the left and the local control Parameters - in this case the derivatives
-		  */
-
-		for (int i = 0; i < adblY.length - 1; ++i) {
-			aSPRDLeft[i] = new SegmentPredictorResponseDerivative (adblY[i], new double[] {adblDYDX[i]});
-
-			aSPRDRight[i] = new SegmentPredictorResponseDerivative (adblY[i + 1], new double[] {adblDYDX[i + 1]});
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentCustomBuilderControlArray[segmentIndex] = segmentCustomBuilderControl;
 		}
 
-		/* 
-		 * - 4) Calibrate the Stretch and compute the Jacobian
-		 */
+		MultiSegmentSequence multiSegmentSequence =
+			MultiSegmentSequenceBuilder.CreateUncalibratedStretchEstimator (
+				"SPLINE_STRETCH",
+				xArray,
+				segmentCustomBuilderControlArray
+			);
 
-		System.out.println ("Stretch Setup Succeeded: " +
-			mss.setupHermite (
-				aSPRDLeft,
-				aSPRDRight,
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentPredictorResponseDerivativeLeftArray[segmentIndex] =
+				new SegmentPredictorResponseDerivative (
+					yArray[segmentIndex],
+					new double[]
+					{
+						dYdXArray[segmentIndex]
+					}
+				);
+
+			segmentPredictorResponseDerivativeRightArray[segmentIndex] =
+				new SegmentPredictorResponseDerivative (
+					yArray[segmentIndex + 1],
+					new double[]
+					{
+						dYdXArray[segmentIndex + 1]
+					}
+				);
+		}
+
+		System.out.println (
+			"Stretch Setup Succeeded: " +
+			multiSegmentSequence.setupHermite (
+				segmentPredictorResponseDerivativeLeftArray,
+				segmentPredictorResponseDerivativeRightArray,
 				null,
 				null,
 				MultiSegmentSequence.CALIBRATE
 			)
 		);
 
-		double dblX = 0.;
-		double dblXMax = 4.;
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/* 
-		 * - 5) Display the Estimated Y and the Stretch Jacobian across the variates
-		 */
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Y[" + x + "] " + FormatUtil.FormatDouble (
+					multiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + multiSegmentSequence.monotoneType (x)
+			);
 
-		while (dblX <= dblXMax) {
-			System.out.println ("Y[" + dblX + "] " + FormatUtil.FormatDouble (mss.responseValue (dblX), 1, 2, 1.) + " | " +
-				mss.monotoneType (dblX));
+			System.out.println (
+				"\t|| Jacobian Y[" + x + "]: " +
+					multiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+			);
 
-			System.out.println ("Jacobian Y[" + dblX + "]=" + mss.jackDResponseDCalibrationInput (dblX, 1).displayString());
-
-			dblX += 0.5;
+			x += 0.5;
 		}
 
-		System.out.println ("SPLINE_STRETCH DPE: " + mss.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/* 
-		 * We now insert a Hermite local control knot. The following are the steps:
-		 * 
-		 * - 1) Set up the left and the right segment edge parameters
-		 * - 2) Insert the pair of edge parameters at the chosen variate node.
-		 * - 3) Compute the Estimated segment value and the motonicity across a suitable variate range.
-		 */
+		System.out.println ("\t|| SPLINE_STRETCH DPE: " + multiSegmentSequence.curvatureDPE());
 
-		SegmentPredictorResponseDerivative sprdLeftSegmentRightNode = new SegmentPredictorResponseDerivative (
-			27.5,
-			new double[] {25.5}
-		);
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		SegmentPredictorResponseDerivative sprdRightSegmentLeftNode = new SegmentPredictorResponseDerivative (
-			27.5,
-			new double[] {25.5}
-		);
-
-		MultiSegmentSequence mssInsert = MultiSegmentSequenceModifier.InsertKnot (
-			mss,
+		MultiSegmentSequence insertedMultiSegmentSequence = MultiSegmentSequenceModifier.InsertKnot (
+			multiSegmentSequence,
 			2.5,
-			sprdLeftSegmentRightNode,
-			sprdRightSegmentLeftNode
+			new SegmentPredictorResponseDerivative (
+				27.5,
+				new double[]
+				{
+					25.5
+				}
+			),
+			new SegmentPredictorResponseDerivative (
+				27.5,
+				new double[]
+				{
+					25.5
+				}
+			)
 		);
 
-		dblX = 1.;
+		x = 1.;
 
-		while (dblX <= dblXMax) {
-			System.out.println ("Inserted Y[" + dblX + "] " + FormatUtil.FormatDouble (mssInsert.responseValue (dblX), 1, 2, 1.)
-				+ " | " + mssInsert.monotoneType (dblX));
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t|| Inserted Y[" + x + "] " + FormatUtil.FormatDouble (
+					insertedMultiSegmentSequence.responseValue (x),
+					2,
+					2,
+					1.
+				) + " | " + insertedMultiSegmentSequence.monotoneType (x)
+			);
 
-			dblX += 0.5;
+			x += 0.5;
 		}
 
-		System.out.println ("SPLINE_STRETCH_INSERT DPE: " + mssInsert.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/* 
-		 * We now insert a Cardinal local control knot. The following are the steps:
-		 * 
-		 * - 1) Set up the left and the right segment edge parameters
-		 * - 2) Insert the pair of edge parameters at the chosen variate node.
-		 * - 3) Compute the Estimated segment value and the motonicity across a suitable variate range.
-		 */
+		System.out.println ("\t||  SPLINE_STRETCH_INSERT DPE: " + insertedMultiSegmentSequence.curvatureDPE());
 
-		MultiSegmentSequence mssCardinalInsert = MultiSegmentSequenceModifier.InsertCardinalKnot (
-			mss,
-			2.5,
-			0.
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		MultiSegmentSequence cardinalInsertedMultiSegmentSequence =
+			MultiSegmentSequenceModifier.InsertCardinalKnot (multiSegmentSequence, 2.5, 0.);
+
+		x = 1.;
+
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t||  Cardinal Inserted Y[" + x + "] " + FormatUtil.FormatDouble (
+					cardinalInsertedMultiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + insertedMultiSegmentSequence.monotoneType (x)
+			);
+
+			x += 0.5;
+		}
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println (
+			"\t||  SPLINE_STRETCH_CARDINAL_INSERT DPE: " +
+				cardinalInsertedMultiSegmentSequence.curvatureDPE()
 		);
 
-		dblX = 1.;
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		while (dblX <= dblXMax) {
-			System.out.println ("Cardinal Inserted Y[" + dblX + "] " + FormatUtil.FormatDouble
-				(mssCardinalInsert.responseValue (dblX), 1, 2, 1.) + " | " + mssInsert.monotoneType (dblX));
+		MultiSegmentSequence catmullRomInsertedMultiSegmentSequence =
+			MultiSegmentSequenceModifier.InsertCatmullRomKnot (multiSegmentSequence, 2.5);
 
-			dblX += 0.5;
+		x = 1.;
+
+		while (x <= xMaximum) {
+			System.out.println (
+				"\t||  Catmull-Rom Inserted Y[" + x + "] " + FormatUtil.FormatDouble (
+					catmullRomInsertedMultiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + insertedMultiSegmentSequence.monotoneType (x)
+			);
+
+			x += 0.5;
 		}
 
-		System.out.println ("SPLINE_STRETCH_CARDINAL_INSERT DPE: " + mssCardinalInsert.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/* 
-		 * We now insert a Catmull-Rom local control knot. The following are the steps:
-		 * 
-		 * - 1) Set up the left and the right segment edge parameters
-		 * - 2) Insert the pair of edge parameters at the chosen variate node.
-		 * - 3) Compute the Estimated segment value and the motonicity across a suitable variate range.
-		 */
-
-		MultiSegmentSequence mssCatmullRomInsert = MultiSegmentSequenceModifier.InsertCatmullRomKnot (
-			mss,
-			2.5
+		System.out.println (
+			"\t||  SPLINE_STRETCH_CATMULL_ROM_INSERT DPE: " +
+				catmullRomInsertedMultiSegmentSequence.curvatureDPE()
 		);
 
-		dblX = 1.;
-
-		while (dblX <= dblXMax) {
-			System.out.println ("Catmull-Rom Inserted Y[" + dblX + "] " + FormatUtil.FormatDouble
-				(mssCatmullRomInsert.responseValue (dblX), 1, 2, 1.) + " | " + mssInsert.monotoneType (dblX));
-
-			dblX += 0.5;
-		}
-
-		System.out.println ("SPLINE_STRETCH_CATMULL_ROM_INSERT DPE: " + mssCatmullRomInsert.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
 	}
-
-	/*
-	 * This function demonstrates the construction, the calibration, and the usage of Lagrange Polynomial Stretch.
-	 * 	It does the following:
-	 * 	- Set up the predictors and the Lagrange Polynomial Stretch.
-	 *  - Calibrate to a target Y array.
-	 *  - Calibrate the value to a target X.
-	 *  - Calibrate the value Jacobian to a target X.
-	 *  - Verify the local monotonicity and convexity (both the co- and the local versions).
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
 
 	private static final void TestLagrangePolynomialStretch()
-		throws java.lang.Exception
+		throws Exception
 	{
-		SingleSegmentSequence sslp = new SingleSegmentLagrangePolynomial (new double[] {-2., -1., 2., 5.});
-
-		System.out.println ("Setup: " + sslp.setup (
-			0.25, 										// Left Edge Response Value
-			new double[] {0.25, 0.25, 12.25, 42.25},	// Array of Segment Response Values
-			null, 										// Fitness Weighted Response
-			BoundarySettings.NaturalStandard(), 		// Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE) 			// Calibrate the Stretch predictors to the responses
+		SingleSegmentSequence singleSegmentLagrangePolynomial = new SingleSegmentLagrangePolynomial (
+			new double[]
+			{
+				-2.,
+				-1.,
+				 2.,
+				 5.
+			 }
 		);
 
-		System.out.println ("Value = " + sslp.responseValue (2.16));
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println ("Value Jacobian = " + sslp.jackDResponseDCalibrationInput (2.16, 1).displayString());
+		System.out.println (
+			"\t||  Setup: " + singleSegmentLagrangePolynomial.setup (
+				0.25, 									// Left Edge Response Value
+				new double[]
+				{
+					 0.25,
+					 0.25,
+					12.25,
+					42.25
+				},	// Array of Segment Response Values
+				null, 									// Fitness Weighted Response
+				BoundarySettings.NaturalStandard(), 	// Boundary Condition - Natural
+				MultiSegmentSequence.CALIBRATE 			// Calibrate the Stretch predictors to the responses
+			)
+		);
 
-		System.out.println ("Value Monotone Type: " + sslp.monotoneType (2.16));
+		System.out.println (
+			"\t||  Value = " + singleSegmentLagrangePolynomial.responseValue (2.16)
+		);
 
-		System.out.println ("Is Locally Monotone: " + sslp.isLocallyMonotone());
+		System.out.println (
+			"\t||  Value Jacobian = " +
+				singleSegmentLagrangePolynomial.jackDResponseDCalibrationInput (2.16, 1).displayString()
+		);
+
+		System.out.println (
+			"\t||  Value Monotone Type: " + singleSegmentLagrangePolynomial.monotoneType (2.16)
+		);
+
+		System.out.println (
+			"\t||  Is Locally Monotone: " + singleSegmentLagrangePolynomial.isLocallyMonotone()
+		);
+
+		System.out.println ("\t||------------------------------------------------------------------------");
 	}
 
-	/*
-	 * Construct the C1 Stretch with the desired customization - this demonstrates the following steps:
-	 * 	- Construct the Local Monotone C1 Generator with the desired Customization.
-	 * 	- Array of Segment Builder Parameters - one per segment.
-	 * 	- Construct the Local Control Stretch instance.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final MultiSegmentSequence ConstructSpecifiedC1Stretch (
-		final double[] adblX,
-		final double[] adblY,
-		final java.lang.String strGeneratorType,
-		final SegmentCustomBuilderControl scbc,
-		final boolean bEliminateSpuriousExtrema,
-		final boolean bApplyMonotoneFilter)
+		final double[] xArray,
+		final double[] yArray,
+		final String generatorType,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final boolean eliminateSpuriousExtrema,
+		final boolean applyMonotoneFilter)
 	{
-		/*
-		 * Construct the Local Monotone C1 Generator with the desired Customization
-		 */
-
-		LocalMonotoneCkGenerator lmcg = LocalMonotoneCkGenerator.Create (
-			adblX,						// The Array of Predictor Ordinates
-			adblY,						// The Array of Response Value
-			strGeneratorType,			// The C1 Generator Type
-			bEliminateSpuriousExtrema,	// TRUE => Eliminate Spurious Extremum
-			bApplyMonotoneFilter		// TRUE => Apply Monotone Filter
+		LocalMonotoneCkGenerator localMonotoneCkGenerator = LocalMonotoneCkGenerator.Create (
+			xArray,						// The Array of Predictor Ordinates
+			yArray,						// The Array of Response Value
+			generatorType,			  	// The C1 Generator Type
+			eliminateSpuriousExtrema,	// TRUE => Eliminate Spurious Extremum
+			applyMonotoneFilter			// TRUE => Apply Monotone Filter
 		);
 
-		/*
-		 * Array of Segment Builder Parameters - one per segment
-		 */
+		int segmentCount = xArray.length - 1;
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[segmentCount]; 
 
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[adblX.length - 1]; 
-
-		for (int i = 0; i < adblX.length - 1; ++i)
-			aSCBC[i] = scbc;
-
-		/*
-		 * Construct the Local Control Stretch instance 
-		 */
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			segmentCustomBuilderControlArray[segmentIndex] = segmentCustomBuilderControl;
+		}
 
 		return LocalControlStretchBuilder.CustomSlopeHermiteSpline (
-			strGeneratorType + "_LOCAL_STRETCH",
-			adblX,
-			adblY,
-			lmcg.C1(),
-			aSCBC,
+			generatorType + "_LOCAL_STRETCH",
+			xArray,
+			yArray,
+			localMonotoneCkGenerator.C1(),
+			segmentCustomBuilderControlArray,
 			null,
 			MultiSegmentSequence.CALIBRATE
 		);
 	}
 
-	/*
-	 * Perform the following sequence of tests for a given segment control for a predictor/response range:
-	 * 	- Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian.
-	 *  - Construct a new Stretch instance by inserting a pair of of predictor/response knots.
-	 *  - Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian.
-	 *  - Stretch knot insertion
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
-
 	private static final void C1GeneratedStretchTest (
-		final double[] adblX,
-		final double[] adblY,
-		final MultiSegmentSequence mss)
+		final MultiSegmentSequence multiSegmentSequence)
 		throws Exception
 	{
-		double dblX = 1.;
-		double dblXMax = 10.;
+		double x = 1.;
+		double xMaximum = 10.;
 
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		while (dblX <= dblXMax) {
+		while (x <= xMaximum) {
 			System.out.println (
-				"Y[" + dblX + "] => " + FormatUtil.FormatDouble (mss.responseValue (dblX), 1, 2, 1.) + " | " +
-				mss.monotoneType (dblX));
+				"\t|| Y[" + x + "] => " + FormatUtil.FormatDouble (
+					multiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + multiSegmentSequence.monotoneType (x)
+			);
 
-			System.out.println ("Jacobian Y[" + dblX + "]=" + mss.jackDResponseDCalibrationInput (dblX, 1).displayString());
+			System.out.println (
+				"\t|| Jacobian Y[" + x + "]: " +
+					multiSegmentSequence.jackDResponseDCalibrationInput (x, 1).displayString()
+			);
 
-			dblX += 1.;
+			x += 1.;
 		}
 
-		System.out.println ("\tSPLINE_STRETCH DPE: " + mss.curvatureDPE());
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		/*
-		 * Construct a new Stretch instance by inserting a pair of of predictor/response knots
-		 */
+		System.out.println ("\t|| SPLINE_STRETCH DPE: " + multiSegmentSequence.curvatureDPE());
 
-		MultiSegmentSequence mssInsert = MultiSegmentSequenceModifier.InsertKnot (
-			mss, 								// The Original MSS
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		MultiSegmentSequence insertedMultiSegmentSequence = MultiSegmentSequenceModifier.InsertKnot (
+			multiSegmentSequence, 				// The Original MSS
 			9.,  								// Predictor Ordinate at which the Insertion is to be made
 			10., 								// Response Value to be inserted
 			BoundarySettings.NaturalStandard(), // Boundary Condition - Natural
-			MultiSegmentSequence.CALIBRATE 	// Calibrate the Stretch predictors to the responses
+			MultiSegmentSequence.CALIBRATE 		// Calibrate the Stretch predictors to the responses
 		);
 
-		dblX = 1.;
+		x = 1.;
 
-		/*
-		 * Estimate, compute the segment-by-segment monotonicity and the Stretch Jacobian
-		 */
+		while (x <= xMaximum) {
+			System.out.println (""
+				+ "\t|| Inserted Y[" + x + "] " + FormatUtil.FormatDouble (
+					insertedMultiSegmentSequence.responseValue (x),
+					1,
+					2,
+					1.
+				) + " | " + insertedMultiSegmentSequence.monotoneType (x)
+			);
 
-		while (dblX <= dblXMax) {
-			System.out.println ("Inserted Y[" + dblX + "] " + FormatUtil.FormatDouble (mssInsert.responseValue (dblX), 1, 2, 1.)
-				+ " | " + mssInsert.monotoneType (dblX));
-
-			dblX += 1.;
+			x += 1.;
 		}
 
-		System.out.println ("\tSPLINE_STRETCH_INSERT DPE: " + mssInsert.curvatureDPE());
-	}
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-	/*
-	 * This function brings it all together. It demonstrates the following sequence:
-	 * 	- Setup and X predictor ordinate and Y response value arrays.
-	 * 	- Construct a rational shape controller with the specified shape controller tension parameter.
-	 * 	- Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with 2nd order
-	 * 		roughness penalty derivative, and without constraint
-	 * 	- Regular Polynomial Basis Spline Stretch Test.
-	 * 	- Bernstein Polynomial Basis Spline Stretch Test.
-	 * 	- Exponential Tension Basis Spline Stretch Test.
-	 * 	- Hyperbolic Tension Basis Spline Stretch Test.
-	 * 	- Kaklis-Pandelis Basis Spline Stretch Test.
-	 * 	- Catmull-Rom Cardinal Hermite Basis Spline Stretch Test.
-	 * 	- Lagrange Polynomial Basis Spline Stretch Test.
-	 * 	- Akima C1 Basis Spline Stretch Test.
-	 * 	- Bessel/Hermite C1 Basis Spline Stretch Test.
-	 * 	- Harmonic Monotone C1 Basis Spline Stretch Test with Filter.
-	 * 	- Harmonic Monotone C1 Basis Spline Stretch Test without Filter.
-	 * 	- Huynh-Le Floch Limiter Monotone C1 Basis Spline Stretch Test without Filter.
-	 * 	- Hyman 1983 Monotone C1 Basis Spline Stretch Test with Filter.
-	 * 	- Hyman 1989 Monotone C1 Basis Spline Stretch Test with Filter.
-	 * 	- Kruger C1 Basis Spline Stretch Test with Filter.
-	 * 	- Van Leer Limiter Monotone C1 Basis Spline Stretch Test without Filter.
-	 */
+		System.out.println (
+			"\t|| SPLINE_STRETCH_INSERT DPE: " + insertedMultiSegmentSequence.curvatureDPE()
+		);
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+	}
 
 	private static final void StretchEstimationTestSequence()
 		throws Exception
 	{
-		/*
-		 * X predictors
-		 */
+		int k = 2;
+		double tension = 1.;
+		int polynomialBasisCount = 4;
+		double shapeControllerTension = 1.;
+		int kaklisPandelisTensionDegree = 2;
+		int bernsteinBasisPolynomialCount = 4;
+		int roughnessPenaltyDerivativeOrder = 2;
+		double[] xArray =
+		{
+			 1.0,
+			 1.5,
+			 2.0,
+			 3.0,
+			 4.0,
+			 5.0,
+			 6.5,
+			 8.0,
+			10.0
+		};
+		double[] yArray =
+		{
+			25.00,
+			20.25,
+			16.00,
+			 9.00,
+			 4.00,
+			 1.00,
+			 0.25,
+			 4.00,
+			16.00
+		};
 
-		double[] adblX = new double[] { 1.00,  1.50,  2.00, 3.00, 4.00, 5.00, 6.50, 8.00, 10.00};
-
-		/*
-		 * Y responses
-		 */
-
-		double[] adblY = new double[] {25.00, 20.25, 16.00, 9.00, 4.00, 1.00, 0.25, 4.00, 16.00};
-
-		/*
-		 * Construct a rational shape controller with the shape controller tension of 1.
-		 */
-
-		double dblShapeControllerTension = 1.;
-
-		ResponseScalingShapeControl rssc = new ResponseScalingShapeControl (
+		ResponseScalingShapeControl responseScalingShapeControl = new ResponseScalingShapeControl (
 			true,
-			new QuadraticRationalShapeControl (dblShapeControllerTension)
+			new QuadraticRationalShapeControl (shapeControllerTension)
 		);
 
-		/*
-		 * Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with 2nd order
-		 * 	roughness penalty derivative, and without constraint
-		 */
-
-		int iK = 2;
-		int iRoughnessPenaltyDerivativeOrder = 2;
-
-		SegmentInelasticDesignControl sdic = SegmentInelasticDesignControl.Create (
-			iK,
-			iRoughnessPenaltyDerivativeOrder
+		SegmentInelasticDesignControl segmentInelasticDesignControl = SegmentInelasticDesignControl.Create (
+			k,
+			roughnessPenaltyDerivativeOrder
 		);
 
-		/*
-		 * Bernstein Polynomial Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n BERNSTEIN POLYNOMIAL \n ---------- \n");
+		System.out.println();
 
-		int iBernPolyNumBasis = 4;
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  BERNSTEIN POLYNOMIAL");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			BernsteinPolynomialSegmentControlParams (
-				iBernPolyNumBasis,
-				sdic,
-				rssc
+				bernsteinBasisPolynomialCount,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * Regular Polynomial Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n POLYNOMIAL \n ---------- \n");
+		System.out.println();
 
-		int iPolyNumBasis = 4;
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  POLYNOMIAL");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			PolynomialSegmentControlParams (
-				iPolyNumBasis,
-				sdic,
-				rssc
+				polynomialBasisCount,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * Exponential Tension Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n EXPONENTIAL TENSION \n ---------- \n");
+		System.out.println();
 
-		double dblTension = 1.;
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  EXPONENTIAL TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			ExponentialTensionSegmentControlParams (
-				dblTension,
-				sdic,
-				rssc
+				tension,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * Hyperbolic Tension Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n HYPERBOLIC TENSION \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  HYPERBOLIC TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			HyperbolicTensionSegmentControlParams (
-				dblTension,
-				sdic,
-				rssc
+				tension,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * Kaklis-Pandelis Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n KAKLIS PANDELIS \n ---------- \n");
+		System.out.println();
 
-		int iKPTensionDegree = 2;
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  KAKLIS-PANDELIS TENSION");
 
 		BasisSplineStretchTest (
-			adblX,
-			adblY,
+			xArray,
+			yArray,
 			KaklisPandelisSegmentControlParams (
-				iKPTensionDegree,
-				sdic,
-				rssc
+				kaklisPandelisTensionDegree,
+				segmentInelasticDesignControl,
+				responseScalingShapeControl
 			)
 		);
 
-		/*
-		 * Catmull-Rom Cardinal Hermite Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n HERMITE - CATMULL ROM - CARDINAL \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  HERMITE - CATMULL ROM - CARDINAL");
 
 		TestHermiteCatmullRomCardinal();
 
-		/*
-		 * Lagrange Polynomial Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n LAGRANGE POLYNOMIAL STRETCH\n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  LAGRANGE POLYNOMIAL STRETCH");
 
 		TestLagrangePolynomialStretch();
 
-		/*
-		 * Akima C1 Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 AKIMA STRETCH\n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  AKIMA STRETCH");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_AKIMA,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * Bessel/Hermite C1 Basis Spline Stretch Test
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 BESSEL/HERMITE \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 BESSEL/HERMITE");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_BESSEL,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * Harmonic Monotone C1 Basis Spline Stretch Test with Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 HARMONIC MONOTONE WITH FILTER \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 HARMONIC MONOTONE WITH FILTER");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_HARMONIC,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * Harmonic Monotone C1 Basis Spline Stretch Test without Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 HARMONIC MONOTONE WITHOUT FILTER \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 HARMONIC MONOTONE WITHOUT FILTER");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_HARMONIC,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				false
 			)
 		);
 
-		/*
-		 * Huynh-Le Floch Limiter Monotone C1 Basis Spline Stretch Test without Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 HUYNH LE-FLOCH LIMITER STRETCH WITHOUT FILTER \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 HUYNH LE-FLOCH LIMITER STRETCH WITHOUT FILTER");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_HUYNH_LE_FLOCH,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * 
-		 * Hyman 1983 Monotone C1 Basis Spline Stretch Test with Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 HYMAN 1983 MONOTONE \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 HYMAN 1983 MONOTONE");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_HYMAN83,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * Hyman 1989 Monotone C1 Basis Spline Stretch Test with Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 HYMAN 1989 MONOTONE \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 HYMAN 1989 MONOTONE");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_HYMAN89,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * Kruger C1 Basis Spline Stretch Test with Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 KRUGER STRETCH\n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 KRUGER STRETCH");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_KRUGER,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				true
 			)
 		);
 
-		/*
-		 * Van Leer Limiter Monotone C1 Basis Spline Stretch Test without Filter
-		 */
+		System.out.println ("\t||------------------------------------------------------------------------");
 
-		System.out.println (" \n---------- \n C1 VAN LEER LIMITER STRETCH WITHOUT FILTER \n ---------- \n");
+		System.out.println();
+
+		System.out.println ("\t||------------------------------------------------------------------------");
+
+		System.out.println ("\t||  C1 VAN LEER LIMITER STRETCH WITHOUT FILTER");
 
 		C1GeneratedStretchTest (
-			adblX,
-			adblY,
 			ConstructSpecifiedC1Stretch (
-				adblX,
-				adblY,
+				xArray,
+				yArray,
 				LocalMonotoneCkGenerator.C1_VAN_LEER,
 				PolynomialSegmentControlParams (
-					iPolyNumBasis,
-					sdic,
-					rssc
+					polynomialBasisCount,
+					segmentInelasticDesignControl,
+					responseScalingShapeControl
 				),
 				true,
 				false
@@ -1072,18 +1018,16 @@ public class KnotInsertionPolynomialEstimator {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		StretchEstimationTestSequence();
 
