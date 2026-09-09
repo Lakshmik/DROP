@@ -156,7 +156,7 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 							);
 						}
 
-						return -1. * jumpDiffusionVertex.value() / relaxationTime;
+						return -1. * (jumpDiffusionVertex.value() - meanReversionLevel) / relaxationTime;
 					}
 				},
 				new LocalEvaluator()

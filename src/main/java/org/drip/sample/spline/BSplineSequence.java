@@ -10,6 +10,14 @@ import org.drip.spline.bspline.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -92,54 +100,51 @@ import org.drip.spline.bspline.*;
  * 	- Construction and Usage of segment Monic B Spline Sequence.
  * 	- Construction and Usage of segment Multic B Spline Sequence.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BSplineSequence {
-
-	/*
-	 * This sample shows the computation of the response value, the normalized cumulative, and the ordered
-	 * 	derivative of the specified Segment Basis Function.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
+public class BSplineSequence
+{
 
 	private static final void ComputeResponseMetric (
-		final SegmentBasisFunction me,
+		final SegmentBasisFunction segmentBasisFunction,
 		final String strComment)
 		throws Exception
 	{
-		int iOrder = 1;
-		double dblXIncrement = 0.25;
+		int order = 1;
+		double xIncrement = 0.25;
 
-		double dblX = me.leading() - dblXIncrement;
+		double x = segmentBasisFunction.leading() - xIncrement;
 
-		double dblXEnd = me.trailing() + dblXIncrement;
+		double xEnd = segmentBasisFunction.trailing() + xIncrement;
 
-		System.out.println ("\n\t---------------------------------------------------------------");
+		System.out.println ("\n\t||---------------------------------------------------------------");
 
-		System.out.println ("\t-------------------------" + strComment + "---------------------------");
+		System.out.println ("\t||-------------------------" + strComment + "---------------------------");
 
-		System.out.println ("\t---------------------------------------------------------------\n");
+		System.out.println ("\t||---------------------------------------------------------------");
 
-		while (dblX <= dblXEnd) {
+		while (x <= xEnd) {
 			System.out.println (
-				"\t\tResponse[" + FormatUtil.FormatDouble (dblX, 1, 3, 1.) + "] : " +
-				FormatUtil.FormatDouble (me.evaluate (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (me.normalizedCumulative (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (me.derivative (dblX, iOrder), 1, 5, 1.)
+				"\t|| Response[" + FormatUtil.FormatDouble (x, 1, 3, 1.) + "] : " +
+				FormatUtil.FormatDouble (segmentBasisFunction.evaluate (x), 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (segmentBasisFunction.normalizedCumulative (x), 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (segmentBasisFunction.derivative (x, order), 1, 5, 1.)
 			);
 
-			dblX += dblXIncrement;
+			x += xIncrement;
 		}
+
+		System.out.println ("\t||---------------------------------------------------------------");
 	}
 
 	/*
@@ -148,116 +153,68 @@ public class BSplineSequence {
 	 * 	- Multic basis functions of 3rd degree (i.e., quadratic).
 	 * 	- Multic basis functions of 4th degree (i.e., cubic).
 	 * 	- Multic basis functions of 5th degree (i.e., quartic).
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void BSplineSequenceSample()
 		throws Exception
 	{
-		double[] adblPredictorOrdinate = new double[] {
-			1., 2., 3., 4., 5., 6.
+		double[] predictorOrdinateArray =
+		{
+			1.,
+			2.,
+			3.,
+			4.,
+			5.,
+			6.
 		};
 
-		/*
-		 * Construct the Array of Hyperbolic Rational Linear Monic Segment Basis Functions. 
-		 */
-
-		SegmentBasisFunction[] aMonic = SegmentBasisFunctionGenerator.MonicSequence (
+		SegmentBasisFunction[] monicSegmentBasisFunctionArray = SegmentBasisFunctionGenerator.MonicSequence (
 			BasisHatPairGenerator.RAW_TENSION_HYPERBOLIC,
 			BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_LINEAR,
-			adblPredictorOrdinate,
+			predictorOrdinateArray,
 			0,
 			1.
 		);
 
-		/*
-		 * Display the response value, the normalized cumulative, and the ordered derivative of the Monic
-		 * 	Segment Basis Function.
-		 */
+		for (int basisIndex = 0; basisIndex < monicSegmentBasisFunctionArray.length; ++basisIndex) {
+			ComputeResponseMetric (monicSegmentBasisFunctionArray[basisIndex], "   MONIC   ");
+		}
 
-		for (int i = 0; i < aMonic.length; ++i)
-			ComputeResponseMetric (
-				aMonic[i],
-				"   MONIC   "
-			);
+		SegmentBasisFunction[] quadraticSegmentBasisFunctionArray =
+			SegmentBasisFunctionGenerator.MulticSequence (3, monicSegmentBasisFunctionArray);
 
-		/*
-		 * Construct the array of multic basis functions of 3rd degree (i.e., quadratic).
-		 */
+		for (int basisIndex = 0; basisIndex < quadraticSegmentBasisFunctionArray.length; ++basisIndex) {
+			ComputeResponseMetric (quadraticSegmentBasisFunctionArray[basisIndex], " QUADRATIC ");
+		}
 
-		SegmentBasisFunction[] aQuadratic = SegmentBasisFunctionGenerator.MulticSequence (
-			3,
-			aMonic
-		);
+		SegmentBasisFunction[] cubicSegmentBasisFunctionArray =
+			SegmentBasisFunctionGenerator.MulticSequence (4, quadraticSegmentBasisFunctionArray);
 
-		/*
-		 * Display the response value, the normalized cumulative, and the ordered derivative of the Quadratic
-		 * 	Multic Segment Basis Function.
-		 */
+		for (int basisIndex = 0; basisIndex < cubicSegmentBasisFunctionArray.length; ++basisIndex) {
+			ComputeResponseMetric (cubicSegmentBasisFunctionArray[basisIndex], "   CUBIC   ");
+		}
 
-		for (int i = 0; i < aQuadratic.length; ++i)
-			ComputeResponseMetric (
-				aQuadratic[i],
-				" QUADRATIC "
-			);
+		SegmentBasisFunction[] quarticSegmentBasisFunctionArray =
+			SegmentBasisFunctionGenerator.MulticSequence (5, cubicSegmentBasisFunctionArray);
 
-		/*
-		 * Construct the array of multic basis functions of 4th degree (i.e., cubic).
-		 */
-
-		SegmentBasisFunction[] aCubic = SegmentBasisFunctionGenerator.MulticSequence (
-			4,
-			aQuadratic
-		);
-
-		/*
-		 * Display the response value, the normalized cumulative, and the ordered derivative of the Cubic
-		 * 	Multic Segment Basis Function.
-		 */
-
-		for (int i = 0; i < aCubic.length; ++i)
-			ComputeResponseMetric (
-				aCubic[i],
-				"   CUBIC   "
-			);
-
-		/*
-		 * Construct the array of multic basis functions of 5th degree (i.e., quartic).
-		 */
-
-		SegmentBasisFunction[] aQuartic = SegmentBasisFunctionGenerator.MulticSequence (
-			5,
-			aCubic
-		);
-
-		/*
-		 * Display the response value, the normalized cumulative, and the ordered derivative of the Quartic
-		 * 	Multic Segment Basis Function.
-		 */
-
-		for (int i = 0; i < aQuartic.length; ++i)
-			ComputeResponseMetric (
-				aQuartic[i],
-				"  QUARTIC  "
-			);
+		for (int basisIndex = 0; basisIndex < quarticSegmentBasisFunctionArray.length; ++basisIndex) {
+			ComputeResponseMetric (quarticSegmentBasisFunctionArray[basisIndex], "  QUARTIC  ");
+		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		BSplineSequenceSample();
 

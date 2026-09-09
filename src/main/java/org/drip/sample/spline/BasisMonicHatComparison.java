@@ -10,6 +10,14 @@ import org.drip.spline.bspline.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -95,18 +103,20 @@ import org.drip.spline.bspline.*;
  * 	- Construction of the Wrapping Monic Functions
  * 	- Estimation and Comparison of the Ordered Derivatives
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BasisMonicHatComparison {
+public class BasisMonicHatComparison
+{
 
 	/*
 	 * This sample display the test of the different shape controller functions. It demonstrates the
@@ -127,87 +137,54 @@ public class BasisMonicHatComparison {
 	 */
 
 	private static final void ShapeControllerTest (
-		final String strShapeController,
-		final double dblTension)
+		final String shapeController,
+		final double tension)
 		throws Exception
 	{
-		/*
-		 * Construct the Raw Cubic rational left Tension Basis using the specified shape controller and
-		 *  tension.
-		 */
+		CubicRationalLeftRaw cubicRationalLeftRaw =
+			new CubicRationalLeftRaw (1., 2., shapeController, tension);
 
-		CubicRationalLeftRaw crlr = new CubicRationalLeftRaw (
-			1.,
-			2.,
-			strShapeController,
-			dblTension
-		);
+		CubicRationalRightRaw cubicRationalRightRaw =
+			new CubicRationalRightRaw (2., 3., shapeController, tension);
 
-		/*
-		 * Construct the Raw Cubic rational right Tension Basis using the specified shape controller and
-		 * 	tension.
-		 */
+		TensionProcessedBasisHat leftTensionProcessedBasisHat =
+			new TensionProcessedBasisHat (cubicRationalLeftRaw, 2);
 
-		CubicRationalRightRaw crrr = new CubicRationalRightRaw (
-			2.,
-			3.,
-			strShapeController,
-			dblTension
-		);
+		TensionProcessedBasisHat rightTensionProcessedBasisHat =
+			new TensionProcessedBasisHat (cubicRationalRightRaw, 2);
 
-		/*
-		 * Construct the processed Cubic rational left Tension Basis using the Raw Cubic rational left
-		 * 	Tension Basis.
-		 */
+		SegmentMonicBasisFunction segmentMonicBasisFunction =
+			new SegmentMonicBasisFunction (leftTensionProcessedBasisHat, rightTensionProcessedBasisHat);
 
-		TensionProcessedBasisHat tpbhLeft = new TensionProcessedBasisHat (
-			crlr,
-			2
-		);
+		double x = cubicRationalLeftRaw.left();
 
-		/*
-		 * Construct the processed Cubic rational right Tension Basis using the Raw Cubic rational Right
-		 * 	Tension Basis.
-		 */
+		while (x <= cubicRationalRightRaw.right()) {
+			System.out.println (
+				"\t|| Deriv[" + x + "] => " +
+					FormatUtil.FormatDouble (segmentMonicBasisFunction.derivative (x, 1), 1, 5, 1.)
+			);
 
-		TensionProcessedBasisHat tpbhRight = new TensionProcessedBasisHat (
-			crrr,
-			2
-		);
+			System.out.println (
+				"\t|| Cubic Rational Left Deriv[" + x + "]  => " +
+					FormatUtil.FormatDouble (cubicRationalLeftRaw.derivative (x, 3), 1, 5, 1.)
+			);
 
-		/*
-		 * Construct the Segment Monic Basis Function using the left and the right processed hat functions.
-		 */
+			System.out.println (
+				"\t|| Cubic Rational Right Deriv[" + x + "] => " +
+					FormatUtil.FormatDouble (cubicRationalRightRaw.derivative (x, 3), 1, 5, 1.)
+			);
 
-		SegmentMonicBasisFunction smbf = new SegmentMonicBasisFunction (
-			tpbhLeft,
-			tpbhRight
-		);
+			System.out.println (
+				"\t|| TPBH Left Deriv[" + x + "]  => " +
+					FormatUtil.FormatDouble (leftTensionProcessedBasisHat.derivative (x, 1), 1, 5, 1.)
+			);
 
-		/*
-		 * Display the response and the derivatives for the left/right cubic rational, and their
-		 *  corresponding processed tension hat basis functions.
-		 */
+			System.out.println (
+				"\t|| TPBH Right Deriv[" + x + "] => " +
+				FormatUtil.FormatDouble (rightTensionProcessedBasisHat.derivative (x, 1), 1, 5, 1.)
+			);
 
-		double dblX = crlr.left();
-
-		while (dblX <= crrr.right()) {
-			System.out.println ("\tDeriv[" + dblX + "] => " +
-				FormatUtil.FormatDouble (smbf.derivative (dblX, 1), 1, 5, 1.));
-
-			System.out.println ("\t\tCubic Rational Left Deriv[" + dblX + "]  => " +
-				FormatUtil.FormatDouble (crlr.derivative (dblX, 3), 1, 5, 1.));
-
-			System.out.println ("\t\tCubic Rational Right Deriv[" + dblX + "] => " +
-				FormatUtil.FormatDouble (crrr.derivative (dblX, 3), 1, 5, 1.));
-
-			System.out.println ("\t\tTPBH Left Deriv[" + dblX + "]  => " +
-				FormatUtil.FormatDouble (tpbhLeft.derivative (dblX, 1), 1, 5, 1.));
-
-			System.out.println ("\t\tTPBH Right Deriv[" + dblX + "] => " +
-				FormatUtil.FormatDouble (tpbhRight.derivative (dblX, 1), 1, 5, 1.));
-
-			dblX += 0.5;
+			x += 0.5;
 		}
 	}
 
@@ -225,82 +202,54 @@ public class BasisMonicHatComparison {
 	private static final void BasisMonicHatComparisonSample()
 		throws Exception
 	{
-		/*
-		 * Test Rational Linear Shape Control with 0.0 Tension Parameter (i.e., no shape control)
-		 */
+		System.out.println ("\n\t||-------------------------------------------------------------------");
 
-		System.out.println ("\n-------------------------------------------------------------------");
+		System.out.println ("\t||----------------- NO SHAPE CONTROL --------------------------------");
 
-		System.out.println ("----------------- NO SHAPE CONTROL --------------------------------");
+		System.out.println ("\t||-------------------------------------------------------------------");
 
-		System.out.println ("-------------------------------------------------------------------");
+		ShapeControllerTest (BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_LINEAR, 0.);
 
-		ShapeControllerTest (
-			BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_LINEAR,
-			0.
-		);
+		System.out.println ("\n\t||-------------------------------------------------------------------");
 
-		/*
-		 * Test Rational Linear Shape Control with 1.0 Tension Parameter
-		 */
+		System.out.println ("\t||----------------- LINEAR SHAPE CONTROL; Tension 1.0 ---------------");
 
-		System.out.println ("\n-------------------------------------------------------------------");
+		System.out.println ("\t||-------------------------------------------------------------------");
 
-		System.out.println ("----------------- LINEAR SHAPE CONTROL; Tension 1.0 ---------------");
+		ShapeControllerTest (BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_LINEAR, 1.);
 
-		System.out.println ("-------------------------------------------------------------------");
+		System.out.println ("\n\t||-------------------------------------------------------------------");
 
-		ShapeControllerTest (
-			BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_LINEAR,
-			1.
-		);
+		System.out.println ("\t||-------------- QUADRATIC SHAPE CONTROL; Tension 1.0 ---------------");
 
-		/*
-		 * Test Rational Quadratic Shape Control with 1.0 Tension Parameter
-		 */
+		System.out.println ("\t||-------------------------------------------------------------------");
 
-		System.out.println ("\n-------------------------------------------------------------------");
+		ShapeControllerTest (BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_QUADRATIC, 1.);
 
-		System.out.println ("-------------- QUADRATIC SHAPE CONTROL; Tension 1.0 ---------------");
+		System.out.println ("\n\t||-------------------------------------------------------------------");
 
-		System.out.println ("-------------------------------------------------------------------");
+		System.out.println ("\t||-------------- EXPONENTIAL SHAPE CONTROL; Tension 1.0 ---------------");
 
-		ShapeControllerTest (
-			BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_QUADRATIC,
-			1.
-		);
+		System.out.println ("\t||-------------------------------------------------------------------");
 
-		/*
-		 * Test Exponential Shape Control with 1.0 Tension Parameter
-		 */
+		ShapeControllerTest (BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_EXPONENTIAL, 1.);
 
-		System.out.println ("\n-------------------------------------------------------------------");
-
-		System.out.println ("-------------- EXPONENTIAL SHAPE CONTROL; Tension 1.0 ---------------");
-
-		System.out.println ("-------------------------------------------------------------------");
-
-		ShapeControllerTest (
-			BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_EXPONENTIAL,
-			1.
-		);
+		System.out.println ("\t||-------------------------------------------------------------------");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		BasisMonicHatComparisonSample();
 

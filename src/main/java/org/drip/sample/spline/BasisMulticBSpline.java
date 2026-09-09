@@ -10,6 +10,14 @@ import org.drip.spline.bspline.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,18 +101,20 @@ import org.drip.spline.bspline.*;
  * 	- Estimation of the derivatives and the basis envelope cumulative integrands.
  * 	- Estimation of the normalizer and the basis envelope cumulative normalized integrands.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BasisMulticBSpline {
+public class BasisMulticBSpline
+{
 
 	/*
 	 * This sample illustrates the construction and the usage of multic basis functions, and their eventual
@@ -124,161 +134,125 @@ public class BasisMulticBSpline {
 	 * 	- Construct a multic basis function using the left/right monic basis functions, and the multic order.
 	 * 	- Display the multic Basis Function response as well as normalized Cumulative across the specified
 	 * 		variate range.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void RunMulticBSplineTest (
-		final String strHatType,
-		final String strShapeControlType,
-		final double dblTension,
-		final int iMulticBSplineOrder)
+		final String hatType,
+		final String shapeControlType,
+		final double tension,
+		final int multicBSplineOrder)
 		throws Exception
 	{
-		double[] adblPredictorOrdinateLeft = new double[] {
-			1., 2., 3.
+		double[] predictorOrdinateLeftArray =
+		{
+			1.,
+			2.,
+			3.
 		};
-		double[] adblPredictorOrdinateRight = new double[] {
-			2., 3., 4.
+		double[] predictorOrdinateRightArray =
+		{
+			2.,
+			3.,
+			4.
 		};
 
-		/*
-		 * Construct the hyperbolic tension basis hat pair using the left predictor ordinates and the
-		 * 	tension.
-		 */
-
-		TensionBasisHat[] aTBHLeft = BasisHatPairGenerator.HyperbolicTensionHatPair (
-			adblPredictorOrdinateLeft[0],
-			adblPredictorOrdinateLeft[1],
-			adblPredictorOrdinateLeft[2],
-			dblTension
+		TensionBasisHat[] leftTensionBasisHatArray = BasisHatPairGenerator.HyperbolicTensionHatPair (
+			predictorOrdinateLeftArray[0],
+			predictorOrdinateLeftArray[1],
+			predictorOrdinateLeftArray[2],
+			tension
 		);
 
-		/*
-		 * Construct the hyperbolic tension basis hat pair using the right predictor ordinates and the
-		 *  tension.
-		 */
-
-		TensionBasisHat[] aTBHRight = BasisHatPairGenerator.HyperbolicTensionHatPair (
-			adblPredictorOrdinateRight[0],
-			adblPredictorOrdinateRight[1],
-			adblPredictorOrdinateRight[2],
-			dblTension
+		TensionBasisHat[] rightTensionBasisHatArray = BasisHatPairGenerator.HyperbolicTensionHatPair (
+			predictorOrdinateRightArray[0],
+			predictorOrdinateRightArray[1],
+			predictorOrdinateRightArray[2],
+			tension
 		);
 
-		/*
-		 * Generate the left monic basis function from the hat type, left predictor ordinates, shape control,
-		 * 	and the tension parameters.
-		 */
-
-		SegmentBasisFunction sbfMonicLeft = SegmentBasisFunctionGenerator.Monic (
-			strHatType,
-			strShapeControlType,
-			adblPredictorOrdinateLeft,
+		SegmentBasisFunction monicLeftSegmentBasisFunction = SegmentBasisFunctionGenerator.Monic (
+			hatType,
+			shapeControlType,
+			predictorOrdinateLeftArray,
 			2,
-			dblTension
+			tension
 		);
 
-		/*
-		 * Generate the right monic basis function from the hat type, right predictor ordinates, shape
-		 * 	control, and the tension parameters.
-		 */
-
-		SegmentBasisFunction sbfMonicRight = SegmentBasisFunctionGenerator.Monic (
-			strHatType,
-			strShapeControlType,
-			adblPredictorOrdinateRight,
+		SegmentBasisFunction monicRightSegmentBasisFunction = SegmentBasisFunctionGenerator.Monic (
+			hatType,
+			shapeControlType,
+			predictorOrdinateRightArray,
 			2,
-			dblTension
+			tension
 		);
 
-		/*
-		 * Run a response value calculation comparison across the predictor ordinates for each of the left
-		 * 	basis hat and the monic basis functions.
-		 */
+		System.out.println ("\t||-------------------------------------------------");
 
-		System.out.println ("\n\t-------------------------------------------------");
+		System.out.println ("\t||            X    |   LEFT   |   RIGHT  |   MONIC  ");
 
-		System.out.println ("\t            X    |   LEFT   |   RIGHT  |   MONIC  ");
+		System.out.println ("\t||-------------------------------------------------");
 
-		System.out.println ("\t-------------------------------------------------");
+		double x = 0.5;
+		double xIncrement = 0.25;
 
-		double dblX = 0.50;
-		double dblXIncrement = 0.25;
-
-		while (dblX <= 4.50) {
+		while (x <= 4.5) {
 			System.out.println (
-				"\tResponse[" + FormatUtil.FormatDouble (dblX, 1, 3, 1.) + "] : " +
-				FormatUtil.FormatDouble (aTBHLeft[0].evaluate (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (aTBHLeft[1].evaluate (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (sbfMonicLeft.evaluate (dblX), 1, 5, 1.)
+				"\t|| Response[" + FormatUtil.FormatDouble (x, 1, 3, 1.) + "] : " +
+					FormatUtil.FormatDouble (leftTensionBasisHatArray[0].evaluate (x), 1, 5, 1.) + " | " +
+					FormatUtil.FormatDouble (leftTensionBasisHatArray[1].evaluate (x), 1, 5, 1.) + " | " +
+					FormatUtil.FormatDouble (monicLeftSegmentBasisFunction.evaluate (x), 1, 5, 1.)
 			);
 
-			dblX += dblXIncrement;
+			x += xIncrement;
 		}
 
-		/*
-		 * Run a response value calculation comparison across the predictor ordinates for each of the right
-		 * 	basis hat and the monic basis functions.
-		 */
+		System.out.println ("\t||-------------------------------------------------");
 
-		System.out.println ("\n\t-------------------------------------------------");
+		System.out.println ("\t||            X    |   LEFT   |   RIGHT  |   MONIC  ");
 
-		System.out.println ("\t            X    |   LEFT   |   RIGHT  |   MONIC  ");
+		System.out.println ("\t||-------------------------------------------------");
 
-		System.out.println ("\t-------------------------------------------------");
+		x = 0.5;
 
-		dblX = 0.50;
-
-		while (dblX <= 4.50) {
+		while (x <= 4.5) {
 			System.out.println (
-				"\tResponse[" + FormatUtil.FormatDouble (dblX, 1, 3, 1.) + "] : " +
-				FormatUtil.FormatDouble (aTBHRight[0].evaluate (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (aTBHRight[1].evaluate (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (sbfMonicRight.evaluate (dblX), 1, 5, 1.)
+				"\t|| Response[" + FormatUtil.FormatDouble (x, 1, 3, 1.) + "] : " +
+				FormatUtil.FormatDouble (rightTensionBasisHatArray[0].evaluate (x), 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (rightTensionBasisHatArray[1].evaluate (x), 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (monicRightSegmentBasisFunction.evaluate (x), 1, 5, 1.)
 			);
 
-			dblX += dblXIncrement;
+			x += xIncrement;
 		}
 
-		/*
-		 * Construct a multic basis function using the left/right monic basis functions, and the multic
-		 * 	order.
-		 */
-
-		SegmentBasisFunction[] sbfMultic = SegmentBasisFunctionGenerator.MulticSequence (
-			iMulticBSplineOrder,
+		SegmentBasisFunction[] multicSegmentBasisFunction = SegmentBasisFunctionGenerator.MulticSequence (
+			multicBSplineOrder,
 			new SegmentBasisFunction[] {
-				sbfMonicLeft,
-				sbfMonicRight
+				monicLeftSegmentBasisFunction,
+				monicRightSegmentBasisFunction
 			}
 		);
 
-		/*
-		 * Display the multic Basis Function response as well as normalized Cumulative across the specified
-		 * 	variate range.
-		 */
+		System.out.println ("\t||-------------------------------------------------");
 
-		System.out.println ("\n\t-------------------------------------------------");
+		System.out.println ("\t||          PREDICTOR    | RESPONSE | CUMULATIVE  ");
 
-		System.out.println ("\t          PREDICTOR    | RESPONSE | CUMULATIVE  ");
+		System.out.println ("\t||-------------------------------------------------");
 
-		System.out.println ("\t-------------------------------------------------");
+		x = 0.5;
+		xIncrement = 0.125;
 
-		dblX = 0.50;
-		dblXIncrement = 0.125;
-
-		while (dblX <= 4.50) {
+		while (x <= 4.50) {
 			System.out.println (
-				"\t\tMultic[" + FormatUtil.FormatDouble (dblX, 1, 3, 1.) + "] : " +
-				FormatUtil.FormatDouble (sbfMultic[0].evaluate (dblX), 1, 5, 1.) + " | " +
-				FormatUtil.FormatDouble (sbfMultic[0].normalizedCumulative (dblX), 1, 5, 1.)
+				"\t|| Multic[" + FormatUtil.FormatDouble (x, 1, 3, 1.) + "] : " +
+				FormatUtil.FormatDouble (multicSegmentBasisFunction[0].evaluate (x), 1, 5, 1.) + " | " +
+				FormatUtil.FormatDouble (multicSegmentBasisFunction[0].normalizedCumulative (x), 1, 5, 1.)
 			);
 
-			dblX += dblXIncrement;
+			x += xIncrement;
 		}
 
-		System.out.println ("\n\t-------------------------------------------------\n");
+		System.out.println ("\t||-------------------------------------------------\n");
 	}
 
 	/*
@@ -303,12 +277,9 @@ public class BasisMulticBSpline {
 	private static final void BasisMulticBSplineSample()
 		throws Exception
 	{
-		/*
-		 * Creation and usage of Multic B Spline built off of raw hyperbolic tension basis function,
-		 *  rational linear shape controller, tension = 1.0, and 3rd order multic.
-		 */
-
-		System.out.println ("\n    RAW TENSION HYPERBOLIC | LINEAR SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE");
+		System.out.println (
+			"\t||    RAW TENSION HYPERBOLIC | LINEAR SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE"
+		);
 
 		RunMulticBSplineTest (
 			BasisHatPairGenerator.RAW_TENSION_HYPERBOLIC,
@@ -317,12 +288,9 @@ public class BasisMulticBSpline {
 			3
 		);
 
-		/*
-		 * Creation and usage of Multic B Spline built off of processed hyperbolic tension basis function,
-		 *  rational linear shape controller, tension = 1.0, and 3rd order multic.
-		 */
-
-		System.out.println ("\n   PROC TENSION HYPERBOLIC | LINEAR SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE");
+		System.out.println (
+			"\t||   PROC TENSION HYPERBOLIC | LINEAR SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE"
+		);
 
 		RunMulticBSplineTest (
 			BasisHatPairGenerator.PROCESSED_TENSION_HYPERBOLIC,
@@ -331,12 +299,9 @@ public class BasisMulticBSpline {
 			3
 		);
 
-		/*
-		 * Creation and usage of Multic B Spline built off of raw cubic tension basis function, rational
-		 *  linear shape controller, tension = 0.0, and 3rd order multic.
-		 */
-
-		System.out.println ("\n   RAW CUBIC RATIONAL | LINEAR SHAPE CONTROL | TENSION = 0.0 | CUBIC B SPLINE");
+		System.out.println (
+			"\t||   RAW CUBIC RATIONAL | LINEAR SHAPE CONTROL | TENSION = 0.0 | CUBIC B SPLINE"
+		);
 
 		RunMulticBSplineTest (
 			BasisHatPairGenerator.PROCESSED_CUBIC_RATIONAL,
@@ -345,12 +310,9 @@ public class BasisMulticBSpline {
 			3
 		);
 
-		/*
-		 * Creation and usage of Multic B Spline built off of raw cubic tension basis function, rational
-		 *  linear shape controller, tension = 1.0, and 3rd order multic.
-		 */
-
-		System.out.println ("\n   RAW CUBIC RATIONAL | LINEAR SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE");
+		System.out.println (
+			"\t||   RAW CUBIC RATIONAL | LINEAR SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE"
+		);
 
 		RunMulticBSplineTest (
 			BasisHatPairGenerator.PROCESSED_CUBIC_RATIONAL,
@@ -359,12 +321,9 @@ public class BasisMulticBSpline {
 			3
 		);
 
-		/*
-		 * Creation and usage of Multic B Spline built off of raw cubic tension basis function, rational
-		 *  quadratic shape controller, tension = 1.0, and 3rd order multic.
-		 */
-
-		System.out.println ("\n   RAW CUBIC RATIONAL | QUADRATIC SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE");
+		System.out.println (
+			"\t||   RAW CUBIC RATIONAL | QUADRATIC SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE"
+		);
 
 		RunMulticBSplineTest (
 			BasisHatPairGenerator.PROCESSED_CUBIC_RATIONAL,
@@ -373,12 +332,9 @@ public class BasisMulticBSpline {
 			3
 		);
 
-		/*
-		 * Creation and usage of Multic B Spline built off of raw cubic tension basis function, rational
-		 *  exponential shape controller, tension = 1.0, and 3rd order multic.
-		 */
-
-		System.out.println ("\n   RAW CUBIC RATIONAL | EXPONENTIAL SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE");
+		System.out.println (
+			"\t||   RAW CUBIC RATIONAL | EXPONENTIAL SHAPE CONTROL | TENSION = 1.0 | CUBIC B SPLINE"
+		);
 
 		RunMulticBSplineTest (
 			BasisHatPairGenerator.PROCESSED_CUBIC_RATIONAL,
@@ -391,18 +347,16 @@ public class BasisMulticBSpline {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		BasisMulticBSplineSample();
 

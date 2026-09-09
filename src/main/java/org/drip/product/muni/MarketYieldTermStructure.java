@@ -1,11 +1,8 @@
 
-package org.drip.sample.spline;
+package org.drip.product.muni;
 
-import org.drip.service.env.EnvManager;
-import org.drip.spline.basis.*;
-import org.drip.spline.bspline.*;
-import org.drip.spline.params.*;
-import org.drip.spline.segment.LatentStateResponseModel;
+import java.util.Map;
+import java.util.Set;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -17,19 +14,6 @@ import org.drip.spline.segment.LatentStateResponseModel;
  * Copyright (C) 2028 Lakshmi Krishnamurthy
  * Copyright (C) 2027 Lakshmi Krishnamurthy
  * Copyright (C) 2026 Lakshmi Krishnamurthy
- * Copyright (C) 2025 Lakshmi Krishnamurthy
- * Copyright (C) 2024 Lakshmi Krishnamurthy
- * Copyright (C) 2023 Lakshmi Krishnamurthy
- * Copyright (C) 2022 Lakshmi Krishnamurthy
- * Copyright (C) 2021 Lakshmi Krishnamurthy
- * Copyright (C) 2020 Lakshmi Krishnamurthy
- * Copyright (C) 2019 Lakshmi Krishnamurthy
- * Copyright (C) 2018 Lakshmi Krishnamurthy
- * Copyright (C) 2017 Lakshmi Krishnamurthy
- * Copyright (C) 2016 Lakshmi Krishnamurthy
- * Copyright (C) 2015 Lakshmi Krishnamurthy
- * Copyright (C) 2014 Lakshmi Krishnamurthy
- * Copyright (C) 2013 Lakshmi Krishnamurthy
  * 
  *  This file is part of DROP, an open-source library targeting analytics/risk, transaction cost analytics,
  *  	asset liability management analytics, capital, exposure, and margin analytics, valuation adjustment
@@ -97,88 +81,106 @@ import org.drip.spline.segment.LatentStateResponseModel;
  */
 
 /**
- * <i>BasisBSplineSet</i> implements Samples for the Construction and the usage of various basis spline
- * 	functions. It demonstrates the following:
- * 	- Construction of segment control parameters - polynomial (regular/Bernstein) segment control,
- * 		exponential/hyperbolic tension segment control, Kaklis-Pandelis tension segment control, and C1
- * 		Hermite.
- * 	- Control the segment using the rational shape controller, and the appropriate Ck.
- * 	- Estimate the node value and the node value Jacobian with the segment, as well as at the boundaries.
- * 	- Calculate the segment monotonicity.
+ * <i>MarketYieldTermStructure</i> holds the Spot and the Infinite Horizon Yields for a given Muni
+ * 	Sub-market, i.e., Tax-exempt, Taxable, and Escrow Yield Curves. The References are:
+ *
+ *  <br><br>
+ *  <ul>
+ *  	<li>
+ *  		Ang, A., R. C. Green, and Y. Xing (2013): <i>Advance Re-fundings of Municipal Bonds</i>
+ *  			https://www.nber.org/papers/w19459
+ *  	</li>
+ *  	<li>
+ *  		de Guillaume, N., R. Rebonato, and A. Pogudin (2013): The Nature of the Dependence of the
+ *  			Magnitude of the Rates Moves on the Rates Levels: A Universal Relationship <i>Quantitative
+ *  			Finance</i> <b>13 (3)</b> 351-367
+ *  	</li>
+ *  	<li>
+ *  		Orr, P., and D. de la Nuez (2013): <i>The Right and Wrong Models for Evaluating Callable
+ *  			Municipal Bonds</i> <b>eSSRN</b>
+ *  	</li>
+ *  	<li>
+ *  		Rebonato, R. (2003): <i>Term Structure Models: A Review</i>
+ *  			https://dept.math.lsa.umich.edu/~conlon/math623/rebonato_review.pdf
+ *  	</li>
+ *  	<li>
+ *  		Rebonato, R., and S. K. Nawalkha (2011): <i>What Interest Rate Models to Use? Buy Side versus
+ *  			Sell Side</i> <b>eSSRN</b>
+ *  	</li>
+ *  </ul>
  *
  *	<br>
  *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
- *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
- *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
- *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></td></tr>
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/README.md">Product Components/Baskets for Credit, FRA, FX, Govvie, Rates, and Option Asset Classes</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/muni/README.md">Refunding and Optimal Exercise Mechanics</a></td></tr>
  *  </table>
  *	<br>
- * 
+ *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BasisBSplineSet
+public class MarketYieldTermStructure
 {
+	private Map<String, Double> _spotTenorValueMap = null;
+	private Map<String, Double> _infiniteHorizonTenorValueMap = null;
 
-	private static final void TestSpline (
-		final FunctionSet functionSet,
-		final ResponseScalingShapeControl responseScalingShapeControl,
-		final SegmentInelasticDesignControl segmentInelasticDesignControl)
+	/**
+	 * <i>MarketYieldTermStructure</i> Constructor
+	 * 
+	 * @param spotTenorValueMap Map of Tenor to Spot Yield
+	 * @param infiniteHorizonTenorValueMap Map of Tenor to Infinite Horizon Yield
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
+	public MarketYieldTermStructure (
+		final Map<String, Double> spotTenorValueMap,
+		final Map<String, Double> infiniteHorizonTenorValueMap)
 		throws Exception
 	{
-		LatentStateResponseModel latentStateResponseModel1 = LatentStateResponseModel.Create (
-			1.0,
-			1.5,
-			functionSet,
-			responseScalingShapeControl,
-			segmentInelasticDesignControl
-		);
+		if (null == (_spotTenorValueMap = spotTenorValueMap) ||
+			null == (_infiniteHorizonTenorValueMap = infiniteHorizonTenorValueMap))
+		{
+			throw new Exception ("MarketYieldTermStructure Constructor => Invalid Inputs");
+		}
 
-		System.out.println (
-			"\t|| Calibration: " + latentStateResponseModel1.calibrate (25., 0., 20.25, null)
-		);
-
-		System.out.println ("\t|| Y[" + 1.0 + "]: " + latentStateResponseModel1.responseValue (1.));
-
-		System.out.println ("\t|| Y[" + 1.5 + "]: " + latentStateResponseModel1.responseValue (1.5));
-	}
-
-	private static final void BasisBSplineSetSample()
-		throws Exception
-	{
-		TestSpline (
-			FunctionSetBuilder.BSplineBasisSet (
-				new BSplineSequenceParams (
-					BasisHatPairGenerator.PROCESSED_CUBIC_RATIONAL,
-					BasisHatShapeControl.SHAPE_CONTROL_RATIONAL_LINEAR,
-					2,
-					4,
-					1.,
-					2
-				)
-			),
-			null,
-			SegmentInelasticDesignControl.Create (2, 2)
-		);
+		if (!_spotTenorValueMap.keySet().equals (_infiniteHorizonTenorValueMap.keySet())) {
+			throw new Exception ("MarketYieldTermStructure Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
-	 * Entry Point
+	 * Retrieve the Map of Tenor to Spot Yield
 	 * 
-	 * @param argumentArray Command Line Argument Array
-	 * 
-	 * @throws Exception Thrown on Error/Exception Situation
+	 * @return Map of Tenor to Spot Yield
 	 */
 
-	public static final void main (
-		final String[] argumentArray)
-		throws Exception
+	public Map<String, Double> spotTenorValueMap()
 	{
-		EnvManager.InitEnv ("");
+		return _spotTenorValueMap;
+	}
 
-		BasisBSplineSetSample();
+	/**
+	 * Retrieve the Map of Tenor to Infinite Horizon Yield
+	 * 
+	 * @return Map of Tenor to Infinite Horizon Yield
+	 */
 
-		EnvManager.TerminateEnv();
+	public Map<String, Double> infiniteHorizonTenorValueMap()
+	{
+		return _infiniteHorizonTenorValueMap;
+	}
+
+	/**
+	 * Retrieve the Set of Tenor Keys
+	 * 
+	 * @return Set of Tenor Keys
+	 */
+
+	public Set<String> tenorKeySet()
+	{
+		return _spotTenorValueMap.keySet();
 	}
 }

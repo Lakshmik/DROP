@@ -2,7 +2,6 @@
 package org.drip.sample.spline;
 
 import org.drip.function.r1tor1custom.QuadraticRationalShapeControl;
-import org.drip.numerical.differentiation.WengertJacobian;
 import org.drip.service.env.EnvManager;
 import org.drip.spline.basis.*;
 import org.drip.spline.params.*;
@@ -14,6 +13,14 @@ import org.drip.spline.tension.KochLycheKvasovFamily;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -99,97 +106,53 @@ import org.drip.spline.tension.KochLycheKvasovFamily;
  * 	- Estimate the node value and the node value Jacobian with the segment, as well as at the boundaries.
  * 	- Calculate the segment monotonicity.
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/SplineBuilderLibrary.md">Spline Builder Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/spline/README.md">Basis Monic Multic Tension Spline</a></td></tr>
+ *  </table>
+ *	<br>
  *  
  * @author Lakshmi Krishnamurthy
  */
 
-public class BasisTensionSplineSet {
-
-	/*
-	 * Sample demonstrating the creation of the KLK Hyperbolic tension basis spline set
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
+public class BasisTensionSplineSet
+{
 
 	private static final FunctionSet KLKHyperbolicTensionSpline()
 		throws Exception
 	{
-		double dblTension = .01;
+		double tension = .01;
 
-		/*
-		 * Create the basis parameter set from the segment tension parameter, and construct the basis
-		 */
-
-		ExponentialTensionSetParams etbsbp = new ExponentialTensionSetParams (dblTension);
-
-		return KochLycheKvasovFamily.FromHyperbolicPrimitive (etbsbp);
+		return KochLycheKvasovFamily.FromHyperbolicPrimitive (new ExponentialTensionSetParams (tension));
 	}
-
-	/*
-	 * Sample demonstrating the creation of the KLK Rational Linear tension basis spline set
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FunctionSet KLKRationalLinearTensionSpline()
 		throws Exception
 	{
-		double dblTension = 1.;
+		double tension = 1.;
 
-		/*
-		 * Create the basis parameter set from the segment tension parameter, and construct the basis
-		 */
-
-		ExponentialTensionSetParams etbsbp = new ExponentialTensionSetParams (dblTension);
-
-		return KochLycheKvasovFamily.FromRationalLinearPrimitive (etbsbp);
+		return KochLycheKvasovFamily.FromRationalLinearPrimitive (new ExponentialTensionSetParams (tension));
 	}
-
-	/*
-	 * Sample demonstrating the creation of the KLK Rational Quadratic tension basis spline set
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FunctionSet KLKRationalQuadraticTensionSpline()
 		throws Exception
 	{
-		double dblTension = 1.;
-
-		/*
-		 * Create the basis parameter set from the segment tension parameter, and construct the basis
-		 */
-
-		ExponentialTensionSetParams etbsbp = new ExponentialTensionSetParams (dblTension);
-
-		return KochLycheKvasovFamily.FromRationalQuadraticPrimitive (etbsbp);
+		double tension = 1.;
+ 
+		return KochLycheKvasovFamily.FromRationalQuadraticPrimitive (
+			new ExponentialTensionSetParams (tension)
+		);
 	}
-
-	/*
-	 * Sample demonstrating the creation of the KLK Exponential tension basis spline set
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FunctionSet KLKExponentialTensionSpline()
 		throws Exception
 	{
-		double dblTension = 1.;
+		double tension = 1.;
 
-		/*
-		 * Create the basis parameter set from the segment tension parameter, and construct the basis
-		 */
-
-		ExponentialTensionSetParams etbsbp = new ExponentialTensionSetParams (dblTension);
-
-		return KochLycheKvasovFamily.FromExponentialPrimitive (etbsbp);
+		return KochLycheKvasovFamily.FromExponentialPrimitive (new ExponentialTensionSetParams (tension));
 	}
 
 	/*
@@ -200,105 +163,83 @@ public class BasisTensionSplineSet {
 	 *  - Extraction of the segment Jacobians and segment monotonicity
 	 *  - Estimate point value and the Jacobian
 	 *  - Estimate the curvature penalty
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void TestSpline (
-		final FunctionSet fs,
-		final ResponseScalingShapeControl rssc,
-		final SegmentInelasticDesignControl segParams)
+		final FunctionSet functionSet,
+		final ResponseScalingShapeControl responseScalingShapeControl,
+		final SegmentInelasticDesignControl segmentInelasticDesignControl)
 		throws Exception
 	{
-		/*
-		 * Construct the left and the right segments
-		 */
-
-		LatentStateResponseModel seg1 = LatentStateResponseModel.Create (
+		LatentStateResponseModel latentStateResponseModel1 = LatentStateResponseModel.Create (
 			1.0,
 			1.5,
-			fs,
-			rssc,
-			segParams
+			functionSet,
+			responseScalingShapeControl,
+			segmentInelasticDesignControl
 		);
 
-		LatentStateResponseModel seg2 = LatentStateResponseModel.Create (
+		LatentStateResponseModel latentStateResponseModel2 = LatentStateResponseModel.Create (
 			1.5,
 			2.0,
-			fs,
-			rssc,
-			segParams
+			functionSet,
+			responseScalingShapeControl,
+			segmentInelasticDesignControl
 		);
 
-		/*
-		 * Calibrate the left segment using the node values, and compute the segment Jacobian, the monotonicity, and the curvature penalty
-		 */
+		System.out.println ("\t|| Y[" + 1.0 + "]: " + latentStateResponseModel1.responseValue (1.));
 
-		WengertJacobian wj1 = seg1.jackDCoeffDEdgeParams (
-			25.,
-			0.,
-			20.25,
-			null
+		System.out.println ("\t|| Y[" + 1.5 + "]: " + latentStateResponseModel1.responseValue (1.5));
+
+		System.out.println (
+			"\t|| Segment 1 Jacobian: " +
+				latentStateResponseModel1.jackDCoeffDEdgeParams (25., 0, 20.25, null).displayString()
 		);
 
-		System.out.println ("\tY[" + 1.0 + "]: " + seg1.responseValue (1.));
-
-		System.out.println ("\tY[" + 1.5 + "]: " + seg1.responseValue (1.5));
-
-		System.out.println ("Segment 1 Jacobian: " + wj1.displayString());
-
-		System.out.println ("Segment 1 Head: " + seg1.jackDCoeffDEdgeInputs().displayString());
-
-		System.out.println ("Segment 1 Monotone Type: " + seg1.monotoneType());
-
-		System.out.println ("\tSegment 1 DPE: " + seg1.curvatureDPE());
-
-		/*
-		 * Calibrate the right segment using the node values, and compute the segment Jacobian, the monotonicity, and the curvature penalty
-		 */
-
-		WengertJacobian wj2 = seg2.jackDCoeffDEdgeParams (
-			seg1,
-			"Default",
-			16.,
-			null,
-			Double.NaN,
-			null
+		System.out.println (
+			"\t|| Segment 1 Head: " + latentStateResponseModel1.jackDCoeffDEdgeInputs().displayString()
 		);
 
-		System.out.println ("\tY[" + 1.5 + "]: " + seg2.responseValue (1.5));
+		System.out.println ("\t|| Segment 1 Monotone Type: " + latentStateResponseModel1.monotoneType());
 
-		System.out.println ("\tY[" + 2. + "]: " + seg2.responseValue (2.));
+		System.out.println ("\t|| Segment 1 DPE: " + latentStateResponseModel1.curvatureDPE());
 
-		System.out.println ("Segment 2 Jacobian: " + wj2.displayString());
+		System.out.println ("\t|| Y[" + 1.5 + "]: " + latentStateResponseModel2.responseValue (1.5));
 
-		System.out.println ("Segment 2 Regular Jacobian: " + seg2.jackDCoeffDEdgeInputs().displayString());
+		System.out.println ("\t|| Y[" + 2. + "]: " + latentStateResponseModel2.responseValue (2.));
 
-		System.out.println ("Segment 2 Monotone Type: " + seg2.monotoneType());
-
-		System.out.println ("\tSegment 2 DPE: " + seg2.curvatureDPE());
-
-		/*
-		 * Re-calibrate Segment #2 with a different response value
-		 */
-
-		seg2.calibrate (
-			seg1,
-			14.,
-			null
+		System.out.println (
+			"\t|| Segment 2 Jacobian: " + latentStateResponseModel2.jackDCoeffDEdgeParams (
+				latentStateResponseModel1,
+				"Default",
+				16.,
+				null,
+				Double.NaN,
+				null
+			).displayString()
 		);
 
-		/*
-		 * Estimate the segment value at the given variate, and compute the corresponding Jacobian and the curvature penalty
-		 */
+		System.out.println (
+			"\t|| Segment 2 Regular Jacobian: " +
+				latentStateResponseModel2.jackDCoeffDEdgeInputs().displayString()
+		);
 
-		double dblX = 2.0;
+		System.out.println ("\t|| Segment 2 Monotone Type: " + latentStateResponseModel2.monotoneType());
 
-		System.out.println ("\t\tValue[" + dblX + "]: " + seg2.responseValue (dblX));
+		System.out.println ("\t|| Segment 2 DPE: " + latentStateResponseModel2.curvatureDPE());
 
-		System.out.println ("\t\tValue Jacobian[" + dblX + "]: " + seg2.jackDResponseDEdgeInput (dblX, 1).displayString());
+		latentStateResponseModel2.calibrate (latentStateResponseModel1, 14., null);
 
-		System.out.println ("\t\tSegment 2 DPE: " + seg2.curvatureDPE());
+		double x = 2.;
+
+		System.out.println ("\t|| Value[" + x + "]: " + latentStateResponseModel2.responseValue (x));
+
+		System.out.println (
+			"\t|| Value Jacobian[" + x + "]: " +
+				latentStateResponseModel2.jackDResponseDEdgeInput (x, 1).displayString()
+		);
+
+		System.out.println ("\t|| Segment 2 DPE: " + latentStateResponseModel2.curvatureDPE());
 	}
 
 	/*
@@ -318,94 +259,64 @@ public class BasisTensionSplineSet {
 	private static final void BasisTensionSplineSetSample()
 		throws Exception
 	{
-		/*
-		 * Construct a rational shape controller with the shape controller tension of 1.
-		 */
+		int k = 2;
+		double shapeControllerTension = 1.;
+		int curvaturePenaltyDerivativeOrder = 2;
 
-		double dblShapeControllerTension = 1.;
-
-		ResponseScalingShapeControl rssc = new ResponseScalingShapeControl (
+		ResponseScalingShapeControl responseScalingShapeControl = new ResponseScalingShapeControl (
 			true,
-			new QuadraticRationalShapeControl (dblShapeControllerTension)
+			new QuadraticRationalShapeControl (shapeControllerTension)
 		);
 
-		/*
-		 * Construct the segment inelastic parameter that is C2 (iK = 2 sets it to C2), with second order
-		 *  curvature penalty, and without constraint
-		 */
+		SegmentInelasticDesignControl segmentInelasticDesignControl =
+			SegmentInelasticDesignControl.Create (k, curvaturePenaltyDerivativeOrder);
 
-		int iK = 2;
-		int iCurvaturePenaltyDerivativeOrder = 2;
-
-		SegmentInelasticDesignControl segParams = SegmentInelasticDesignControl.Create (
-			iK,
-			iCurvaturePenaltyDerivativeOrder
-		);
-
-		/*
-		 * Test the KLK Hyperbolic tension spline
-		 */
-
-		System.out.println ( " ----------- \n KLK HYPERBOLIC \n ----------- \n");
+		System.out.println ("\t||----------- \n\t|| KLK HYPERBOLIC \n\t||-----------");
 
 		TestSpline (
 			KLKHyperbolicTensionSpline(),
-			rssc,
-			segParams
+			responseScalingShapeControl,
+			segmentInelasticDesignControl
 		);
 
-		/*
-		 * Test the KLK Rational Linear tension spline
-		 */
-
-		System.out.println ( " ----------- \n KLK RATIONAL LINEAR \n ----------- \n");
+		System.out.println ("\t||----------- \n\t||KLK RATIONAL LINEAR \n\t||-----------");
 
 		TestSpline (
 			KLKRationalLinearTensionSpline(),
-			rssc,
-			segParams
+			responseScalingShapeControl,
+			segmentInelasticDesignControl
 		);
 
-		/*
-		 * Test the KLK Rational Quadratic tension spline
-		 */
-
-		System.out.println ( " ----------- \n KLK RATIONAL QUADRATIC \n ----------- \n");
+		System.out.println ("\t||----------- \n\t|| KLK RATIONAL QUADRATIC \n\t||-----------");
 
 		TestSpline (
 			KLKRationalQuadraticTensionSpline(),
-			rssc,
-			segParams
+			responseScalingShapeControl,
+			segmentInelasticDesignControl
 		);
 
-		/*
-		 * Test the KLK Exponential tension spline
-		 */
-
-		System.out.println ( " ----------- \n KLK EXPONENTIAL \n ----------- \n");
+		System.out.println ("\t||----------- \n\t|| KLK EXPONENTIAL \n\t||-----------");
 
 		TestSpline (
 			KLKExponentialTensionSpline(),
-			rssc,
-			segParams
+			responseScalingShapeControl,
+			segmentInelasticDesignControl
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		BasisTensionSplineSetSample();
 
