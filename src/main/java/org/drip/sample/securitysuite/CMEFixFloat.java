@@ -8,7 +8,6 @@ import org.drip.analytics.support.CaseInsensitiveTreeMap;
 import org.drip.market.otc.*;
 import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.valuation.ValuationParams;
-import org.drip.product.rates.FixFloatComponent;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.service.template.LatentMarketStateBuilder;
@@ -21,6 +20,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -97,83 +104,80 @@ import org.drip.state.identifier.ForwardLabel;
  * <i>CMEFixFloat</i> demonstrates the Analytics Calculation/Reconciliation for the CME Cleared Fix-Float
  * 	IRS.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CMEFixFloat {
+public class CMEFixFloat
+{
 
 	private static final MergedDiscountForwardCurve OvernightCurve (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String[] astrDepositMaturityTenor = new String[] {
-			"1D",
-		};
-
-		double[] adblDepositQuote = new double[] {
-			0.0116,		// 1D
-		};
-
-		String[] astrShortEndOISMaturityTenor = new String[] {
-			 "1W",
-			 "2W",
-			 "3W",
-			 "1M",
-			 "2M",
-			 "3M",
-			 "4M",
-			 "5M",
-			 "6M",
-			 "9M",
-			"12M",
-			"18M",
-			 "2Y",
-			 "3Y",
-			 "4Y",
-			 "5Y",
-			"10Y",
-		};
-
-		double[] adblShortEndOISQuote = new double[] {
-			0.0117,    //   1W
-			0.0115,    //   2W
-			0.0116,    //   3W
-			0.0116,    //   1M
-			0.0120,    //   2M
-			0.0125,    //   3M
-			0.0128,    //   4M
-			0.0131,    //   5M
-			0.0133,    //   6M
-			0.0139,    //   9M
-			0.0146,    //  12M
-			0.0154,    //  18M
-			0.0161,    //   2Y
-			0.0171,    //   3Y
-			0.0179,    //   4Y
-			0.0185,    //   5Y
-			0.0206,    //  10Y
-		};
-
 		return LatentMarketStateBuilder.SmoothOvernightCurve (
-			dtSpot,
-			strCurrency,
-			astrDepositMaturityTenor,
-			adblDepositQuote,
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1D",
+			},
+			new double[]
+			{
+				0.0116,		// 1D
+			},
 			"Rate",
-			astrShortEndOISMaturityTenor,
-			adblShortEndOISQuote,
+			new String[]
+			{
+				 "1W",
+				 "2W",
+				 "3W",
+				 "1M",
+				 "2M",
+				 "3M",
+				 "4M",
+				 "5M",
+				 "6M",
+				 "9M",
+				"12M",
+				"18M",
+				 "2Y",
+				 "3Y",
+				 "4Y",
+				 "5Y",
+				"10Y",
+			},
+			new double[]
+			{
+				0.0117,    //   1W
+				0.0115,    //   2W
+				0.0116,    //   3W
+				0.0116,    //   1M
+				0.0120,    //   2M
+				0.0125,    //   3M
+				0.0128,    //   4M
+				0.0131,    //   5M
+				0.0133,    //   6M
+				0.0139,    //   9M
+				0.0146,    //  12M
+				0.0154,    //  18M
+				0.0161,    //   2Y
+				0.0171,    //   3Y
+				0.0179,    //   4Y
+				0.0185,    //   5Y
+				0.0206,    //  10Y
+			},
 			"SwapRate",
 			null,
 			null,
@@ -188,99 +192,85 @@ public class CMEFixFloat {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
-		String strForwardTenor = "3M";
+		String currency = "USD";
+		String forwardTenor = "3M";
+		String maturityTenor = "7Y";
+		double fixedCoupon = 0.021893;
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.SEPTEMBER,
-			1
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.SEPTEMBER, 1);
 
-		MergedDiscountForwardCurve dcOvernight = OvernightCurve (
-			dtSpot,
-			strCurrency
-		);
+		JulianDate effectiveDate = DateUtil.CreateFromYMD (2017, DateUtil.JULY, 8);
 
-		ForwardLabel forwardLabel = ForwardLabel.Create (
-			strCurrency,
-			strForwardTenor
-		);
+		MergedDiscountForwardCurve overnightCurve = OvernightCurve (spotDate, currency);
 
-		String[] astrDepositMaturityTenor = new String[] {
-			"1D",
-		};
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, forwardTenor);
 
-		double[] adblDepositQuote = new double[] {
-			0.013161,	// 1D
-		};
-
-		String[] astrFixFloatMaturityTenor = new String[] {
-			"02Y",
-			"03Y",
-			"04Y",
-			"05Y",
-			"06Y",
-			"07Y",
-			"08Y",
-			"09Y",
-			"10Y",
-			"11Y",
-			"12Y",
-			"15Y",
-			"20Y",
-			"25Y",
-			"30Y",
-			"40Y",
-			"50Y",
-		};
-
-		double[] adblFixFloatQuote = new double[] {
-			0.015540,	//  2Y
-			0.016423,	//  3Y
-			0.017209,	//  4Y			
-			0.017980,	//  5Y
-			0.018743,	//  6Y
-			0.019455,	//  7Y
-			0.020080,	//  8Y
-			0.020651,	//  9Y
-			0.021195,	// 10Y
-			0.021651,	// 11Y
-			0.022065,	// 12Y
-			0.022952,	// 15Y
-			0.023825,	// 20Y
-			0.024175,	// 25Y
-			0.024347,	// 30Y
-			0.024225,	// 40Y
-			0.023968,	// 50Y
-		};
-
-		ForwardCurve fc = LatentMarketStateBuilder.ShapePreservingForwardCurve (
-			dtSpot,
+		ForwardCurve forwardCurve = LatentMarketStateBuilder.ShapePreservingForwardCurve (
+			spotDate,
 			forwardLabel,
-			astrDepositMaturityTenor,
-			adblDepositQuote,
+			new String[]
+			{
+				"1D",
+			},
+			new double[]
+			{
+				0.013161,	// 1D
+			},
 			"ForwardRate",
 			null,
 			null,
 			"ParForwardRate",
-			astrFixFloatMaturityTenor,
-			adblFixFloatQuote,
+			new String[]
+			{
+				"02Y",
+				"03Y",
+				"04Y",
+				"05Y",
+				"06Y",
+				"07Y",
+				"08Y",
+				"09Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y",
+			},
+			new double[]
+			{
+				0.015540,	//  2Y
+				0.016423,	//  3Y
+				0.017209,	//  4Y			
+				0.017980,	//  5Y
+				0.018743,	//  6Y
+				0.019455,	//  7Y
+				0.020080,	//  8Y
+				0.020651,	//  9Y
+				0.021195,	// 10Y
+				0.021651,	// 11Y
+				0.022065,	// 12Y
+				0.022952,	// 15Y
+				0.023825,	// 20Y
+				0.024175,	// 25Y
+				0.024347,	// 30Y
+				0.024225,	// 40Y
+				0.023968,	// 50Y
+			},
 			"SwapRate",
 			null,
 			null,
@@ -288,112 +278,106 @@ public class CMEFixFloat {
 			null,
 			null,
 			"DerivedParBasisSpread",
-			dcOvernight,
+			overnightCurve,
 			null
 		);
 
-		String strMaturityTenor = "7Y";
-		double dblFixedCoupon = 0.021893;
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		JulianDate dtEffective = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.JULY,
-			8
-		);
+		curveSurfaceQuoteContainer.setFundingState (overnightCurve);
 
-		FixedFloatSwapConvention ffsc = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		curveSurfaceQuoteContainer.setForwardState (forwardCurve);
+
+		CaseInsensitiveTreeMap<Double> measureMap = IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		FixFloatComponent ffc = ffsc.createFixFloatComponent (
-			dtEffective,
-			strMaturityTenor,
-			dblFixedCoupon,
+		).createFixFloatComponent (
+			effectiveDate,
+			maturityTenor,
+			fixedCoupon,
 			0.,
 			1.
-		);
-
-		CurveSurfaceQuoteContainer csqc = new CurveSurfaceQuoteContainer();
-
-		csqc.setFundingState (dcOvernight);
-
-		csqc.setForwardState (fc);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		CaseInsensitiveTreeMap<Double> mapOutput = ffc.value (
-			valParams,
+		).value (
+			new ValuationParams (spotDate, spotDate, currency),
 			null,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		for (Map.Entry<String, Double> me : mapOutput.entrySet())
-			System.out.println ("\t\t" + me.getKey() + " => " + me.getValue());
+		for (Map.Entry<String, Double> measureMapEntry : measureMap.entrySet()) {
+			System.out.println ("\t|| " + measureMapEntry.getKey() + " => " + measureMapEntry.getValue());
+		}
 
 		System.out.println();
 
-		System.out.println ("\tClean Price       =>" +
-			FormatUtil.FormatDouble (mapOutput.get ("CleanPrice"), 1, 4, 1.)
+		System.out.println (
+			"\t|| Clean Price       =>" + FormatUtil.FormatDouble (measureMap.get ("CleanPrice"), 1, 4, 1.)
 		);
 
-		System.out.println ("\tDirty Price       =>" +
-			FormatUtil.FormatDouble (mapOutput.get ("DirtyPrice"), 1, 4, 1.)
+		System.out.println (
+			"\t|| Dirty Price       =>" + FormatUtil.FormatDouble (measureMap.get ("DirtyPrice"), 1, 4, 1.)
 		);
 
-		System.out.println ("\tFixed Stream PV   =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("ReferencePV"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Fixed Stream PV   =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("ReferencePV"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tFloat Stream PV   =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("DerivedPV"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Float Stream PV   =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("DerivedPV"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tFixed Stream PV   =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("ReferencePV"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Fixed Stream PV   =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("ReferencePV"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tFixed Stream DV01 =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("ReferenceDV01"), 1, 8, 10000.)
+		System.out.println (
+			"\t|| Fixed Stream DV01 =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("ReferenceDV01"), 1, 8, 10000.)
 		);
 
-		System.out.println ("\tFloat Stream DV01 =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("DerivedDV01"), 1, 8, 10000.)
+		System.out.println (
+			"\t|| Float Stream DV01 =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("DerivedDV01"), 1, 8, 10000.)
 		);
 
-		System.out.println ("\tFixing 01         =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("Fixing01"), 1, 8, 10000.)
+		System.out.println (
+			"\t|| Fixing 01         =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("Fixing01"), 1, 8, 10000.)
 		);
 
-		System.out.println ("\tClean PV          =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("CleanPV"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Clean PV          =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("CleanPV"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tDirty PV          =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("DirtyPV"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Dirty PV          =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("DirtyPV"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tFixed Accrued     =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("FixedAccrued"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Fixed Accrued     =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("FixedAccrued"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tFloat Accrued     =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("FloatAccrued"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Float Accrued     =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("FloatAccrued"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tAccrued           =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("Accrued"), 1, 8, 1.)
+		System.out.println (
+			"\t|| Accrued           =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("Accrued"), 1, 8, 1.)
 		);
 
-		System.out.println ("\tPar Swap Rate     =>  " +
-			FormatUtil.FormatDouble (mapOutput.get ("ParSwapRate"), 1, 4, 100.) + "%"
+		System.out.println (
+			"\t|| Par Swap Rate     =>  " +
+				FormatUtil.FormatDouble (measureMap.get ("ParSwapRate"), 1, 4, 100.) + "%"
 		);
 
 		EnvManager.TerminateEnv();

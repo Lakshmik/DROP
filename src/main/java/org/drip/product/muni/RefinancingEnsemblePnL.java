@@ -1,11 +1,12 @@
 
 package org.drip.product.muni;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
-import org.drip.numerical.common.NumberUtil;
+import org.drip.analytics.date.JulianDate;
+import org.drip.measure.statistics.UnivariateDiscreteThin;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -84,8 +85,9 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>DeGuillaumeRebonatoPogudinMarketYield</i> holds the Market Yield Term Structure for Muni Sub-markets,
- * 	i.e., Tax-exempt, Taxable, and Escrow Yield Curves. The References are:
+ * <i>RefinancingEnsemblePnL</i> holds the Ensemble of Bond PnL's incurred across multiple Paths and Dates by
+ *  re-financing using simulated Muni Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The
+ * 	References are:
  *
  *  <br><br>
  *  <ul>
@@ -124,146 +126,107 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class DeGuillaumeRebonatoPogudinMarketYield
+public class RefinancingEnsemblePnL
 {
-	private MarketYieldTermStructure _escrowMarketYieldTermStructure = null;
-	private MarketYieldTermStructure _taxableMarketYieldTermStructure = null;
-	private MarketYieldTermStructure _taxExemptMarketYieldTermStructure = null;
+	private TreeMap<JulianDate, List<RefinancingPathPnLEntry>> _dateToPnLListMap = null;
 
 	/**
-	 * Construct a <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance from the Tax Rate
-	 * 
-	 * @param taxExemptMarketYieldTermStructure Tax-exempt <i>MarketYieldTermStructure</i>
-	 * @param escrowMarketYieldTermStructure Escrow (i.e., SGLS) <i>MarketYieldTermStructure</i>
-	 * @param taxRate Tax Rate
-	 * 
-	 * @return <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
+	 * Empty <i>RefinancingEnsemblePnL</i> Constructor
 	 */
 
-	public static final DeGuillaumeRebonatoPogudinMarketYield FromTaxRate (
-		final MarketYieldTermStructure taxExemptMarketYieldTermStructure,
-		final MarketYieldTermStructure escrowMarketYieldTermStructure,
-		final double taxRate)
+	public RefinancingEnsemblePnL()
 	{
-		if (null == taxExemptMarketYieldTermStructure ||
-			!NumberUtil.IsValid (taxRate) || 0. > taxRate || 1. < taxRate)
-		{
-			return null;
-		}
-
-		double taxScaler = 1. / (1. - taxRate);
-
-		Map<String, Double> taxableSpotTenorValueMap = new HashMap<String, Double>();
-
-		Map<String, Double> taxableInfiniteHorizonTenorValueMap = new HashMap<String, Double>();
-
-		Map<String, Double> taxExemptSpotTenorValueMap =
-			taxExemptMarketYieldTermStructure.spotTenorValueMap();
-
-		Map<String, Double> taxExemptInfiniteHorizonTenorValueMap =
-			taxExemptMarketYieldTermStructure.infiniteHorizonTenorValueMap();
-
-		for (String tenor : taxExemptSpotTenorValueMap.keySet()) {
-			taxableSpotTenorValueMap.put (tenor, taxExemptSpotTenorValueMap.get (tenor) * taxScaler);
-		}
-
-		for (String tenor : taxExemptInfiniteHorizonTenorValueMap.keySet()) {
-			taxableInfiniteHorizonTenorValueMap.put (
-				tenor,
-				taxExemptInfiniteHorizonTenorValueMap.get (tenor) * taxScaler
-			);
-		}
-
-		try {
-			return new DeGuillaumeRebonatoPogudinMarketYield (
-				taxExemptMarketYieldTermStructure,
-				new MarketYieldTermStructure (
-					taxableSpotTenorValueMap,
-					taxExemptInfiniteHorizonTenorValueMap
-				),
-				escrowMarketYieldTermStructure
-			);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		_dateToPnLListMap = new TreeMap<JulianDate, List<RefinancingPathPnLEntry>>();
 	}
 
 	/**
-	 * <i>DeGuillaumeRebonatoPogudinMarketYield</i> Constructor
+	 * Retrieve the Map of Date to PnL List
 	 * 
-	 * @param taxExemptMarketYieldTermStructure Tax-exempt <i>MarketYieldTermStructure</i>
-	 * @param taxableMarketYieldTermStructure Taxable <i>MarketYieldTermStructure</i>
-	 * @param escrowMarketYieldTermStructure Escrow (i.e., SGLS) <i>MarketYieldTermStructure</i>
-	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
+	 * @return Map of Date to PnL List
 	 */
 
-	public DeGuillaumeRebonatoPogudinMarketYield (
-		final MarketYieldTermStructure taxExemptMarketYieldTermStructure,
-		final MarketYieldTermStructure taxableMarketYieldTermStructure,
-		final MarketYieldTermStructure escrowMarketYieldTermStructure)
-		throws Exception
+	public TreeMap<JulianDate, List<RefinancingPathPnLEntry>> dateToPnLListMap()
 	{
-		if (null == (_taxExemptMarketYieldTermStructure = taxExemptMarketYieldTermStructure) ||
-			null == (_taxableMarketYieldTermStructure = taxableMarketYieldTermStructure) ||
-			null == (_escrowMarketYieldTermStructure = escrowMarketYieldTermStructure))
-		{
-			throw new Exception ("DeGuillaumeRebonatoPogudinMarketYield Constructor => Invalid Inputs");
+		return _dateToPnLListMap;
+	}
+
+	/**
+	 * Add the <i>RefinancingPathPnLEntry</i> Instance at the Specified Date
+	 * 
+	 * @param date Date
+	 * @param refinancingPathPnLEntry <i>RefinancingPathPnLEntry</i> Instance
+	 * 
+	 * @return TRUE -The <i>RefinancingPathPnLEntry</i> Instance successfully added at the Specified Date
+	 */
+
+	public boolean add (
+		final JulianDate date,
+		final RefinancingPathPnLEntry refinancingPathPnLEntry)
+	{
+		if (null == date || null == refinancingPathPnLEntry) {
+			return false;
 		}
 
-		Set<String> tenorKeySet = _taxExemptMarketYieldTermStructure.tenorKeySet();
-
-		if (tenorKeySet.isEmpty() ||
-			!tenorKeySet.equals (_taxableMarketYieldTermStructure.tenorKeySet()) ||
-			!tenorKeySet.equals (_escrowMarketYieldTermStructure.tenorKeySet()))
-		{
-			throw new Exception ("DeGuillaumeRebonatoPogudinMarketYield Constructor => Invalid Inputs");
+		if (!_dateToPnLListMap.containsKey (date)) {
+			_dateToPnLListMap.put (date, new ArrayList<RefinancingPathPnLEntry>());
 		}
+
+		_dateToPnLListMap.get (date).add (refinancingPathPnLEntry);
+
+		return true;
 	}
 
 	/**
-	 * Retrieve the Tax-exempt <i>MarketYieldTermStructure</i>
+	 * Construct a Map of Date to <i>RefinancingEnsemblePnLThinStatistics</i> Instance
 	 * 
-	 * @return Tax-exempt <i>MarketYieldTermStructure</i>
+	 * @return Map of Date to <i>RefinancingEnsemblePnLThinStatistics</i> Instance
 	 */
 
-	public MarketYieldTermStructure taxExemptMarketYieldTermStructure()
+	public TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics> dateThinStatisticsMap()
 	{
-		return _taxExemptMarketYieldTermStructure;
-	}
+		TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics> dateThinStatisticsMap =
+			new TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics>();
 
-	/**
-	 * Retrieve the Taxable <i>MarketYieldTermStructure</i>
-	 * 
-	 * @return Taxable <i>MarketYieldTermStructure</i>
-	 */
+		for (JulianDate date : _dateToPnLListMap.keySet()) {
+			List<Double> taxExemptGovvieCurveDirtyPriceList = new ArrayList<Double>();
 
-	public MarketYieldTermStructure taxableMarketYieldTermStructure()
-	{
-		return _taxableMarketYieldTermStructure;
-	}
+			List<Double> taxableGovvieCurveDirtyPriceList = new ArrayList<Double>();
 
-	/**
-	 * Retrieve the Escrow (i.e., SGLS) <i>MarketYieldTermStructure</i>
-	 * 
-	 * @return Escrow (i.e., SGLS) <i>MarketYieldTermStructure</i>
-	 */
+			List<Double> taxExempt = new ArrayList<Double>();
 
-	public MarketYieldTermStructure escrowMarketYieldTermStructure()
-	{
-		return _escrowMarketYieldTermStructure;
-	}
+			List<Double> taxable = new ArrayList<Double>();
 
-	/**
-	 * Retrieve the Set of Tenor Keys
-	 * 
-	 * @return Set of Tenor Keys
-	 */
+			for (RefinancingPathPnLEntry refinancingPathPnLEntry : _dateToPnLListMap.get (date)) {
+				taxExemptGovvieCurveDirtyPriceList.add (
+					refinancingPathPnLEntry.taxExemptGovvieCurveCleanPrice()
+				);
 
-	public Set<String> tenorKeySet()
-	{
-		return _taxExemptMarketYieldTermStructure.tenorKeySet();
+				taxableGovvieCurveDirtyPriceList.add (
+					refinancingPathPnLEntry.taxableGovvieCurveCleanPrice()
+				);
+
+				taxExempt.add (refinancingPathPnLEntry.taxExempt());
+
+				taxable.add (refinancingPathPnLEntry.taxable());
+			}
+
+			try {
+				dateThinStatisticsMap.put (
+					date,
+					new RefinancingEnsemblePnLThinStatistics (
+						UnivariateDiscreteThin.FromList (taxExemptGovvieCurveDirtyPriceList),
+						UnivariateDiscreteThin.FromList (taxableGovvieCurveDirtyPriceList),
+						UnivariateDiscreteThin.FromList (taxExempt),
+						UnivariateDiscreteThin.FromList (taxable)
+					)
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return null;
+			}
+		}
+
+		return dateThinStatisticsMap;
 	}
 }

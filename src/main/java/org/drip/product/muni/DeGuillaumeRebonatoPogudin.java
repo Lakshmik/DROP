@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.drip.analytics.date.JulianDate;
 import org.drip.measure.dynamics.DiffusionEvaluatorOrnsteinUhlenbeck;
+import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.measure.realization.DiffusionEvolver;
 import org.drip.measure.realization.JumpDiffusionEdgeUnit;
 import org.drip.measure.realization.JumpDiffusionVertex;
@@ -91,7 +92,7 @@ import org.drip.numerical.common.NumberUtil;
 
 /**
  * <i>DeGuillaumeRebonatoPogudin</i> evolves the Market Yield Term Structure for Muni Sub-markets, i.e.,
- *  Tax-exempt, Taxable, and Escrow Yield Curves using the de Guillaume, Rebonato, and Pogudin (201)
+ *  Tax-exempt, Taxable, and Escrow Yield Curves using the de Guillaume, Rebonato, and Pogudin (2013)
  *  scheme. Default Evolution is using Ornstein-Uhlenbeck Evolver. The References are:
  *
  *  <br><br>
@@ -133,29 +134,32 @@ import org.drip.numerical.common.NumberUtil;
 
 public class DeGuillaumeRebonatoPogudin
 {
-	private String _currency = "";
 	private Map<String, DiffusionEvolver> _tenorEscrowEvolverMap = null;
 	private Map<String, DiffusionEvolver> _tenorTaxableEvolverMap = null;
 	private Map<String, DiffusionEvolver> _tenorTaxExemptEvolverMap = null;
 
 	/**
-	 * Construct a Standard Instance of <i>DeGuillaumeRebonatoPogudin</i>
+	 * Construct a Standard Instance of <i>DeGuillaumeRebonatoPogudin</i> using Custom Yield Dynamics
 	 * 
-	 * @param currency Currency
-	 * @param burstiness The Burstiness Parameter
-	 * @param relaxationTime The Relaxation Time
+	 * @param taxExemptOrnsteinUhlenbeckDriftWander Tax-exempt <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 * @param taxableOrnsteinUhlenbeckDriftWander <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 * @param escrowOrnsteinUhlenbeckDriftWander <i>OrnsteinUhlenbeckDriftWander</i> Instance
 	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
 	 * 
 	 * @return Standard Instance of <i>DeGuillaumeRebonatoPogudin</i>
 	 */
 
 	public static final DeGuillaumeRebonatoPogudin Standard (
-		final String currency,
-		final double burstiness,
-		final double relaxationTime,
-		final DeGuillaumeRebonatoPogudinMarketYield marketYield)
+		final OrnsteinUhlenbeckDriftWander taxExemptOrnsteinUhlenbeckDriftWander,
+		final OrnsteinUhlenbeckDriftWander taxableOrnsteinUhlenbeckDriftWander,
+		final OrnsteinUhlenbeckDriftWander escrowOrnsteinUhlenbeckDriftWander,
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield)
 	{
-		if (null == marketYield) {
+		if (null == taxExemptOrnsteinUhlenbeckDriftWander ||
+			null == taxableOrnsteinUhlenbeckDriftWander ||
+			null == escrowOrnsteinUhlenbeckDriftWander ||
+			null == marketYield)
+		{
 			return null;
 		}
 
@@ -181,8 +185,8 @@ public class DeGuillaumeRebonatoPogudin
 					new DiffusionEvolver (
 						DiffusionEvaluatorOrnsteinUhlenbeck.Standard (
 							taxExemptMarketYieldTermStructure.infiniteHorizonTenorValueMap().get (tenorKey),
-							burstiness,
-							relaxationTime
+							taxExemptOrnsteinUhlenbeckDriftWander.burstiness(),
+							taxExemptOrnsteinUhlenbeckDriftWander.relaxationTime()
 						)
 					)
 				);
@@ -192,8 +196,8 @@ public class DeGuillaumeRebonatoPogudin
 					new DiffusionEvolver (
 						DiffusionEvaluatorOrnsteinUhlenbeck.Standard (
 							taxableMarketYieldTermStructure.infiniteHorizonTenorValueMap().get (tenorKey),
-							burstiness,
-							relaxationTime
+							taxableOrnsteinUhlenbeckDriftWander.burstiness(),
+							taxableOrnsteinUhlenbeckDriftWander.relaxationTime()
 						)
 					)
 				);
@@ -203,15 +207,14 @@ public class DeGuillaumeRebonatoPogudin
 					new DiffusionEvolver (
 						DiffusionEvaluatorOrnsteinUhlenbeck.Standard (
 							escrowMarketYieldTermStructure.infiniteHorizonTenorValueMap().get (tenorKey),
-							burstiness,
-							relaxationTime
+							escrowOrnsteinUhlenbeckDriftWander.burstiness(),
+							escrowOrnsteinUhlenbeckDriftWander.relaxationTime()
 						)
 					)
 				);
 			}
 
 			DeGuillaumeRebonatoPogudin deGuillaumeRebonatoPogudin = new DeGuillaumeRebonatoPogudin (
-				currency,
 				tenorTaxExemptEvolverMap,
 				tenorTaxableEvolverMap,
 				tenorEscrowEvolverMap
@@ -225,13 +228,35 @@ public class DeGuillaumeRebonatoPogudin
 		return null;
 	}
 
-	private static final DeGuillaumeRebonatoPogudinPath InitializeRun (
-		final JulianDate spotDate,
-		final DeGuillaumeRebonatoPogudinMarketYield marketYield)
+	/**
+	 * Construct a Standard Instance of <i>DeGuillaumeRebonatoPogudin</i> using Common Yield Dynamics
+	 * 
+	 * @param ornsteinUhlenbeckDriftWander Common <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
+	 * 
+	 * @return Standard Instance of <i>DeGuillaumeRebonatoPogudin</i>
+	 */
+
+	public static final DeGuillaumeRebonatoPogudin Standard (
+		final OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander,
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield)
 	{
-		if (null == spotDate || null == marketYield) {
+		return Standard (
+			ornsteinUhlenbeckDriftWander,
+			ornsteinUhlenbeckDriftWander,
+			ornsteinUhlenbeckDriftWander,
+			marketYield
+		);
+	}
+
+	private static final DeGuillaumeRebonatoPogudinPath InitializeRun (
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield)
+	{
+		if (null == marketYield) {
 			return null;
 		}
+
+		JulianDate spotDate = marketYield.spotDate();
 
 		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun = new DeGuillaumeRebonatoPogudinPath();
 
@@ -413,23 +438,20 @@ public class DeGuillaumeRebonatoPogudin
 	/**
 	 * <i>DeGuillaumeRebonatoPogudin</i> Constructor
 	 * 
-	 * @param currency Currency
-	 * @param tenorTaxExemptEvolverMap Map of Tenor to Tax-exempt <i>DiffusionEvolver</> Evolver
-	 * @param tenorTaxableEvolverMap Map of Tenor to Taxable <i>DiffusionEvolver</> Evolver
-	 * @param tenorEscrowEvolverMap Map of Tenor to Escrow <i>DiffusionEvolver</> Evolver
+	 * @param tenorTaxExemptEvolverMap Map of Tenor to Tax-exempt <i>DiffusionEvolver</i> Evolver
+	 * @param tenorTaxableEvolverMap Map of Tenor to Taxable <i>DiffusionEvolver</i> Evolver
+	 * @param tenorEscrowEvolverMap Map of Tenor to Escrow <i>DiffusionEvolver</i> Evolver
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public DeGuillaumeRebonatoPogudin (
-		final String currency,
 		final Map<String, DiffusionEvolver> tenorTaxExemptEvolverMap,
 		final Map<String, DiffusionEvolver> tenorTaxableEvolverMap,
 		final Map<String, DiffusionEvolver> tenorEscrowEvolverMap)
 		throws Exception
 	{
-		if (null == (_currency = currency) || _currency.isEmpty() ||
-			null == (_tenorTaxExemptEvolverMap = tenorTaxExemptEvolverMap) ||
+		if (null == (_tenorTaxExemptEvolverMap = tenorTaxExemptEvolverMap) ||
 			null == (_tenorTaxableEvolverMap = tenorTaxableEvolverMap) ||
 			null == (_tenorEscrowEvolverMap = tenorEscrowEvolverMap))
 		{
@@ -444,20 +466,9 @@ public class DeGuillaumeRebonatoPogudin
 	}
 
 	/**
-	 * Retrieve the Currency
+	 * Retrieve the Map of Tenor to Tax-exempt <i>DiffusionEvolver</i> Evolver
 	 * 
-	 * @return Currency
-	 */
-
-	public String currency()
-	{
-		return _currency;
-	}
-
-	/**
-	 * Retrieve the Map of Tenor to Tax-exempt <i>DiffusionEvolver</> Evolver
-	 * 
-	 * @return Map of Tenor to Tax-exempt <i>DiffusionEvolver</> Evolver
+	 * @return Map of Tenor to Tax-exempt <i>DiffusionEvolver</i> Evolver
 	 */
 
 	public Map<String, DiffusionEvolver> tenorTaxExemptEvolverMap()
@@ -466,9 +477,9 @@ public class DeGuillaumeRebonatoPogudin
 	}
 
 	/**
-	 * Retrieve the Map of Tenor to Taxable <i>DiffusionEvolver</> Evolver
+	 * Retrieve the Map of Tenor to Taxable <i>DiffusionEvolver</i> Evolver
 	 * 
-	 * @return Map of Tenor to Taxable <i>DiffusionEvolver</> Evolver
+	 * @return Map of Tenor to Taxable <i>DiffusionEvolver</i> Evolver
 	 */
 
 	public Map<String, DiffusionEvolver> tenorTaxableEvolverMap()
@@ -477,9 +488,9 @@ public class DeGuillaumeRebonatoPogudin
 	}
 
 	/**
-	 * Retrieve the Map of Tenor to Escrow <i>DiffusionEvolver</> Evolver
+	 * Retrieve the Map of Tenor to Escrow <i>DiffusionEvolver</i> Evolver
 	 * 
-	 * @return Map of Tenor to Escrow <i>DiffusionEvolver</> Evolver
+	 * @return Map of Tenor to Escrow <i>DiffusionEvolver</i> Evolver
 	 */
 
 	public Map<String, DiffusionEvolver> tenorEscrowEvolverMap()
@@ -491,7 +502,6 @@ public class DeGuillaumeRebonatoPogudin
 	 * Generate an Instance of <i>DeGuillaumeRebonatoPogudinRun</i> Instance
 	 * 
 	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
-	 * @param spotDate Spot Date
 	 * @param increment Evolution Time Increment
 	 * @param terminalTime Evolution Termination Time
 	 * 
@@ -499,24 +509,24 @@ public class DeGuillaumeRebonatoPogudin
 	 */
 
 	public DeGuillaumeRebonatoPogudinPath evolve (
-		final DeGuillaumeRebonatoPogudinMarketYield marketYield,
-		final JulianDate spotDate,
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield,
 		final double increment,
 		final double terminalTime)
 	{
 		if (null == marketYield ||
-			null == spotDate ||
 			!NumberUtil.IsValid (increment) || 0. >= increment ||
 			!NumberUtil.IsValid (terminalTime) || terminalTime < increment)
 		{
 			return null;
 		}
 
-		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun = InitializeRun (spotDate, marketYield);
+		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun = InitializeRun (marketYield);
 
 		if (null == deGuillaumeRebonatoPogudinRun) {
 			return null;
 		}
+
+		JulianDate spotDate = marketYield.spotDate();
 
 		Set<String> tenorKeySet = marketYield.tenorKeySet();
 
@@ -547,29 +557,26 @@ public class DeGuillaumeRebonatoPogudin
 	 * Generate an Instance of <i>DeGuillaumeRebonatoPogudinRun</i> Instance
 	 * 
 	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
-	 * @param spotDate Spot Date
 	 * @param simulationDateList List of Ascending Simulation Dates
 	 * 
 	 * @return <i>DeGuillaumeRebonatoPogudinRun</i> Instance
 	 */
 
 	public DeGuillaumeRebonatoPogudinPath evolve (
-		final DeGuillaumeRebonatoPogudinMarketYield marketYield,
-		final JulianDate spotDate,
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield,
 		final List<JulianDate> simulationDateList)
 	{
-		if (null == marketYield ||
-			null == spotDate ||
-			null == simulationDateList || 0 == simulationDateList.size())
-		{
+		if (null == marketYield || null == simulationDateList || 0 == simulationDateList.size()) {
 			return null;
 		}
 
-		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun = InitializeRun (spotDate, marketYield);
+		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun = InitializeRun (marketYield);
 
 		if (null == deGuillaumeRebonatoPogudinRun) {
 			return null;
 		}
+
+		JulianDate spotDate = marketYield.spotDate();
 
 		Set<String> tenorKeySet = marketYield.tenorKeySet();
 
@@ -594,7 +601,7 @@ public class DeGuillaumeRebonatoPogudin
 			tenorKeySet,
 			timeIncrementArray
 		) && deGuillaumeRebonatoPogudinRun.setUpGovvieCurveMap (
-			_currency
+			marketYield.currency()
 		) ? deGuillaumeRebonatoPogudinRun : null;
 	}
 }

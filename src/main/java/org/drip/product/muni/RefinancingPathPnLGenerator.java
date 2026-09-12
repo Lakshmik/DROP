@@ -129,8 +129,8 @@ import org.drip.state.govvie.GovvieCurve;
 public class RefinancingPathPnLGenerator
 {
 	private BondComponent _bond = null;
-	private GovvieCurve _initialTaxableGovvieCurve = null;
-	private GovvieCurve _initialTaxExemptGovvieCurve = null;
+	private TreeMap<JulianDate, CurveMeasures> _dateInceptionMarketSimulatedMeasureMap =
+		null;
 
 	private double govvieCurvePrice (
 		final ValuationParams valuationParams,
@@ -148,21 +148,20 @@ public class RefinancingPathPnLGenerator
 	 * <i>RefinancingPathPnLGenerator</i> Constructor
 	 * 
 	 * @param bond Underlying Bond
-	 * @param initialTaxExemptGovvieCurve Initial Tax-Exempt <i>GovvieCurve</i> Instance
-	 * @param initialTaxableGovvieCurve Initial Taxable <i>GovvieCurve</i> Instance
+	 * @param dateInceptionMarketSimulatedMeasureMap Date Map of <i>InceptionMarketSimulatedMeasure</i>
+	 * 												 Instances
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public RefinancingPathPnLGenerator (
 		final BondComponent bond,
-		final GovvieCurve initialTaxExemptGovvieCurve,
-		final GovvieCurve initialTaxableGovvieCurve)
+		final TreeMap<JulianDate, CurveMeasures> dateInceptionMarketSimulatedMeasureMap)
 		throws Exception
 	{
 		if (null == (_bond = bond) ||
-			null == (_initialTaxExemptGovvieCurve = initialTaxExemptGovvieCurve) ||
-			null == (_initialTaxableGovvieCurve = initialTaxableGovvieCurve))
+			null == (_dateInceptionMarketSimulatedMeasureMap = dateInceptionMarketSimulatedMeasureMap) ||
+				_dateInceptionMarketSimulatedMeasureMap.isEmpty())
 		{
 			throw new Exception ("RefinancingPathPnLGenerator Constructor => Invalid Inputs");
 		}
@@ -180,33 +179,22 @@ public class RefinancingPathPnLGenerator
 	}
 
 	/**
-	 * Retrieve the Initial Tax-Exempt <i>GovvieCurve</i> Instance
+	 * Retrieve the Date Map of <i>InceptionMarketSimulatedMeasure</i>
 	 * 
-	 * @return Initial Tax-Exempt <i>GovvieCurve</i> Instance
+	 * @return Date Map of <i>InceptionMarketSimulatedMeasure</i>
 	 */
 
-	public GovvieCurve initialTaxExemptGovvieCurve()
+	public TreeMap<JulianDate, CurveMeasures> dateInceptionMarketSimulatedMeasureMap()
 	{
-		return _initialTaxExemptGovvieCurve;
+		return _dateInceptionMarketSimulatedMeasureMap;
 	}
 
 	/**
-	 * Retrieve the Initial Taxable <i>GovvieCurve</i> Instance
-	 * 
-	 * @return Initial Taxable <i>GovvieCurve</i> Instance
-	 */
-
-	public GovvieCurve initialTaxableGovvieCurve()
-	{
-		return _initialTaxableGovvieCurve;
-	}
-
-	/**
-	 * Generate the Date to PnL Map
+	 * Generate the Date to <i>RefinancingPathPnLEntry</i> Map
 	 * 
 	 * @param deGuillaumeRebonatoPogudinPath Simulated <i>DeGuillaumeRebonatoPogudinPath</i> Instance
 	 * 
-	 * @return Date to PnL Map
+	 * @return Date to <i>RefinancingPathPnLEntry</i> Map
 	 */
 
 	public TreeMap<JulianDate, RefinancingPathPnLEntry> dateEntryMap (
@@ -225,19 +213,22 @@ public class RefinancingPathPnLGenerator
 		TreeMap<JulianDate, GovvieCurve> dateTaxExemptGovvieCurveMap =
 			deGuillaumeRebonatoPogudinPath.dateTaxExemptGovvieCurveMap();
 
-		for (JulianDate asOfDate : dateTaxExemptGovvieCurveMap.keySet()) {
+		for (JulianDate asOfDate : _dateInceptionMarketSimulatedMeasureMap.keySet()) {
 			int asOfDateJulian = asOfDate.julian();
 
 			ValuationParams valuationParams = ValuationParams.Spot (asOfDateJulian);
 
-			try {
-				double accrued = _bond.accrued (asOfDateJulian, null);
+			CurveMeasures inceptionMarketSimulatedMeasure =
+				_dateInceptionMarketSimulatedMeasureMap.get (asOfDate);
 
+			double accrued = inceptionMarketSimulatedMeasure.accrual();
+
+			try {
 				dateEntryMap.put (
 					asOfDate,
 					new RefinancingPathPnLEntry (
-						govvieCurvePrice (valuationParams, _initialTaxExemptGovvieCurve) + accrued,
-						govvieCurvePrice (valuationParams, _initialTaxableGovvieCurve) + accrued,
+						inceptionMarketSimulatedMeasure.taxExemptCleanPrice() + accrued,
+						inceptionMarketSimulatedMeasure.taxableCleanPrice() + accrued,
 						govvieCurvePrice (valuationParams, dateTaxExemptGovvieCurveMap.get (asOfDate)) +
 							accrued,
 						govvieCurvePrice (valuationParams, dateTaxableGovvieCurveMap.get (asOfDate)) +

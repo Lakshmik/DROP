@@ -100,15 +100,15 @@ import org.drip.state.inference.LinearLatentStateCalibrator;
 
 /**
  * <i>DecayedFXCurve</i> illustrates the build out the forward decayed FX Curve.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/rolledstate/README.md">Generation of T1 Decayed State</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/rolledstate/README.md">Generation of T1 Decayed State</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -196,32 +196,32 @@ public class DecayedFXCurve
 			fxCurve
 		).markSuite().quoteArray();
 
-		System.out.println ("\n\t|-------------------------------------------------------------------||");
+		System.out.println ("\n\t||----------------------------------------||");
 
-		System.out.println ("\t|    Custom FX Curve Builder Metrics                                ||");
+		System.out.println ("\t||    Custom FX Curve Builder Metrics     ||");
 
-		System.out.println ("\t|-------------------------------------------------------------------||");
+		System.out.println ("\t||----------------------------------------||");
 
-		System.out.println ("\t|    L -> R:                                                        ||");
+		System.out.println ("\t||    L -> R:                             ||");
 
-		System.out.println ("\t|        FX Forward Tenor                                           ||");
+		System.out.println ("\t||        FX Forward Tenor                ||");
 
-		System.out.println ("\t|        Input FX Forward Outright                                  ||");
+		System.out.println ("\t||        T0 EOD FX Forward Outright      ||");
 
-		System.out.println ("\t|        Curve FX Forward Outright                                  ||");
+		System.out.println ("\t||        T1 SOD FX Forward Outright      ||");
 
-		System.out.println ("\t|-------------------------------------------------------------------||");
+		System.out.println ("\t||----------------------------------------||");
 
 		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
 			System.out.println (
-				"\t| [" + maturityTenorArray[tenorIndex] + "] => " +
-				FormatUtil.FormatDouble (fxForwardArray[tenorIndex], 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (fxCurve.fx (maturityTenorArray[tenorIndex]), 1, 6, 1.) + " | " +
+				"\t|| [" + maturityTenorArray[tenorIndex] + "] =>" +
+				FormatUtil.FormatDouble (fxForwardArray[tenorIndex], 1, 6, 1.) + " |" +
+				FormatUtil.FormatDouble (fxCurve.fx (maturityTenorArray[tenorIndex]), 1, 6, 1.) + " |" +
 				FormatUtil.FormatDouble (t1FXForwardQuoteArray[tenorIndex], 1, 6, 1.) + " ||"
 			);
 		}
 
-		System.out.println ("\t|-------------------------------------------------------------------||");
+		System.out.println ("\t||----------------------------------------||");
 
 		EnvManager.TerminateEnv();
 	}

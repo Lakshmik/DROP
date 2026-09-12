@@ -13,6 +13,14 @@ import org.drip.service.scenario.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -88,49 +96,47 @@ import org.drip.service.scenario.*;
 /**
  * <i>Ahmednagar</i> generates the Full Suite of Replication Metrics for Bond Ahmednagar.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class Ahmednagar {
+public class Ahmednagar
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.JULY,
-			10
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.JULY, 10);
 
-		String[] astrDepositTenor = new String[] {
+		String[] depositTenorArray = new String[]
+		{
 			"2D"
 		};
-
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray = new double[]
+		{
 			0.0130411 // 2D
 		};
-
-		double[] adblFuturesQuote = new double[] {
+		double[] futuresQuoteArray = new double[]
+		{
 			0.01345,	// 98.655
 			0.01470,	// 98.530
 			0.01575,	// 98.425
@@ -138,8 +144,8 @@ public class Ahmednagar {
 			0.01745,    // 98.255
 			0.01845     // 98.155
 		};
-
-		String[] astrFixFloatTenor = new String[] {
+		String[] fixFloatTenorArray = new String[]
+		{
 			"02Y",
 			"03Y",
 			"04Y",
@@ -158,8 +164,8 @@ public class Ahmednagar {
 			"40Y",
 			"50Y"
 		};
-
-		String[] astrGovvieTenor = new String[] {
+		String[] govvieTenorArray = new String[]
+		{
 			"1Y",
 			"2Y",
 			"3Y",
@@ -169,8 +175,8 @@ public class Ahmednagar {
 			"20Y",
 			"30Y"
 		};
-
-		double[] adblFixFloatQuote = new double[] {
+		double[] fixFloatQuoteArray = new double[]
+		{
 			0.016410, //  2Y
 			0.017863, //  3Y
 			0.019030, //  4Y
@@ -200,8 +206,8 @@ public class Ahmednagar {
 			0.02677, // 20Y
 			0.02927  // 30Y
 		};
-
-		String[] astrCreditTenor = new String[] {
+		String[] creditTenorArray = new String[]
+		{
 			"06M",
 			"01Y",
 			"02Y",
@@ -211,8 +217,8 @@ public class Ahmednagar {
 			"07Y",
 			"10Y"
 		};
-
-		double[] adblCreditQuote = new double[] {
+		double[] creditQuoteArray = new double[]
+		{
 			 60.,	//  6M
 			 68.,	//  1Y
 			 88.,	//  2Y
@@ -222,74 +228,49 @@ public class Ahmednagar {
 			168.,	//  7Y
 			188.	// 10Y
 		};
+		double fx = 1.;
+		int settleLag = 3;
+		int fixedFrequency = 2;
+		int floatFrequency = 4;
+		String name = "Ahmednagar";
+		double cleanPrice = 1.;
+		double issuePrice = 1.;
+		String currency = "USD";
+		double spreadBump = 20.;
+		double fixedCoupon = 0.0625;
+		double issueAmount = 3.6e08;
+		String treasuryCode = "UST";
+		String floatIndex = "USD-3M";
+		double floatSpread = 0.03899;
+		String fixedDayCount = "30/360";
+		double spreadDurationMultiplier = 5.;
 
-		double dblFX = 1.;
-		int iSettleLag = 3;
-		int iFixedFreq = 2;
-		int iFloatFreq = 4;
-		String strName = "Ahmednagar";
-		double dblCleanPrice = 1.;
-		double dblIssuePrice = 1.;
-		String strCurrency = "USD";
-		double dblSpreadBump = 20.;
-		double dblFixedCoupon = 0.0625;
-		double dblIssueAmount = 3.6e08;
-		String strTreasuryCode = "UST";
-		String strFloatIndex = "USD-3M";
-		double dblFloatSpread = 0.03899;
-		String strFixedDayCount = "30/360";
-		double dblSpreadDurationMultiplier = 5.;
+		JulianDate effectiveDate = DateUtil.CreateFromYMD (2017, DateUtil.FEBRUARY, 28);
 
-		JulianDate dtEffective = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.FEBRUARY,
-			28
-		);
+		JulianDate fixedFirstCouponDate = DateUtil.CreateFromYMD (2017, DateUtil.AUGUST, 28);
 
-		JulianDate dtFixedFirstCoupon = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.AUGUST,
-			28
-		);
+		JulianDate fixedEndDate = DateUtil.CreateFromYMD (2027, DateUtil.AUGUST, 28);
 
-		JulianDate dtFixedEnd = DateUtil.CreateFromYMD (
-			2027,
-			DateUtil.AUGUST,
-			28
-		);
+		JulianDate penultimateFloatCouponDate = DateUtil.CreateFromYMD (2056, DateUtil.AUGUST, 28);
 
-		JulianDate dtFloatPenultimateCoupon = DateUtil.CreateFromYMD (
-			2056,
-			DateUtil.AUGUST,
-			28
-		);
-
-		JulianDate dtMaturity = DateUtil.CreateFromYMD (
-			2057,
-			DateUtil.FEBRUARY,
-			28
-		);
+		JulianDate maturityDate = DateUtil.CreateFromYMD (2057, DateUtil.FEBRUARY, 28);
 
 		BondComponent bond = BondBuilder.FixedFToFloatP (
-			strName,
-			strName,
-			dtEffective.julian(),
-			dtFixedEnd.julian(),
-			dtFixedFirstCoupon.julian(),
-			iFixedFreq,
-			dblFixedCoupon,
-			strFixedDayCount,
-			strFixedDayCount,
-			dtMaturity.julian(),
-			dtFloatPenultimateCoupon.julian(),
-			iFloatFreq,
-			dblFloatSpread,
-			strFloatIndex,
-			new DateAdjustParams (
-				Convention.DATE_ROLL_FOLLOWING,
-				0,
-				strCurrency
-			),
+			name,
+			name,
+			effectiveDate.julian(),
+			fixedEndDate.julian(),
+			fixedFirstCouponDate.julian(),
+			fixedFrequency,
+			fixedCoupon,
+			fixedDayCount,
+			fixedDayCount,
+			maturityDate.julian(),
+			penultimateFloatCouponDate.julian(),
+			floatFrequency,
+			floatSpread,
+			floatIndex,
+			new DateAdjustParams (Convention.DATE_ROLL_FOLLOWING, 0, currency),
 			null,
 			null,
 			null,
@@ -299,32 +280,30 @@ public class Ahmednagar {
 			null
 		);
 
-		BondReplicator abr = BondReplicator.CorporateSenior (
-			dblCleanPrice,
-			dblIssuePrice,
-			dblIssueAmount,
-			dtSpot,
-			astrDepositTenor,
-			adblDepositQuote,
-			adblFuturesQuote,
-			astrFixFloatTenor,
-			adblFixFloatQuote,
-			dblSpreadBump,
-			dblSpreadDurationMultiplier,
-			strTreasuryCode,
-			astrGovvieTenor,
+		BondReplicator bondReplicator = BondReplicator.CorporateSenior (
+			cleanPrice,
+			issuePrice,
+			issueAmount,
+			spotDate,
+			depositTenorArray,
+			depositQuoteArray,
+			futuresQuoteArray,
+			fixFloatTenorArray,
+			fixFloatQuoteArray,
+			spreadBump,
+			spreadDurationMultiplier,
+			treasuryCode,
+			govvieTenorArray,
 			adblGovvieYield,
-			astrCreditTenor,
-			adblCreditQuote,
-			dblFX,
+			creditTenorArray,
+			creditQuoteArray,
+			fx,
 			Double.NaN,
-			iSettleLag,
+			settleLag,
 			bond
 		);
 
-		BondReplicationRun abrr = abr.generateRun();
-
-		System.out.println (abrr.display());
+		System.out.println (bondReplicator.generateRun().display());
 
 		EnvManager.TerminateEnv();
 	}

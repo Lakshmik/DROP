@@ -26,6 +26,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -106,7 +114,7 @@ import org.drip.state.identifier.ForwardLabel;
  * <i>ForwardDerivedBasisSensitivity</i> contains the sample demonstrating the full functionality behind
  * 	creating highly customized spline based forward curves.
  * 
- * The first sample illustrates the creation and usage of the xM-6M Tenor Basis Swap:
+ * 	The first sample illustrates the creation and usage of the xM-6M Tenor Basis Swap:
  * 	- Construct the 6M-xM float-float basis swap.
  * 	- Calculate the corresponding starting forward rate off of the discount curve.
  * 	- Construct the shape preserving forward curve off of Cubic Polynomial Basis Spline.
@@ -123,279 +131,281 @@ import org.drip.state.identifier.ForwardLabel;
  * 	- Compare these with a) the forward rate off of the discount curve, b) The LIBOR rate, and c) The
  * 		Input Basis Swap Quote.
  * 
- * The second sample illustrates how to build and test the forward curves across various tenor basis. It
- * 	shows the following steps:
+ * 	The second sample illustrates how to build and test the forward curves across various tenor basis. It
+ * 		shows the following steps:
  * 	- Construct the Discount Curve using its instruments and quotes.
  * 	- Build and run the sampling for the 1M-6M Tenor Basis Swap from its instruments and quotes.
  * 	- Build and run the sampling for the 3M-6M Tenor Basis Swap from its instruments and quotes.
  * 	- Build and run the sampling for the 6M-6M Tenor Basis Swap from its instruments and quotes.
  * 	- Build and run the sampling for the 12M-6M Tenor Basis Swap from its instruments and quotes.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sensitity/README.md">Forward Funding OIS Curve Sensitivity</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sensitivity/README.md">Forward Funding OIS Curve Sensitivity</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ForwardDerivedBasisSensitivity {
+public class ForwardDerivedBasisSensitivity
+{
 
 	private static final FixFloatComponent OTCFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
 	private static final FloatFloatComponent OTCFloatFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strDerivedTenor,
-		final String strMaturityTenor,
-		final double dblBasis)
+		final JulianDate spotDate,
+		final String currency,
+		final String derivedTenor,
+		final String maturityTenor,
+		final double basis)
 	{
-		FloatFloatSwapConvention ffConv = IBORFloatFloatContainer.ConventionFromJurisdiction (strCurrency);
-
-		return ffConv.createFloatFloatComponent (
-			dtSpot,
-			strDerivedTenor,
-			strMaturityTenor,
-			dblBasis,
+		return IBORFloatFloatContainer.ConventionFromJurisdiction (
+			currency
+		).createFloatFloatComponent (
+			spotDate,
+			derivedTenor,
+			maturityTenor,
+			basis,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final CalibratableComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final int[] aiDay,
-		final int iNumFutures,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final int[] maturityDaysArray,
+		final int futuresCount,
+		final String currency)
 		throws Exception
 	{
-		CalibratableComponent[] aCalibComp = new CalibratableComponent[aiDay.length + iNumFutures];
+		CalibratableComponent[] calibratableComponentArray =
+			new CalibratableComponent[maturityDaysArray.length + futuresCount];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aCalibComp[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					strCurrency,
-					aiDay[i] + "D"
-				)
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			calibratableComponentArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				ForwardLabel.Create (currency, "3M")
 			);
+		}
 
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtEffective,
-			iNumFutures,
-			strCurrency
+		CalibratableComponent[] futuresArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
+			effectiveDate,
+			futuresCount,
+			currency
 		);
 
-		for (int i = aiDay.length; i < aiDay.length + iNumFutures; ++i)
-			aCalibComp[i] = aEDF[i - aiDay.length];
+		for (int componentIndex = maturityDaysArray.length;
+			componentIndex < maturityDaysArray.length + futuresCount;
+			++componentIndex)
+		{
+			calibratableComponentArray[componentIndex] =
+				futuresArray[componentIndex - maturityDaysArray.length];
+		}
 
-		return aCalibComp;
+		return calibratableComponentArray;
 	}
 
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+	private static final CalibratableComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aIRS[i] = OTCFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int irsIndex = 0; irsIndex < maturityTenorArray.length; ++irsIndex) {
+			irsArray[irsIndex] = OTCFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[irsIndex],
+				couponArray[irsIndex]
 			);
+		}
 
-		return aIRS;
+		return irsArray;
 	}
-
-	/*
-	 * Construct the discount curve using the following steps:
-	 * 	- Construct the array of cash instruments and their quotes.
-	 * 	- Construct the array of swap instruments and their quotes.
-	 * 	- Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the array of Deposit instruments and their quotes.
-		 */
-
-		CalibratableComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			new int[] {
-			},
-			0,
-			strCurrency
-		);
-
-		double[] adblDepositQuote = new double[] {
+		double[] swapQuoteArray =
+		{
+			0.02604,    //  4Y
+			0.02808,    //  5Y
+			0.02983,    //  6Y
+			0.03136,    //  7Y
+			0.03268,    //  8Y
+			0.03383,    //  9Y
+			0.03488,    // 10Y
+			0.03583,    // 11Y
+			0.03668,    // 12Y
+			0.03833,    // 15Y
+			0.03854,    // 20Y
+			0.03672,    // 25Y
+			0.03510,    // 30Y
+			0.03266,    // 40Y
+			0.03145     // 50Y
 		};
-
-		/*
-		 * Construct the array of Swap instruments and their quotes.
-		 */
-
-		double[] adblSwapQuote = new double[] {
-			0.0009875,   //  9M
-			0.00122,     //  1Y
-			0.00223,     // 18M
-			0.00383,     //  2Y
-			0.00827,     //  3Y
-			0.01245,     //  4Y
-			0.01605,     //  5Y
-			0.02597      // 10Y
-		};
-
-		String[] astrSwapManifestMeasure = new String[] {
-			"SwapRate",		//  9M
-			"SwapRate",     //  1Y
-			"SwapRate",     // 18M
-			"SwapRate",     //  2Y
-			"SwapRate",     //  3Y
-			"SwapRate",     //  4Y
-			"SwapRate",     //  5Y
-			"SwapRate"      // 10Y
-		};
-
-		CalibratableComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"9M",
-				"1Y",
-				"18M",
-				"2Y",
-				"3Y",
-				"4Y",
-				"5Y",
-				"10Y"
-			},
-			adblSwapQuote
-		);
-
-		/*
-		 * Construct a shape preserving and smoothing KLK Hyperbolic Spline from the cash/swap instruments.
-		 */
 
 		return ScenarioDiscountCurveBuilder.CubicKLKHyperbolicDFRateShapePreserver (
 			"KLK_HYPERBOLIC_SHAPE_TEMPLATE",
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
+			new ValuationParams (spotDate, spotDate, currency),
+			DepositInstrumentsFromMaturityDays (
+				spotDate,
+				new int[]
+				{
+					1,
+					2,
+					3,
+					7,
+					14,
+					21,
+					30,
+					60
+				},
+				0,
+				currency
 			),
-			aDepositComp,
-			adblDepositQuote,
-			null,
-			aSwapComp,
-			adblSwapQuote,
-			astrSwapManifestMeasure,
+			new double[]
+			{
+				0.0120,
+				0.0120,
+				0.0120,
+				0.0145,
+				0.0155,
+				0.0160,
+				0.0166,
+				0.0185
+			},
+			new String[]
+			{
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate",
+				"ForwardRate"
+			},
+			SwapInstrumentsFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"40Y",
+					"50Y"
+				},
+				swapQuoteArray
+			),
+			swapQuoteArray,
+			new String[]
+			{
+				"SwapRate",    //  4Y
+				"SwapRate",    //  5Y
+				"SwapRate",    //  6Y
+				"SwapRate",    //  7Y
+				"SwapRate",    //  8Y
+				"SwapRate",    //  9Y
+				"SwapRate",    // 10Y
+				"SwapRate",    // 11Y
+				"SwapRate",    // 12Y
+				"SwapRate",    // 15Y
+				"SwapRate",    // 20Y
+				"SwapRate",    // 25Y
+				"SwapRate",    // 30Y
+				"SwapRate",    // 40Y
+				"SwapRate"     // 50Y
+			},
 			false
 		);
 	}
 
-	/*
-	 * Construct an array of float-float swaps from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FloatFloatComponent[] MakexM6MBasisSwap (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final int iTenorInMonths)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final int tenorInMonths)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		String tenor = tenorInMonths + "M";
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFFC[i] = OTCFloatFloat (
-				dtSpot,
-				strCurrency,
-				iTenorInMonths + "M",
-				astrMaturityTenor[i],
-				0.
-			);
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			floatFloatComponentArray[tenorIndex] =
+				OTCFloatFloat (spotDate, currency, tenor, maturityTenorArray[tenorIndex], 0.);
+		}
 
-		return aFFC;
+		return floatFloatComponentArray;
 	}
 
 	private static final void ForwardJack (
-		final JulianDate dt,
-		final Map<String, ForwardCurve> mapForward,
-		final String strStartDateTenor)
+		final JulianDate date,
+		final Map<String, ForwardCurve> forwardCurveMap,
+		final String startDateTenor)
 	{
-		for (Map.Entry<String, ForwardCurve> me : mapForward.entrySet())
-			System.out.println (me.getKey() + " | " + strStartDateTenor + ": " +
-				me.getValue().jackDForwardDManifestMeasure (
-					"PV",
-					dt.addTenor (strStartDateTenor)).displayString()
+		for (Map.Entry<String, ForwardCurve> forwardCurveMapEntry : forwardCurveMap.entrySet()) {
+			System.out.println (
+				"\t|| " + forwardCurveMapEntry.getKey() + " | " + startDateTenor + ": " +
+					forwardCurveMapEntry.getValue().jackDForwardDManifestMeasure (
+						"PV",
+						date.addTenor (startDateTenor)
+					).displayString()
 				);
+		}
 	}
 
 	private static final void ForwardJack (
-		final JulianDate dt,
-		final Map<String, ForwardCurve> mapForward)
+		final JulianDate date,
+		final Map<String, ForwardCurve> forwardCurveMap)
 	{
-		ForwardJack (dt, mapForward, "1Y");
+		ForwardJack (date, forwardCurveMap, "1Y");
 
-		ForwardJack (dt, mapForward, "2Y");
+		ForwardJack (date, forwardCurveMap, "2Y");
 
-		ForwardJack (dt, mapForward, "3Y");
+		ForwardJack (date, forwardCurveMap, "3Y");
 
-		ForwardJack (dt, mapForward, "5Y");
+		ForwardJack (date, forwardCurveMap, "5Y");
 
-		ForwardJack (dt, mapForward, "7Y");
+		ForwardJack (date, forwardCurveMap, "7Y");
 	}
 
 	/*
@@ -415,107 +425,60 @@ public class ForwardDerivedBasisSensitivity {
 	 * 		- Derived Basis Par Spread
 	 * 	- Compare these with a) the forward rate off of the discount curve, b) The LIBOR rate, and c) The
 	 * 		Input Basis Swap Quote.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final Map<String, ForwardCurve> xM6MBasisSample (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final MergedDiscountForwardCurve dc,
-		final int iTenorInMonths,
-		final String[] astrxM6MFwdTenor,
-		final double[] adblxM6MBasisSwapQuote)
+		final JulianDate spotDate,
+		final String currency,
+		final MergedDiscountForwardCurve discountCurve,
+		final int tenorInMonths,
+		final String[] xM6MForwardTenorArray,
+		final double[] xM6MBasisSwapQuoteArray)
 		throws Exception
 	{
-		System.out.println ("------------------------------------------------------------");
+		System.out.println ("\t||------------------------------------------------------------");
 
-		System.out.println (" SPL =>              n=4               |         |         |");
+		System.out.println ("\t|| SPL =>              n=4               |         |         |");
 
-		System.out.println ("---------------------------------------|  LOG DF |  LIBOR  |");
+		System.out.println ("\t||---------------------------------------|  LOG DF |  LIBOR  |");
 
-		System.out.println (" MSR =>  RECALC  |  REFEREN |  DERIVED |         |         |");
+		System.out.println ("\t|| MSR =>  RECALC  |  REFEREN |  DERIVED |         |         |");
 
-		System.out.println ("------------------------------------------------------------");
+		System.out.println ("\t||------------------------------------------------------------");
 
-		/*
-		 * Construct the 6M-xM float-float basis swap.
-		 */
-
-		FloatFloatComponent[] aFFC = MakexM6MBasisSwap (
-			dtSpot,
-			strCurrency,
-			astrxM6MFwdTenor,
-			iTenorInMonths
+		FloatFloatComponent[] floatFloatComponentArray = MakexM6MBasisSwap (
+			spotDate,
+			currency,
+			xM6MForwardTenorArray,
+			tenorInMonths
 		);
 
-		String strBasisTenor = iTenorInMonths + "M";
+		String basisTenor = tenorInMonths + "M";
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		/*
-		 * Calculate the starting forward rate off of the discount curve.
-		 */
+		Map<String, ForwardCurve> forwardCurveMap = new HashMap<String, ForwardCurve>();
 
-		double dblStartingFwd = dc.forward (
-			dtSpot.julian(),
-			dtSpot.addTenor (strBasisTenor).julian()
-		);
-
-		/*
-		 * Set the discount curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
+		ForwardCurve xMQuarticForwardCurve = ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
+			"QUARTIC_FWD" + basisTenor,
+			ForwardLabel.Create (currency, basisTenor),
+			valuationParams,
 			null,
-			null,
-			null,
-			null,
-			null,
-			null
-		);
-
-		Map<String, ForwardCurve> mapForward = new HashMap<String, ForwardCurve>();
-
-		/*
-		 * Construct the shape preserving forward curve off of Quartic Polynomial Basis Spline.
-		 */
-
-		ForwardCurve fcxMQuartic = ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
-			"QUARTIC_FWD" + strBasisTenor,
-			ForwardLabel.Create (
-				strCurrency,
-				strBasisTenor
-			),
-			valParams,
-			null,
-			mktParams,
+			MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
 			null,
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (5),
-			aFFC,
+			floatFloatComponentArray,
 			"ReferenceParBasisSpread",
-			adblxM6MBasisSwapQuote,
-			dblStartingFwd
+			xM6MBasisSwapQuoteArray,
+			discountCurve.forward (spotDate.julian(), spotDate.addTenor (basisTenor).julian())
 		);
 
-		mapForward.put (
-			" QUARTIC_FWD" + strBasisTenor,
-			fcxMQuartic
-		);
+		forwardCurveMap.put (" QUARTIC_FWD" + basisTenor, xMQuarticForwardCurve);
 
-		/*
-		 * Set the discount curve + quartic polynomial forward curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer mktParamsQuarticFwd = MarketParamsBuilder.Create (
-			dc,
-			fcxMQuartic,
+		CurveSurfaceQuoteContainer quarticForwardCurveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
+			xMQuarticForwardCurve,
 			null,
 			null,
 			null,
@@ -525,42 +488,53 @@ public class ForwardDerivedBasisSensitivity {
 		);
 
 		int i = 0;
-		int iFreq = 12 / iTenorInMonths;
+		int frequency = 12 / tenorInMonths;
 
-		/*
-		 * Compute the following forward curve metrics for each of cubic polynomial forward, quartic
-		 * 	polynomial forward, and KLK Hyperbolic tension forward curves:
-		 * 	- Reference Basis Par Spread
-		 * 	- Derived Basis Par Spread
-		 * 
-		 * Further compare these with a) the forward rate off of the discount curve, b) the LIBOR rate, and
-		 * 	c) Input Basis Swap Quote.
-		 */
+		for (String maturityTenor : xM6MForwardTenorArray) {
+			int forwardEndDate = spotDate.addTenor (maturityTenor).julian();
 
-		for (String strMaturityTenor : astrxM6MFwdTenor) {
-			int iFwdEndDate = dtSpot.addTenor (strMaturityTenor).julian();
+			int forwardStartDate = spotDate.addTenor (maturityTenor).subtractTenor (basisTenor).julian();
 
-			int iFwdStartDate = dtSpot.addTenor (strMaturityTenor).subtractTenor (strBasisTenor).julian();
-
-			FloatFloatComponent ffc = aFFC[i++];
-
-			CaseInsensitiveTreeMap<Double> mapQuarticValue = ffc.value (
-				valParams,
+			CaseInsensitiveTreeMap<Double> measureMap = floatFloatComponentArray[i++].value (
+				valuationParams,
 				null,
-				mktParamsQuarticFwd,
+				quarticForwardCurveSurfaceQuoteContainer,
 				null
 			);
 
-			System.out.println (" " + strMaturityTenor + " =>  " +
-				FormatUtil.FormatDouble (fcxMQuartic.forward (strMaturityTenor), 2, 2, 100.) + "  |  " +
-				FormatUtil.FormatDouble (mapQuarticValue.get ("ReferenceParBasisSpread"), 2, 2, 1.) + "  |  " +
-				FormatUtil.FormatDouble (mapQuarticValue.get ("DerivedParBasisSpread"), 2, 2, 1.) + "  |  " +
-				FormatUtil.FormatDouble (iFreq * java.lang.Math.log (dc.df (iFwdStartDate) / dc.df (iFwdEndDate)), 1, 2, 100.) + "  |  " +
-				FormatUtil.FormatDouble (dc.libor (iFwdStartDate, iFwdEndDate), 1, 2, 100.) + "  |  "
+			System.out.println (
+				"\t|| " + maturityTenor + " =>  " + FormatUtil.FormatDouble (
+					xMQuarticForwardCurve.forward (maturityTenor),
+					2,
+					2,
+					100.
+				) + "  |  " + FormatUtil.FormatDouble (
+					measureMap.get ("ReferenceParBasisSpread"),
+					2,
+					2,
+					1.
+				) + "  |  " + FormatUtil.FormatDouble (
+					measureMap.get ("DerivedParBasisSpread"),
+					2,
+					2,
+					1.
+				) + "  |  " + FormatUtil.FormatDouble (
+					frequency * Math.log (
+						discountCurve.df (forwardStartDate) / discountCurve.df (forwardEndDate)
+					),
+					1,
+					2,
+					100.
+				) + "  |  " + FormatUtil.FormatDouble (
+					discountCurve.libor (forwardStartDate, forwardEndDate),
+					1,
+					2,
+					100.
+				) + "  ||"
 			);
 		}
 
-		return mapForward;
+		return forwardCurveMap;
 	}
 
 	/*
@@ -571,186 +545,226 @@ public class ForwardDerivedBasisSensitivity {
 	 * 	- Build and run the sampling for the 3M-6M Tenor Basis Swap from its instruments and quotes.
 	 * 	- Build and run the sampling for the 6M-6M Tenor Basis Swap from its instruments and quotes.
 	 * 	- Build and run the sampling for the 12M-6M Tenor Basis Swap from its instruments and quotes.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void CustomForwardCurveBuilderSample()
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "AUD";
+		String currency = "AUD";
 
-		JulianDate dtToday = DateUtil.Today().addTenor ("0D");
+		JulianDate today = DateUtil.Today().addTenor ("0D");
 
-		/*
-		 * Construct the Discount Curve using its instruments and quotes
-		 */
+		MergedDiscountForwardCurve discountCurve = MakeDC (today, currency);
 
-		MergedDiscountForwardCurve dc = MakeDC (
-			dtToday,
-			strCurrency
+		System.out.println ("\n\t||------------------------------------------------------------");
+
+		System.out.println ("\t||-------------------    1M-6M Basis Swap    -----------------");
+
+		System.out.println ("\n\t||------------------------------------------------------------");
+
+		System.out.println ("\t||-------------------    3M-6M Basis Swap    -----------------");
+
+		System.out.println ("\n\t||------------------------------------------------------------");
+
+		System.out.println ("\t||-------------------   12M-6M Basis Swap    -----------------");
+
+		System.out.println (
+			"\n\t||--------------------------------------------------------------------------------------------------------------------------------------------"
 		);
 
-		System.out.println ("\n------------------------------------------------------------");
-
-		System.out.println ("-------------------    1M-6M Basis Swap    -----------------");
-
-		/*
-		 * Build and run the sampling for the 1M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		Map<String, ForwardCurve> mapForward1M6M = xM6MBasisSample (
-			dtToday,
-			strCurrency,
-			dc,
-			1,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-			},
-			new double[] {
-				0.00551,    //  1Y
-				0.00387,    //  2Y
-				0.00298,    //  3Y
-				0.00247,    //  4Y
-				0.00211,    //  5Y
-				0.00185,    //  6Y
-				0.00165,    //  7Y
-				0.00150,    //  8Y
-				0.00137,    //  9Y
-				0.00127,    // 10Y
-				0.00119,    // 11Y
-				0.00112,    // 12Y
-				0.00096,    // 15Y
-				0.00079,    // 20Y
-				0.00069,    // 25Y
-				0.00062     // 30Y
-			}
+		System.out.println (
+			"\t||------------------------------------------------------- 1M-6M Micro Jack -------------------------------------------------------------------"
 		);
 
-		/*
-		 * Build and run the sampling for the 3M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		System.out.println ("\n------------------------------------------------------------");
-
-		System.out.println ("-------------------    3M-6M Basis Swap    -----------------");
-
-		Map<String, ForwardCurve> mapForward3M6M = xM6MBasisSample (
-			dtToday,
-			strCurrency,
-			dc,
-			3,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-			},
-			new double[] {
-				0.00186,    //  1Y
-				0.00127,    //  2Y
-				0.00097,    //  3Y
-				0.00080,    //  4Y
-				0.00067,    //  5Y
-				0.00058,    //  6Y
-				0.00051,    //  7Y
-				0.00046,    //  8Y
-				0.00042,    //  9Y
-				0.00038,    // 10Y
-				0.00035,    // 11Y
-				0.00033,    // 12Y
-				0.00028,    // 15Y
-				0.00022,    // 20Y
-				0.00020,    // 25Y
-				0.00018     // 30Y
-			}
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------------------------\n"
 		);
-
-		/*
-		 * Build and run the sampling for the 12M-6M Tenor Basis Swap from its instruments and quotes.
-		 */
-
-		System.out.println ("\n------------------------------------------------------------");
-
-		System.out.println ("-------------------   12M-6M Basis Swap    -----------------");
-
-		Map<String, ForwardCurve> mapForward12M6M = xM6MBasisSample (
-			dtToday,
-			strCurrency,
-			dc,
-			12,
-			new String[] {
-				"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "35Y", "40Y"
-			},
-			new double[] {
-				-0.00212,    //  1Y
-				-0.00152,    //  2Y
-				-0.00117,    //  3Y
-				-0.00097,    //  4Y
-				-0.00082,    //  5Y
-				-0.00072,    //  6Y
-				-0.00063,    //  7Y
-				-0.00057,    //  8Y
-				-0.00051,    //  9Y
-				-0.00047,    // 10Y
-				-0.00044,    // 11Y
-				-0.00041,    // 12Y
-				-0.00035,    // 15Y
-				-0.00028,    // 20Y
-				-0.00025,    // 25Y
-				-0.00022,    // 30Y
-				-0.00022,    // 35Y Extrapolated
-				-0.00022,    // 40Y Extrapolated
-			}
-		);
-
-		System.out.println ("\n--------------------------------------------------------------------------------------------------------------------------------------------");
-
-		System.out.println ("------------------------------------------------------- 1M-6M Micro Jack -------------------------------------------------------------------");
-
-		System.out.println ("--------------------------------------------------------------------------------------------------------------------------------------------\n");
 
 		ForwardJack (
-			dtToday,
-			mapForward1M6M
+			today,
+			xM6MBasisSample (
+				today,
+				currency,
+				discountCurve,
+				1,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				new double[]
+				{
+					0.00551,    //  1Y
+					0.00387,    //  2Y
+					0.00298,    //  3Y
+					0.00247,    //  4Y
+					0.00211,    //  5Y
+					0.00185,    //  6Y
+					0.00165,    //  7Y
+					0.00150,    //  8Y
+					0.00137,    //  9Y
+					0.00127,    // 10Y
+					0.00119,    // 11Y
+					0.00112,    // 12Y
+					0.00096,    // 15Y
+					0.00079,    // 20Y
+					0.00069,    // 25Y
+					0.00062     // 30Y
+				}
+			)
 		);
 
-		System.out.println ("\n--------------------------------------------------------------------------------------------------------------------------------------------");
-
-		System.out.println ("------------------------------------------------------- 3M-6M Micro Jack -------------------------------------------------------------------");
-
-		System.out.println ("--------------------------------------------------------------------------------------------------------------------------------------------\n");
-
-		ForwardJack (
-			dtToday,
-			mapForward3M6M
+		System.out.println (
+			"\n\t||--------------------------------------------------------------------------------------------------------------------------------------------"
 		);
 
-		System.out.println ("\n--------------------------------------------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t||------------------------------------------------------- 3M-6M Micro Jack -------------------------------------------------------------------"
+		);
 
-		System.out.println ("------------------------------------------------------ 12M-6M Micro Jack -------------------------------------------------------------------");
-
-		System.out.println ("--------------------------------------------------------------------------------------------------------------------------------------------\n");
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------------------------\n"
+		);
 
 		ForwardJack (
-			dtToday,
-			mapForward12M6M
+			today,
+			xM6MBasisSample (
+				today,
+				currency,
+				discountCurve,
+				3,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y"
+				},
+				new double[]
+				{
+					0.00186,    //  1Y
+					0.00127,    //  2Y
+					0.00097,    //  3Y
+					0.00080,    //  4Y
+					0.00067,    //  5Y
+					0.00058,    //  6Y
+					0.00051,    //  7Y
+					0.00046,    //  8Y
+					0.00042,    //  9Y
+					0.00038,    // 10Y
+					0.00035,    // 11Y
+					0.00033,    // 12Y
+					0.00028,    // 15Y
+					0.00022,    // 20Y
+					0.00020,    // 25Y
+					0.00018     // 30Y
+				}
+			)
+		);
+
+		System.out.println (
+			"\n\t||--------------------------------------------------------------------------------------------------------------------------------------------"
+		);
+
+		System.out.println (
+			"\t||------------------------------------------------------ 12M-6M Micro Jack -------------------------------------------------------------------"
+		);
+
+		System.out.println (
+			"\t||--------------------------------------------------------------------------------------------------------------------------------------------\n"
+		);
+
+		ForwardJack (
+			today,
+			xM6MBasisSample (
+				today,
+				currency,
+				discountCurve,
+				12,
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"35Y",
+					"40Y"
+				},
+				new double[]
+				{
+					-0.00212,    //  1Y
+					-0.00152,    //  2Y
+					-0.00117,    //  3Y
+					-0.00097,    //  4Y
+					-0.00082,    //  5Y
+					-0.00072,    //  6Y
+					-0.00063,    //  7Y
+					-0.00057,    //  8Y
+					-0.00051,    //  9Y
+					-0.00047,    // 10Y
+					-0.00044,    // 11Y
+					-0.00041,    // 12Y
+					-0.00035,    // 15Y
+					-0.00028,    // 20Y
+					-0.00025,    // 25Y
+					-0.00022,    // 30Y
+					-0.00022,    // 35Y Extrapolated
+					-0.00022,    // 40Y Extrapolated
+				}
+			)
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		CustomForwardCurveBuilderSample();

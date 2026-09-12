@@ -105,15 +105,15 @@ import org.drip.state.inference.LinearLatentStateCalibrator;
 
 /**
  * <i>DecayedFundingCurve</i> illustrates the build out the forward decayed Funding Curve.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/rolledstate/README.md">Generation of T1 Decayed State</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/rolledstate/README.md">Generation of T1 Decayed State</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -156,18 +156,26 @@ public class DecayedFundingCurve
 			null
 		);
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||     T0 EOD DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        - Instrument Index");
+
+		System.out.println ("\t||        - Recovered Quote");
+
+		System.out.println ("\t||        - Calibrated Quote");
+
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		for (int depositComponentIndex = 0;
 			depositComponentIndex < depositComponentArray.length;
 			++depositComponentIndex)
 		{
 			System.out.println (
-				"\t[" + depositComponentArray[depositComponentIndex].maturityDate() + "] = " +
+				"\t|| [" + depositComponentArray[depositComponentIndex].maturityDate() + "] =>" +
 				FormatUtil.FormatDouble (
 					depositComponentArray[depositComponentIndex].measureValue (
 						valuationParams,
@@ -179,11 +187,16 @@ public class DecayedFundingCurve
 					1,
 					6,
 					1.
-				) + " | " + FormatUtil.FormatDouble (depositQuoteArray[depositComponentIndex], 1, 6, 1.)
+				) + " |" + FormatUtil.FormatDouble (
+					depositQuoteArray[depositComponentIndex],
+					1,
+					6,
+					1.
+				)
 			);
 		}
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		SingleStreamComponent[] futuresComponentArray = fundingStateEvaluation.futuresComponentArray();
 
@@ -193,18 +206,26 @@ public class DecayedFundingCurve
 
 		double[] futuresQuoteArray = t0FundingCalibrationSuite.futuresQuoteArray();
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     EDF INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||    T0 EOD EDF INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        - Instrument Index");
+
+		System.out.println ("\t||        - Recovered Quote");
+
+		System.out.println ("\t||        - Calibrated Quote");
+
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		for (int futuresComponentIndex = 0;
 			futuresComponentIndex < futuresComponentArray.length;
 			++futuresComponentIndex)
 		{
 			System.out.println (
-				"\t[" + futuresComponentArray[futuresComponentIndex].maturityDate() + "] = " +
+				"\t|| [" + futuresComponentArray[futuresComponentIndex].maturityDate() + "] =>" +
 				FormatUtil.FormatDouble (
 					futuresComponentArray[futuresComponentIndex].measureValue (
 						valuationParams,
@@ -216,7 +237,7 @@ public class DecayedFundingCurve
 					1,
 					6,
 					1.
-				) + " | " + FormatUtil.FormatDouble (
+				) + " |" + FormatUtil.FormatDouble (
 					futuresQuoteArray[futuresComponentIndex],
 					1,
 					6,
@@ -225,7 +246,7 @@ public class DecayedFundingCurve
 			);
 		}
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		FixFloatComponent[] fixFloatComponentArray = fundingStateEvaluation.fixFloatComponentArray();
 
@@ -233,18 +254,26 @@ public class DecayedFundingCurve
 
 		double[] fixFloatQuoteArray = t0FundingCalibrationSuite.fixFloatQuoteArray();
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     SWAP INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||    T0 EOD SWAP INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        - Instrument Index");
+
+		System.out.println ("\t||        - Recovered Quote");
+
+		System.out.println ("\t||        - Calibrated Quote");
+
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		for (int fixfloatComponentIndex = 0;
 			fixfloatComponentIndex < fixFloatComponentArray.length;
 			++fixfloatComponentIndex)
 		{
 			System.out.println (
-				"\t[" + fixFloatComponentArray[fixfloatComponentIndex].maturityDate() + "] => " +
+				"\t|| [" + fixFloatComponentArray[fixfloatComponentIndex].maturityDate() + "] =>" +
 				FormatUtil.FormatDouble (
 					fixFloatComponentArray[fixfloatComponentIndex].measureValue (
 						valuationParams,
@@ -256,7 +285,7 @@ public class DecayedFundingCurve
 					1,
 					6,
 					1.
-				) + " | " + FormatUtil.FormatDouble (
+				) + " |" + FormatUtil.FormatDouble (
 					fixFloatQuoteArray[fixfloatComponentIndex],
 					1,
 					6,
@@ -265,7 +294,7 @@ public class DecayedFundingCurve
 			);
 		}
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		return fundingStateEvaluation;
 	}
@@ -286,8 +315,8 @@ public class DecayedFundingCurve
 
 		String currency = "USD";
 		String depositCode = "DEPOSIT";
-		String depositCalibrationMetric = "ForwardRate";
 		String depositPeriodTenor = "3M";
+		String depositCalibrationMetric = "ForwardRate";
 		int[] depositMaturityDaysArray = new int[]
 		{
 			1,
@@ -323,8 +352,8 @@ public class DecayedFundingCurve
 		};
 
 		String fixFloatCode = "SWAP";
-		String fixFloatCalibrationMetric = "SwapRate";
 		String fixFloatPeriodTenor = "6M";
+		String fixFloatCalibrationMetric = "SwapRate";
 		String fixFloatDayCountConvention = "Act/360";
 		String[] fixFloatMaturityTenor = new String[]
 		{
@@ -363,20 +392,6 @@ public class DecayedFundingCurve
 			0.0409
 		};
 
-		LinearLatentStateCalibrator linearLatentStateCalibrator = new LinearLatentStateCalibrator (
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (2, 2),
-				new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
-				null
-			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
 		JulianDate t0 = DateUtil.Today().addTenor ("0D");
 
 		JulianDate t1 = t0.addBusDays (1, currency);
@@ -390,7 +405,19 @@ public class DecayedFundingCurve
 
 		FundingStateGenerator fundingStateGenerator = new FundingStateGenerator (
 			new FundingStateCustomization (
-				linearLatentStateCalibrator,
+				new LinearLatentStateCalibrator (
+					new SegmentCustomBuilderControl (
+						MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+						new PolynomialFunctionSetParams (4),
+						SegmentInelasticDesignControl.Create (2, 2),
+						new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+						null
+					),
+					BoundarySettings.NaturalStandard(),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null
+				),
 				new DepositInstrumentSuite (
 					depositCode,
 					currency,
@@ -398,7 +425,12 @@ public class DecayedFundingCurve
 					depositPeriodTenor,
 					depositMaturityDaysArray
 				),
-				new FuturesInstrumentSuite (futuresCode, currency, futuresCalibrationMetric, futuresComponentCount),
+				new FuturesInstrumentSuite (
+					futuresCode,
+					currency,
+					futuresCalibrationMetric,
+					futuresComponentCount
+				),
 				new FixFloatInstrumentSuite (
 					fixFloatCode,
 					currency,
@@ -424,60 +456,84 @@ public class DecayedFundingCurve
 
 		double[] t1SODDepositQuoteArray = t1SODFundingCalibrationSuite.depositQuoteArray();
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     ROLLED OVER DEPOSIT INSTRUMENTS CALIBRATION");
+		System.out.println ("\t||    ROLLED OVER DEPOSIT INSTRUMENTS QUOTES");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        - T1 SOD");
+
+		System.out.println ("\t||        - T0 EOD");
+
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		for (int depositComponentIndex = 0;
 			depositComponentIndex < t1SODDepositQuoteArray.length;
 			++depositComponentIndex)
 		{
 			System.out.println (
-				"\t[" + depositComponentIndex + "] = " +
-				FormatUtil.FormatDouble (t1SODDepositQuoteArray[depositComponentIndex],1 ,6, 1.) + " | " +
+				"\t|| [" + depositComponentIndex + "] =>" +
+				FormatUtil.FormatDouble (t1SODDepositQuoteArray[depositComponentIndex], 1 ,6, 1.) + " |" +
 				FormatUtil.FormatDouble (t0EODDepositQuoteArray[depositComponentIndex], 1, 6, 1.)
 			);
 		}
 
-		System.out.println ("\t----------------------------------------------------------------\n");
+		System.out.println ("\t||----------------------------------------------------------------\n");
 
 		double[] t1SODFuturesQuoteArray = t1SODFundingCalibrationSuite.futuresQuoteArray();
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     ROLLED OVER EDF INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||    ROLLED OVER EDF INSTRUMENTS QUOTES");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        - T1 SOD");
+
+		System.out.println ("\t||        - T0 EOD");
+
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		for (int futuresComponentIndex = 0;
 			futuresComponentIndex < t1SODFuturesQuoteArray.length;
 			++futuresComponentIndex)
 		{
 			System.out.println (
-				"\t[" + futuresComponentIndex + "] = " +
-				FormatUtil.FormatDouble (t1SODFuturesQuoteArray[futuresComponentIndex], 1, 6, 1.) + " | " +
+				"\t|| [" + futuresComponentIndex + "] = " +
+				FormatUtil.FormatDouble (t1SODFuturesQuoteArray[futuresComponentIndex], 1, 6, 1.) + " |" +
 				FormatUtil.FormatDouble (t0EODFuturesQuoteArray[futuresComponentIndex], 1, 6, 1.)
 			);
 		}
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------\n");
 
 		double[] t1SODFixFloatQuoteArray = t1SODFundingCalibrationSuite.fixFloatQuoteArray();
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||    ROLLED OVER IRS INSTRUMENTS QUOTES");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        - T1 SOD");
+
+		System.out.println ("\t||        - T0 EOD");
+
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		for (int fixfloatComponentIndex = 0;
 			fixfloatComponentIndex < t1SODFixFloatQuoteArray.length;
 			++fixfloatComponentIndex)
 		{
 			System.out.println (
-				"\t[" + fixfloatComponentIndex + "] => " +
-				FormatUtil.FormatDouble (t1SODFixFloatQuoteArray[fixfloatComponentIndex], 1, 6, 1) + " | " +
+				"\t|| [" + fixfloatComponentIndex + "] =>" +
+				FormatUtil.FormatDouble (t1SODFixFloatQuoteArray[fixfloatComponentIndex], 1, 6, 1) + " |" +
 				FormatUtil.FormatDouble (t0EODFixFloatQuoteArray[fixfloatComponentIndex], 1, 6, 1)
 			);
 		}
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
 		EnvManager.TerminateEnv();
 	}

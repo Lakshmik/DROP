@@ -8,18 +8,18 @@ import java.util.Map;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
-import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketYield;
-import org.drip.product.muni.DeGuillaumeRebonatoPogudinPath;
+import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
+import org.drip.product.muni.InceptionMarketSettings;
 import org.drip.product.muni.MarketYieldTermStructure;
 import org.drip.product.muni.RefinancingPathPnLEntry;
 import org.drip.product.muni.RefinancingPathPnLGenerator;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.ScenarioGovvieCurveBuilder;
-import org.drip.state.govvie.GovvieCurve;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -470,15 +470,6 @@ public class ExercisePeriodMarketPnLPath
 
 		JulianDate bondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
 
-		List<JulianDate> simulationDateArray = SimulationDateArray (exerciseStartDate, simulationDateCount);
-
-		DeGuillaumeRebonatoPogudinMarketYield deGuillaumeRebonatoPogudinMarketYield =
-			new DeGuillaumeRebonatoPogudinMarketYield (
-				TaxExemptMarketYieldTermStructure(),
-				TaxableMarketYieldTermStructure(),
-				EscrowMarketYieldTermStructure()
-			);
-
 		BondComponent bond = BondBuilder.CreateSimpleFixed (
 			"CUSIP",
 			currency,
@@ -500,45 +491,50 @@ public class ExercisePeriodMarketPnLPath
 
 		double[] initialTaxExemptYieldArray = InitialTaxExemptYieldArray();
 
-		GovvieCurve initialTaxExemptGovvieCurve = ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
-			"TAX_EXEMPT_" + initialDate,
+		List<JulianDate> simulationDateList = SimulationDateArray (exerciseStartDate, simulationDateCount);
+
+		DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield =
+			new DeGuillaumeRebonatoPogudinMarketSettings (
+				currency,
+				spotDate,
+				TaxExemptMarketYieldTermStructure(),
+				TaxableMarketYieldTermStructure(),
+				EscrowMarketYieldTermStructure()
+			);
+
+		InceptionMarketSettings inceptionMarketSettings = new InceptionMarketSettings (
 			initialDate,
-			"UST",
-			currency,
-			tenorDateJulianArray,
-			initialTaxExemptYieldArray
-		);
-
-		GovvieCurve initialTaxableGovvieCurve = ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
-			"TAXABLE_" + initialDate,
-			initialDate,
-			"UST",
-			currency,
-			tenorDateJulianArray,
-			initialTaxableYieldArray
-		);
-
-		RefinancingPathPnLGenerator refinancingPathPnLGenerator = new RefinancingPathPnLGenerator (
-			bond,
-			initialTaxExemptGovvieCurve,
-			initialTaxableGovvieCurve
-		);
-
-		DeGuillaumeRebonatoPogudin deGuillaumeRebonatoPogudin = DeGuillaumeRebonatoPogudin.Standard (
-			currency,
-			burstiness,
-			relaxationTime,
-			deGuillaumeRebonatoPogudinMarketYield
-		);
-
-		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath = deGuillaumeRebonatoPogudin.evolve (
-			deGuillaumeRebonatoPogudinMarketYield,
-			spotDate,
-			simulationDateArray
+			ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
+				"TAX_EXEMPT_" + initialDate,
+				initialDate,
+				"UST",
+				currency,
+				tenorDateJulianArray,
+				initialTaxExemptYieldArray
+			),
+			ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
+				"TAXABLE_" + initialDate,
+				initialDate,
+				"UST",
+				currency,
+				tenorDateJulianArray,
+				initialTaxableYieldArray
+			)
 		);
 
 		Map<JulianDate, RefinancingPathPnLEntry> refinancingPathPnLEntryMap =
-			refinancingPathPnLGenerator.dateEntryMap (deGuillaumeRebonatoPogudinPath);
+			new RefinancingPathPnLGenerator (
+				bond,
+				inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (bond, simulationDateList)
+			).dateEntryMap (
+				DeGuillaumeRebonatoPogudin.Standard (
+					new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime),
+					deGuillaumeRebonatoPogudinMarketYield
+				).evolve (
+					deGuillaumeRebonatoPogudinMarketYield,
+					simulationDateList
+				)
+			);
 
 		System.out.println ("\t||----------------------------------------------------||");
 
@@ -565,7 +561,7 @@ public class ExercisePeriodMarketPnLPath
 
 			System.out.println (
 				"\t|| " + date + " =>" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.initialTaxExemptGovvieCurveDirtyPrice(),
+					refinancingPathPnLEntry.initialTaxExemptGovvieCurveCleanPrice(),
 					3,
 					3, 
 					100.
@@ -575,7 +571,7 @@ public class ExercisePeriodMarketPnLPath
 					3, 
 					100.
 				) + " |" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.initialTaxableGovvieCurveDirtyPrice(),
+					refinancingPathPnLEntry.initialTaxableGovvieCurveCleanPrice(),
 					3,
 					3, 
 					100.

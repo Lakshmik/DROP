@@ -5,9 +5,7 @@ import java.util.Map;
 
 import org.drip.analytics.cashflow.CompositePeriod;
 import org.drip.analytics.date.*;
-import org.drip.analytics.support.CaseInsensitiveTreeMap;
 import org.drip.param.creator.MarketParamsBuilder;
-import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.pricer.CreditPricerParams;
 import org.drip.param.valuation.ValuationParams;
 import org.drip.product.creator.CDSBuilder;
@@ -23,6 +21,14 @@ import org.drip.state.discount.MergedDiscountForwardCurve;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -98,108 +104,105 @@ import org.drip.state.discount.MergedDiscountForwardCurve;
 /**
  * <i>CreditDefaultSwapIndex</i> demonstrates the Analytics Calculation/Reconciliation for a CDX.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CreditDefaultSwapIndex {
+public class CreditDefaultSwapIndex
+{
 
 	private static final MergedDiscountForwardCurve FundingCurve (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final double dblBump)
+		final JulianDate spotDate,
+		final String currency,
+		final double bump)
 		throws Exception
 	{
-		String[] astrDepositMaturityTenor = new String[] {
-			"2D"
-		};
-
-		double[] adblDepositQuote = new double[] {
-			0.013161 + dblBump // 2D
-		};
-
-		double[] adblFuturesQuote = new double[] {
-			0.013225 + dblBump,	// 98.6775
-			0.014250 + dblBump,	// 98.5750
-			0.014750 + dblBump,	// 98.5250
-			0.015250 + dblBump,	// 98.4750
-			0.015750 + dblBump,  // 98.4250
-			0.016500 + dblBump   // 98.3500
-		};
-
-		String[] astrFixFloatMaturityTenor = new String[] {
-			"02Y",
-			"03Y",
-			"04Y",
-			"05Y",
-			"06Y",
-			"07Y",
-			"08Y",
-			"09Y",
-			"10Y",
-			"11Y",
-			"12Y",
-			"15Y",
-			"20Y",
-			"25Y",
-			"30Y",
-			"40Y",
-			"50Y"
-		};
-
-		double[] adblFixFloatQuote = new double[] {
-			0.015540 + dblBump, //  2Y
-			0.016423 + dblBump, //  3Y
-			0.017209 + dblBump, //  4Y
-			0.017980 + dblBump, //  5Y
-			0.018743 + dblBump, //  6Y
-			0.019455 + dblBump, //  7Y
-			0.020080 + dblBump, //  8Y
-			0.020651 + dblBump, //  9Y
-			0.021195 + dblBump, // 10Y
-			0.021651 + dblBump, // 11Y
-			0.022065 + dblBump, // 12Y
-			0.022952 + dblBump, // 15Y
-			0.023825 + dblBump, // 20Y
-			0.024175 + dblBump, // 25Y
-			0.024347 + dblBump, // 30Y
-			0.024225 + dblBump, // 40Y
-			0.023968 + dblBump  // 50Y
-		};
-
 		return LatentMarketStateBuilder.SmoothFundingCurve (
-			dtSpot,
-			strCurrency,
-			astrDepositMaturityTenor,
-			adblDepositQuote,
+			spotDate,
+			currency,
+			new String[]
+			{
+				"2D"
+			},
+			new double[]
+			{
+				0.013161 + bump // 2D
+			},
 			"ForwardRate",
-			adblFuturesQuote,
+			 new double[]
+			{
+				0.013225 + bump,	// 98.6775
+				0.014250 + bump,	// 98.5750
+				0.014750 + bump,	// 98.5250
+				0.015250 + bump,	// 98.4750
+				0.015750 + bump,  	// 98.4250
+				0.016500 + bump   	// 98.3500
+			},
 			"ForwardRate",
-			astrFixFloatMaturityTenor,
-			adblFixFloatQuote,
+			new String[]
+			{
+				"02Y",
+				"03Y",
+				"04Y",
+				"05Y",
+				"06Y",
+				"07Y",
+				"08Y",
+				"09Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y"
+			},
+			new double[]
+			{
+				0.015540 + bump, //  2Y
+				0.016423 + bump, //  3Y
+				0.017209 + bump, //  4Y
+				0.017980 + bump, //  5Y
+				0.018743 + bump, //  6Y
+				0.019455 + bump, //  7Y
+				0.020080 + bump, //  8Y
+				0.020651 + bump, //  9Y
+				0.021195 + bump, // 10Y
+				0.021651 + bump, // 11Y
+				0.022065 + bump, // 12Y
+				0.022952 + bump, // 15Y
+				0.023825 + bump, // 20Y
+				0.024175 + bump, // 25Y
+				0.024347 + bump, // 30Y
+				0.024225 + bump, // 40Y
+				0.023968 + bump  // 50Y
+			},
 			"SwapRate"
 		);
 	}
 
 	private static final CreditCurve CreditCurve (
-		final JulianDate dtSpot,
-		final String strCreditCurve,
-		final MergedDiscountForwardCurve mdfc,
-		final double dblBump)
+		final JulianDate spotDate,
+		final String creditCurve,
+		final MergedDiscountForwardCurve mergedDiscountForwardCurve,
+		final double bump)
 		throws Exception
 	{
 		return LatentMarketStateBuilder.CreditCurve (
-			dtSpot,
-			strCreditCurve,
-			new String[] {
+			spotDate,
+			creditCurve,
+			new String[]
+			{
 				 "6M",
 				 "1Y",
 				 "2Y",
@@ -211,7 +214,8 @@ public class CreditDefaultSwapIndex {
 				"20Y",
 				"30Y",
 			},
-			new double[] {
+			new double[]
+			{
 				392.509,	//  6M
 				320.707,	//  1Y
 				393.624,	//  2Y
@@ -223,7 +227,8 @@ public class CreditDefaultSwapIndex {
 				908.712, 	// 20Y
 				900.297, 	// 30Y
 			},
-			new double[] {
+			new double[]
+			{
 				392.509,	//  6M
 				320.707,	//  1Y
 				393.624,	//  2Y
@@ -236,107 +241,77 @@ public class CreditDefaultSwapIndex {
 				900.297, 	// 30Y
 			},
 			"FairPremium",
-			mdfc
+			mergedDiscountForwardCurve
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.SEPTEMBER,
-			17
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.SEPTEMBER, 17);
 
-		JulianDate dtIssue = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.JUNE,
-			20
-		);
+		JulianDate issueDate = DateUtil.CreateFromYMD (2017, DateUtil.JUNE, 20);
 
-		String strCDXTenor = "5Y";
-		String strCurrency = "USD";
-		String strCDXName = "CDXNAHY";
-		double dblCDXFixedCoupon = 0.05;
+		String cdxTenor = "5Y";
+		String currency = "USD";
+		String cdxName = "CDXNAHY";
+		double cdxFixedCoupon = 0.05;
 
-		CreditDefaultSwap cdx = CDSBuilder.CreateSNAC (
-			dtIssue,
-			strCDXTenor,
-			dblCDXFixedCoupon,
-			strCDXName
-		);
+		CreditDefaultSwap cdx = CDSBuilder.CreateSNAC (issueDate, cdxTenor, cdxFixedCoupon, cdxName);
 
-		MergedDiscountForwardCurve mdfc = FundingCurve (
-			dtSpot,
-			strCurrency,
-			0.
-		);
+		MergedDiscountForwardCurve discountCurve = FundingCurve (spotDate, currency, 0.);
 
-		CreditCurve cc = CreditCurve (
-			dtSpot,
-			strCDXName,
-			mdfc,
-			0.
-		);
-
-		CurveSurfaceQuoteContainer csqc = MarketParamsBuilder.Credit (
-			mdfc,
-			cc
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		CreditPricerParams pricerParams = CreditPricerParams.Standard();
-
-		CaseInsensitiveTreeMap<Double> mapOutput = cdx.value (
-			valParams,
-			pricerParams,
-			csqc,
-			null
-		);
+		CreditCurve creditCurve = CreditCurve (spotDate, cdxName, discountCurve, 0.);
 
 		System.out.println ("");
 
 		System.out.println ("\t |-----------------------------------------------|");
 
-		for (Map.Entry<String, Double> me : mapOutput.entrySet())
-			System.out.println ("\t | " + me.getKey() + " => " + me.getValue());
+		for (Map.Entry<String, Double> mapEntry : cdx.value (
+				new ValuationParams (spotDate, spotDate, currency),
+				CreditPricerParams.Standard(),
+				MarketParamsBuilder.Credit (discountCurve, creditCurve),
+				null
+			).entrySet()
+		)
+		{
+			System.out.println ("\t | " + mapEntry.getKey() + " => " + mapEntry.getValue());
+		}
 
 		System.out.println ("\t |-----------------------------------------------|");
 
 		System.out.println ("");
 
-		System.out.println ("\t |---------------------------------------------------------------------------||");
+		System.out.println (
+			"\t |---------------------------------------------------------------------------||"
+		);
 
-		for (CompositePeriod p : cdx.couponPeriods())
+		for (CompositePeriod compositePeriod : cdx.couponPeriods()) {
 			System.out.println (
-				"\t | " +
-				DateUtil.YYYYMMDD (p.startDate()) + " | " +
-				DateUtil.YYYYMMDD (p.endDate()) + " | " +
-				DateUtil.YYYYMMDD (p.payDate()) + " | " +
-				FormatUtil.FormatDouble (p.couponDCF(), 1, 3, 1.) + " | " +
-				FormatUtil.FormatDouble (p.couponDCF(), 1, 2, 0.01 * 1.) + " | " +
-				FormatUtil.FormatDouble (mdfc.df (p.payDate()), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (cc.survival (p.payDate()), 1, 4, 1.) + " ||"
+				"\t | " + DateUtil.YYYYMMDD (compositePeriod.startDate()) + " | " +
+				DateUtil.YYYYMMDD (compositePeriod.endDate()) + " | " +
+				DateUtil.YYYYMMDD (compositePeriod.payDate()) + " | " +
+				FormatUtil.FormatDouble (compositePeriod.couponDCF(), 1, 3, 1.) + " | " +
+				FormatUtil.FormatDouble (compositePeriod.couponDCF(), 1, 2, 0.01 * 1.) + " | " +
+				FormatUtil.FormatDouble (discountCurve.df (compositePeriod.payDate()), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (creditCurve.survival (compositePeriod.payDate()), 1, 4, 1.) + " ||"
 			);
+		}
 
-		System.out.println ("\t |---------------------------------------------------------------------------||");
+		System.out.println (
+			"\t |---------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

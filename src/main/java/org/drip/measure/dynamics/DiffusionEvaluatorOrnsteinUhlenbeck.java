@@ -120,9 +120,8 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 	extends DiffusionEvaluator
 	implements OrnsteinUhlenbeck
 {
-	private double _burstiness = Double.NaN;
-	private double _relaxationTime = Double.NaN;
 	private double _meanReversionLevel = Double.NaN;
+	private OrnsteinUhlenbeckDriftWander _ornsteinUhlenbeckDriftWander = null;
 
 	/**
 	 * Construct a Standard Instance of <i>DiffusionEvaluatorOrnsteinUhlenbeck</i>
@@ -202,12 +201,11 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 	{
 		super (localDriftEvaluator, localVolatilityEvaluator);
 
-		if (!NumberUtil.IsValid (_meanReversionLevel = meanReversionLevel) ||
-			!NumberUtil.IsValid (_burstiness = burstiness) || 0. >= _burstiness ||
-			!NumberUtil.IsValid (_relaxationTime = relaxationTime) || 0. >= _relaxationTime)
-		{
+		if (!NumberUtil.IsValid (_meanReversionLevel = meanReversionLevel)) {
 			throw new Exception ("DiffusionEvaluatorOrnsteinUhlenbeck Constructor => Invalid Inputs");
 		}
+
+		_ornsteinUhlenbeckDriftWander = new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime);
 	}
 
 	/**
@@ -229,7 +227,7 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 
 	public double burstiness()
 	{
-		return _burstiness;
+		return _ornsteinUhlenbeckDriftWander.burstiness();
 	}
 
 	/**
@@ -240,7 +238,18 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 
 	public double relaxationTime()
 	{
-		return _relaxationTime;
+		return _ornsteinUhlenbeckDriftWander.relaxationTime();
+	}
+
+	/**
+	 * Retrieve the <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 * 
+	 * @return The <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 */
+
+	public OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander()
+	{
+		return _ornsteinUhlenbeckDriftWander;
 	}
 
 	/**

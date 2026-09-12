@@ -281,13 +281,13 @@ public class UncollateralizedFundingNeutralStochastic
 
 	private static final double[][] Path (
 		final double[][] correlationMatrix,
-		final int iNumVertex)
+		final int vertexCount)
 		throws Exception
 	{
 		return new CorrelatedFactorsPathVertexRealization (
 			new RandomNumberGenerator(),
 			correlationMatrix,
-			iNumVertex,
+			vertexCount,
 			1,
 			false,
 			null

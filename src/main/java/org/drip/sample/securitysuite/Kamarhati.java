@@ -13,13 +13,20 @@ import org.drip.service.env.EnvManager;
 import org.drip.service.scenario.*;
 import org.drip.service.template.LatentMarketStateBuilder;
 import org.drip.state.discount.MergedDiscountForwardCurve;
-import org.drip.state.identifier.FloaterLabel;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -95,60 +102,62 @@ import org.drip.state.identifier.FloaterLabel;
 /**
  * <i>Kamarhati</i> demonstrates the Analytics Calculation/Reconciliation for the Bond Kamarhati.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class Kamarhati {
+public class Kamarhati
+{
 
 	private static final void SetEOS (
 		final BondComponent bond,
-		final EmbeddedOptionSchedule eosCall,
-		final EmbeddedOptionSchedule eosPut)
-		throws java.lang.Exception
+		final EmbeddedOptionSchedule callSchedule,
+		final EmbeddedOptionSchedule putSchedule)
+		throws Exception
 	{
-		if (null != eosPut) bond.setEmbeddedPutSchedule (eosPut);
+		if (null != putSchedule) {
+			bond.setEmbeddedPutSchedule (putSchedule);
+		}
 
-		if (null != eosCall) bond.setEmbeddedCallSchedule (eosCall);
+		if (null != callSchedule) {
+			bond.setEmbeddedCallSchedule (callSchedule);
+		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.OCTOBER,
-			10
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.OCTOBER, 5);
 
-		String[] astrDepositTenor = new String[] {
+		String[] depositTenorArray = new String[]
+		{
 			"2D"
 		};
-
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray = new double[]
+		{
 			0.0130411 // 2D
 		};
-
-		double[] adblFuturesQuote = new double[] {
+		double[] futuresQuoteArray = new double[]
+		{
 			0.01345,	// 98.655
 			0.01470,	// 98.530
 			0.01575,	// 98.425
@@ -156,8 +165,8 @@ public class Kamarhati {
 			0.01745,    // 98.255
 			0.01845     // 98.155
 		};
-
-		String[] astrFixFloatTenor = new String[] {
+		String[] fixFloatTenorArray = new String[]
+		{
 			"02Y",
 			"03Y",
 			"04Y",
@@ -176,8 +185,19 @@ public class Kamarhati {
 			"40Y",
 			"50Y"
 		};
-
-		double[] adblFixFloatQuote = new double[] {
+		String[] govvieTenorArray = new String[]
+		{
+			"1Y",
+			"2Y",
+			"3Y",
+			"5Y",
+			"7Y",
+			"10Y",
+			"20Y",
+			"30Y"
+		};
+		double[] fixFloatQuoteArray = new double[]
+		{
 			0.016410, //  2Y
 			0.017863, //  3Y
 			0.019030, //  4Y
@@ -196,19 +216,8 @@ public class Kamarhati {
 			0.025838, // 40Y
 			0.025560  // 50Y
 		};
-
-		String[] astrGovvieTenor = new String[] {
-			"1Y",
-			"2Y",
-			"3Y",
-			"5Y",
-			"7Y",
-			"10Y",
-			"20Y",
-			"30Y"
-		};
-
-		double[] adblGovvieYield = new double[] {
+		double[] govvieYieldArray = new double[]
+		{
 			0.01219, //  1Y
 			0.01391, //  2Y
 			0.01590, //  3Y
@@ -218,8 +227,8 @@ public class Kamarhati {
 			0.02677, // 20Y
 			0.02927  // 30Y
 		};
-
-		String[] astrCreditTenor = new String[] {
+		String[] creditTenorArray = new String[]
+		{
 			"06M",
 			"01Y",
 			"02Y",
@@ -229,52 +238,43 @@ public class Kamarhati {
 			"07Y",
 			"10Y"
 		};
-
-		double[] adblCreditQuote = new double[] {
-			 10.,	//  6M
-			 12.,	//  1Y
-			 15.,	//  2Y
-			 19.,	//  3Y
-			 24.,	//  4Y
-			 28.,	//  5Y
-			 38.,	//  7Y
-			 51.	// 10Y
+		double[] creditQuoteArray = new double[]
+		{
+			 60.,	//  6M
+			 68.,	//  1Y
+			 88.,	//  2Y
+			102.,	//  3Y
+			121.,	//  4Y
+			138.,	//  5Y
+			168.,	//  7Y
+			188.	// 10Y
 		};
+		double fx = 1.;
+		int settleLag = 3;
+		double spread = 0.;
+		double cleanPrice = 0.824219;
+		double issuePrice = 0.89;
+		String currency = "USD";
+		double spreadBump = 20.;
+		String treasuryCode = "UST";
+		double issueAmount = 7.50e8;
+		double spreadDurationMultiplier = 5.;
+		double resetRate = 0.060603 - spread;
 
-		double dblFX = 1;
-		int iSettleLag = 3;
-		double dblSpread = 0.0;
-		String strCurrency = "USD";
-		double dblCleanPrice = 0.824219;
-		double dblIssuePrice = 0.89;
-		double dblSpreadBump = 20.;
-		String strTreasuryCode = "UST";
-		double dblIssueAmount = 7.50e8;
-		double dblSpreadDurationMultiplier = 5.;
-		double dblResetRate = 0.060603 - dblSpread;
+		JulianDate effectiveDate = DateUtil.CreateFromYMD (2015, 12, 10);
 
-		JulianDate dtEffective = DateUtil.CreateFromYMD (
-			2015,
-			12,
-			10
-		);
-
-		JulianDate dtMaturity = DateUtil.CreateFromYMD (
-			2022,
-			12,
-			10
-		);
+		JulianDate maturityDate = DateUtil.CreateFromYMD (2022, 12, 10);
 
 		BondComponent bond = BondBuilder.CreateSimpleFloater (
 			"Kamarhati",
 			"USD",
 			"USD-3M",
 			"Kamarhati",
-			dblSpread,
+			spread,
 			4,
 			"Act/360",
-			dtEffective,
-			dtMaturity,
+			effectiveDate,
+			maturityDate,
 			null,
 			null
 		);
@@ -282,13 +282,15 @@ public class Kamarhati {
 		SetEOS (
 			bond,
 			EmbeddedOptionSchedule.FromAmerican (
-				dtSpot.julian(),
-				new int[] {
+				spotDate.julian(),
+				new int[]
+				{
 					DateUtil.CreateFromYMD (2015, 12, 10).julian(),
 					DateUtil.CreateFromYMD (2016, 12, 10).julian(),
 					DateUtil.CreateFromYMD (2022, 12, 10).julian(),
 				},
-				new double[] {
+				new double[]
+				{
 					1.01,
 					1.00,
 					1.00,
@@ -304,160 +306,215 @@ public class Kamarhati {
 			null
 		);
 
-		CompositeFloatingPeriod cfp = (CompositeFloatingPeriod) bond.stream().containingPeriod (dtSpot.julian());
+		CompositeFloatingPeriod compositeFloatingPeriod =
+			(CompositeFloatingPeriod) bond.stream().containingPeriod (spotDate.julian());
 
-		int iResetDate = ((org.drip.analytics.cashflow.ComposableUnitFloatingPeriod) (cfp.periods().get
-			(0))).referenceIndexPeriod().fixingDate();
+		int resetDate = (
+			(ComposableUnitFloatingPeriod) (compositeFloatingPeriod.periods().get (0))
+		).referenceIndexPeriod().fixingDate();
 
-		MergedDiscountForwardCurve mdfc = LatentMarketStateBuilder.SmoothFundingCurve (
-			dtSpot,
-			strCurrency,
-			astrDepositTenor,
-			adblDepositQuote,
+		MergedDiscountForwardCurve discountCurve = LatentMarketStateBuilder.SmoothFundingCurve (
+			spotDate,
+			currency,
+			depositTenorArray,
+			depositQuoteArray,
 			"ForwardRate",
-			adblFuturesQuote,
+			futuresQuoteArray,
 			"ForwardRate",
-			astrFixFloatTenor,
-			adblFixFloatQuote,
+			fixFloatTenorArray,
+			fixFloatQuoteArray,
 			"SwapRate"
 		);
 
-		BondReplicator abr = BondReplicator.CorporateSenior (
-			dblCleanPrice,
-			dblIssuePrice,
-			dblIssueAmount,
-			dtSpot,
-			astrDepositTenor,
-			adblDepositQuote,
-			adblFuturesQuote,
-			astrFixFloatTenor,
-			adblFixFloatQuote,
-			dblSpreadBump,
-			dblSpreadDurationMultiplier,
-			strTreasuryCode,
-			astrGovvieTenor,
-			adblGovvieYield,
-			astrCreditTenor,
-			adblCreditQuote,
-			dblFX,
-			dblResetRate,
-			iSettleLag,
+		BondReplicator bondReplicator = BondReplicator.CorporateSenior (
+			cleanPrice,
+			issuePrice,
+			issueAmount,
+			spotDate,
+			depositTenorArray,
+			depositQuoteArray,
+			futuresQuoteArray,
+			fixFloatTenorArray,
+			fixFloatQuoteArray,
+			spreadBump,
+			spreadDurationMultiplier,
+			treasuryCode,
+			govvieTenorArray,
+			govvieYieldArray,
+			creditTenorArray,
+			creditQuoteArray,
+			fx,
+			resetRate,
+			settleLag,
 			bond
 		);
 
-		BondReplicationRun abrr = abr.generateRun();
+		System.out.println (bondReplicator.generateRun().display());
 
-		System.out.println (abrr.display());
-
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		CurveSurfaceQuoteContainer csqc = abr.creditBaseCSQC();
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = bondReplicator.creditBaseCSQC();
 
-		FloaterLabel fl = bond.floaterSetting().fri();
+		curveSurfaceQuoteContainer.setFixing (resetDate, bond.floaterSetting().fri(), resetRate);
 
-		csqc.setFixing (iResetDate, fl, dblResetRate);
+		ValuationParams valuationParams = ValuationParams.Spot (spotDate.julian());
 
-		ValuationParams valParams = ValuationParams.Spot (dtSpot.julian());
-
-		double dblYield = bond.yieldFromPrice (
-			ValuationParams.Spot (dtSpot.julian()),
-			csqc,
+		double yield = bond.yieldFromPrice (
+			ValuationParams.Spot (spotDate.julian()),
+			curveSurfaceQuoteContainer,
 			null,
-			dblCleanPrice
+			cleanPrice
 		);
 
-		System.out.println ("Price In  : " + dblCleanPrice);
+		System.out.println ("Price In  : " + cleanPrice);
 
-		System.out.println ("Yield Out : " + dblYield);
+		System.out.println ("Yield Out : " + yield);
 
-		System.out.println ("Price Out : " +
-			bond.priceFromYield (
-				ValuationParams.Spot (dtSpot.julian()),
-				csqc,
-				null,
-				dblYield
-			)
+		System.out.println (
+			"Price Out : " + bond.priceFromYield (valuationParams, curveSurfaceQuoteContainer, null, yield)
 		);
 
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||                                            PERIOD LABELS AND CURVE FACTORS                                           ||");
+		System.out.println (
+			"\t||                                            PERIOD LABELS AND CURVE FACTORS                                           ||"
+		);
 
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t||   L -> R:                                                                                                            ||");
+		System.out.println (
+			"\t||   L -> R:                                                                                                            ||"
+		);
 
-		System.out.println ("\t||           - Period Start Date                                                                                        ||");
+		System.out.println (
+			"\t||           - Period Start Date                                                                                        ||"
+		);
 
-		System.out.println ("\t||           - Period End Date                                                                                          ||");
+		System.out.println (
+			"\t||           - Period End Date                                                                                          ||"
+		);
 
-		System.out.println ("\t||           - Period Credit Label                                                                                      ||");
+		System.out.println (
+			"\t||           - Period Credit Label                                                                                      ||"
+		);
 
-		System.out.println ("\t||           - Period Funding Label                                                                                     ||");
+		System.out.println (
+			"\t||           - Period Funding Label                                                                                     ||"
+		);
 
-		System.out.println ("\t||           - Period Coupon Rate (%)                                                                                   ||");
+		System.out.println (
+			"\t||           - Period Coupon Rate (%)                                                                                   ||"
+		);
 
-		System.out.println ("\t||           - Period Coupon Year Fraction                                                                              ||");
+		System.out.println (
+			"\t||           - Period Coupon Year Fraction                                                                              ||"
+		);
 
-		System.out.println ("\t||           - Period Coupon Amount                                                                                     ||");
+		System.out.println (
+			"\t||           - Period Coupon Amount                                                                                     ||"
+		);
 
-		System.out.println ("\t||           - Period Principal Amount                                                                                  ||");
+		System.out.println (
+			"\t||           - Period Principal Amount                                                                                  ||"
+		);
 
-		System.out.println ("\t||           - Period Discount Factor                                                                                   ||");
+		System.out.println (
+			"\t||           - Period Discount Factor                                                                                   ||"
+		);
 
-		System.out.println ("\t||           - Period Survival Probability                                                                              ||");
+		System.out.println (
+			"\t||           - Period Survival Probability                                                                              ||"
+		);
 
-		System.out.println ("\t||           - Period Recovery                                                                                          ||");
+		System.out.println (
+			"\t||           - Period Recovery                                                                                          ||"
+		);
 
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (CompositePeriod p : bond.couponPeriods()) {
-			int iEndDate = p.endDate();
+		for (CompositePeriod compositePeriod : bond.couponPeriods()) {
+			int endDateJulian = compositePeriod.endDate();
 
-			int iPayDate = p.payDate();
+			int startDateJulian = compositePeriod.startDate();
 
-			int iStartDate = p.startDate();
-
-			double dblCouponRate = bond.couponMetrics (
-				iPayDate,
-				valParams,
-				csqc
+			double couponRate = bond.couponMetrics (
+				compositePeriod.payDate(),
+				valuationParams,
+				curveSurfaceQuoteContainer
 			).rate();
 
-			double dblCouponDCF = p.couponDCF();
+			double couponDCF = compositePeriod.couponDCF();
 
-			System.out.println ("\t|| " +
-				DateUtil.YYYYMMDD (iStartDate) + " => " +
-				DateUtil.YYYYMMDD (iEndDate) + " | ? | " +
-				p.fundingLabel().fullyQualifiedName() + " | " +
-				p.floaterLabel().fullyQualifiedName() + " | " +
-				FormatUtil.FormatDouble (dblCouponRate, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblCouponDCF, 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (dblCouponRate * dblCouponDCF * p.notional (iEndDate) * p.couponFactor (iEndDate), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (p.notional (iStartDate) - p.notional (iEndDate), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (p.df (csqc), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (p.survival (csqc), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (p.recovery (csqc), 2, 0, 100.) + "% ||"
+			System.out.println (
+				"\t|| " + DateUtil.YYYYMMDD (startDateJulian) + " => " + DateUtil.YYYYMMDD (endDateJulian) +
+				" | ? | " + compositePeriod.floaterLabel().fullyQualifiedName() + " | " +
+				FormatUtil.FormatDouble (
+					couponRate,
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					couponDCF,
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					couponRate * couponDCF * compositePeriod.notional (endDateJulian) *
+						compositePeriod.couponFactor (endDateJulian),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					compositePeriod.notional (startDateJulian) - compositePeriod.notional (endDateJulian),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					compositePeriod.df (curveSurfaceQuoteContainer),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					compositePeriod.survival (curveSurfaceQuoteContainer),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					compositePeriod.recovery (curveSurfaceQuoteContainer),
+					2,
+					0,
+					100.
+				) + "% ||"
 			);
 		}
 
-		System.out.println ("\t|| " +
-			DateUtil.YYYYMMDD (dtEffective.julian()) + " => " +
-			DateUtil.YYYYMMDD (dtMaturity.julian()) + " | ? | " +
+		System.out.println (
+			"\t|| " + DateUtil.YYYYMMDD (effectiveDate.julian()) + " => " +
+			DateUtil.YYYYMMDD (maturityDate.julian()) + " | ? | " +
 			bond.fundingLabel().fullyQualifiedName() + " | " +
 			bond.forwardLabel().get (bond.name()).fullyQualifiedName() + " | " +
 			FormatUtil.FormatDouble (0., 1, 2, 100.) + "% | " +
 			FormatUtil.FormatDouble (0., 1, 4, 1.) + " | " +
 			FormatUtil.FormatDouble (0., 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (bond.notional (dtMaturity.julian()), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (mdfc.df (dtMaturity), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (bond.notional (maturityDate.julian()), 1, 4, 1.) + " | " +
+			FormatUtil.FormatDouble (discountCurve.df (maturityDate), 1, 4, 1.) + " | " +
 			FormatUtil.FormatDouble (1., 1, 4, 1.) + " | " +
 			FormatUtil.FormatDouble (1., 2, 0, 100.) + "% ||"
 		);
 
-		System.out.println ("\t||----------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t||----------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 

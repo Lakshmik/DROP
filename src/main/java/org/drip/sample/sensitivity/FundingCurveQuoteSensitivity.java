@@ -26,6 +26,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -119,140 +127,116 @@ import org.drip.state.inference.*;
  * 	- Display of the Cash Instrument Discount Factor Quote Jacobian Sensitivities.
  * 	- Display of the Swap Instrument Discount Factor Quote Jacobian Sensitivities.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sensitity/README.md">Forward Funding OIS Curve Sensitivity</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sensitivity/README.md">Forward Funding OIS Curve Sensitivity</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FundingCurveQuoteSensitivity {
+public class FundingCurveQuoteSensitivity
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		OvernightLabel overnightLabel = OvernightLabel.Create (currency);
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				OvernightLabel.Create (
-					strCurrency
-				)
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
+
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				overnightLabel
 			);
-
-		return aDeposit;
-	}
-
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor)
-		throws Exception
-	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			FixFloatComponent irs = OTCIRS (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				0.
-			);
-
-			irs.setPrimaryCode ("IRS." + astrMaturityTenor[i] + "." + strCurrency);
-
-			aIRS[i] = irs;
 		}
 
-		return aIRS;
+		return depositArray;
+	}
+
+	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray)
+		throws Exception
+	{
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
+
+		for (int irsIndex = 0; irsIndex < maturityTenorArray.length; ++irsIndex) {
+			irsArray[irsIndex] = OTCIRS (
+				spotDate,
+				currency,
+				maturityTenorArray[irsIndex],
+				0.
+			);
+		}
+
+		return irsArray;
 	}
 
 	private static final void TenorJack (
-		final JulianDate dtStart,
-		final String strTenor,
-		final String strCurrency,
-		final String strManifestMeasure,
-		final MergedDiscountForwardCurve dc)
+		final JulianDate startDate,
+		final String tenor,
+		final String currency,
+		final String manifestMeasure,
+		final MergedDiscountForwardCurve discountCurve)
 		throws Exception
 	{
-		CalibratableComponent irsBespoke = OTCIRS (
-			dtStart,
-			strCurrency,
-			strTenor,
-			0.
-		);
+		CalibratableComponent irsBespoke = OTCIRS (startDate, currency, tenor, 0.);
 
-		WengertJacobian wjDFQuoteBespokeMat = dc.jackDDFDManifestMeasure (
-			irsBespoke.maturityDate(),
-			strManifestMeasure
+		System.out.println (
+			"\t|| " + tenor + " => " + discountCurve.jackDDFDManifestMeasure (
+				irsBespoke.maturityDate(),
+				manifestMeasure
+			).displayString()
 		);
-
-		System.out.println (strTenor + " => " + wjDFQuoteBespokeMat.displayString());
 	}
 
 	private static final void Forward6MRateJack (
-		final JulianDate dtStart,
-		final String strStartTenor,
-		final String strManifestMeasure,
-		final MergedDiscountForwardCurve dc)
+		final JulianDate startDate,
+		final String startTenor,
+		final String manifestMeasure,
+		final MergedDiscountForwardCurve discountCurve)
 	{
-		JulianDate dtBegin = dtStart.addTenor (strStartTenor);
+		JulianDate beginDate = startDate.addTenor (startTenor);
 
-		WengertJacobian wjForwardRate = dc.jackDForwardDManifestMeasure (
-			dtBegin,
-			"6M",
-			strManifestMeasure,
-			0.5
+		System.out.println (
+			"\t|| [" + beginDate + " | 6M] => " + discountCurve.jackDForwardDManifestMeasure (
+				beginDate,
+				"6M",
+				manifestMeasure,
+				0.5
+			).displayString()
 		);
-
-		System.out.println ("[" + dtBegin + " | 6M] => " + wjForwardRate.displayString());
 	}
 
 	/*
@@ -271,126 +255,122 @@ public class FundingCurveQuoteSensitivity {
 	 * 		construction methodologies.
 	 * 	- Display of the Cash Instrument Discount Factor Quote Jacobian Sensitivities.
 	 * 	- Display of the Swap Instrument Discount Factor Quote Jacobian Sensitivities.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void DiscountCurveQuoteSensitivitySample (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the Array of DEPOSIT Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
-				1, 2, 7, 14, 30, 60
+		SingleStreamComponent[] depositArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
+				1,
+				2,
+				7,
+				14,
+				30,
+				60
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.0013, 0.0017, 0.0017, 0.0018, 0.0020, 0.0023
+		double[] depositQuoteArray = new double[]
+		{
+			0.0013,
+			0.0017,
+			0.0017,
+			0.0018,
+			0.0020,
+			0.0023
 		}; // Cash Rate
-
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
 
 		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
 			"DEPOSIT",
-			aDepositComp,
+			depositArray,
 			"ForwardRate",
-			adblDepositQuote
+			depositQuoteArray
 		);
 
-		/*
-		 * Construct the Array of FUTURE Instruments and their Quotes from the given set of parameters
-		 */
+		SingleStreamComponent[] futuresArray =
+			SingleStreamComponentBuilder.ForwardRateFuturesPack (spotDate, 8, currency);
 
-		SingleStreamComponent[] aEDFComp = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtSpot,
-			8,
-			strCurrency
-		);
-
-		double[] adblEDFQuote = new double[] {
-			0.0027, 0.0032, 0.0041, 0.0054, 0.0077, 0.0104, 0.0134, 0.0160
+		double[] futuresQuoteArray = new double[]
+		{
+			0.0027,
+			0.0032,
+			0.0041,
+			0.0054,
+			0.0077,
+			0.0104,
+			0.0134,
+			0.0160
 		};
 
-		/*
-		 * Construct the EDF Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec edfStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
+		LatentStateStretchSpec futuresStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
 			"EDF",
-			aEDFComp,
+			futuresArray,
 			"ForwardRate",
-			adblEDFQuote
+			futuresQuoteArray
 		);
 
-		/*
-		 * Construct the Array of SWAP Instruments and their Quotes from the given set of parameters
-		 */
-
-		FixFloatComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
+		FixFloatComponent[] irsArray = SwapInstrumentsFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y"
 			}
 		);
 
-		double[] adblSwapQuote = new double[] {
-			0.0166, 0.0206, 0.0241, 0.0269, 0.0292, 0.0311, 0.0326, 0.0340, 0.0351, 0.0375, 0.0393, 0.0402, 0.0407, 0.0409, 0.0409
+		double[] swapQuoteArray = new double[]
+		{
+			0.0166,
+			0.0206,
+			0.0241,
+			0.0269,
+			0.0292,
+			0.0311,
+			0.0326,
+			0.0340,
+			0.0351,
+			0.0375,
+			0.0393,
+			0.0402,
+			0.0407,
+			0.0409,
+			0.0409
 		};
-
-		/*
-		 * Construct the Swap Instrument Set Stretch Builder
-		 */
 
 		LatentStateStretchSpec swapStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
 			"SWAP",
-			aSwapComp,
+			irsArray,
 			"SwapRate",
-			adblSwapQuote
+			swapQuoteArray
 		);
 
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			edfStretch,
-			swapStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following Default Segment Control parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Prior Quote Sensitivity Control with first derivative tail fade, with FADE ON
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
+		LinearLatentStateCalibrator linearLatentStateCalibrator = new LinearLatentStateCalibrator (
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
 				new ExponentialTensionSetParams (2.),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
-				new org.drip.spline.params.PreceedingManifestSensitivityControl (
-					true,
-					1,
-					null
-				)
+				SegmentInelasticDesignControl.Create (2, 2),
+				new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+				new PreceedingManifestSensitivityControl (true, 1, null)
 			),
 			BoundarySettings.NaturalStandard(),
 			MultiSegmentSequence.CALIBRATE,
@@ -398,325 +378,277 @@ public class FundingCurveQuoteSensitivity {
 			null
 		);
 
-		/*
-		 * Set up the DEPOSIT Segment Control parameters with the following details:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Prior Quote Sensitivity Control with first derivative tail fade, with FADE ON
-		 * 	- Natural Boundary Setting
-		 */
-
-		lcc.setStretchSegmentBuilderControl (
+		linearLatentStateCalibrator.setStretchSegmentBuilderControl (
 			depositStretch.name(),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
 				new ExponentialTensionSetParams (2.),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
-				new org.drip.spline.params.PreceedingManifestSensitivityControl (
-					true,
-					1,
-					null
-				)
+				SegmentInelasticDesignControl.Create (2, 2),
+				new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+				new PreceedingManifestSensitivityControl (true, 1, null)
 			)
 		);
 
-		/*
-		 * Set up the FUTURE Segment Control parameters with the following details:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Prior Quote Sensitivity Control with first derivative tail fade, with FADE OFF, RETAIN ON
-		 * 	- Natural Boundary Setting
-		 */
-
-		lcc.setStretchSegmentBuilderControl (
-			edfStretch.name(),
+		linearLatentStateCalibrator.setStretchSegmentBuilderControl (
+			futuresStretch.name(),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
 				new ExponentialTensionSetParams (2.),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
-				new org.drip.spline.params.PreceedingManifestSensitivityControl (
-					false,
-					1,
-					null
-				)
+				SegmentInelasticDesignControl.Create (2, 2),
+				new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+				new PreceedingManifestSensitivityControl (false, 1, null)
 			)
 		);
 
-		/*
-		 * Set up the SWAP Segment Control parameters with the following details:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Prior Quote Sensitivity Control with first derivative tail fade, with FADE ON
-		 * 	- Natural Boundary Setting
-		 */
-
-		lcc.setStretchSegmentBuilderControl (
+		linearLatentStateCalibrator.setStretchSegmentBuilderControl (
 			swapStretch.name(),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
 				new ExponentialTensionSetParams (2.),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
-				new org.drip.spline.params.PreceedingManifestSensitivityControl (
-					true,
-					1,
-					null
-				)
+				SegmentInelasticDesignControl.Create (2, 2),
+				new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+				new PreceedingManifestSensitivityControl (true, 1, null)
 			)
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit, Futures, and Swap Stretches.
-		 */
-
-		MergedDiscountForwardCurve dc = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
-			valParams,
+		MergedDiscountForwardCurve discountCurve = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+			currency,
+			linearLatentStateCalibrator,
+			new LatentStateStretchSpec[]
+			{
+				depositStretch,
+				futuresStretch,
+				swapStretch
+			},
+			valuationParams,
 			null,
 			null,
 			null,
 			1.
 		);
 
-		/*
-		 * Cross-Comparison of the DEPOSIT Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aDepositComp.length; ++i)
-			System.out.println ("\t[" + aDepositComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aDepositComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dc, null, null, null, null, null, null),
-						null, "Rate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.));
-
-		/*
-		 * Cross-Comparison of the FUTURE Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t     FUTURE INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aEDFComp.length; ++i)
-			System.out.println ("\t[" + aEDFComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aEDFComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dc, null, null, null, null, null, null),
-						null, "Rate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblEDFQuote[i], 1, 6, 1.));
-
-		/*
-		 * Cross-Comparison of the SWAP Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t     SWAP INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aSwapComp.length; ++i)
-			System.out.println ("\t[" + aSwapComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aSwapComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dc, null, null, null, null, null, null),
-						null, "CalibSwapRate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblSwapQuote[i], 1, 6, 1.));
-
-		/*
-		 * Display of the DEPOSIT Instrument Discount Factor Quote Jacobian Sensitivities.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t     DEPOSIT MATURITY DISCOUNT FACTOR JACOBIAN");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aDepositComp.length; ++i) {
-			org.drip.numerical.differentiation.WengertJacobian wj = dc.jackDDFDManifestMeasure (aDepositComp[i].maturityDate(), "PV");
-
-			System.out.println (aDepositComp[i].maturityDate() + " => " + wj.displayString());
-		}
-
-		/*
-		 * Display of the FUTURE Instrument Discount Factor Quote Jacobian Sensitivities.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t     FUTURE MATURITY DISCOUNT FACTOR JACOBIAN");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aEDFComp.length; ++i) {
-			org.drip.numerical.differentiation.WengertJacobian wj = dc.jackDDFDManifestMeasure (
-				aEDFComp[i].maturityDate(),
-				"PV"
+		for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+			System.out.println (
+				"\t|| [" + depositArray[depositIndex].maturityDate() + "] => " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
+						null,
+						MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					depositQuoteArray[depositIndex],
+					1,
+					6,
+					1.
+				) + " ||"
 			);
-
-			System.out.println (aEDFComp[i].maturityDate() + " => " + wj.displayString());
 		}
 
-		/*
-		 * Display of the SWAP Instrument Discount Factor Quote Jacobian Sensitivities.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||     FUTURE INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t     SWAP MATURITY DISCOUNT FACTOR JACOBIAN");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aSwapComp.length; ++i) {
-			org.drip.numerical.differentiation.WengertJacobian wjDFQuote = dc.jackDDFDManifestMeasure (
-				aSwapComp[i].maturityDate(),
-				"PV"
+		for (int futuresIndex = 0; futuresIndex < futuresArray.length; ++futuresIndex) {
+			System.out.println (
+				"\t|| [" + futuresArray[futuresIndex].maturityDate() + "] => " + FormatUtil.FormatDouble (
+					futuresArray[futuresIndex].measureValue (
+						valuationParams,
+						null,
+						MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					futuresQuoteArray[futuresIndex],
+					1,
+					6,
+					1.
+				) + " ||"
 			);
-
-			System.out.println (aSwapComp[i].maturityDate() + " => " + wjDFQuote.displayString());
 		}
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     COMPONENT-BY-COMPONENT QUOTE JACOBIAN");
+		System.out.println ("\t||     SWAP INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		WengertJacobian wj = dc.compJackDPVDManifestMeasure (dtSpot);
+		for (int irsIndex = 0; irsIndex < irsArray.length; ++irsIndex) {
+			System.out.println (
+				"\t|| [" + irsArray[irsIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+					irsArray[irsIndex].measureValue (
+						valuationParams,
+						null,
+						MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+						null,
+						"CalibSwapRate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					swapQuoteArray[irsIndex],
+					1,
+					6,
+					1.
+				) + " ||"
+			);
+		}
 
-		System.out.println (wj.displayString());
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||     DEPOSIT MATURITY DISCOUNT FACTOR JACOBIAN");
 
-		System.out.println ("\t     BESPOKE 35Y SWAP QUOTE JACOBIAN");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+			System.out.println (
+				"\t|| " + depositArray[depositIndex].maturityDate() + " => " +
+					discountCurve.jackDDFDManifestMeasure (
+						depositArray[depositIndex].maturityDate(),
+						"PV"
+					).displayString()
+			);
+		}
 
-		CalibratableComponent irs35Y = OTCIRS (
-			dtSpot,
-			strCurrency,
-			"35Y",
-			0.
-		);
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		WengertJacobian wjIRSBespokeQuoteJack = irs35Y.jackDDirtyPVDManifestMeasure (
-			valParams,
-			null,
-			MarketParamsBuilder.Create (
-				dc,
+		System.out.println ("\t||     FUTURE MATURITY DISCOUNT FACTOR JACOBIAN");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int futuresIndex = 0; futuresIndex < futuresArray.length; ++futuresIndex) {
+			System.out.println (
+				"\t|| " + futuresArray[futuresIndex].maturityDate() + " => " +
+					discountCurve.jackDDFDManifestMeasure (
+						futuresArray[futuresIndex].maturityDate(),
+						"PV"
+					).displayString()
+			);
+		}
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||     SWAP MATURITY DISCOUNT FACTOR JACOBIAN");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int irsIndex = 0; irsIndex < irsArray.length; ++irsIndex) {
+			System.out.println (
+				"\t|| " + irsArray[irsIndex].maturityDate() + " => " +
+					discountCurve.jackDDFDManifestMeasure (
+						irsArray[irsIndex].maturityDate(),
+						"PV"
+					).displayString()
+			);
+		}
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||     COMPONENT-BY-COMPONENT QUOTE JACOBIAN");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		WengertJacobian wengertJacobian = discountCurve.compJackDPVDManifestMeasure (spotDate);
+
+		if (null != wengertJacobian) {
+			System.out.println (wengertJacobian.displayString());
+		}
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||     BESPOKE 35Y SWAP QUOTE JACOBIAN");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println (
+			"\t|| " + OTCIRS (
+				spotDate,
+				currency,
+				"35Y",
+				0.
+			).jackDDirtyPVDManifestMeasure (
+				valuationParams,
 				null,
-				null,
-				null,
-				null,
-				null,
-				null,
+				MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null, null),
 				null
-			),
-			null
+			).displayString()
 		);
 
-		System.out.println (wjIRSBespokeQuoteJack.displayString());
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||     BESPOKE SWAP MATURITY QUOTE JACOBIAN");
 
-		System.out.println ("\t     BESPOKE SWAP MATURITY QUOTE JACOBIAN");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		TenorJack (spotDate, "30Y", currency, "PV", discountCurve);
 
-		TenorJack (dtSpot, "30Y", strCurrency, "PV", dc);
+		TenorJack (spotDate, "32Y", currency, "PV", discountCurve);
 
-		TenorJack (dtSpot, "32Y", strCurrency, "PV", dc);
+		TenorJack (spotDate, "34Y", currency, "PV", discountCurve);
 
-		TenorJack (dtSpot, "34Y", strCurrency, "PV", dc);
+		TenorJack (spotDate, "36Y", currency, "PV", discountCurve);
 
-		TenorJack (dtSpot, "36Y", strCurrency, "PV", dc);
+		TenorJack (spotDate, "38Y", currency, "PV", discountCurve);
 
-		TenorJack (dtSpot, "38Y", strCurrency, "PV", dc);
+		TenorJack (spotDate, "40Y", currency, "PV", discountCurve);
 
-		TenorJack (dtSpot, "40Y", strCurrency, "PV", dc);
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||     DISCOUNT CURVE IMPLIED 6M FORWARD RATE QUOTE JACOBIAN");
 
-		System.out.println ("\t     DISCOUNT CURVE IMPLIED 6M FORWARD RATE QUOTE JACOBIAN");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		Forward6MRateJack (spotDate, "1D", "PV", discountCurve);
 
-		Forward6MRateJack (dtSpot, "1D", "PV", dc);
+		Forward6MRateJack (spotDate, "3M", "PV", discountCurve);
 
-		Forward6MRateJack (dtSpot, "3M", "PV", dc);
+		Forward6MRateJack (spotDate, "6M", "PV", discountCurve);
 
-		Forward6MRateJack (dtSpot, "6M", "PV", dc);
+		Forward6MRateJack (spotDate, "1Y", "PV", discountCurve);
 
-		Forward6MRateJack (dtSpot, "1Y", "PV", dc);
+		Forward6MRateJack (spotDate, "2Y", "PV", discountCurve);
 
-		Forward6MRateJack (dtSpot, "2Y", "PV", dc);
+		Forward6MRateJack (spotDate, "5Y", "PV", discountCurve);
 
-		Forward6MRateJack (dtSpot, "5Y", "PV", dc);
+		System.out.println ("\t||----------------------------------------------------------------");
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		String strCurrency = "USD";
+		String currency = "USD";
 
-		DiscountCurveQuoteSensitivitySample (
-			DateUtil.Today(),
-			strCurrency
-		);
+		DiscountCurveQuoteSensitivitySample (DateUtil.Today(), currency);
 
 		EnvManager.TerminateEnv();
 	}

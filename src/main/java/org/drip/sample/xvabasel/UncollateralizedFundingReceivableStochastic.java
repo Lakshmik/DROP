@@ -281,13 +281,13 @@ public class UncollateralizedFundingReceivableStochastic
 
 	private static final double[][] Path (
 		final double[][] correlationMatrix,
-		final int iNumVertex)
+		final int vertexCount)
 		throws Exception
 	{
 		return new CorrelatedFactorsPathVertexRealization (
 			new RandomNumberGenerator(),
 			correlationMatrix,
-			iNumVertex,
+			vertexCount,
 			1,
 			false,
 			null
@@ -342,7 +342,8 @@ public class UncollateralizedFundingReceivableStochastic
 		double counterPartyFundingSpreadDrift = 0.000022;
 		double counterPartyFundingSpreadVolatility = 0.0022;
 
-		double[][] correlationMatrix = new double[][] {
+		double[][] correlationMatrix = new double[][]
+		{
 			{1.00,  0.00,  0.03,  0.07,  0.04,  0.05,  0.08,  0.00,  0.00},  // PORTFOLIO
 			{0.00,  1.00,  0.00,  0.00,  0.00,  0.00,  0.00,  0.00,  1.00},  // OVERNIGHT
 			{0.03,  0.00,  1.00,  0.26,  0.33,  0.21,  0.35,  0.13,  0.00},  // CSA

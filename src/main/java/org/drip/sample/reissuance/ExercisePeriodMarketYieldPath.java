@@ -9,8 +9,9 @@ import java.util.TreeMap;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
-import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketYield;
+import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinPath;
 import org.drip.product.muni.MarketYieldTermStructure;
 import org.drip.service.common.FormatUtil;
@@ -137,6 +138,39 @@ import org.drip.state.govvie.GovvieCurve;
 
 public class ExercisePeriodMarketYieldPath
 {
+
+	private static final List<String> TenorList()
+	{
+		List<String> tenorList = new ArrayList<String>();
+
+		tenorList.add ("3M");
+
+		tenorList.add ("6M");
+
+		tenorList.add ("1Y");
+
+		tenorList.add ("2Y");
+
+		tenorList.add ("3Y");
+
+		tenorList.add ("4Y");
+
+		tenorList.add ("5Y");
+
+		tenorList.add ("7Y");
+
+		tenorList.add ("10Y");
+
+		tenorList.add ("12Y");
+
+		tenorList.add ("15Y");
+
+		tenorList.add ("20Y");
+
+		tenorList.add ("30Y");
+
+		return tenorList;
+	}
 
 	private static final MarketYieldTermStructure TaxExemptMarketYieldTermStructure()
 		throws Exception
@@ -324,39 +358,6 @@ public class ExercisePeriodMarketYieldPath
 		return new MarketYieldTermStructure (spotTenorValueMap, infiniteHorizonTenorValueMap);
 	}
 
-	private static final List<String> TenorList()
-	{
-		List<String> tenorList = new ArrayList<String>();
-
-		tenorList.add ("3M");
-
-		tenorList.add ("6M");
-
-		tenorList.add ("1Y");
-
-		tenorList.add ("2Y");
-
-		tenorList.add ("3Y");
-
-		tenorList.add ("4Y");
-
-		tenorList.add ("5Y");
-
-		tenorList.add ("7Y");
-
-		tenorList.add ("10Y");
-
-		tenorList.add ("12Y");
-
-		tenorList.add ("15Y");
-
-		tenorList.add ("20Y");
-
-		tenorList.add ("30Y");
-
-		return tenorList;
-	}
-
 	/**
 	 * Entry Point
 	 * 
@@ -393,23 +394,20 @@ public class ExercisePeriodMarketYieldPath
 
 		simulationDateList.add (exerciseStartDate.addBusDays (5, "USD"));
 
-		DeGuillaumeRebonatoPogudinMarketYield deGuillaumeRebonatoPogudinMarketYield =
-			new DeGuillaumeRebonatoPogudinMarketYield (
+		DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield =
+			new DeGuillaumeRebonatoPogudinMarketSettings (
+				currency,
+				spotDate,
 				TaxExemptMarketYieldTermStructure(),
 				TaxableMarketYieldTermStructure(),
 				EscrowMarketYieldTermStructure()
 			);
 
-		DeGuillaumeRebonatoPogudin deGuillaumeRebonatoPogudin = DeGuillaumeRebonatoPogudin.Standard (
-			currency,
-			burstiness,
-			relaxationTime,
+		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath = DeGuillaumeRebonatoPogudin.Standard (
+			new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime),
 			deGuillaumeRebonatoPogudinMarketYield
-		);
-
-		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath = deGuillaumeRebonatoPogudin.evolve (
+		).evolve (
 			deGuillaumeRebonatoPogudinMarketYield,
-			spotDate,
 			simulationDateList
 		);
 

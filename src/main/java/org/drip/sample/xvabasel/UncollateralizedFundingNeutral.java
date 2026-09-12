@@ -373,7 +373,8 @@ public class UncollateralizedFundingNeutral
 			);
 		}
 
-		return new ExposureAdjustmentAggregator[] {
+		return new ExposureAdjustmentAggregator[]
+		{
 			new ExposureAdjustmentAggregator (groundMonoPathExposureAdjustmentArray),
 			new ExposureAdjustmentAggregator (extendedMonoPathExposureAdjustmentArray)
 		};

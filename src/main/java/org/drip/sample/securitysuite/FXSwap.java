@@ -15,7 +15,6 @@ import org.drip.spline.params.*;
 import org.drip.spline.stretch.*;
 import org.drip.state.creator.ScenarioFXCurveBuilder;
 import org.drip.state.estimator.LatentStateStretchBuilder;
-import org.drip.state.fx.FXCurve;
 import org.drip.state.inference.*;
 
 /*
@@ -23,6 +22,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -98,66 +105,65 @@ import org.drip.state.inference.*;
 /**
  * <i>FXSwap</i> demonstrates the Analytics Calculation/Reconciliation for an FX Swap.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FXSwap {
+public class FXSwap
+{
 
 	private static FXForwardComponent[] FXForwardCalibComponent (
-		final CurrencyPair cp,
-		final JulianDate dtSpot,
-		final String[] astrMaturityTenor)
+		final CurrencyPair currencyPair,
+		final JulianDate spotDate,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		FXForwardComponent[] aFXForward = new FXForwardComponent[astrMaturityTenor.length];
+		FXForwardComponent[] fxForwardArray = new FXForwardComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFXForward[i] = new FXForwardComponent (
-				cp.code() + "::FXFWD::" + astrMaturityTenor[i],
-				cp,
-				dtSpot.julian(),
-				dtSpot.addTenor (astrMaturityTenor[i]).julian(),
+		for (int i = 0; i < maturityTenorArray.length; ++i) {
+			fxForwardArray[i] = new FXForwardComponent (
+				currencyPair.code() + "::FXFWD::" + maturityTenorArray[i],
+				currencyPair,
+				spotDate.julian(),
+				spotDate.addTenor (maturityTenorArray[i]).julian(),
 				1.,
 				null
 			);
+		}
 
-		return aFXForward;
+		return fxForwardArray;
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.AUGUST,
-			25
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.AUGUST, 25);
 
-		CurrencyPair cp = CurrencyPair.FromCode ("USD/EUR");
+		CurrencyPair currencyPair = CurrencyPair.FromCode ("USD/EUR");
 
-		double dblSpot = 1.0993;
+		double spot = 1.0993;
 
-		String[] astrMaturityTenor = new String[] {
+		String[] maturityTenorArray = new String[]
+		{
 			"1W",
 			"1M",
 			"3M",
@@ -167,13 +173,8 @@ public class FXSwap {
 			"3Y"
 		};
 
-		FXForwardComponent[] aFXForward = FXForwardCalibComponent (
-			cp,
-			dtSpot,
-			astrMaturityTenor
-		);
-
-		double[] adblFXForward = new double[] {
+		double[] fxForwardArray = new double[]
+		{
 			1.1000, //	"1W",
 			1.1012,	// 	"1M",
 			1.1039,	// 	"3M",
@@ -183,82 +184,62 @@ public class FXSwap {
 			1.1865,	// 	"3Y"
 		};
 
-		LatentStateStretchSpec fxForwardStretch = LatentStateStretchBuilder.FXStretchSpec (
-			"FXFORWARD",
-			aFXForward,
-			"Outright",
-			adblFXForward
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currencyPair.denomCcy());
+
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
+
+		curveSurfaceQuoteContainer.setFXState (
+			ScenarioFXCurveBuilder.ShapePreservingFXCurve (
+				new LinearLatentStateCalibrator (
+					new SegmentCustomBuilderControl (
+						MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+						new PolynomialFunctionSetParams (4),
+						SegmentInelasticDesignControl.Create (2, 2),
+						new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+						null
+					),
+					BoundarySettings.NaturalStandard(),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null
+				),
+				new LatentStateStretchSpec[]
+				{
+					LatentStateStretchBuilder.FXStretchSpec (
+						"FXFORWARD",
+						FXForwardCalibComponent (currencyPair, spotDate, maturityTenorArray),
+						"Outright",
+						fxForwardArray
+					)
+				},
+				currencyPair,
+				valuationParams,
+				null,
+				null,
+				null,
+				spot
+			)
 		);
 
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			fxForwardStretch
-		};
+		JulianDate maturityDate = DateUtil.CreateFromYMD (2028, DateUtil.NOVEMBER, 27);
 
-		LinearLatentStateCalibrator llsc = new LinearLatentStateCalibrator (
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
+		for (Map.Entry<String, Double> mapEntry : new FXForwardComponent (
+				currencyPair.code() + "::FXFWD::" + maturityDate,
+				currencyPair,
+				spotDate.julian(),
+				maturityDate.julian(),
+				1.,
 				null
-			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			cp.denomCcy()
-		);
-
-		FXCurve fxCurve = ScenarioFXCurveBuilder.ShapePreservingFXCurve (
-			llsc,
-			aStretchSpec,
-			cp,
-			valParams,
-			null,
-			null,
-			null,
-			dblSpot
-		);
-
-		CurveSurfaceQuoteContainer csqc = new CurveSurfaceQuoteContainer();
-
-		csqc.setFXState (fxCurve);
-
-		JulianDate dtMaturity = DateUtil.CreateFromYMD (
-			2028,
-			DateUtil.NOVEMBER,
-			27
-		);
-
-		FXForwardComponent fxfc = new FXForwardComponent (
-			cp.code() + "::FXFWD::" + dtMaturity,
-			cp,
-			dtSpot.julian(),
-			dtMaturity.julian(),
-			1.,
-			null
-		);
-
-		Map<String, Double> mapOutput = fxfc.value (
-			valParams,
-			null,
-			csqc,
-			null
-		);
-
-		for (Map.Entry<String, Double> me : mapOutput.entrySet())
-			System.out.println ("\t[" + me.getKey() + "] => " + me.getValue());
+			).value (
+				valuationParams,
+				null,
+				curveSurfaceQuoteContainer,
+				null
+			).entrySet()
+		)
+		{
+			System.out.println ("\t|| [" + mapEntry.getKey() + "] => " + mapEntry.getValue());
+		}
 
 		EnvManager.TerminateEnv();
 	}

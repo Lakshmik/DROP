@@ -15,6 +15,14 @@ import org.drip.service.scenario.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,49 +98,47 @@ import org.drip.service.scenario.*;
 /**
  * <i>Bhilwara</i> generates the Full Suite of Replication Metrics for Bond Bhilwara.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/securitysuite/README.md">Custom Security Relative Value Demonstration</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class Bhilwara {
+public class Bhilwara
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.OCTOBER,
-			5
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.OCTOBER, 5);
 
-		String[] astrDepositTenor = new String[] {
+		String[] depositTenorArray = new String[]
+		{
 			"2D"
 		};
-
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray = new double[]
+		{
 			0.0130411 // 2D
 		};
-
-		double[] adblFuturesQuote = new double[] {
+		double[] futuresQuoteArray = new double[]
+		{
 			0.01345,	// 98.655
 			0.01470,	// 98.530
 			0.01575,	// 98.425
@@ -140,8 +146,8 @@ public class Bhilwara {
 			0.01745,    // 98.255
 			0.01845     // 98.155
 		};
-
-		String[] astrFixFloatTenor = new String[] {
+		String[] fixFloatTenorArray = new String[]
+		{
 			"02Y",
 			"03Y",
 			"04Y",
@@ -160,8 +166,8 @@ public class Bhilwara {
 			"40Y",
 			"50Y"
 		};
-
-		String[] astrGovvieTenor = new String[] {
+		String[] govvieTenorArray = new String[]
+		{
 			"1Y",
 			"2Y",
 			"3Y",
@@ -171,8 +177,8 @@ public class Bhilwara {
 			"20Y",
 			"30Y"
 		};
-
-		double[] adblFixFloatQuote = new double[] {
+		double[] fixFloatQuoteArray = new double[]
+		{
 			0.016410, //  2Y
 			0.017863, //  3Y
 			0.019030, //  4Y
@@ -202,8 +208,8 @@ public class Bhilwara {
 			0.02677, // 20Y
 			0.02927  // 30Y
 		};
-
-		String[] astrCreditTenor = new String[] {
+		String[] creditTenorArray = new String[]
+		{
 			"06M",
 			"01Y",
 			"02Y",
@@ -213,8 +219,8 @@ public class Bhilwara {
 			"07Y",
 			"10Y"
 		};
-
-		double[] adblCreditQuote = new double[] {
+		double[] creditQuoteArray = new double[]
+		{
 			 60.,	//  6M
 			 68.,	//  1Y
 			 88.,	//  2Y
@@ -224,21 +230,21 @@ public class Bhilwara {
 			168.,	//  7Y
 			188.	// 10Y
 		};
+		double fx = 1.;
+		int settleLag = 3;
+		int couponFrequency = 12;
+		String name = "Bhilwara";
+		double cleanPrice = 0.95;
+		double issuePrice = 1.;
+		String currency = "USD";
+		double spreadBump = 20.;
+		double couponRate = 0.03; 
+		String treasuryCode = "UST";
+		String couponDayCount = "30/360";
+		double spreadDurationMultiplier = 5.;
 
-		double dblFX = 1.;
-		int iSettleLag = 3;
-		int iCouponFreq = 12;
-		String strName = "Bhilwara";
-		double dblCleanPrice = 0.95;
-		double dblIssuePrice = 1.;
-		String strCurrency = "USD";
-		double dblSpreadBump = 20.;
-		double dblCouponRate = 0.03; 
-		String strTreasuryCode = "UST";
-		String strCouponDayCount = "30/360";
-		double dblSpreadDurationMultiplier = 5.;
-
-		org.drip.analytics.date.JulianDate[] adtPeriodEnd = new org.drip.analytics.date.JulianDate[] {
+		JulianDate[] periodEndArray = new JulianDate[]
+		{
 			DateUtil.CreateFromYMD (2017, DateUtil.SEPTEMBER, 25),
 			DateUtil.CreateFromYMD (2017, DateUtil.OCTOBER  , 25),
 			DateUtil.CreateFromYMD (2017, DateUtil.NOVEMBER , 25),
@@ -468,7 +474,8 @@ public class Bhilwara {
 			DateUtil.CreateFromYMD (2036, DateUtil.JULY     , 25),
 		};
 
-		double[] adblPrincipalPayDown = new double[] {
+		double[] principalPayDownArray = new double[]
+		{
 			299135.42,
 			293800.82,
 			286422.31,
@@ -698,7 +705,8 @@ public class Bhilwara {
 			13025.09,
 		};
 
-		double[] adblCouponAmount = new double[] {
+		double[] couponAmountArray = new double[]
+		{
 			32157.95,
 			30759.71,
 			33409.09,
@@ -928,75 +936,75 @@ public class Bhilwara {
 			17.11,
 		};
 
-		double dblIssueAmount = R1MatrixUtil.Sum (adblPrincipalPayDown);
+		double issueAmount = R1MatrixUtil.Sum (principalPayDownArray);
 
-		JulianDate dtEffective = DateUtil.CreateFromYMD (
+		JulianDate effectiveDate = DateUtil.CreateFromYMD (
 			2017,
 			DateUtil.AUGUST,
 			25
 		);
 
 		BondComponent bond = BondBuilder.CreateBondFromCF (
-			strName,
-			dtEffective,
-			strCurrency,
-			strName,
-			strCouponDayCount,
-			dblIssueAmount,
-			dblCouponRate,
-			iCouponFreq,
-			adtPeriodEnd,
-			adblCouponAmount,
-			adblPrincipalPayDown,
+			name,
+			effectiveDate,
+			currency,
+			name,
+			couponDayCount,
+			issueAmount,
+			couponRate,
+			couponFrequency,
+			periodEndArray,
+			couponAmountArray,
+			principalPayDownArray,
 			true
 		);
 
-		BondReplicator abr = BondReplicator.CorporateSenior (
-			dblCleanPrice,
-			dblIssuePrice,
-			dblIssueAmount,
-			dtSpot,
-			astrDepositTenor,
-			adblDepositQuote,
-			adblFuturesQuote,
-			astrFixFloatTenor,
-			adblFixFloatQuote,
-			dblSpreadBump,
-			dblSpreadDurationMultiplier,
-			strTreasuryCode,
-			astrGovvieTenor,
+		BondReplicator bondReplicator = BondReplicator.CorporateSenior (
+			cleanPrice,
+			issuePrice,
+			issueAmount,
+			spotDate,
+			depositTenorArray,
+			depositQuoteArray,
+			futuresQuoteArray,
+			fixFloatTenorArray,
+			fixFloatQuoteArray,
+			spreadBump,
+			spreadDurationMultiplier,
+			treasuryCode,
+			govvieTenorArray,
 			adblGovvieYield,
-			astrCreditTenor,
-			adblCreditQuote,
-			dblFX,
+			creditTenorArray,
+			creditQuoteArray,
+			fx,
 			Double.NaN,
-			iSettleLag,
+			settleLag,
 			bond
 		);
 
-		BondReplicationRun abrr = abr.generateRun();
+		BondReplicationRun abrr = bondReplicator.generateRun();
 
 		System.out.println (abrr.display());
 
-		double dblBalance = 1.;
+		double balance = 1.;
 
 		for (CompositePeriod p : bond.couponPeriods()) {
-			int iEndDate = p.endDate();
+			int endDate = p.endDate();
 
-			int iStartDate = p.startDate();
+			int startDate = p.startDate();
 
-			double dblPrincipalPayDown = bond.notional (iStartDate) - bond.notional (iEndDate);
+			double principalPayDown = bond.notional (startDate) - bond.notional (endDate);
 
-			double dblInterest = dblCouponRate * p.couponDCF() * bond.notional (iStartDate) * bond.couponFactor (iEndDate);
+			double interest = couponRate * p.couponDCF() * bond.notional (startDate) * bond.couponFactor (endDate);
 
-			dblBalance -= dblPrincipalPayDown;
+			balance -= principalPayDown;
 
 			System.out.println (
-				"\t" + new JulianDate (iEndDate) + " => " +
-				FormatUtil.FormatDouble (dblPrincipalPayDown, 8, 2, dblIssueAmount) + " | " +
-				FormatUtil.FormatDouble (dblInterest, 6, 2, dblIssueAmount) + " | " +
-				FormatUtil.FormatDouble (dblPrincipalPayDown + dblInterest, 8, 2, dblIssueAmount) + " | " +
-				FormatUtil.FormatDouble (dblBalance, 8, 2, dblIssueAmount) + " ||"
+				"\t" + new JulianDate (endDate) + " => " +
+				FormatUtil.FormatDouble (principalPayDown, 8, 2, issueAmount) + " | " +
+				FormatUtil.FormatDouble (interest, 6, 2, issueAmount) + " | " +
+				FormatUtil.FormatDouble (principalPayDown + interest, 8, 2, issueAmount) + " | " +
+				FormatUtil.FormatDouble (balance, 8, 2, issueAmount) + " ||"
 			);
 		}
 

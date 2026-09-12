@@ -123,88 +123,88 @@ import org.drip.numerical.common.NumberUtil;
 
 public class RefinancingPathPnLEntry
 {
-	private double _taxableGovvieCurveDirtyPrice = Double.NaN;
-	private double _taxExemptGovvieCurveDirtyPrice = Double.NaN;
-	private double _initialTaxableGovvieCurveDirtyPrice = Double.NaN;
-	private double _initialTaxExemptGovvieCurveDirtyPrice = Double.NaN;
+	private double _taxableGovvieCurveCleanPrice = Double.NaN;
+	private double _taxExemptGovvieCurveCleanPrice = Double.NaN;
+	private double _initialTaxableGovvieCurveCleanPrice = Double.NaN;
+	private double _initialTaxExemptGovvieCurveCleanPrice = Double.NaN;
 
 	/**
 	 * <i>RefinancingPathPnLEntry</i> Constructor
 	 * 
-	 * @param initialTaxExemptGovvieCurveDirtyPrice
-	 * 		  Price generated from the Initial Tax-exempt Govvie Dirty Curve
-	 * @param initialTaxableGovvieCurveDirtyPrice
-	 * 		  Price generated from the Initial Taxable Govvie Dirty Curve
-	 * @param taxExemptGovvieCurveDirtyPrice Price generated from the Tax-exempt Govvie Dirty Curve
-	 * @param taxableGovvieCurveDirtyPrice Price generated from the Taxable Govvie Dirty Curve
+	 * @param initialTaxExemptGovvieCurveCleanPrice
+	 * 		  Price generated from the Initial Tax-exempt Govvie Clean Curve
+	 * @param initialTaxableGovvieCurveCleanPrice
+	 * 		  Price generated from the Initial Taxable Govvie Clean Curve
+	 * @param taxExemptGovvieCurveCleanPrice Price generated from the Tax-exempt Govvie Clean Curve
+	 * @param taxableGovvieCurveCleanPrice Price generated from the Taxable Govvie Clean Curve
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public RefinancingPathPnLEntry (
-		final double initialTaxExemptGovvieCurveDirtyPrice,
-		final double initialTaxableGovvieCurveDirtyPrice,
-		final double taxExemptGovvieCurveDirtyPrice,
-		final double taxableGovvieCurveDirtyPrice)
+		final double initialTaxExemptGovvieCurveCleanPrice,
+		final double initialTaxableGovvieCurveCleanPrice,
+		final double taxExemptGovvieCurveCleanPrice,
+		final double taxableGovvieCurveCleanPrice)
 		throws Exception
 	{
 		if (!NumberUtil.IsValid (
-				_initialTaxExemptGovvieCurveDirtyPrice = initialTaxExemptGovvieCurveDirtyPrice
-			) || 0. > _initialTaxExemptGovvieCurveDirtyPrice ||
+				_initialTaxExemptGovvieCurveCleanPrice = initialTaxExemptGovvieCurveCleanPrice
+			) || 0. > _initialTaxExemptGovvieCurveCleanPrice ||
 			!NumberUtil.IsValid (
-				_initialTaxableGovvieCurveDirtyPrice = initialTaxableGovvieCurveDirtyPrice
-			) || 0. > _initialTaxableGovvieCurveDirtyPrice ||
-			!NumberUtil.IsValid (_taxExemptGovvieCurveDirtyPrice = taxExemptGovvieCurveDirtyPrice) ||
-				0. > _taxExemptGovvieCurveDirtyPrice ||
-			!NumberUtil.IsValid (_taxableGovvieCurveDirtyPrice = taxableGovvieCurveDirtyPrice) ||
-				0. > _taxableGovvieCurveDirtyPrice)
+				_initialTaxableGovvieCurveCleanPrice = initialTaxableGovvieCurveCleanPrice
+			) || 0. > _initialTaxableGovvieCurveCleanPrice ||
+			!NumberUtil.IsValid (_taxExemptGovvieCurveCleanPrice = taxExemptGovvieCurveCleanPrice) ||
+				0. > _taxExemptGovvieCurveCleanPrice ||
+			!NumberUtil.IsValid (_taxableGovvieCurveCleanPrice = taxableGovvieCurveCleanPrice) ||
+				0. > _taxableGovvieCurveCleanPrice)
 		{
 			throw new Exception ("RefinancingPathPnLEntry Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Return the Price generated from the Initial Tax-exempt Govvie Dirty Curve
+	 * Return the Price generated from the Initial Tax-exempt Govvie Clean Curve
 	 * 
-	 * @return Price generated from the Initial Tax-exempt Govvie Dirty Curve
+	 * @return Price generated from the Initial Tax-exempt Govvie Clean Curve
 	 */
 
-	public double initialTaxExemptGovvieCurveDirtyPrice()
+	public double initialTaxExemptGovvieCurveCleanPrice()
 	{
-		return _initialTaxExemptGovvieCurveDirtyPrice;
+		return _initialTaxExemptGovvieCurveCleanPrice;
 	}
 
 	/**
-	 * Return the Price generated from the Initial Taxable Govvie Dirty Curve
+	 * Return the Price generated from the Initial Taxable Govvie Clean Curve
 	 * 
-	 * @return Price generated from the Initial Taxable Govvie Dirty Curve
+	 * @return Price generated from the Initial Taxable Govvie Clean Curve
 	 */
 
-	public double initialTaxableGovvieCurveDirtyPrice()
+	public double initialTaxableGovvieCurveCleanPrice()
 	{
-		return _initialTaxableGovvieCurveDirtyPrice;
+		return _initialTaxableGovvieCurveCleanPrice;
 	}
 
 	/**
-	 * Return the Price generated from the Tax-exempt Govvie Dirty Curve
+	 * Return the Price generated from the Tax-exempt Govvie Clean Curve
 	 * 
-	 * @return Price generated from the Tax-exempt Govvie Dirty Curve
+	 * @return Price generated from the Tax-exempt Govvie Clean Curve
 	 */
 
-	public double taxExemptGovvieCurveDirtyPrice()
+	public double taxExemptGovvieCurveCleanPrice()
 	{
-		return _taxExemptGovvieCurveDirtyPrice;
+		return _taxExemptGovvieCurveCleanPrice;
 	}
 
 	/**
-	 * Return the Price generated from the Taxable Govvie Dirty Curve
+	 * Return the Price generated from the Taxable Govvie Clean Curve
 	 * 
-	 * @return Price generated from the Taxable Govvie Dirty Curve
+	 * @return Price generated from the Taxable Govvie Clean Curve
 	 */
 
-	public double taxableGovvieCurveDirtyPrice()
+	public double taxableGovvieCurveCleanPrice()
 	{
-		return _taxableGovvieCurveDirtyPrice;
+		return _taxableGovvieCurveCleanPrice;
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class RefinancingPathPnLEntry
 
 	public double taxExempt()
 	{
-		return _taxExemptGovvieCurveDirtyPrice - _initialTaxExemptGovvieCurveDirtyPrice;
+		return _taxExemptGovvieCurveCleanPrice - _initialTaxExemptGovvieCurveCleanPrice;
 	}
 
 	/**
@@ -226,6 +226,6 @@ public class RefinancingPathPnLEntry
 
 	public double taxable()
 	{
-		return _taxableGovvieCurveDirtyPrice - _initialTaxableGovvieCurveDirtyPrice;
+		return _taxableGovvieCurveCleanPrice - _initialTaxableGovvieCurveCleanPrice;
 	}
 }
