@@ -7,8 +7,6 @@ import org.drip.service.env.EnvManager;
 import org.drip.spline.basis.PolynomialFunctionSetParams;
 import org.drip.spline.params.*;
 import org.drip.spline.stretch.MultiSegmentSequenceBuilder;
-import org.drip.state.discount.*;
-import org.drip.state.forward.ForwardCurve;
 import org.drip.state.identifier.ForwardLabel;
 
 /*
@@ -16,6 +14,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,93 +99,55 @@ import org.drip.state.identifier.ForwardLabel;
 
 /**
  * <i>IBOR1MQuarticPolyVanilla</i> illustrates the Construction and Usage of the IBOR 1M Forward Curve Using
- * Vanilla Quartic Polynomial.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></li>
- *  </ul>
- * <br><br>
+ * 	Vanilla Quartic Polynomial.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class IBOR1MQuarticPolyVanilla {
+public class IBOR1MQuarticPolyVanilla
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
+
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtValue = DateUtil.CreateFromYMD (
-			2012,
-			DateUtil.DECEMBER,
-			11
-		);
+		JulianDate valueDate = DateUtil.CreateFromYMD (2012, DateUtil.DECEMBER, 11);
 
-		String strTenor = "1M";
-		String strCurrency = "USD";
-
-		ForwardLabel fri = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
-
-		MergedDiscountForwardCurve dcEONIA = OvernightIndexCurve.MakeDC (
-			dtValue,
-			strCurrency
-		);
-
-		SegmentCustomBuilderControl scbcCubic = new SegmentCustomBuilderControl (
-			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (5),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
-			new ResponseScalingShapeControl (
-				true,
-				new QuadraticRationalShapeControl (0.)
-			),
-			null
-		);
-
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblDepositQuote = new double[] {
+		String tenor = "1M";
+		String currency = "USD";
+		double[] depositQuoteArray =
+		{
 			0.000661,
 			0.000980,
 			0.000993
 		};
-
-		String[] astrDepositTenor = new String[] {
+		String[] depositTenorArray =
+		{
 			"1D",
 			"7D",
 			"14D"
 		};
-
-		/*
-		 * Construct the Array of Fix-Float Component and their Quotes from the given set of parameters
-		 */
-
-		double[] adblFixFloatQuote = new double[] {
+		double[] fixFloatQuoteArray =
+		{
 			0.001100,
 			0.001060,
 			0.000960,
@@ -193,8 +161,8 @@ public class IBOR1MQuarticPolyVanilla {
 			0.000640,
 			0.000630
 		};
-
-		String[] astrFixFloatTenor = new String[] {
+		String[] fixFloatTenorArray =
+		{
 			 "1M",
 			 "2M",
 			 "3M",
@@ -208,12 +176,8 @@ public class IBOR1MQuarticPolyVanilla {
 			"11M",
 			"12M"
 		};
-
-		/*
-		 * Construct the Array of Float-Float Component and their Quotes from the given set of parameters
-		 */
-
-		double[] adblFloatFloatQuote = new double[] {
+		double[] floatFloatQuoteArray =
+		{
 			0.002260,	//  2Y
 			0.002380,	//  3Y
 			0.002460,	//  4Y
@@ -230,8 +194,8 @@ public class IBOR1MQuarticPolyVanilla {
 			0.001750,	// 25Y
 			0.001630	// 30Y
 		};
-
-		String[] astrFloatFloatTenor = new String[] {
+		String[] floatFloatTenorArray =
+		{
 			  "2Y",
 			  "3Y",
 			  "4Y",
@@ -248,59 +212,53 @@ public class IBOR1MQuarticPolyVanilla {
 			 "25Y",
 			 "30Y"
 		};
-
-		/*
-		 * Construct the Array of Terminal Synthetic Float-Float Components and their Quotes from the given set of parameters
-		 */
-
-		String[] astrSyntheticFloatFloatTenor = new String[] {
+		String[] syntheticFloatFloatTenorArray =
+		{
 			"35Y",
 			"40Y",
 			"50Y",
 			"60Y"
 		};
-
-		double[] adblSyntheticFloatFloatQuote = new double[] {
+		double[] syntheticFloatFloatQuoteArray =
+		{
 			0.001630,
 			0.001630,
 			0.001630,
 			0.001630
 		};
 
-		ForwardCurve fc6M = IBOR6MCubicPolyVanilla.Make6MForward (
-			dtValue,
-			strCurrency,
-			"6M",
-			true);
-
-		ForwardCurve fc = IBORCurve.CustomIBORBuilderSample (
-			dcEONIA,
-			fc6M,
-			fri,
-			scbcCubic,
-			astrDepositTenor,
-			adblDepositQuote,
-			"ForwardRate",
-			null,
-			null,
-			"ParForwardRate",
-			astrFixFloatTenor,
-			adblFixFloatQuote,
-			"SwapRate",
-			astrFloatFloatTenor,
-			adblFloatFloatQuote,
-			"DerivedParBasisSpread",
-			astrSyntheticFloatFloatTenor,
-			adblSyntheticFloatFloatQuote,
-			"DerivedParBasisSpread",
-			"---- VANILLA QUARTIC POLYNOMIAL FORWARD CURVE ---",
-			true
-		);
-
 		IBORCurve.ForwardJack (
-			dtValue,
+			valueDate,
 			"---- VANILLA QUARTIC POLYNOMIAL FORWARD CURVE SENSITIVITY ---",
-			fc,
+			IBORCurve.CustomIBORBuilderSample (
+				OvernightIndexCurve.MakeDC (valueDate, currency),
+				IBOR6MCubicPolyVanilla.Make6MForward (valueDate, currency, "6M", true),
+				ForwardLabel.Create (currency, tenor),
+				new SegmentCustomBuilderControl (
+					MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+					new PolynomialFunctionSetParams (5),
+					SegmentInelasticDesignControl.Create (2, 2),
+					new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+					null
+				),
+				depositTenorArray,
+				depositQuoteArray,
+				"ForwardRate",
+				null,
+				null,
+				"ParForwardRate",
+				fixFloatTenorArray,
+				fixFloatQuoteArray,
+				"SwapRate",
+				floatFloatTenorArray,
+				floatFloatQuoteArray,
+				"DerivedParBasisSpread",
+				syntheticFloatFloatTenorArray,
+				syntheticFloatFloatQuoteArray,
+				"DerivedParBasisSpread",
+				"---- VANILLA QUARTIC POLYNOMIAL FORWARD CURVE ---",
+				true
+			),
 			"DerivedParBasisSpread"
 		);
 

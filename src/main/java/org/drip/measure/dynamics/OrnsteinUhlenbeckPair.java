@@ -1,6 +1,7 @@
 
 package org.drip.measure.dynamics;
 
+import org.drip.function.definition.R1ToR1;
 import org.drip.measure.gaussian.NormalQuadrature;
 import org.drip.measure.realization.JumpDiffusionEdge;
 import org.drip.measure.realization.JumpDiffusionEdgeUnit;
@@ -233,25 +234,29 @@ public class OrnsteinUhlenbeckPair
 			return null;
 		}
 
-		double referenceRelaxationTime = _referenceDiffusionEvaluator.relaxationTime();
+		R1ToR1 referenceRelaxationTimeFunction = _referenceDiffusionEvaluator.relaxationTimeFunction();
 
-		double derivedRelaxationTime = _derivedDiffusionEvaluator.relaxationTime();
+		R1ToR1 derivedRelaxationTimeFunction = _derivedDiffusionEvaluator.relaxationTimeFunction();
 
 		try {
+			double referenceRelaxationTime = referenceRelaxationTimeFunction.evaluate (variatePair[0]);
+
+			double derivedRelaxationTime = derivedRelaxationTimeFunction.evaluate (variatePair[0]);
+
 			return new JumpDiffusionEdge[] {
 				JumpDiffusionEdge.Standard (
 					variatePair[0],
 					-1. * variatePair[0] / referenceRelaxationTime * timeIncrement,
-					_referenceDiffusionEvaluator.burstiness() * diffusionPair[0] *
-						Math.sqrt (timeIncrement / referenceRelaxationTime),
+					_referenceDiffusionEvaluator.burstinessFunction().evaluate (variatePair[0]) *
+						diffusionPair[0] * Math.sqrt (timeIncrement / referenceRelaxationTime),
 					null,
 					new JumpDiffusionEdgeUnit (timeIncrement, diffusionPair[0], 0.)
 				),
 				JumpDiffusionEdge.Standard (
 					variatePair[1],
 					-1. * variatePair[1] / derivedRelaxationTime * timeIncrement,
-					_derivedDiffusionEvaluator.burstiness() * diffusionPair[1] *
-						Math.sqrt (timeIncrement / derivedRelaxationTime),
+					_derivedDiffusionEvaluator.burstinessFunction().evaluate (variatePair[0]) *
+						diffusionPair[1] * Math.sqrt (timeIncrement / derivedRelaxationTime),
 					null,
 					new JumpDiffusionEdgeUnit (timeIncrement, diffusionPair[1], 0.)
 				)
@@ -299,25 +304,25 @@ public class OrnsteinUhlenbeckPair
 	}
 
 	/**
-	 * Retrieve the Reference Relaxation Time Scale
+	 * Retrieve the Reference Relaxation Time Scale Function
 	 * 
-	 * @return The Reference Relaxation Time Scale
+	 * @return The Reference Relaxation Time Scale Function
 	 */
 
-	@Override public double referenceRelaxationTime()
+	@Override public R1ToR1 referenceRelaxationTimeFunction()
 	{
-		return _referenceDiffusionEvaluator.relaxationTime();
+		return _referenceDiffusionEvaluator.relaxationTimeFunction();
 	}
 
 	/**
-	 * Retrieve the Reference Burstiness Scale
+	 * Retrieve the Reference Burstiness Scale Function
 	 * 
-	 * @return The Reference Burstiness Scale
+	 * @return The Reference Burstiness Scale Function
 	 */
 
-	@Override public double referenceBurstiness()
+	@Override public R1ToR1 referenceBurstinessFunction()
 	{
-		return _referenceDiffusionEvaluator.burstiness();
+		return _referenceDiffusionEvaluator.burstinessFunction();
 	}
 
 	/**

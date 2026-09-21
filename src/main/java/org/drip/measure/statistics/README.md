@@ -18,9 +18,8 @@ DROP Measure Statistics contains the R<sup>1</sup> R<sup>d</sup> Thin Thick Mome
  * [***PopulationCentralMeasures***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/statistics/PopulationCentralMeasures.java)
  <i>PopulationCentralMeasures</i> holds the Population Central Measures (Mean, and Variance) of the Population.
 
- * [***UnivariateDiscreteThin***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/statistics/UnivariateDiscreteThin.java)
- <i>UnivariateDiscreteThin</i> analyzes and computes the "Thin" Statistics for the Realized Univariate
- Sequence.
+ * [***UnivariateCentralMeasures***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/statistics/UnivariateCentralMeasures.java)
+ <i>UnivariateCentralMeasures</i> analyzes and computes the "Thin" Statistics for the Realized Univariate Sequence.
 
  * [***UnivariateMoments***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/statistics/UnivariateMoments.java)
  <i>UnivariateMoments</i> generates and holds the Specified Univariate Series Mean, Variance, and a few

@@ -1,6 +1,7 @@
 
 package org.drip.measure.realization;
 
+import org.drip.measure.crng.RandomSequenceGenerator;
 import org.drip.measure.gaussian.NormalQuadrature;
 import org.drip.numerical.common.NumberUtil;
 
@@ -101,6 +102,8 @@ import org.drip.numerical.common.NumberUtil;
  * 		<li>Generate an Array of <i>JumpDiffusionEdgeUnit</i> Realizations #1</li>
  * 		<li>Generate an Array of <i>JumpDiffusionEdgeUnit</i> Realizations #2</li>
  * 		<li>Generate an Array of <i>JumpDiffusionEdgeUnit</i> Realizations #3</li>
+ * 		<li>Retrieve the Array of <i>JumpDiffusionEdgeUnit</i> Instances</li>
+ * 		<li>Retrieve the Grid of Correlated <i>JumpDiffusionEdgeUnit</i> Instances corresponding to the Correlation Matrix and the Time Increment Array</li>
  * 		<li><i>JumpDiffusionEdgeUnit</i> Constructor</li>
  * 		<li>Retrieve the Edge Time Increment</li>
  * 		<li>Retrieve the Diffusion Unit Random Variable</li>
@@ -331,6 +334,87 @@ public class JumpDiffusionEdgeUnit
 		}
 
 		return jumpDiffusionEdgeUnitArray;
+	}
+
+	/**
+	 * Retrieve the Array of <i>JumpDiffusionEdgeUnit</i> Instances
+	 * 
+	 * @param timeIncrementArray Array of Time Increments
+	 * 
+	 * @return Array of <i>JumpDiffusionEdgeUnit</i> Instances
+	 */
+
+	public static final JumpDiffusionEdgeUnit[] Array (
+		final double[] timeIncrementArray)
+	{
+		JumpDiffusionEdgeUnit[] jumpDiffusionEdgeUnitArray =
+			new JumpDiffusionEdgeUnit[timeIncrementArray.length];
+
+		for (int incrementIndex = 0; incrementIndex < timeIncrementArray.length; ++incrementIndex) {
+			jumpDiffusionEdgeUnitArray[incrementIndex] =
+				JumpDiffusionEdgeUnit.GaussianDiffusion (timeIncrementArray[incrementIndex]);
+		}
+
+		return jumpDiffusionEdgeUnitArray;
+	}
+
+	/**
+	 * Retrieve the Grid of Correlated <i>JumpDiffusionEdgeUnit</i> Instances corresponding to the
+	 * 	Correlation Matrix and the Time Increment Array
+	 * 
+	 * @param correlationMatrix Correlation Matrix
+	 * @param timeIncrementArray Array of Time Increments
+	 * 
+	 * @return Grid of Correlated <i>JumpDiffusionEdgeUnit</i> Instances corresponding to the Correlation
+	 * 		   Matrix and the Time Increment Array
+	 */
+
+	public static final JumpDiffusionEdgeUnit[][] Grid (
+		final double[][] correlationMatrix,
+		final double[] timeIncrementArray)
+	{
+		JumpDiffusionEdgeUnit[][] jumpDiffusionEdgeUnitGrid = new JumpDiffusionEdgeUnit[3][];
+
+		if (null == correlationMatrix) {
+			jumpDiffusionEdgeUnitGrid[2] = Array (timeIncrementArray);
+
+			jumpDiffusionEdgeUnitGrid[1] = Array (timeIncrementArray);
+
+			jumpDiffusionEdgeUnitGrid[0] = Array (timeIncrementArray);
+		} else {
+			try {
+				double[][] jointGaussianGrid = RandomSequenceGenerator.GaussianJoint (
+					timeIncrementArray.length,
+					correlationMatrix
+				);
+
+				if (null == jointGaussianGrid) {
+					return null;
+				}
+
+				for (int factorIndex = 0; factorIndex < 3; ++factorIndex) {
+					jumpDiffusionEdgeUnitGrid[factorIndex] =
+						new JumpDiffusionEdgeUnit[timeIncrementArray.length];
+
+					for (int incrementIndex = 0;
+						incrementIndex < timeIncrementArray.length;
+						++incrementIndex)
+					{
+						jumpDiffusionEdgeUnitGrid[factorIndex][incrementIndex] = new JumpDiffusionEdgeUnit (
+							timeIncrementArray[incrementIndex],
+							jointGaussianGrid[incrementIndex][factorIndex],
+							0.
+						);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return null;
+			}
+		}
+
+		return jumpDiffusionEdgeUnitGrid;
 	}
 
 	/**

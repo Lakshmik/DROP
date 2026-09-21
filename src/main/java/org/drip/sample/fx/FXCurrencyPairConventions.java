@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,56 +93,53 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>FXCurrencyPairConventions</i> demonstrates the accessing of the Standard FX Currency Order and Currency
- * Pair Conventions.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fx/README.md">Smooth Shape Preserving FX Curve</a></li>
- *  </ul>
- * <br><br>
+ * 	Pair Conventions.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/fx/README.md">Smooth Shape Preserving FX Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class FXCurrencyPairConventions {
+public class FXCurrencyPairConventions
+{
 
 	private static final void CurrencyOrder (
-		final String strCurrency)
+		final String currency)
 		throws Exception
 	{
-		System.out.println ("\t|     " + strCurrency + "   " +
-			FXSettingContainer.CurrencyOrder (
-				strCurrency
-			) + "    |"
+		System.out.println (
+			"\t|     " + currency + "   " + FXSettingContainer.CurrencyOrder (currency) + "    |"
 		);
 	}
 
 	private static final void CurrencyPairInfo (
-		final String strCurrency1,
-		final String strCurrency2)
+		final String currency1,
+		final String currency2)
 		throws Exception
 	{
-		System.out.println ("\t|  " + strCurrency1 + "/" + strCurrency2 + " => " +
-			FXSettingContainer.CurrencyPair (
-				strCurrency1,
-				strCurrency2
-			)
+		System.out.println (
+			"\t|  " + currency1 + "/" + currency2 + " => " +
+				FXSettingContainer.CurrencyPair (currency1, currency2)
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");

@@ -25,6 +25,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -101,63 +109,66 @@ import org.drip.state.inference.*;
 
 /**
  * <i>CustomFXCurveBuilder</i> illustrates the Construction and Usage of the FX Forward Curve.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/fx/README.md">Smooth Shape Preserving FX Curve</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/fx/README.md">Smooth Shape Preserving FX Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CustomFXCurveBuilder {
+public class CustomFXCurveBuilder
+{
 
-	private static FXForwardComponent[] FXForwardCalibComponent (
-		final CurrencyPair cp,
-		final JulianDate dtSpot,
-		final String[] astrMaturityTenor)
+	private static FXForwardComponent[] FXForwardCalibrationComponent (
+		final CurrencyPair currencyPair,
+		final JulianDate spotDate,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		FXForwardComponent[] aFXForward = new FXForwardComponent[astrMaturityTenor.length];
+		FXForwardComponent[] fxForwardCalibrationComponentArray =
+			new FXForwardComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFXForward[i] = new FXForwardComponent (
-				cp.code() + "::FXFWD::" + astrMaturityTenor[i],
-				cp,
-				dtSpot.julian(),
-				dtSpot.addTenor (astrMaturityTenor[i]).julian(),
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			fxForwardCalibrationComponentArray[tenorIndex] = new FXForwardComponent (
+				currencyPair.code() + "::FXFWD::" + maturityTenorArray[tenorIndex],
+				currencyPair,
+				spotDate.julian(),
+				spotDate.addTenor (maturityTenorArray[tenorIndex]).julian(),
 				1.,
 				null
 			);
+		}
 
-		return aFXForward;
+		return fxForwardCalibrationComponentArray;
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		JulianDate dtToday = DateUtil.Today().addTenor ("0D");
+		JulianDate today = DateUtil.Today().addTenor ("0D");
 
-		CurrencyPair cp = CurrencyPair.FromCode ("USD/EUR");
+		CurrencyPair currencyPair = CurrencyPair.FromCode ("USD/EUR");
 
-		double dblSpot = 1.0993;
-
-		String[] astrMaturityTenor = new String[] {
+		double fxSpot = 1.0993;
+		String[] maturityTenorArray =
+		{
 			"1W",
 			"1M",
 			"3M",
@@ -166,14 +177,8 @@ public class CustomFXCurveBuilder {
 			"2Y",
 			"3Y"
 		};
-
-		FXForwardComponent[] aFXForward = FXForwardCalibComponent (
-			cp,
-			dtToday,
-			astrMaturityTenor
-		);
-
-		double[] adblFXForward = new double[] {
+		double[] fxForwardArray =
+		{
 			1.1000, //	"1W",
 			1.1012,	// 	"1M",
 			1.1039,	// 	"3M",
@@ -183,69 +188,54 @@ public class CustomFXCurveBuilder {
 			1.1865,	// 	"3Y"
 		};
 
-		LatentStateStretchSpec fxForwardStretch = LatentStateStretchBuilder.FXStretchSpec (
-			"FXFORWARD",
-			aFXForward,
-			"Outright",
-			adblFXForward
+		FXForwardComponent[] fxForwardComponentArray = FXForwardCalibrationComponent (
+			currencyPair,
+			today,
+			maturityTenorArray
 		);
 
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			fxForwardStretch
-		};
-
-		LinearLatentStateCalibrator llsc = new LinearLatentStateCalibrator (
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
-				null
-			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtToday,
-			dtToday,
-			cp.denomCcy()
-		);
+		ValuationParams valuationParams = new ValuationParams (today, today, currencyPair.denomCcy());
 
 		FXCurve fxCurve = ScenarioFXCurveBuilder.ShapePreservingFXCurve (
-			llsc,
-			aStretchSpec,
-			cp,
-			valParams,
+			new LinearLatentStateCalibrator (
+				new SegmentCustomBuilderControl (
+					MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+					new PolynomialFunctionSetParams (4),
+					SegmentInelasticDesignControl.Create (2, 2),
+					new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+					null
+				),
+				BoundarySettings.NaturalStandard(),
+				MultiSegmentSequence.CALIBRATE,
+				null,
+				null
+			),
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.FXStretchSpec (
+					"FXFORWARD",
+					fxForwardComponentArray,
+					"Outright",
+					fxForwardArray
+				)
+			},
+			currencyPair,
+			valuationParams,
 			null,
 			null,
 			null,
-			dblSpot
+			fxSpot
 		);
 
-		MergedDiscountForwardCurve dcUSD = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			"USD",
-			0.02
-		);
+		MergedDiscountForwardCurve eurDiscountCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (today, "EUR", 0.01);
 
-		MergedDiscountForwardCurve dcEUR = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtToday,
-			"EUR",
-			0.01
-		);
+		MergedDiscountForwardCurve usdDiscountCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (today, "USD", 0.02);
 
-		CurveSurfaceQuoteContainer csqs = new CurveSurfaceQuoteContainer();
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		csqs.setFXState (fxCurve);
+		curveSurfaceQuoteContainer.setFXState (fxCurve);
 
 		System.out.println ("\n\t|-------------------------------------------------------------------||");
 
@@ -273,78 +263,86 @@ public class CustomFXCurveBuilder {
 
 		System.out.println ("\t|-------------------------------------------------------------------||");
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			Map<String, Double> mapMeasures = aFXForward[i].value (
-				valParams,
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			Map<String, Double> measureMap = fxForwardComponentArray[tenorIndex].value (
+				valuationParams,
 				null,
-				csqs,
+				curveSurfaceQuoteContainer,
 				null
 			);
 
 			System.out.println (
-				"\t| [" + astrMaturityTenor[i] + "] => " +
-				FormatUtil.FormatDouble (adblFXForward[i], 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (fxCurve.fx (astrMaturityTenor[i]), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (mapMeasures.get ("Outright"), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (mapMeasures.get ("PIP"), 1, 4, 1.) + " | " +
+				"\t| [" + maturityTenorArray[tenorIndex] + "] => " +
+				FormatUtil.FormatDouble (fxForwardArray[tenorIndex], 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (fxCurve.fx (maturityTenorArray[tenorIndex]), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (measureMap.get ("Outright"), 1, 4, 1.) + " | " +
+				FormatUtil.FormatDouble (measureMap.get ("PIP"), 1, 4, 1.) + " | " +
 				FormatUtil.FormatDouble (
-					aFXForward[i].discountCurveBasis (
-						valParams,
-						dcEUR,
-						dcUSD,
-						dblSpot,
-						adblFXForward[i],
+					fxForwardComponentArray[tenorIndex].discountCurveBasis (
+						valuationParams,
+						eurDiscountCurve,
+						usdDiscountCurve,
+						fxSpot,
+						fxForwardArray[tenorIndex],
 						false
-					), 1, 4, 1.) + " | " +
-				FormatUtil.FormatDouble (
-					aFXForward[i].discountCurveBasis (
-						valParams,
-						dcEUR,
-						dcUSD,
-						dblSpot,
-						adblFXForward[i],
+					),
+					1,
+					4,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					fxForwardComponentArray[tenorIndex].discountCurveBasis (
+						valuationParams,
+						eurDiscountCurve,
+						usdDiscountCurve,
+						fxSpot,
+						fxForwardArray[tenorIndex],
 						true
-					), 1, 4, 1.) + " || "
+					),
+					1,
+					4,
+					1.
+				) + " || "
 			);
 		}
 
 		System.out.println ("\t|-------------------------------------------------------------------||");
 
-		int[] aiDateNode = new int[astrMaturityTenor.length];
+		int[] dateNodeArray = new int[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aiDateNode[i] = dtToday.addTenor (astrMaturityTenor[i]).julian();
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			dateNodeArray[tenorIndex] = today.addTenor (maturityTenorArray[tenorIndex]).julian();
+		}
 
-		double[] adblZeroUSDBasis = fxCurve.zeroBasis (
-			aiDateNode,
-			valParams,
-			dcEUR,
-			dcUSD,
-			true
-		);
-
-		double[] adblZeroEURBasis = fxCurve.zeroBasis (
-			aiDateNode,
-			valParams,
-			dcEUR,
-			dcUSD,
+		double[] zeroEURBasisArray = fxCurve.zeroBasis (
+			dateNodeArray,
+			valuationParams,
+			eurDiscountCurve,
+			usdDiscountCurve,
 			false
 		);
 
-		double[] adblBootstrappedUSDBasis = fxCurve.bootstrapBasis (
-			aiDateNode,
-			valParams,
-			dcEUR,
-			dcUSD,
+		double[] zeroUSDBasisArray = fxCurve.zeroBasis (
+			dateNodeArray,
+			valuationParams,
+			eurDiscountCurve,
+			usdDiscountCurve,
 			true
 		);
 
-		double[] adblBootstrappedEURBasis = fxCurve.bootstrapBasis (
-			aiDateNode,
-			valParams,
-			dcEUR,
-			dcUSD,
+		double[] bootstrappedEURBasisArray = fxCurve.bootstrapBasis (
+			dateNodeArray,
+			valuationParams,
+			eurDiscountCurve,
+			usdDiscountCurve,
 			false
+		);
+
+		double[] bootstrappedUSDBasisArray = fxCurve.bootstrapBasis (
+			dateNodeArray,
+			valuationParams,
+			eurDiscountCurve,
+			usdDiscountCurve,
+			true
 		);
 
 		System.out.println ("\n\t|-------------------------------------------------------------------||");
@@ -369,14 +367,15 @@ public class CustomFXCurveBuilder {
 
 		System.out.println ("\t|-------------------------------------------------------------------||");
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
 			System.out.println (
-				"\t| [" + astrMaturityTenor[i] + "] => " +
-				FormatUtil.FormatDouble (adblZeroUSDBasis[i], 1, 4, 100.) + " | " +
-				FormatUtil.FormatDouble (adblZeroEURBasis[i], 1, 4, 100.) + " | " +
-				FormatUtil.FormatDouble (adblBootstrappedUSDBasis[i], 1, 4, 100.) + " | " +
-				FormatUtil.FormatDouble (adblBootstrappedEURBasis[i], 1, 4, 100.) + " ||"
+				"\t| [" + maturityTenorArray[tenorIndex] + "] => " +
+				FormatUtil.FormatDouble (zeroUSDBasisArray[tenorIndex], 1, 4, 100.) + " | " +
+				FormatUtil.FormatDouble (zeroEURBasisArray[tenorIndex], 1, 4, 100.) + " | " +
+				FormatUtil.FormatDouble (bootstrappedUSDBasisArray[tenorIndex], 1, 4, 100.) + " | " +
+				FormatUtil.FormatDouble (bootstrappedEURBasisArray[tenorIndex], 1, 4, 100.) + " ||"
 			);
+		}
 
 		System.out.println ("\t|-------------------------------------------------------------------||");
 

@@ -9,16 +9,17 @@ import java.util.TreeMap;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.function.r1tor1operator.Flat;
 import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
 import org.drip.product.muni.InceptionMarketSettings;
 import org.drip.product.muni.MarketYieldTermStructure;
-import org.drip.product.muni.OrrDeLaNuez2013;
-import org.drip.product.muni.RefinancingEnsemblePnLThinStatistics;
-import org.drip.product.muni.RefinancingPathPnLGenerator;
+import org.drip.product.muni.RefinancingEnsemble;
+import org.drip.product.muni.RefinancingPathGenerator;
+import org.drip.product.refinancing.OrrDeLaNuez2013;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.ScenarioGovvieCurveBuilder;
@@ -525,20 +526,32 @@ public class ExercisePeriodMarketPnLEnsemble
 			)
 		);
 
-		RefinancingPathPnLGenerator refinancingPathPnLGenerator = new RefinancingPathPnLGenerator (
+		RefinancingPathGenerator refinancingPathPnLGenerator = new RefinancingPathGenerator (
 			bond,
 			inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (bond, simulationDateList)
 		);
 
-		TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics> dateThinStatisticsMap =
-			OrrDeLaNuez2013.Standard (
-				pathCount,
-				simulationDateList,
-				new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime)
-			).refinancingEnsemblePnL (
-				deGuillaumeRebonatoPogudinMarketYield,
-				refinancingPathPnLGenerator
-			).dateThinStatisticsMap();
+		RefinancingEnsemble refinancingEnsemble = OrrDeLaNuez2013.Standard (
+			pathCount,
+			new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
+			null
+		).refinancingEnsemble (
+			deGuillaumeRebonatoPogudinMarketYield,
+			refinancingPathPnLGenerator,
+			simulationDateList
+		);
+
+		TreeMap<JulianDate, UnivariateCentralMeasures> taxExemptGovvieCurveDirtyPriceCentralMeasuresMap =
+			refinancingEnsemble.taxExemptGovvieCurveDirtyPriceCentralMeasuresMap();
+
+		TreeMap<JulianDate, UnivariateCentralMeasures> taxableGovvieCurveDirtyPriceCentralMeasuresMap =
+			refinancingEnsemble.taxableGovvieCurveDirtyPriceCentralMeasuresMap();
+
+		TreeMap<JulianDate, UnivariateCentralMeasures> taxExemptPnLCentralMeasuresMap =
+			refinancingEnsemble.taxExemptPnLCentralMeasuresMap();
+
+		TreeMap<JulianDate, UnivariateCentralMeasures> taxablePnLCentralMeasuresMap =
+			refinancingEnsemble.taxablePnLCentralMeasuresMap();
 
 		System.out.println (
 			"\t||--------------------------------------------------------------------------------------------||"
@@ -576,58 +589,56 @@ public class ExercisePeriodMarketPnLEnsemble
 			"\t||--------------------------------------------------------------------------------------------||"
 		);
 
-		for (JulianDate date : dateThinStatisticsMap.keySet()) {
-			RefinancingEnsemblePnLThinStatistics refinancingEnsemblePnLThinStatistics =
-				dateThinStatisticsMap.get (date);
+		for (JulianDate date : taxExemptGovvieCurveDirtyPriceCentralMeasuresMap.keySet()) {
+			UnivariateCentralMeasures taxExemptGovvieCurveDirtyPriceCentralMeasures =
+				taxExemptGovvieCurveDirtyPriceCentralMeasuresMap.get (date);
 
-			UnivariateDiscreteThin taxExemptGovvieCurveDirtyPrice =
-				refinancingEnsemblePnLThinStatistics.taxExemptGovvieCurveDirtyPrice();
+			UnivariateCentralMeasures taxableGovvieCurveDirtyPriceCentralMeasures =
+				taxableGovvieCurveDirtyPriceCentralMeasuresMap.get (date);
 
-			UnivariateDiscreteThin taxableGovvieCurveDirtyPrice =
-				refinancingEnsemblePnLThinStatistics.taxableGovvieCurveDirtyPrice();
+			UnivariateCentralMeasures taxExemptPnLCentralMeasures =
+				taxExemptPnLCentralMeasuresMap.get (date);
 
-			UnivariateDiscreteThin taxExempt = refinancingEnsemblePnLThinStatistics.taxExempt();
-
-			UnivariateDiscreteThin taxable = refinancingEnsemblePnLThinStatistics.taxable();
+			UnivariateCentralMeasures taxablePnLCentralMeasures = taxablePnLCentralMeasuresMap.get (date);
 
 			System.out.println (
 				"\t|| " + date + " =>" + FormatUtil.FormatDouble (
-					taxExemptGovvieCurveDirtyPrice.average(),
+					taxExemptGovvieCurveDirtyPriceCentralMeasures.average(),
 					3,
 					3,
 					100.
 				) + " |" + FormatUtil.FormatDouble (
-					taxableGovvieCurveDirtyPrice.average(),
+					taxableGovvieCurveDirtyPriceCentralMeasures.average(),
 					3,
 					3,
 					100.
 				) + " |" + FormatUtil.FormatDouble (
-					taxExempt.average(),
+					taxExemptPnLCentralMeasures.average(),
 					2,
 					3,
 					100.
 				) + " (" + FormatUtil.FormatDouble (
-					taxExempt.minimum(),
+					taxExemptPnLCentralMeasures.minimum(),
 					2,
 					3,
 					100.
 				) + " ->" + FormatUtil.FormatDouble (
-					taxExempt.maximum(),
+					taxExemptPnLCentralMeasures.maximum(),
 					2,
 					3,
 					100.
 				) + ") |" + FormatUtil.FormatDouble (
-					taxable.average(),
+					taxablePnLCentralMeasures.average(),
 					2,
 					3,
 					100.
 				) + " (" + FormatUtil.FormatDouble (
-					taxable.minimum(),
+					taxablePnLCentralMeasures.minimum(),
 					2,
 					3,
 					100.
 				) + " ->" + FormatUtil.FormatDouble (
-					taxable.maximum(),
+					taxablePnLCentralMeasures.maximum(),
 					2,
 					3,
 					100.

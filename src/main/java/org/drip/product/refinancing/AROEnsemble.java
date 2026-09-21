@@ -1,7 +1,10 @@
 
-package org.drip.product.muni;
+package org.drip.product.refinancing;
 
-import org.drip.numerical.common.NumberUtil;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -80,9 +83,8 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>RefinancingPathPnLEntry</i> contains the Entries corresponding to the Single Path/Date Bond PnL
- * 	incurred by re-financing using Muni Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The
- * 	References are:
+ * <i>AROEnsemble</i> holds the Ensemble of Path PnL's incurred by the ARO Process using Muni Sub-markets,
+ * 	i.e., Tax-exempt, and Taxable Path Yield Curves. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -114,118 +116,125 @@ import org.drip.numerical.common.NumberUtil;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/README.md">Product Components/Baskets for Credit, FRA, FX, Govvie, Rates, and Option Asset Classes</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/muni/README.md">Refunding and Optimal Exercise Mechanics</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/refinancing/README.md">Evaluation of Product Re-financing PnL</a></td></tr>
  *  </table>
  *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class RefinancingPathPnLEntry
+public class AROEnsemble
 {
-	private double _taxableGovvieCurveCleanPrice = Double.NaN;
-	private double _taxExemptGovvieCurveCleanPrice = Double.NaN;
-	private double _initialTaxableGovvieCurveCleanPrice = Double.NaN;
-	private double _initialTaxExemptGovvieCurveCleanPrice = Double.NaN;
+	private List<AROPathEntry> _dateToAROPathList = null;
+	private UnivariateCentralMeasures _issuePnLCentralMeasures = null;
+	private UnivariateCentralMeasures _totalPnLCentralMeasures = null;
+	private UnivariateCentralMeasures _escrowPnLCentralMeasures = null;
 
 	/**
-	 * <i>RefinancingPathPnLEntry</i> Constructor
-	 * 
-	 * @param initialTaxExemptGovvieCurveCleanPrice
-	 * 		  Price generated from the Initial Tax-exempt Govvie Clean Curve
-	 * @param initialTaxableGovvieCurveCleanPrice
-	 * 		  Price generated from the Initial Taxable Govvie Clean Curve
-	 * @param taxExemptGovvieCurveCleanPrice Price generated from the Tax-exempt Govvie Clean Curve
-	 * @param taxableGovvieCurveCleanPrice Price generated from the Taxable Govvie Clean Curve
-	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
+	 * Empty <i>AROEnsemble</i> Constructor
 	 */
 
-	public RefinancingPathPnLEntry (
-		final double initialTaxExemptGovvieCurveCleanPrice,
-		final double initialTaxableGovvieCurveCleanPrice,
-		final double taxExemptGovvieCurveCleanPrice,
-		final double taxableGovvieCurveCleanPrice)
-		throws Exception
+	public AROEnsemble()
 	{
-		if (!NumberUtil.IsValid (
-				_initialTaxExemptGovvieCurveCleanPrice = initialTaxExemptGovvieCurveCleanPrice
-			) || 0. > _initialTaxExemptGovvieCurveCleanPrice ||
-			!NumberUtil.IsValid (
-				_initialTaxableGovvieCurveCleanPrice = initialTaxableGovvieCurveCleanPrice
-			) || 0. > _initialTaxableGovvieCurveCleanPrice ||
-			!NumberUtil.IsValid (_taxExemptGovvieCurveCleanPrice = taxExemptGovvieCurveCleanPrice) ||
-				0. > _taxExemptGovvieCurveCleanPrice ||
-			!NumberUtil.IsValid (_taxableGovvieCurveCleanPrice = taxableGovvieCurveCleanPrice) ||
-				0. > _taxableGovvieCurveCleanPrice)
-		{
-			throw new Exception ("RefinancingPathPnLEntry Constructor => Invalid Inputs");
+		_dateToAROPathList = new ArrayList<AROPathEntry>();
+	}
+
+	/**
+	 * Retrieve the List of <i>AROPathEntry</i> Instances
+	 * 
+	 * @return List of <i>AROPathEntry</i> Instances
+	 */
+
+	public List<AROPathEntry> dateToAROPathList()
+	{
+		return _dateToAROPathList;
+	}
+
+	/**
+	 * Retrieve the Issue PnL <i>UnivariateCentralMeasures</i> Instance
+	 * 
+	 * @return Issue PnL <i>UnivariateCentralMeasures</i> Instance
+	 */
+
+	public UnivariateCentralMeasures issuePnLCentralMeasures()
+	{
+		return _issuePnLCentralMeasures;
+	}
+
+	/**
+	 * Retrieve the Escrow PnL <i>UnivariateCentralMeasures</i> Instance
+	 * 
+	 * @return Escrow PnL <i>UnivariateCentralMeasures</i> Instance
+	 */
+
+	public UnivariateCentralMeasures escrowPnLCentralMeasures()
+	{
+		return _escrowPnLCentralMeasures;
+	}
+
+	/**
+	 * Retrieve the Total PnL <i>UnivariateCentralMeasures</i> Instance
+	 * 
+	 * @return Total PnL <i>UnivariateCentralMeasures</i> Instance
+	 */
+
+	public UnivariateCentralMeasures totalPnLCentralMeasures()
+	{
+		return _totalPnLCentralMeasures;
+	}
+
+	/**
+	 * Add the <i>AROPathEntry</i> Instance
+	 * 
+	 * @param aroPathEntry <i>AROPathEntry</i> Instance
+	 * 
+	 * @return TRUE -The <i>AROPathEntry</i> Instance successfully added
+	 */
+
+	public boolean add (
+		final AROPathEntry aroPathEntry)
+	{
+		if (null == aroPathEntry) {
+			return false;
 		}
+
+		_dateToAROPathList.add (aroPathEntry);
+
+		return true;
 	}
 
 	/**
-	 * Return the Price generated from the Initial Tax-exempt Govvie Clean Curve
+	 * Update the <i>UnivariateCentralMeasures</i> Instances
 	 * 
-	 * @return Price generated from the Initial Tax-exempt Govvie Clean Curve
+	 * @return TRUE - The <i>UnivariateCentralMeasures</i> Instances successfully updated
 	 */
 
-	public double initialTaxExemptGovvieCurveCleanPrice()
+	public boolean updateCentralMeasures()
 	{
-		return _initialTaxExemptGovvieCurveCleanPrice;
-	}
+		if (_dateToAROPathList.isEmpty()) {
+			return false;
+		}
 
-	/**
-	 * Return the Price generated from the Initial Taxable Govvie Clean Curve
-	 * 
-	 * @return Price generated from the Initial Taxable Govvie Clean Curve
-	 */
+		List<Double> issuePnLList = new ArrayList<Double>();
 
-	public double initialTaxableGovvieCurveCleanPrice()
-	{
-		return _initialTaxableGovvieCurveCleanPrice;
-	}
+		List<Double> escrowPnLList = new ArrayList<Double>();
 
-	/**
-	 * Return the Price generated from the Tax-exempt Govvie Clean Curve
-	 * 
-	 * @return Price generated from the Tax-exempt Govvie Clean Curve
-	 */
+		List<Double> totalPnLList = new ArrayList<Double>();
 
-	public double taxExemptGovvieCurveCleanPrice()
-	{
-		return _taxExemptGovvieCurveCleanPrice;
-	}
+		for (AROPathEntry aroPathEntry : _dateToAROPathList) {
+			issuePnLList.add (aroPathEntry.issuePnL());
 
-	/**
-	 * Return the Price generated from the Taxable Govvie Clean Curve
-	 * 
-	 * @return Price generated from the Taxable Govvie Clean Curve
-	 */
+			escrowPnLList.add (aroPathEntry.escrowPnL());
 
-	public double taxableGovvieCurveCleanPrice()
-	{
-		return _taxableGovvieCurveCleanPrice;
-	}
+			totalPnLList.add (aroPathEntry.pnL());
+		}
 
-	/**
-	 * Retrieve the Tax-exempt PnL
-	 * 
-	 * @return Tax-exempt PnL
-	 */
+		_issuePnLCentralMeasures = UnivariateCentralMeasures.FromList (issuePnLList);
 
-	public double taxExempt()
-	{
-		return _taxExemptGovvieCurveCleanPrice - _initialTaxExemptGovvieCurveCleanPrice;
-	}
+		_escrowPnLCentralMeasures = UnivariateCentralMeasures.FromList (escrowPnLList);
 
-	/**
-	 * Retrieve the Taxable PnL
-	 * 
-	 * @return Taxable PnL
-	 */
+		_totalPnLCentralMeasures = UnivariateCentralMeasures.FromList (totalPnLList);
 
-	public double taxable()
-	{
-		return _taxableGovvieCurveCleanPrice - _initialTaxableGovvieCurveCleanPrice;
+		return true;
 	}
 }

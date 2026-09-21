@@ -96,12 +96,12 @@ public class BondEOSMetrics {
 	private double[][] _aadblForwardPrice = null;
 	private double _dblOASTM = java.lang.Double.NaN;
 	private boolean[][] _aabExerciseIndicator = null;
-	private org.drip.measure.statistics.UnivariateDiscreteThin _udtOptimalExerciseOAS = null;
-	private org.drip.measure.statistics.UnivariateDiscreteThin _udtOptimalExercisePrice = null;
-	private org.drip.measure.statistics.UnivariateDiscreteThin _udtOptimalExerciseValue = null;
-	private org.drip.measure.statistics.UnivariateDiscreteThin _udtOptimalExerciseOASGap = null;
-	private org.drip.measure.statistics.UnivariateDiscreteThin _udtOptimalExerciseDuration = null;
-	private org.drip.measure.statistics.UnivariateDiscreteThin _udtOptimalExerciseConvexity = null;
+	private org.drip.measure.statistics.UnivariateCentralMeasures _udtOptimalExerciseOAS = null;
+	private org.drip.measure.statistics.UnivariateCentralMeasures _udtOptimalExercisePrice = null;
+	private org.drip.measure.statistics.UnivariateCentralMeasures _udtOptimalExerciseValue = null;
+	private org.drip.measure.statistics.UnivariateCentralMeasures _udtOptimalExerciseOASGap = null;
+	private org.drip.measure.statistics.UnivariateCentralMeasures _udtOptimalExerciseDuration = null;
+	private org.drip.measure.statistics.UnivariateCentralMeasures _udtOptimalExerciseConvexity = null;
 
 	/**
 	 * BondEOSMetrics Constructor
@@ -134,22 +134,22 @@ public class BondEOSMetrics {
 		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblOASTM = dblOASTM))
 			throw new java.lang.Exception ("BondEOSMetrics Constructor => Invalid Inputs");
 
-		_udtOptimalExercisePrice = new org.drip.measure.statistics.UnivariateDiscreteThin
+		_udtOptimalExercisePrice = new org.drip.measure.statistics.UnivariateCentralMeasures
 			(adblOptimalExercisePrice);
 
-		_udtOptimalExerciseValue = new org.drip.measure.statistics.UnivariateDiscreteThin
+		_udtOptimalExerciseValue = new org.drip.measure.statistics.UnivariateCentralMeasures
 			(adblOptimalExerciseValue);
 
-		_udtOptimalExerciseOAS = new org.drip.measure.statistics.UnivariateDiscreteThin
+		_udtOptimalExerciseOAS = new org.drip.measure.statistics.UnivariateCentralMeasures
 			(adblOptimalExerciseOAS);
 
-		_udtOptimalExerciseOASGap = new org.drip.measure.statistics.UnivariateDiscreteThin
+		_udtOptimalExerciseOASGap = new org.drip.measure.statistics.UnivariateCentralMeasures
 			(adblOptimalExerciseOASGap);
 
-		_udtOptimalExerciseDuration = new org.drip.measure.statistics.UnivariateDiscreteThin
+		_udtOptimalExerciseDuration = new org.drip.measure.statistics.UnivariateCentralMeasures
 			(adblOptimalExerciseDuration);
 
-		_udtOptimalExerciseConvexity = new org.drip.measure.statistics.UnivariateDiscreteThin
+		_udtOptimalExerciseConvexity = new org.drip.measure.statistics.UnivariateCentralMeasures
 			(adblOptimalExerciseConvexity);
 
 		_aadblForwardPrice = aadblForwardPrice;
@@ -162,7 +162,7 @@ public class BondEOSMetrics {
 	 * @return The Optimal Exercise Price UDT
 	 */
 
-	public org.drip.measure.statistics.UnivariateDiscreteThin optimalExercisePrice()
+	public org.drip.measure.statistics.UnivariateCentralMeasures optimalExercisePrice()
 	{
 		return _udtOptimalExercisePrice;
 	}
@@ -173,7 +173,7 @@ public class BondEOSMetrics {
 	 * @return The Optimal Exercise Value UDT
 	 */
 
-	public org.drip.measure.statistics.UnivariateDiscreteThin optimalExerciseValue()
+	public org.drip.measure.statistics.UnivariateCentralMeasures optimalExerciseValue()
 	{
 		return _udtOptimalExerciseValue;
 	}
@@ -184,7 +184,7 @@ public class BondEOSMetrics {
 	 * @return The Optimal Exercise OAS UDT
 	 */
 
-	public org.drip.measure.statistics.UnivariateDiscreteThin optimalExerciseOAS()
+	public org.drip.measure.statistics.UnivariateCentralMeasures optimalExerciseOAS()
 	{
 		return _udtOptimalExerciseOAS;
 	}
@@ -195,7 +195,7 @@ public class BondEOSMetrics {
 	 * @return The Optimal Exercise OAS Gap UDT
 	 */
 
-	public org.drip.measure.statistics.UnivariateDiscreteThin optimalExerciseOASGap()
+	public org.drip.measure.statistics.UnivariateCentralMeasures optimalExerciseOASGap()
 	{
 		return _udtOptimalExerciseOASGap;
 	}
@@ -206,7 +206,7 @@ public class BondEOSMetrics {
 	 * @return The Optimal Exercise Duration UDT
 	 */
 
-	public org.drip.measure.statistics.UnivariateDiscreteThin optimalExerciseDuration()
+	public org.drip.measure.statistics.UnivariateCentralMeasures optimalExerciseDuration()
 	{
 		return _udtOptimalExerciseDuration;
 	}
@@ -217,7 +217,7 @@ public class BondEOSMetrics {
 	 * @return The Optimal Exercise Convexity UDT
 	 */
 
-	public org.drip.measure.statistics.UnivariateDiscreteThin optimalExerciseConvexity()
+	public org.drip.measure.statistics.UnivariateCentralMeasures optimalExerciseConvexity()
 	{
 		return _udtOptimalExerciseConvexity;
 	}

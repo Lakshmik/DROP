@@ -161,8 +161,7 @@ public class JurisdictionIRSFuturesValuation
 			"3M",
 			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
 			null,
-			ForwardLabel.Create (currency, "3M"
-			),
+			ForwardLabel.Create (currency, "3M"),
 			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
 			0.
 		);

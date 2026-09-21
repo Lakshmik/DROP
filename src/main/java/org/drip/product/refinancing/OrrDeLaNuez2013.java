@@ -1,11 +1,17 @@
 
-package org.drip.product.muni;
+package org.drip.product.refinancing;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.drip.analytics.date.JulianDate;
 import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
+import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
+import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
+import org.drip.product.muni.RefinancingEnsemble;
+import org.drip.product.muni.RefinancingPathEntry;
+import org.drip.product.muni.RefinancingPathGenerator;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -119,7 +125,7 @@ import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/README.md">Product Components/Baskets for Credit, FRA, FX, Govvie, Rates, and Option Asset Classes</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/muni/README.md">Refunding and Optimal Exercise Mechanics</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/refinancing/README.md">Evaluation of Product Re-financing PnL</a></td></tr>
  *  </table>
  *	<br>
  *
@@ -128,10 +134,10 @@ import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 
 public class OrrDeLaNuez2013
 {
-	private static final boolean _Blog = true;
+	private static final boolean _Blog = false;
 
 	private int _pathCount = Integer.MIN_VALUE;
-	private List<JulianDate> _simulationDateList = null;
+	private double[][] _yieldCorrelationMatrix = null;
 	private OrnsteinUhlenbeckDriftWander _escrowOrnsteinUhlenbeckDriftWander = null;
 	private OrnsteinUhlenbeckDriftWander _taxableOrnsteinUhlenbeckDriftWander = null;
 	private OrnsteinUhlenbeckDriftWander _taxExemptOrnsteinUhlenbeckDriftWander = null;
@@ -140,24 +146,24 @@ public class OrrDeLaNuez2013
 	 * Construct a Standard Instance of <i>OrrDeLaNuez2013</i>
 	 * 
 	 * @param pathCount Number of Simulation Paths
-	 * @param simulationDateList List of Simulation Dates
 	 * @param ornsteinUhlenbeckDriftWander <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 * @param yieldCorrelationMatrix Matrix of Yield Correlation Weiners
 	 * 
 	 * @return Standard Instance of <i>OrrDeLaNuez2013</i>
 	 */
 
 	public static final OrrDeLaNuez2013 Standard (
 		final int pathCount,
-		final List<JulianDate> simulationDateList,
-		final OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander)
+		final OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander,
+		final double[][] yieldCorrelationMatrix)
 	{
 		try {
 			return new OrrDeLaNuez2013 (
 				pathCount,
-				simulationDateList,
 				ornsteinUhlenbeckDriftWander,
 				ornsteinUhlenbeckDriftWander,
-				ornsteinUhlenbeckDriftWander
+				ornsteinUhlenbeckDriftWander,
+				yieldCorrelationMatrix
 			);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -170,31 +176,32 @@ public class OrrDeLaNuez2013
 	 * <i>OrrDeLaNuez2013</i> Constructor
 	 * 
 	 * @param pathCount Number of Simulation Paths
-	 * @param simulationDateList List of Simulation Dates
 	 * @param taxExemptOrnsteinUhlenbeckDriftWander Tax-exempt Yield <i>OrnsteinUhlenbeckDriftWander</i>
 	 * 												Instance
 	 * @param taxableOrnsteinUhlenbeckDriftWander Taxable Yield <i>OrnsteinUhlenbeckDriftWander</i> Instance
 	 * @param escrowOrnsteinUhlenbeckDriftWander Escrow Yield <i>OrnsteinUhlenbeckDriftWander</i> Instance
+	 * @param yieldCorrelationMatrix Matrix of Yield Correlation Weiners
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public OrrDeLaNuez2013 (
 		final int pathCount,
-		final List<JulianDate> simulationDateList,
 		final OrnsteinUhlenbeckDriftWander taxExemptOrnsteinUhlenbeckDriftWander,
 		final OrnsteinUhlenbeckDriftWander taxableOrnsteinUhlenbeckDriftWander,
-		final OrnsteinUhlenbeckDriftWander escrowOrnsteinUhlenbeckDriftWander)
+		final OrnsteinUhlenbeckDriftWander escrowOrnsteinUhlenbeckDriftWander,
+		final double[][] yieldCorrelationMatrix)
 		throws Exception
 	{
 		if (0 >= (_pathCount = pathCount) ||
-			null == (_simulationDateList = simulationDateList) || 0 == _simulationDateList.size() ||
 			null == (_taxExemptOrnsteinUhlenbeckDriftWander = taxExemptOrnsteinUhlenbeckDriftWander) ||
 			null == (_taxableOrnsteinUhlenbeckDriftWander = taxableOrnsteinUhlenbeckDriftWander) ||
 			null == (_escrowOrnsteinUhlenbeckDriftWander = escrowOrnsteinUhlenbeckDriftWander))
 		{
 			throw new Exception ("OrrDeLaNuez2013 Constructor => Invalid Inputs");
 		}
+
+		_yieldCorrelationMatrix = yieldCorrelationMatrix;
 	}
 
 	/**
@@ -206,17 +213,6 @@ public class OrrDeLaNuez2013
 	public int pathCount()
 	{
 		return _pathCount;
-	}
-
-	/**
-	 * Retrieve the List of Simulation Dates
-	 * 
-	 * @return List of Simulation Dates
-	 */
-
-	public List<JulianDate> simulationDateList()
-	{
-		return _simulationDateList;
 	}
 
 	/**
@@ -253,19 +249,32 @@ public class OrrDeLaNuez2013
 	}
 
 	/**
-	 * Generate the <i>RefinancingEnsemblePnL</i> Instance for the Specified Bond and Market Inputs
+	 * Retrieve the Matrix of Yield Correlation Weiners
 	 * 
-	 * @param deGuillaumeRebonatoPogudinMarketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
-	 * @param refinancingPathPnLGenerator Bond <i>RefinancingPathPnLGenerator</i> Instance
-	 * 
-	 * @return <i>RefinancingEnsemblePnL</i> Instance for the Specified Bond and Market Inputs
+	 * @return Matrix of Yield Correlation Weiners
 	 */
 
-	public RefinancingEnsemblePnL refinancingEnsemblePnL (
-		final DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield,
-		final RefinancingPathPnLGenerator refinancingPathPnLGenerator)
+	public double[][] yieldCorrelationMatrix()
 	{
-		if (null == refinancingPathPnLGenerator) {
+		return _yieldCorrelationMatrix;
+	}
+
+	/**
+	 * Generate the <i>RefinancingEnsemble</i> Instance for the Specified Bond and Market Inputs
+	 * 
+	 * @param deGuillaumeRebonatoPogudinMarketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
+	 * @param refinancingPathGenerator Bond <i>RefinancingPathGenerator</i> Instance
+	 * @param simulationDateList List of Simulation Dates
+	 * 
+	 * @return <i>RefinancingEnsemble</i> Instance for the Specified Bond and Market Inputs
+	 */
+
+	public RefinancingEnsemble refinancingEnsemble (
+		final DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield,
+		final RefinancingPathGenerator refinancingPathGenerator,
+		final List<JulianDate> simulationDateList)
+	{
+		if (null == refinancingPathGenerator) {
 			return null;
 		}
 
@@ -273,25 +282,26 @@ public class OrrDeLaNuez2013
 			_taxExemptOrnsteinUhlenbeckDriftWander,
 			_taxableOrnsteinUhlenbeckDriftWander,
 			_escrowOrnsteinUhlenbeckDriftWander,
-			deGuillaumeRebonatoPogudinMarketYield
+			deGuillaumeRebonatoPogudinMarketYield,
+			_yieldCorrelationMatrix
 		);
 
 		if (null == deGuillaumeRebonatoPogudin) {
 			return null;
 		}
 
-		RefinancingEnsemblePnL refinancingEnsemblePnL = new RefinancingEnsemblePnL();
+		RefinancingEnsemble refinancingEnsemble = new RefinancingEnsemble();
 
 		for (int pathIndex = 0; pathIndex < _pathCount; ++pathIndex) {
 			if (_Blog) {
 				System.out.println ("\t|| Simulation Path #: " + pathIndex);
 			}
 
-			TreeMap<JulianDate, RefinancingPathPnLEntry> refinancingPathPnLEntryMap =
-				refinancingPathPnLGenerator.dateEntryMap (
+			TreeMap<JulianDate, RefinancingPathEntry> refinancingPathPnLEntryMap =
+				refinancingPathGenerator.generate (
 					deGuillaumeRebonatoPogudin.evolve (
 						deGuillaumeRebonatoPogudinMarketYield,
-						_simulationDateList
+						simulationDateList
 					)
 				);
 
@@ -300,10 +310,73 @@ public class OrrDeLaNuez2013
 			}
 
 			for (JulianDate date : refinancingPathPnLEntryMap.keySet()) {
-				refinancingEnsemblePnL.add (date, refinancingPathPnLEntryMap.get (date));
+				refinancingEnsemble.add (date, refinancingPathPnLEntryMap.get (date));
 			}
 		}
 
-		return refinancingEnsemblePnL;
+		return refinancingEnsemble.updateCentralMeasures() ? refinancingEnsemble : null;
+	}
+
+	/**
+	 * Generate the <i>AROEnsemble</i> Instance for the Specified Bond and Market Inputs
+	 * 
+	 * @param deGuillaumeRebonatoPogudinMarketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
+	 * @param aroPathGenerator Bond <i>AROPathGenerator</i> Instance
+	 * @param taxExempt TRUE - Apply Tax-exempt Re-financing
+	 * 
+	 * @return <i>AROEnsemble</i> Instance for the Specified Bond and Market Inputs
+	 */
+
+	public AROEnsemble aroEnsemble (
+		final DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield,
+		final AROPathGenerator aroPathGenerator,
+		final boolean taxExempt)
+	{
+		if (null == aroPathGenerator) {
+			return null;
+		}
+
+		AROSetting aroSetting = aroPathGenerator.setting();
+
+		List<JulianDate> simulationDateList = new ArrayList<JulianDate>();
+
+		simulationDateList.add (aroSetting.embeddedOptionExerciseDate());
+
+		simulationDateList.add (aroSetting.refinancingDate());
+
+		DeGuillaumeRebonatoPogudin deGuillaumeRebonatoPogudin = DeGuillaumeRebonatoPogudin.Standard (
+			_taxExemptOrnsteinUhlenbeckDriftWander,
+			_taxableOrnsteinUhlenbeckDriftWander,
+			_escrowOrnsteinUhlenbeckDriftWander,
+			deGuillaumeRebonatoPogudinMarketYield,
+			_yieldCorrelationMatrix
+		);
+
+		if (null == deGuillaumeRebonatoPogudin) {
+			return null;
+		}
+
+		AROEnsemble aroEnsemble = new AROEnsemble();
+
+		for (int pathIndex = 0; pathIndex < _pathCount; ++pathIndex) {
+			if (_Blog) {
+				System.out.println ("\t|| Simulation Path #: " + pathIndex);
+			}
+
+			if (!aroEnsemble.add (
+				aroPathGenerator.generate (
+					deGuillaumeRebonatoPogudin.evolve (
+						deGuillaumeRebonatoPogudinMarketYield,
+						simulationDateList
+					),
+					taxExempt
+				)
+			))
+			{
+				return null;
+			}
+		}
+
+		return aroEnsemble.updateCentralMeasures() ? aroEnsemble : null;
 	}
 }

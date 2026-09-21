@@ -6,6 +6,7 @@ import org.drip.analytics.definition.LatentStateStatic;
 import org.drip.function.r1tor1custom.QuadraticRationalShapeControl;
 import org.drip.market.otc.*;
 import org.drip.param.creator.*;
+import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.valuation.*;
 import org.drip.product.creator.*;
 import org.drip.product.definition.CalibratableComponent;
@@ -27,6 +28,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,7 +113,7 @@ import org.drip.state.inference.*;
 
 /**
  * <i>ShapePreservingZeroSmooth</i> demonstrates the usage of different shape preserving and smoothing
- * techniques involved in the funding curve creation. It shows the following:
+ * 	techniques involved in the funding curve creation. It shows the following:
  *  
  * <br><br>
  *  <ul>
@@ -200,101 +209,81 @@ import org.drip.state.inference.*;
  *  			construction methodologies for a sequence of bespoke swap instruments.
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/funding/README.md">Shape Preserving Local Funding Curve</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/funding/README.md">Shape Preserving Local Funding Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ShapePreservingZeroSmooth {
+public class ShapePreservingZeroSmooth
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		ForwardLabel forwardLabel = ForwardLabel.Create ("USD", "3M");
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				ForwardLabel.Create (
-					"USD",
-					"3M"
-				)
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
+
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				forwardLabel
 			);
-
-		return aDeposit;
-	}
-
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor)
-		throws Exception
-	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			FixFloatComponent irs = OTCIRS (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				0.
-			);
-
-			irs.setPrimaryCode ("IRS." + astrMaturityTenor[i] + "." + strCurrency);
-
-			aIRS[i] = irs;
 		}
 
-		return aIRS;
+		return depositArray;
+	}
+
+	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
+		final JulianDate effectiveDate,
+		final String currency,
+		final String[] maturityTenorArray)
+		throws Exception
+	{
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
+
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			irsArray[maturityIndex] = OTCIRS (
+				effectiveDate,
+				currency,
+				maturityTenorArray[maturityIndex],
+				0.
+			);
+		}
+
+		return irsArray;
 	}
 
 	/*
@@ -332,23 +321,18 @@ public class ShapePreservingZeroSmooth {
 	 * 		construction methodologies.
 	 *  - Cross-Comparison of the Swap Calibration Instrument "Rate" metric across the different curve
 	 *  	construction methodologies for a sequence of bespoke swap instruments.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void ShapePreservingDFZeroSmoothSample (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
+		SingleStreamComponent[] depositArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
 				2,
 				7,
 				14,
@@ -357,99 +341,62 @@ public class ShapePreservingZeroSmooth {
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
+		double[] depositQuoteArray =
+		{
 			0.0013,
 			0.0017,
 			0.0018,
 			0.0020,
 			0.0023
 		};
-
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"DEPOSIT",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of EDF Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aEDFComp = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtSpot,
-			8,
-			strCurrency
-		);
-
-		double[] adblEDFQuote = new double[] {
-			0.0027,
-			0.0032,
-			0.0041,
-			0.0054,
-			0.0077,
-			0.0104,
-			0.0134,
-			0.0160
+		double[] swapQuoteArray =
+		{
+			0.0166,
+			0.0206,
+			0.0241,
+			0.0269,
+			0.0292,
+			0.0311,
+			0.0326,
+			0.0340,
+			0.0351,
+			0.0375,
+			0.0393,
+			0.0402,
+			0.0407,
+			0.0409,
+			0.0409
 		};
 
-		/*
-		 * Construct the EDF Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec edfStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"EDF",
-			aEDFComp,
-			"ForwardRate",
-			adblEDFQuote
-		);
-
-		/*
-		 * Construct the Array of Swap Instruments and their Quotes from the given set of parameters
-		 */
-
-		FixFloatComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
+		FixFloatComponent[] irsArray = SwapInstrumentsFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y"
 			}
 		);
 
-		double[] adblSwapQuote = new double[] {
-			0.0166, 0.0206, 0.0241, 0.0269, 0.0292, 0.0311, 0.0326, 0.0340, 0.0351, 0.0375, 0.0393, 0.0402, 0.0407, 0.0409, 0.0409
-		};
-
-		/*
-		 * Construct the Swap Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec swapStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"SWAP",
-			aSwapComp,
-			"SwapRate",
-			adblSwapQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {depositStretch, edfStretch, swapStretch};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
+		LinearLatentStateCalibrator linearLatentStateCalibrator = new LinearLatentStateCalibrator (
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_EXPONENTIAL_MIXTURE,
 				new ExponentialMixtureSetParams (
-					new double[] {
+					new double[]
+					{
 						0.01,
 						0.05,
 						0.25
@@ -471,304 +418,306 @@ public class ShapePreservingZeroSmooth {
 			null
 		);
 
-		/*
-		 * Set up the Global Curve Control parameters as follows:
-		 * 	- Zero Rate Quantification Metric
-		 * 	- Cubic Polynomial Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		GlobalControlCurveParams gccp = new GlobalControlCurveParams (
-			LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
+		MergedDiscountForwardCurve shapePreservingDiscountCurve =
+			ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+				currency,
+				linearLatentStateCalibrator,
+				new LatentStateStretchSpec[]
+				{
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"DEPOSIT",
+						depositArray,
+						"ForwardRate",
+						depositQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"EDF",
+						SingleStreamComponentBuilder.ForwardRateFuturesPack (spotDate, 8, currency),
+						"ForwardRate",
+						new double[]
+						{
+							0.0027,
+							0.0032,
+							0.0041,
+							0.0054,
+							0.0077,
+							0.0104,
+							0.0134,
+							0.0160
+						}
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"SWAP",
+						irsArray,
+						"SwapRate",
+						swapQuoteArray
+					)
+				},
+				valuationParams,
+				null,
+				null,
+				null,
+				1.
+			);
+
+		CurveSurfaceQuoteContainer shapePreservingMarketParams =
+			MarketParamsBuilder.Create (shapePreservingDiscountCurve, null, null, null, null, null, null);
+
+		CurveSurfaceQuoteContainer globallySmoothMarketParams = MarketParamsBuilder.Create (
+			ScenarioDiscountCurveBuilder.SmoothingGlobalControlBuild (
+				shapePreservingDiscountCurve,
+				linearLatentStateCalibrator,
+				new GlobalControlCurveParams (
+					LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
+					new SegmentCustomBuilderControl (
+						MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+						new PolynomialFunctionSetParams (4),
+						SegmentInelasticDesignControl.Create (2, 2),
+						new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+						null
+					),
+					BoundarySettings.NaturalStandard(),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null
 				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
+				valuationParams,
+				null,
+				null,
 				null
 			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
+			null,
+			null,
+			null,
+			null,
 			null,
 			null
 		);
 
-		/*
-		 * Set up the Local Curve Control parameters as follows:
-		 * 	- C1 Bessel Monotone Smoothener with no spurious extrema elimination and no monotone filter
-		 * 	- Zero Rate Quantification Metric
-		 * 	- Cubic Polynomial Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LocalControlCurveParams lccp = new LocalControlCurveParams (
-			LocalMonotoneCkGenerator.C1_BESSEL,
-			LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
+		CurveSurfaceQuoteContainer locallySmoothMarketParams = MarketParamsBuilder.Create (
+			ScenarioDiscountCurveBuilder.SmoothingLocalControlBuild (
+				shapePreservingDiscountCurve,
+				linearLatentStateCalibrator,
+				new LocalControlCurveParams (
+					LocalMonotoneCkGenerator.C1_BESSEL,
+					LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
+					new SegmentCustomBuilderControl (
+						MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+						new PolynomialFunctionSetParams (4),
+						SegmentInelasticDesignControl.Create (2, 2),
+						new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+						null
+					),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null,
+					false,
+					false
 				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
+				valuationParams,
+				null,
+				null,
 				null
 			),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null,
-			false,
-			false
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit, Futures, and Swap Stretches.
-		 */
-
-		MergedDiscountForwardCurve dcShapePreserving = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
-			valParams,
 			null,
 			null,
 			null,
-			1.
-		);
-
-		/*
-		 * Construct the Globally Smoothened Discount Curve by applying the linear curve calibrator and the
-		 * 	Global Curve Control parameters to the array of Cash and Swap Stretches and the shape preserving
-		 * 	discount curve.
-		 */
-
-		MergedDiscountForwardCurve dcGloballySmooth = ScenarioDiscountCurveBuilder.SmoothingGlobalControlBuild (
-			dcShapePreserving,
-			lcc,
-			gccp,
-			valParams,
 			null,
 			null,
 			null
 		);
 
-		/*
-		 * Construct the Locally Smoothened Discount Curve by applying the linear curve calibrator and the
-		 * 	Local Curve Control parameters to the array of Cash and Swap Stretches and the shape preserving
-		 *  discount curve.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		MergedDiscountForwardCurve dcLocallySmooth = ScenarioDiscountCurveBuilder.SmoothingLocalControlBuild (
-			dcShapePreserving,
-			lcc,
-			lccp,
-			valParams,
-			null,
-			null,
-			null
-		);
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		/*
-		 * Cross-Comparison of the Deposit Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		System.out.println ("\t||               DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  ");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+			System.out.println (
+				"\t|| [" + depositArray[depositIndex].maturityDate() + "] =>" + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
+						null,
+						shapePreservingMarketParams,
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
+						null,
+						globallySmoothMarketParams,
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
+						null,
+						locallySmoothMarketParams,
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					depositQuoteArray[depositIndex],
+					1,
+					6,
+					1.
+				)
+			);
+		}
 
 		System.out.println ("\n\t----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t               DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||               SWAP INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  ");
+		System.out.println ("\t||        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  ");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		for (int i = 0; i < aDepositComp.length; ++i)
-			System.out.println ("\t[" + aDepositComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (
-					aDepositComp[i].measureValue (
-						valParams,
+		for (int irsIndex = 0; irsIndex < irsArray.length; ++irsIndex) {
+			System.out.println (
+				"\t|| [" + irsArray[irsIndex].maturityDate() + "] =>" + FormatUtil.FormatDouble (
+					irsArray[irsIndex].measureValue (
+						valuationParams,
 						null,
-						MarketParamsBuilder.Create (dcShapePreserving, null, null, null, null, null, null),
+						shapePreservingMarketParams,
 						null,
-						"Rate"),
-					1, 6, 1.) + "   |   " +
-				FormatUtil.FormatDouble (
-					aDepositComp[i].measureValue (
-						valParams,
+						"CalibSwapRate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					irsArray[irsIndex].measureValue (
+						valuationParams,
 						null,
-						MarketParamsBuilder.Create (dcGloballySmooth, null, null, null, null, null, null),
+						locallySmoothMarketParams,
 						null,
-						"Rate"),
-					1, 6, 1.) + "   |   " +
-				FormatUtil.FormatDouble (
-					aDepositComp[i].measureValue (
-						valParams,
-						null,
-						MarketParamsBuilder.Create (dcLocallySmooth, null, null, null, null, null, null),
-						null,
-						"Rate"),
-					1, 6, 1.) + "   |   " +
-				FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.)
+						"CalibSwapRate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					swapQuoteArray[irsIndex],
+					1,
+					6,
+					1.
+				)
 			);
+		}
 
-		/*
-		 * Cross-Comparison of the Swap Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t               SWAP INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  ");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aSwapComp.length; ++i)
-			System.out.println ("\t[" + aSwapComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (
-					aSwapComp[i].measureValue (
-						valParams,
-						null,
-						MarketParamsBuilder.Create (dcShapePreserving, null, null, null, null, null, null),
-						null,
-						"CalibSwapRate"),
-					1, 6, 1.) + "   |   " +
-				/* FormatUtil.FormatDouble (
-					aSwapComp[i].measureValue (
-						new ValuationParams (dtToday, dtToday, "MXN"), null,
-						MarketParamsBuilder.Create (dcGloballySmooth, null, null, null, null, null, null),
-						null,
-						"CalibSwapRate"),
-					1, 6, 1.) + "   |   " + */
-				FormatUtil.FormatDouble (
-					aSwapComp[i].measureValue (
-						valParams,
-						null,
-						MarketParamsBuilder.Create (dcLocallySmooth, null, null, null, null, null, null),
-						null,
-						"CalibSwapRate"),
-					1, 6, 1.) + "   |   " +
-				FormatUtil.FormatDouble (adblSwapQuote[i], 1, 6, 1.)
-			);
-
-		/*
-		 * Cross-Comparison of the Swap Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies for a sequence of bespoke swap instruments.
-		 */
-
-		CalibratableComponent[] aCC = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"3Y", "6Y", "9Y", "12Y", "15Y", "18Y", "21Y", "24Y", "27Y", "30Y"
+		CalibratableComponent[] calibratableComponentArray = SwapInstrumentsFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"3Y",
+				"6Y",
+				"9Y",
+				"12Y",
+				"15Y",
+				"18Y",
+				"21Y",
+				"24Y",
+				"27Y",
+				"30Y"
 			}
 		);
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t           BESPOKE SWAPS PAR RATE");
+		System.out.println ("\t||           BESPOKE SWAPS PAR RATE");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t        SHAPE PRESERVING   |  SMOOTHING #1 |  SMOOTHING #2");
+		System.out.println ("\t||        SHAPE PRESERVING   |  SMOOTHING #1 |  SMOOTHING #2");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		for (int i = 0; i < aCC.length; ++i)
-			System.out.println ("\t[" + aCC[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (
-					aCC[i].measureValue (
-						valParams,
+		for (int calibratableComponentIndex = 0;
+			calibratableComponentIndex < calibratableComponentArray.length;
+			++calibratableComponentIndex)
+		{
+			System.out.println (
+				"\t|| [" + calibratableComponentArray[calibratableComponentIndex].maturityDate() + "] =>" +
+					FormatUtil.FormatDouble (
+						calibratableComponentArray[calibratableComponentIndex].measureValue (
+							valuationParams,
+							null,
+							shapePreservingMarketParams,
+							null,
+							"CalibSwapRate"
+						),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					calibratableComponentArray[calibratableComponentIndex].measureValue (
+						valuationParams,
 						null,
-						MarketParamsBuilder.Create (dcShapePreserving, null, null, null, null, null, null),
+						locallySmoothMarketParams,
 						null,
 						"CalibSwapRate"
 					),
-				1, 6, 1.) + "   |   " +
-				/* FormatUtil.FormatDouble (
-					aCC[i].measureValue (new ValuationParams (dtToday, dtToday, "MXN"), null,
-					MarketParamsBuilder.Create (dcGloballySmooth, null, null, null, null, null, null),
-					null,
-					"CalibSwapRate"),
-				1, 6, 1.) + "   |   " + */
-				FormatUtil.FormatDouble (
-					aCC[i].measureValue (
-						valParams,
-						null,
-						MarketParamsBuilder.Create (dcLocallySmooth, null, null, null, null, null, null),
-						null,
-						"CalibSwapRate"
-					),
-				1, 6, 1.)
+					1,
+					6,
+					1.
+				)
 			);
+		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2017,
-			DateUtil.DECEMBER,
-			21
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2017, DateUtil.DECEMBER, 21);
 
-		String strCurrency = "USD";
+		String currency = "USD";
 
-		ShapePreservingDFZeroSmoothSample (
-			dtSpot,
-			strCurrency
-		);
+		ShapePreservingDFZeroSmoothSample (spotDate, currency);
 
 		EnvManager.TerminateEnv();
 	}

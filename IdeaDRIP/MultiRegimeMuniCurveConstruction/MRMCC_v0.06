@@ -182,4 +182,10 @@
 			- Taxable vs. tax-free refunding
 			- Optimal exercise as a function of rate and time
  --------------------------
+ 6.5) Analysis and Enhancement: (Cumulative => 12/12)
+	- Correlated Ornstein-Uhlenbeck Yield Evolution
+	- Ornstein-Uhlenbeck Dynamics Regime Based NPV Savings
+	- NPV Savings at Typical Exercise YTW
+	- Impact of Negative Escrow Arbitrage
+ --------------------------
  --------------------------

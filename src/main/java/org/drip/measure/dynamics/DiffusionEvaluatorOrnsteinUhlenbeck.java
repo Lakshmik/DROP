@@ -1,6 +1,8 @@
 
 package org.drip.measure.dynamics;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.r1tor1operator.Flat;
 import org.drip.measure.realization.JumpDiffusionVertex;
 import org.drip.numerical.common.NumberUtil;
 
@@ -97,10 +99,10 @@ import org.drip.numerical.common.NumberUtil;
  * 		<li>Construct a Standard Instance of <i>DiffusionEvaluatorOrnsteinUhlenbeck</i></li>
  * 		<li>Construct a Zero-Mean Instance of <i>DiffusionEvaluatorOrnsteinUhlenbeck</i></li>
  * 		<li>Retrieve the Mean Reversion Level</li>
- * 		<li>Retrieve the Burstiness Parameter</li>
- * 		<li>Retrieve the Relaxation Time</li>
- * 		<li>Retrieve the Reference Relaxation Time Scale</li>
- * 		<li>Retrieve the Reference Burstiness Scale</li>
+ * 		<li>Retrieve the Burstiness Parameter Function</li>
+ * 		<li>Retrieve the Relaxation Time Function</li>
+ * 		<li>Retrieve the Reference Relaxation Time Scale Function</li>
+ * 		<li>Retrieve the Reference Burstiness Scale Function</li>
  * 		<li>Retrieve the Reference Mean Reversion Level Scale</li>
  *  </ul>
  *
@@ -127,22 +129,22 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 	 * Construct a Standard Instance of <i>DiffusionEvaluatorOrnsteinUhlenbeck</i>
 	 * 
 	 * @param meanReversionLevel The Mean Reversion Level
-	 * @param burstiness The Burstiness Parameter
-	 * @param relaxationTime The Relaxation Time
+	 * @param burstinessFunction The Burstiness Function
+	 * @param relaxationTimeFunction The Relaxation Time Function
 	 * 
 	 * @return The Standard Instance of <i>DiffusionEvaluatorOrnsteinUhlenbeck</i>
 	 */
 
 	public static final DiffusionEvaluatorOrnsteinUhlenbeck Standard (
 		final double meanReversionLevel,
-		final double burstiness,
-		final double relaxationTime)
+		final R1ToR1 burstinessFunction,
+		final R1ToR1 relaxationTimeFunction)
 	{
 		try {
 			return new DiffusionEvaluatorOrnsteinUhlenbeck (
 				meanReversionLevel,
-				burstiness,
-				relaxationTime,
+				burstinessFunction,
+				relaxationTimeFunction,
 				new LocalEvaluator()
 				{
 					@Override public double value (
@@ -151,11 +153,12 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 					{
 						if (null == jumpDiffusionVertex) {
 							throw new Exception (
-								"DiffusionEvaluatorOrnsteinUhlenbeck::DriftLDEV::value => Invalid Inputs"
+								"DiffusionEvaluatorOrnsteinUhlenbeck::DriftLocalEvaluator::value => Invalid Inputs"
 							);
 						}
 
-						return -1. * (jumpDiffusionVertex.value() - meanReversionLevel) / relaxationTime;
+						return -1. * (jumpDiffusionVertex.value() - meanReversionLevel) /
+							relaxationTimeFunction.evaluate (jumpDiffusionVertex.time());
 					}
 				},
 				new LocalEvaluator()
@@ -164,7 +167,16 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 						final JumpDiffusionVertex jumpDiffusionVertex)
 						throws Exception
 					{
-						return burstiness * Math.sqrt (1. / relaxationTime);
+						if (null == jumpDiffusionVertex) {
+							throw new Exception (
+								"DiffusionEvaluatorOrnsteinUhlenbeck::VolatilityLocalEvaluator::value => Invalid Inputs"
+							);
+						}
+
+						double time = jumpDiffusionVertex.time();
+
+						return burstinessFunction.evaluate (time) *
+							Math.sqrt (1. / relaxationTimeFunction.evaluate (time));
 					}
 				}
 			);
@@ -188,13 +200,19 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 		final double burstiness,
 		final double relaxationTime)
 	{
-		return Standard (0., burstiness, relaxationTime);
+		try {
+			return Standard (0., new Flat (burstiness), new Flat (relaxationTime));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	private DiffusionEvaluatorOrnsteinUhlenbeck (
 		final double meanReversionLevel,
-		final double burstiness,
-		final double relaxationTime,
+		final R1ToR1 burstinessFunction,
+		final R1ToR1 relaxationTimeFunction,
 		final LocalEvaluator localDriftEvaluator,
 		final LocalEvaluator localVolatilityEvaluator)
 		throws Exception
@@ -205,7 +223,10 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 			throw new Exception ("DiffusionEvaluatorOrnsteinUhlenbeck Constructor => Invalid Inputs");
 		}
 
-		_ornsteinUhlenbeckDriftWander = new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime);
+		_ornsteinUhlenbeckDriftWander = new OrnsteinUhlenbeckDriftWander (
+			burstinessFunction,
+			relaxationTimeFunction
+		);
 	}
 
 	/**
@@ -220,25 +241,25 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 	}
 
 	/**
-	 * Retrieve the Burstiness Parameter
+	 * Retrieve the Burstiness Function
 	 * 
-	 * @return The Burstiness Parameter
+	 * @return The Burstiness Function
 	 */
 
-	public double burstiness()
+	public R1ToR1 burstinessFunction()
 	{
-		return _ornsteinUhlenbeckDriftWander.burstiness();
+		return _ornsteinUhlenbeckDriftWander.burstinessFunction();
 	}
 
 	/**
-	 * Retrieve the Relaxation Time
+	 * Retrieve the Relaxation Time Function
 	 * 
-	 * @return The Relaxation Time
+	 * @return The Relaxation Time Function
 	 */
 
-	public double relaxationTime()
+	public R1ToR1 relaxationTimeFunction()
 	{
-		return _ornsteinUhlenbeckDriftWander.relaxationTime();
+		return _ornsteinUhlenbeckDriftWander.relaxationTimeFunction();
 	}
 
 	/**
@@ -253,25 +274,25 @@ public class DiffusionEvaluatorOrnsteinUhlenbeck
 	}
 
 	/**
-	 * Retrieve the Reference Relaxation Time Scale
+	 * Retrieve the Reference Relaxation Time Scale Function
 	 * 
-	 * @return The Reference Relaxation Time Scale
+	 * @return The Reference Relaxation Time Scale Function
 	 */
 
-	@Override public double referenceRelaxationTime()
+	@Override public R1ToR1 referenceRelaxationTimeFunction()
 	{
-		return relaxationTime();
+		return relaxationTimeFunction();
 	}
 
 	/**
-	 * Retrieve the Reference Burstiness Scale
+	 * Retrieve the Reference Burstiness Scale Function
 	 * 
-	 * @return The Reference Burstiness Scale
+	 * @return The Reference Burstiness Scale Function
 	 */
 
-	@Override public double referenceBurstiness()
+	@Override public R1ToR1 referenceBurstinessFunction()
 	{
-		return burstiness();
+		return burstinessFunction();
 	}
 
 	/**

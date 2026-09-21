@@ -12,7 +12,7 @@ import org.drip.measure.crng.*;
 import org.drip.measure.dynamics.*;
 import org.drip.measure.realization.DiffusionEvolver;
 import org.drip.measure.realization.JumpDiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.common.StringUtil;
@@ -546,7 +546,7 @@ public class AlbaneseAndersenBaselProxy
 	private static final void ThinStatistics (
 		final String header,
 		final JulianDate[] vertexDateArray,
-		final UnivariateDiscreteThin[] thinStatisticsArray)
+		final UnivariateCentralMeasures[] thinStatisticsArray)
 		throws Exception
 	{
 		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
@@ -607,7 +607,7 @@ public class AlbaneseAndersenBaselProxy
 
 	private static final void ThinStatistics (
 		final String header,
-		final UnivariateDiscreteThin thinStatistics)
+		final UnivariateCentralMeasures thinStatistics)
 		throws Exception
 	{
 		System.out.println (

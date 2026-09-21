@@ -1,6 +1,8 @@
 
 package org.drip.measure.dynamics;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.r1tor1operator.Flat;
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -110,9 +112,10 @@ import org.drip.numerical.common.NumberUtil;
  * 	It provides the following Functionality:
  *
  *  <ul>
- * 		<li>Retrieve the Reference Relaxation Time Scale</li>
- * 		<li>Retrieve the Reference Burstiness Scale</li>
- * 		<li>Retrieve the Reference Mean Reversion Level Scale</li>
+ * 		<li>Construct a Standard Instance of <i>OrnsteinUhlenbeckDriftWander</i></li>
+ * 		<li><i>OrnsteinUhlenbeckDriftWander</i> Constructor</li>
+ * 		<li>Retrieve the Burstiness Function</li>
+ * 		<li>Retrieve the Relaxation Time Function</li>
  *  </ul>
  *
  *	<br>
@@ -129,49 +132,73 @@ import org.drip.numerical.common.NumberUtil;
 
 public class OrnsteinUhlenbeckDriftWander
 {
-	private double _burstiness = Double.NaN;
-	private double _relaxationTime = Double.NaN;
+	private R1ToR1 _burstinessFunction = null;
+	private R1ToR1 _relaxationTimeFunction = null;
+
+	/**
+	 * Construct a Standard Instance of <i>OrnsteinUhlenbeckDriftWander</i>
+	 * 
+	 * @param burstiness Burstiness Parameter
+	 * @param relaxationTime Relaxation Time
+	 * 
+	 * @return Standard Instance of <i>OrnsteinUhlenbeckDriftWander</i>
+	 */
+
+	public static final OrnsteinUhlenbeckDriftWander Standard (
+		final double burstiness,
+		final double relaxationTime)
+	{
+		try {
+			return !NumberUtil.IsValid (burstiness) || 0. >= burstiness ||
+				!NumberUtil.IsValid (relaxationTime) || 0. >= relaxationTime ? null :
+				new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 
 	/**
 	 * <i>OrnsteinUhlenbeckDriftWander</i> Constructor
 	 * 
-	 * @param burstiness The Burstiness Parameter
-	 * @param relaxationTime The Relaxation Time
+	 * @param burstinessFunction The Burstiness Function
+	 * @param relaxationTimeFunction The Relaxation Time Function
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public OrnsteinUhlenbeckDriftWander (
-		final double burstiness,
-		final double relaxationTime)
+		final R1ToR1 burstinessFunction,
+		final R1ToR1 relaxationTimeFunction)
 		throws Exception
 	{
-		if (!NumberUtil.IsValid (_burstiness = burstiness) || 0. >= _burstiness ||
-			!NumberUtil.IsValid (_relaxationTime = relaxationTime) || 0. >= _relaxationTime)
+		if (null == (_burstinessFunction = burstinessFunction) ||
+			null == (_relaxationTimeFunction = relaxationTimeFunction))
 		{
 			throw new Exception ("OrnsteinUhlenbeckDriftWander Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Burstiness Parameter
+	 * Retrieve the Burstiness Function
 	 * 
-	 * @return The Burstiness Parameter
+	 * @return The Burstiness Function
 	 */
 
-	public double burstiness()
+	public R1ToR1 burstinessFunction()
 	{
-		return _burstiness;
+		return _burstinessFunction;
 	}
 
 	/**
-	 * Retrieve the Relaxation Time
+	 * Retrieve the Relaxation Time Function
 	 * 
-	 * @return The Relaxation Time
+	 * @return The Relaxation Time Function
 	 */
 
-	public double relaxationTime()
+	public R1ToR1 relaxationTimeFunction()
 	{
-		return _relaxationTime;
+		return _relaxationTimeFunction;
 	}
 }

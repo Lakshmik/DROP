@@ -1,6 +1,7 @@
 
 package org.drip.sample.lmm;
 
+import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.definition.MarketSurface;
 import org.drip.dynamics.lmm.LognormalLIBORVolatility;
@@ -19,6 +20,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -112,72 +121,106 @@ import org.drip.state.identifier.ForwardLabel;
  * 				Mathematical Finance 7 (2), 127-155.
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/lmm/README.md">LMM Multi-Factor Monte Carlo</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/lmm/README.md">LMM Multi-Factor Monte Carlo</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ContinuousForwardRateVolatility {
+public class ContinuousForwardRateVolatility
+{
 
 	private static final MarketSurface FlatVolatilitySurface (
-		final JulianDate dtStart,
-		final String strCurrency,
-		final double dblFlatVol)
+		final JulianDate startDate,
+		final String currency,
+		final double flatVolatility)
 		throws Exception
 	{
+		double[] nodeDateArray =
+		{
+			startDate.julian(),
+			startDate.addYears (2).julian(),
+			startDate.addYears (4).julian(),
+			startDate.addYears (6).julian(),
+			startDate.addYears (8).julian(),
+			startDate.addYears (10).julian()
+		};
+
 		return ScenarioMarketSurfaceBuilder.CustomSplineWireSurface (
 			"VIEW_TARGET_VOLATILITY_SURFACE",
-			dtStart,
-			strCurrency,
-			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
-			},
-			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
-			},
-			new double[][] {
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
+			startDate,
+			currency,
+			nodeDateArray,
+			nodeDateArray,
+			new double[][]
+			{
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
 			},
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			)
@@ -185,107 +228,127 @@ public class ContinuousForwardRateVolatility {
 	}
 
 	private static final void DisplayVolArray (
-		final String strTenor,
-		final double[] adblVol)
+		final String tenor,
+		final double[] volatilityArray)
 	{
-		String strDump = "\t | " + strTenor + " => ";
+		String dump = "\t | " + tenor + " => ";
 
-		for (int i = 0; i < adblVol.length; ++i)
-			strDump += FormatUtil.FormatDouble (adblVol[i], 1, 2, 100.) + "% |";
+		for (int volatilityIndex = 0; volatilityIndex < volatilityArray.length; ++volatilityIndex) {
+			dump += FormatUtil.FormatDouble (volatilityArray[volatilityIndex], 1, 2, 100.) + "% |";
+		}
 
-		System.out.println (strDump);
+		System.out.println (dump);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strTenor = "3M";
-		String strCurrency = "USD";
-		double dblFlatVol1 = 0.35;
-		double dblFlatVol2 = 0.42;
-		double dblFlatVol3 = 0.27;
-		double dblFlatForwardRate = 0.02;
+		String tenor = "3M";
+		String currency = "USD";
+		double flatVolatility1 = 0.35;
+		double flatVolatility2 = 0.42;
+		double flatVolatility3 = 0.27;
+		double flatForwardRate = 0.02;
 
-		int[] aiNumFactor = {
-			1, 2, 3
+		int[] factorCountArray =
+		{
+			1,
+			2,
+			3
+		};
+		String[] forwardTenorArray =
+		{
+			"1Y",
+			"2Y",
+			"3Y",
+			"4Y",
+			"5Y",
+			"6Y",
+			"7Y",
+			"8Y"
+		};
+		double[][] factorCorrelationMatrix =
+		{
+			{
+				1.0,
+				0.1,
+				0.2
+			},
+			{
+				0.1,
+				1.0,
+				0.2
+			},
+			{
+				0.2,
+				0.1,
+				1.0
+			}
 		};
 
-		String[] astrForwardTenor = {
-			"1Y", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y"
-		};
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, tenor);
 
-		ForwardLabel forwardLabel = ForwardLabel.Create (
-			strCurrency,
-			strTenor
+		JulianDate spotDate = DateUtil.Today();
+
+		MarketSurface flatVolatilityMarketSurface1 = FlatVolatilitySurface (
+			spotDate,
+			currency,
+			flatVolatility1
 		);
 
-		JulianDate dtSpot = org.drip.analytics.date.DateUtil.Today();
-
-		MarketSurface mktSurfFlatVol1 = FlatVolatilitySurface (
-			dtSpot,
-			strCurrency,
-			dblFlatVol1
+		MarketSurface flatVolatilityMarketSurface2 = FlatVolatilitySurface (
+			spotDate,
+			currency,
+			flatVolatility2
 		);
 
-		MarketSurface mktSurfFlatVol2 = FlatVolatilitySurface (
-			dtSpot,
-			strCurrency,
-			dblFlatVol2
+		MarketSurface flatVolatilityMarketSurface3 = FlatVolatilitySurface (
+			spotDate,
+			currency,
+			flatVolatility3
 		);
 
-		MarketSurface mktSurfFlatVol3 = FlatVolatilitySurface (
-			dtSpot,
-			strCurrency,
-			dblFlatVol3
-		);
-
-		ForwardCurve fc = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-			dtSpot,
+		ForwardCurve forwardCurve = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
+			spotDate,
 			forwardLabel,
-			dblFlatForwardRate
+			flatForwardRate
 		);
 
-		for (int iNumFactor : aiNumFactor) {
-			LognormalLIBORVolatility llv = new LognormalLIBORVolatility (
-				dtSpot.julian(),
+		UnivariateSequenceGenerator univariateSequenceGenerator = new BoxMullerGaussian (0., 1.);
+
+		UnivariateSequenceGenerator[] univariateSequenceGeneratorArray =
+		{
+			univariateSequenceGenerator,
+			univariateSequenceGenerator,
+			univariateSequenceGenerator
+		};
+		MarketSurface[] marketSurfaceArray =
+		{
+			flatVolatilityMarketSurface1,
+			flatVolatilityMarketSurface2,
+			flatVolatilityMarketSurface3
+		};
+
+		for (int factorCount : factorCountArray) {
+			LognormalLIBORVolatility lognormalLIBORVolatility = new LognormalLIBORVolatility (
+				spotDate.julian(),
 				forwardLabel,
-				new MarketSurface[] {
-					mktSurfFlatVol1,
-					mktSurfFlatVol2,
-					mktSurfFlatVol3
-				},
+				marketSurfaceArray,
 				new PrincipalFactorSequenceGenerator (
-					new UnivariateSequenceGenerator[] {
-						new BoxMullerGaussian (
-							0.,
-							1.
-						),
-						new BoxMullerGaussian (
-							0.,
-							1.
-						),
-						new BoxMullerGaussian (
-							0.,
-							1.
-						)
-					},
-					new double[][] {
-						{1.0, 0.1, 0.2},
-						{0.1, 1.0, 0.2},
-						{0.2, 0.1, 1.0}
-					},
-					iNumFactor
+					univariateSequenceGeneratorArray,
+					factorCorrelationMatrix,
+					factorCount
 				)
 			);
 
@@ -293,18 +356,19 @@ public class ContinuousForwardRateVolatility {
 
 			System.out.println ("\t |  CONTINUOUS FORWARD RATE VOL |");
 
-			System.out.println ("\t |    Num Factors: " + iNumFactor + "            |");
+			System.out.println ("\t |   Factor Count: " + factorCount + "            |");
 
 			System.out.println ("\t |------------------------------|");
 
-			for (String strForwardTenor : astrForwardTenor)
+			for (String forwardTenor : forwardTenorArray) {
 				DisplayVolArray (
-					strForwardTenor,
-					llv.continuousForwardVolatility (
-						dtSpot.addTenor (strForwardTenor).julian(),
-						fc
+					forwardTenor,
+					lognormalLIBORVolatility.continuousForwardVolatility (
+						spotDate.addTenor (forwardTenor).julian(),
+						forwardCurve
 					)
 				);
+			}
 
 			System.out.println ("\t |------------------------------|");
 		}

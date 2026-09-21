@@ -1,8 +1,6 @@
 
 package org.drip.sample.overnight;
 
-import java.util.List;
-
 import org.drip.analytics.date.*;
 import org.drip.analytics.definition.LatentStateStatic;
 import org.drip.analytics.support.*;
@@ -31,6 +29,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -142,245 +148,206 @@ import org.drip.state.inference.*;
  *  - Cross-Comparison of the OIS Calibration Instrument "Rate" metric across the different curve
  *  	construction methodologies for a sequence of bespoke OIS instruments.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/overnight/README.md">Shape Preserving Stretch Overnight Curve</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/overnight/README.md">Shape Preserving Stretch Overnight Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ShapePreservingOvernightZeroSmooth {
+public class ShapePreservingOvernightZeroSmooth
+{
 
 	private static final FixFloatComponent OTCOISFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = OvernightFixedFloatContainer.FundConventionFromJurisdiction (
-			strCurrency
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		return OvernightFixedFloatContainer.FundConventionFromJurisdiction (
+			currency
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				OvernightLabel.Create (
-					strCurrency
-				)
+		OvernightLabel overnightLabel = OvernightLabel.Create (currency);
+
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				overnightLabel
 			);
+		}
 
-		return aDeposit;
+		return depositArray;
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOIS[i] = OTCOISFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisArray[maturityIndex] = OTCOISFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
 			);
+		}
 
-		return aOIS;
+		return oisArray;
 	}
 
 	private static final FixFloatComponent[] OvernightIndexFromMaturityTenor (
-		final JulianDate dtEffective,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon,
-		final String strCurrency)
+		final JulianDate effectiveDate,
+		final String[] maturityTenorArray,
+		final double[] couponArray,
+		final String currency)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		OvernightLabel overnightLabel = OvernightLabel.Create (currency);
 
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
+
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
+
+		UnitCouponAccrualSetting fixedUnitCouponAccrualSetting = new UnitCouponAccrualSetting (
 			2,
 			"Act/360",
 			false,
 			"Act/360",
 			false,
-			strCurrency,
+			currency,
 			false,
 			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			java.lang.String strFixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			String fixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[maturityIndex],
 				"6M"
-			) ? astrMaturityTenor[i] : "6M";
+			) ? maturityTenorArray[maturityIndex] : "6M";
 
-			java.lang.String strFloatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+			String floatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[maturityIndex],
 				"3M"
-			) ? astrMaturityTenor[i] : "3M";
-
-			ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-				"ON",
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
-				null,
-				OvernightLabel.Create (
-					strCurrency
-				),
-				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-				0.
-			);
-
-			ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-				strFixedTenor,
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-				null,
-				adblCoupon[i],
-				0.,
-				strCurrency
-			);
-
-			CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-				4,
-				strFloatingTenor,
-				strCurrency,
-				null,
-				-1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-				2,
-				strFixedTenor,
-				strCurrency,
-				null,
-				1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				strFixedTenor,
-				astrMaturityTenor[i],
-				null
-			);
-
-			List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				strFloatingTenor,
-				astrMaturityTenor[i],
-				null
-			);
-
-			Stream floatingStream = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsFloatingStreamEdgeDate,
-					cpsFloating,
-					cfusFloating
-				)
-			);
-
-			Stream fixedStream = new Stream (
-				CompositePeriodBuilder.FixedCompositeUnit (
-					lsFixedStreamEdgeDate,
-					cpsFixed,
-					ucasFixed,
-					cfusFixed
-				)
-			);
+			) ? maturityTenorArray[maturityIndex] : "3M";
 
 			FixFloatComponent ois = new FixFloatComponent (
-				fixedStream,
-				floatingStream,
-				csp
+				new Stream (
+					CompositePeriodBuilder.FixedCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							fixedTenor,
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							2,
+							fixedTenor,
+							currency,
+							null,
+							1.,
+							null,
+							null,
+							null,
+							null
+						),
+						fixedUnitCouponAccrualSetting,
+						new ComposableFixedUnitSetting (
+							fixedTenor,
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+							null,
+							couponArray[maturityIndex],
+							0.,
+							currency
+						)
+					)
+				),
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							floatingTenor,
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							4,
+							floatingTenor,
+							currency,
+							null,
+							-1.,
+							null,
+							null,
+							null,
+							null
+						),
+						new ComposableFloatingUnitSetting (
+							"ON",
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
+							null,
+							overnightLabel,
+							CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+							0.
+						)
+					)
+				),
+				cashSettleParams
 			);
 
-			ois.setPrimaryCode ("OIS." + astrMaturityTenor[i] + "." + strCurrency);
+			ois.setPrimaryCode ("OIS." + maturityTenorArray[maturityIndex] + "." + currency);
 
-			aOIS[i] = ois;
+			oisArray[maturityIndex] = ois;
 		}
 
-		return aOIS;
+		return oisArray;
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Future Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFuturesFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrStartTenor,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] startTenorArray,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOISFutures = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisFuturesArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOISFutures[i] = OTCOISFixFloat (
-				dtSpot.addTenor (astrStartTenor[i]),
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisFuturesArray[maturityIndex] = OTCOISFixFloat (
+				spotDate.addTenor (startTenorArray[maturityIndex]),
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
 			);
+		}
 
-		return aOISFutures;
+		return oisFuturesArray;
 	}
 
 	/*
@@ -418,119 +385,49 @@ public class ShapePreservingOvernightZeroSmooth {
 	 * 		construction methodologies.
 	 *  - Cross-Comparison of the OIS Calibration Instrument "Rate" metric across the different curve
 	 *  	construction methodologies for a sequence of bespoke OIS instruments.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void ShapePreservingOISDFZeroSmoothSample (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
-				1, 2, 3
+		SingleStreamComponent[] depositArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
+				1,
+				2,
+				3
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.0004, 0.0004, 0.0004		 // Deposit
+		double[] depositQuoteArray =
+		{
+			0.0004,
+			0.0004,
+			0.0004		 // Deposit
 		};
-
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"   DEPOSIT   ",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of Short End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblShortEndOISQuote = new double[] {
+		double[] shortEndOISQuoteArray =
+		{
 			0.00070,    //   1W
 			0.00069,    //   2W
 			0.00078,    //   3W
 			0.00074     //   1M
 		};
-
-		CalibratableComponent[] aShortEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1W", "2W", "3W", "1M"
-			},
-			adblShortEndOISQuote
-		);
-
-		/*
-		 * Construct the Short End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisShortEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"SHORT END OIS",
-			aShortEndOISComp,
-			"SwapRate",
-			adblShortEndOISQuote
-		);
-
-		/*
-		 * Construct the Array of OIS Futures Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblOISFutureQuote = new double[] {
+		double[] oisFuturesQuoteArray = new double[]
+		{
 			 0.00046,    //   1M x 1M
 			 0.00016,    //   2M x 1M
 			-0.00007,    //   3M x 1M
 			-0.00013,    //   4M x 1M
 			-0.00014     //   5M x 1M
 		};
-
-		CalibratableComponent[] aOISFutureComp = OISFuturesFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1M", "2M", "3M", "4M", "5M"
-			},
-			new java.lang.String[] {
-				"1M", "1M", "1M", "1M", "1M"
-			},
-			adblOISFutureQuote
-		);
-
-		/*
-		 * Construct the OIS Future Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisFutureStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			" OIS FUTURE  ",
-			aOISFutureComp,
-			"SwapRate",
-			adblOISFutureQuote
-		);
-
-		/*
-		 * Construct the Array of Long End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblLongEndOISQuote = new double[] {
+		double[] longEndOISQuoteArray =
+		{
 			0.00002,    //  15M
 			0.00008,    //  18M
 			0.00021,    //  21M
@@ -551,46 +448,39 @@ public class ShapePreservingOvernightZeroSmooth {
 			0.02038     //  30Y
 		};
 
-		CalibratableComponent[] aLongEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"15M", "18M", "21M", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+		CalibratableComponent[] longEndOISArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"15M",
+				"18M",
+				"21M",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
 			},
-			adblLongEndOISQuote
+			longEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Long End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisLongEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"LONG END OIS ",
-			aLongEndOISComp,
-			"SwapRate",
-			adblLongEndOISQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			oisShortEndStretch,
-			oisFutureStretch,
-			oisLongEndStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
+		LinearLatentStateCalibrator linearLatentStateCalibrator = new LinearLatentStateCalibrator (
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_EXPONENTIAL_MIXTURE,
 				new ExponentialMixtureSetParams (
-					new double[] {
+					new double[]
+					{
 						0.01,
 						0.05,
 						0.25
@@ -612,254 +502,337 @@ public class ShapePreservingOvernightZeroSmooth {
 			null
 		);
 
-		/*
-		 * Set up the Local Curve Control parameters as follows:
-		 * 	- C1 Bessel Monotone Smoothener with no spurious extrema elimination and no monotone filter
-		 * 	- Zero Rate Quantification Metric
-		 * 	- Cubic Polynomial Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		LocalControlCurveParams lccp = new LocalControlCurveParams (
-			LocalMonotoneCkGenerator.C1_BESSEL,
-			LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
+		MergedDiscountForwardCurve shapePreservingDiscountCurve =
+			ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+				currency,
+				linearLatentStateCalibrator,
+				new LatentStateStretchSpec[]
+				{
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"   DEPOSIT   ",
+						depositArray,
+						"ForwardRate",
+						depositQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"SHORT END OIS",
+						OISFromMaturityTenor (
+							spotDate,
+							currency,
+							new String[]
+							{
+								"1W",
+								"2W",
+								"3W",
+								"1M"
+							},
+							shortEndOISQuoteArray
+						),
+						"SwapRate",
+						shortEndOISQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						" OIS FUTURE  ",
+						OISFuturesFromMaturityTenor (
+							spotDate,
+							currency,
+							new String[]
+							{
+								"1M",
+								"2M",
+								"3M",
+								"4M",
+								"5M"
+							},
+							new String[]
+							{
+								"1M",
+								"1M",
+								"1M", 
+								"1M",
+								"1M"
+							},
+							oisFuturesQuoteArray
+						),
+						"SwapRate",
+						oisFuturesQuoteArray
+					),
+					LatentStateStretchBuilder.ForwardFundingStretchSpec (
+						"LONG END OIS ",
+						longEndOISArray,
+						"SwapRate",
+						longEndOISQuoteArray
+					)
+				},
+				valuationParams,
+				null,
+				null,
+				null,
+				1.
+		);
+
+		MergedDiscountForwardCurve locallySmoothDiscountCurve =
+			ScenarioDiscountCurveBuilder.SmoothingLocalControlBuild (
+				shapePreservingDiscountCurve,
+				linearLatentStateCalibrator,
+				new LocalControlCurveParams (
+					LocalMonotoneCkGenerator.C1_BESSEL,
+					LatentStateStatic.DISCOUNT_QM_ZERO_RATE,
+					new SegmentCustomBuilderControl (
+						MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+						new PolynomialFunctionSetParams (4),
+						SegmentInelasticDesignControl.Create (2, 2),
+						new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+						null
+					),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null,
+					false,
+					false
 				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
+				valuationParams,
+				null,
+				null,
 				null
-			),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null,
-			false,
-			false
-		);
-
-		/*
-		 * Construct the Shape Preserving OIS Discount Curve by applying the linear curve calibrator to the array
-		 *  of Cash and OIS Stretches.
-		 */
-
-		MergedDiscountForwardCurve dcShapePreserving = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
-			),
-			null,
-			null,
-			null,
-			1.
-		);
-
-		/*
-		 * Construct the Globally Smoothened OIS Discount Curve by applying the linear curve calibrator and the
-		 * 	Global Curve Control parameters to the array of Cash and OIS Stretches and the shape preserving
-		 * 	discount curve.
-		 */
-
-		/* DiscountCurve dcGloballySmooth = ScenarioDiscountCurveBuilder.SmoothingGlobalControlBuild (
-			dcShapePreserving,
-			lcc,
-			gccp,
-			aRRS,
-			new ValuationParams (dtToday, dtToday, "USD"),
-			null,
-			null,
-			null); */
-
-		/*
-		 * Construct the Locally Smoothened OIS Discount Curve by applying the linear curve calibrator and the
-		 * 	Local Curve Control parameters to the array of Cash and OIS Stretches and the shape preserving
-		 *  discount curve.
-		 */
-
-		MergedDiscountForwardCurve dcLocallySmooth = ScenarioDiscountCurveBuilder.SmoothingLocalControlBuild (
-			dcShapePreserving,
-			lcc,
-			lccp,
-			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
-			),
-			null,
-			null,
-			null
-		);
-
-		/*
-		 * Cross-Comparison of the Deposit Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t               DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  ");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aDepositComp.length; ++i)
-			System.out.println ("\t[" + aDepositComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (
-					aDepositComp[i].measureValue (
-						new ValuationParams (dtSpot, dtSpot, strCurrency), null,
-						MarketParamsBuilder.Create (dcShapePreserving, null, null, null, null, null, null),
-						null,
-						"Rate"),
-					1, 6, 1.) + "   |   " +
-				/* FormatUtil.FormatDouble (
-					aDeposit[i].measureValue (
-						new ValuationParams (dtToday, dtToday, "USD"), null,
-						ComponentMarketParamsBuilder.Create (dcGloballySmooth, null, null, null, null, null, null),
-						null,
-						"Rate"),
-					1, 6, 1.) + "   |   " + */
-				FormatUtil.FormatDouble (
-					aDepositComp[i].measureValue (
-						new ValuationParams (dtSpot, dtSpot, strCurrency), null,
-						MarketParamsBuilder.Create (dcLocallySmooth, null, null, null, null, null, null),
-						null,
-						"Rate"),
-					1, 6, 1.) + "   |   " +
-				FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.)
 			);
 
-		/*
-		 * Cross-Comparison of the OIS Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||               DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t               OIS INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println (
+			"\t||        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  "
+		);
 
-		System.out.println ("\t        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  ");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aLongEndOISComp.length; ++i)
-			System.out.println ("\t[" + aLongEndOISComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (
-					aLongEndOISComp[i].measureValue (
-						new ValuationParams (dtSpot, dtSpot, strCurrency), null,
-						MarketParamsBuilder.Create (dcShapePreserving, null, null, null, null, null, null),
+		for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+			System.out.println (
+				"\t|| [" + depositArray[depositIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
 						null,
-						"CalibSwapRate"),
-					1, 6, 1.) + "   |   " +
-				/* FormatUtil.FormatDouble (
-					aOISComp[i].measureValue (
-						new ValuationParams (dtToday, dtToday, "USD"), null,
-						ComponentMarketParamsBuilder.Create (dcGloballySmooth, null, null, null, null, null, null),
+						MarketParamsBuilder.Create (
+							shapePreservingDiscountCurve,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						),
 						null,
-						"CalibSwapRate"),
-					1, 6, 1.) + "   |   " + */
-				FormatUtil.FormatDouble (
-					aLongEndOISComp[i].measureValue (
-						new ValuationParams (dtSpot, dtSpot, strCurrency), null,
-						MarketParamsBuilder.Create (dcLocallySmooth, null, null, null, null, null, null),
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
 						null,
-						"CalibSwapRate"),
-					1, 6, 1.) + "   |   " +
-				FormatUtil.FormatDouble (adblLongEndOISQuote[i], 1, 6, 1.)
+						MarketParamsBuilder.Create (
+							locallySmoothDiscountCurve,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						),
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					depositQuoteArray[depositIndex],
+					1,
+					6,
+					1.
+				)
 			);
+		}
 
-		/*
-		 * Cross-Comparison of the OIS Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies for a sequence of bespoke OIS instruments.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		CalibratableComponent[] aCC = OvernightIndexFromMaturityTenor (
-			dtSpot,
-			new java.lang.String[] {
-				"3Y", "6Y", "9Y", "12Y", "15Y", "18Y", "21Y", "24Y", "27Y", "30Y"
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||               OIS INSTRUMENTS CALIBRATION RECOVERY");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println (
+			"\t||        SHAPE PRESERVING   | SMOOTHING #1  | SMOOTHING #2  |  INPUT QUOTE  "
+		);
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int longEndOISIndex = 0; longEndOISIndex < longEndOISArray.length; ++longEndOISIndex) {
+			System.out.println (
+				"\t|| [" + longEndOISArray[longEndOISIndex].maturityDate() + "] = " +
+				FormatUtil.FormatDouble (
+					longEndOISArray[longEndOISIndex].measureValue (
+						valuationParams,
+						null,
+						MarketParamsBuilder.Create (
+							shapePreservingDiscountCurve,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						),
+						null,
+						"CalibSwapRate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					longEndOISArray[longEndOISIndex].measureValue (
+						valuationParams, null,
+						MarketParamsBuilder.Create (
+							locallySmoothDiscountCurve,
+							null,
+							null,
+							null,
+							null,
+							null,
+							null
+						),
+						null,
+						"CalibSwapRate"
+					),
+					1,
+					6,
+					1.
+				) + "   |   " + FormatUtil.FormatDouble (
+					longEndOISQuoteArray[longEndOISIndex],
+					1,
+					6,
+					1.
+				)
+			);
+		}
+
+		CalibratableComponent[] calibratableComponentArray = OvernightIndexFromMaturityTenor (
+			spotDate,
+			new String[]
+			{
+				"3Y",
+				"6Y",
+				"9Y",
+				"12Y",
+				"15Y",
+				"18Y",
+				"21Y",
+				"24Y",
+				"27Y",
+				"30Y"
 			},
-			new double[] {
-				0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01
+			new double[]
+			{
+				0.01,
+				0.01,
+				0.01,
+				0.01,
+				0.01,
+				0.01,
+				0.01,
+				0.01,
+				0.01,
+				0.01
 			},
-			strCurrency
+			currency
 		);
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t           BESPOKE OIS PAR RATE");
+		System.out.println ("\t||           BESPOKE OIS PAR RATE");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t        SHAPE PRESERVING   |  SMOOTHING #1 |  SMOOTHING #2");
+		System.out.println ("\t||        SHAPE PRESERVING   |  SMOOTHING #1 |  SMOOTHING #2");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		for (int i = 0; i < aCC.length; ++i)
-			System.out.println ("\t[" + aCC[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (
-					aCC[i].measureValue (new ValuationParams (dtSpot, dtSpot, strCurrency), null,
-					MarketParamsBuilder.Create (dcShapePreserving, null, null, null, null, null, null),
-					null,
-					"CalibSwapRate"),
-				1, 6, 1.) + "   |   " +
-				/* FormatUtil.FormatDouble (
-					aCC[i].measureValue (new ValuationParams (dtToday, dtToday, "USD"), null,
-					ComponentMarketParamsBuilder.Create (dcGloballySmooth, null, null, null, null, null, null),
-					null,
-					"CalibSwapRate"),
-				1, 6, 1.) + "   |   " + */
-				FormatUtil.FormatDouble (
-					aCC[i].measureValue (new ValuationParams (dtSpot, dtSpot, strCurrency), null,
-					MarketParamsBuilder.Create (dcLocallySmooth, null, null, null, null, null, null),
-					null,
-					"CalibSwapRate"),
-				1, 6, 1.)
+		for (int componentIndex = 0; componentIndex < calibratableComponentArray.length; ++componentIndex) {
+			System.out.println (
+				"\t|| [" + calibratableComponentArray[componentIndex].maturityDate() + "] = " +
+					FormatUtil.FormatDouble (
+						calibratableComponentArray[componentIndex].measureValue (
+							valuationParams,
+							null,
+							MarketParamsBuilder.Create (
+								shapePreservingDiscountCurve,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null
+							),
+							null,
+							"CalibSwapRate"
+						),
+						1,
+						6,
+						1.
+					) + "   |   " + FormatUtil.FormatDouble (
+						calibratableComponentArray[componentIndex].measureValue (
+							valuationParams,
+							null,
+							MarketParamsBuilder.Create (
+								locallySmoothDiscountCurve,
+								null,
+								null,
+								null,
+								null,
+								null,
+								null
+							),
+							null,
+							"CalibSwapRate"
+						),
+						1,
+						6,
+						1.
+					)
 			);
+		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		ShapePreservingOISDFZeroSmoothSample (
-			DateUtil.Today(),
-			"EUR"
-		);
+		ShapePreservingOISDFZeroSmoothSample (DateUtil.Today(), "EUR");
 
 		EnvManager.TerminateEnv();
 	}

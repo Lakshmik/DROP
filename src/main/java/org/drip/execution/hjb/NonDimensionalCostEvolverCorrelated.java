@@ -127,7 +127,8 @@ public class NonDimensionalCostEvolverCorrelated extends
 		final org.drip.execution.hjb.NonDimensionalCost ndc,
 		final org.drip.execution.latent.MarketState ms,
 		final double[] adblMarketStateTweak,
-		final double dblNonDimensionalRiskAversion)
+		final double dblNonDimensionalRiskAversion,
+		final double dblNonDimensionalTime)
 		throws java.lang.Exception
 	{
 		org.drip.execution.hjb.NonDimensionalCostCorrelated ndcc =
@@ -144,11 +145,13 @@ public class NonDimensionalCostEvolverCorrelated extends
 
 		double dblLiquidityMarketState = ms.liquidity() + adblMarketStateTweak[0];
 
-		double dblMu = oup1DLiquidity.relaxationTime() / oup1DVolatility.relaxationTime();
+		double dblMu = oup1DLiquidity.relaxationTimeFunction().evaluate (dblNonDimensionalTime) /
+			oup1DVolatility.relaxationTimeFunction().evaluate (dblNonDimensionalTime);
 
-		double dblVolatilityBurstiness = oup1DVolatility.burstiness();
+		double dblVolatilityBurstiness =
+			oup1DVolatility.burstinessFunction().evaluate (dblNonDimensionalTime);
 
-		double dblLiquidityBurstiness = oup1DLiquidity.burstiness();
+		double dblLiquidityBurstiness = oup1DLiquidity.burstinessFunction().evaluate (dblNonDimensionalTime);
 
 		double dblNonDimensionalCost = ndc.realization();
 
@@ -204,31 +207,31 @@ public class NonDimensionalCostEvolverCorrelated extends
 
 		try {
 			double dblCostIncrementMid = advance (ndc, ms, new double[] {0., 0.},
-				dblNonDimensionalRiskAversion) * dblNonDimensionalTimeIncrement;
+				dblNonDimensionalRiskAversion, dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementLiquidityUp = advance (ndc, ms, new double[]
-				{dblLiquidityMarketStateIncrement, 0.}, dblNonDimensionalRiskAversion) *
-					dblNonDimensionalTimeIncrement;
+				{dblLiquidityMarketStateIncrement, 0.}, dblNonDimensionalRiskAversion, dblNonDimensionalTime)
+					* dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementLiquidityDown = advance (ndc, ms, new double[]
-				{-dblLiquidityMarketStateIncrement, 0.}, dblNonDimensionalRiskAversion) *
-					dblNonDimensionalTimeIncrement;
+				{-dblLiquidityMarketStateIncrement, 0.}, dblNonDimensionalRiskAversion,
+					dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementVolatilityUp = advance (ndc, ms, new double[] {0.,
-				dblVolatilityMarketStateIncrement}, dblNonDimensionalRiskAversion) *
+				dblVolatilityMarketStateIncrement}, dblNonDimensionalRiskAversion, dblNonDimensionalTime) *
 					dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementVolatilityDown = advance (ndc, ms, new double[] {0.,
-				-dblVolatilityMarketStateIncrement}, dblNonDimensionalRiskAversion) *
+				-dblVolatilityMarketStateIncrement}, dblNonDimensionalRiskAversion, dblNonDimensionalTime) *
 					dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementCrossUp = advance (ndc, ms, new double[]
 				{dblLiquidityMarketStateIncrement, dblVolatilityMarketStateIncrement},
-					dblNonDimensionalRiskAversion) * dblNonDimensionalTimeIncrement;
+					dblNonDimensionalRiskAversion, dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementCrossDown = advance (ndc, ms, new double[]
 				{-dblLiquidityMarketStateIncrement, -dblVolatilityMarketStateIncrement},
-					dblNonDimensionalRiskAversion) * dblNonDimensionalTimeIncrement;
+					dblNonDimensionalRiskAversion, dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblNonDimensionalCost = ndc.realization() + dblCostIncrementMid;
 

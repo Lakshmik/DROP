@@ -9,7 +9,7 @@ import org.drip.measure.bridge.BrokenDateInterpolatorLinearT;
 import org.drip.measure.crng.RandomSequenceGenerator;
 import org.drip.measure.dynamics.*;
 import org.drip.measure.realization.*;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.identifier.OTCFixFloatLabel;
@@ -452,29 +452,29 @@ public class ZeroThresholdNettingPayable {
 	{
 		System.out.println();
 
-		UnivariateDiscreteThin udtUCOLVA = ead.ucolva();
+		UnivariateCentralMeasures udtUCOLVA = ead.ucolva();
 
-		UnivariateDiscreteThin udtFTDCOLVA = ead.ftdcolva();
+		UnivariateCentralMeasures udtFTDCOLVA = ead.ftdcolva();
 
-		UnivariateDiscreteThin udtUCVA = ead.ucva();
+		UnivariateCentralMeasures udtUCVA = ead.ucva();
 
-		UnivariateDiscreteThin udtFTDCVA = ead.ftdcva();
+		UnivariateCentralMeasures udtFTDCVA = ead.ftdcva();
 
-		UnivariateDiscreteThin udtCVACL = ead.cvacl();
+		UnivariateCentralMeasures udtCVACL = ead.cvacl();
 
-		UnivariateDiscreteThin udtCVA = ead.cva();
+		UnivariateCentralMeasures udtCVA = ead.cva();
 
-		UnivariateDiscreteThin udtDVA = ead.dva();
+		UnivariateCentralMeasures udtDVA = ead.dva();
 
-		UnivariateDiscreteThin udtFVA = ead.fva();
+		UnivariateCentralMeasures udtFVA = ead.fva();
 
-		UnivariateDiscreteThin udtFDA = ead.fda();
+		UnivariateCentralMeasures udtFDA = ead.fda();
 
-		UnivariateDiscreteThin udtFCA = ead.fca();
+		UnivariateCentralMeasures udtFCA = ead.fca();
 
-		UnivariateDiscreteThin udtFBA = ead.fba();
+		UnivariateCentralMeasures udtFBA = ead.fba();
 
-		UnivariateDiscreteThin udtSFVA = ead.sfva();
+		UnivariateCentralMeasures udtSFVA = ead.sfva();
 
 		System.out.println (
 			"\t||-----------------------------------------------------------------------------------------------------------------------------------||"

@@ -7,7 +7,7 @@ import org.drip.exposure.universe.*;
 import org.drip.measure.crng.RandomSequenceGenerator;
 import org.drip.measure.dynamics.*;
 import org.drip.measure.realization.*;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
@@ -279,7 +279,7 @@ public class CPGAUncollateralizedCorrelated {
 	private static final void UDTDump (
 		final String strHeader,
 		final JulianDate[] adtVertexNode,
-		final UnivariateDiscreteThin[] aUDT)
+		final UnivariateCentralMeasures[] aUDT)
 		throws Exception
 	{
 		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
@@ -330,7 +330,7 @@ public class CPGAUncollateralizedCorrelated {
 
 	private static final void UDTDump (
 		final String strHeader,
-		final UnivariateDiscreteThin udt)
+		final UnivariateCentralMeasures udt)
 		throws Exception
 	{
 		System.out.println (

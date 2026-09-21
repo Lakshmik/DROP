@@ -1,7 +1,12 @@
 
 package org.drip.product.muni;
 
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import java.util.TreeMap;
+
+import org.drip.analytics.date.JulianDate;
+import org.drip.param.valuation.ValuationParams;
+import org.drip.product.credit.BondComponent;
+import org.drip.state.govvie.GovvieCurve;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -80,9 +85,8 @@ import org.drip.measure.statistics.UnivariateDiscreteThin;
  */
 
 /**
- * <i>RefinancingEnsemblePnL</i> holds the Ensemble of Bond PnL's incurred across multiple Paths and Dates by
- *  re-financing using simulated Muni Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The
- * 	References are:
+ * <i>RefinancingPathGenerator</i> generates the Single Path Bond PnL incurred by re-financing using Muni
+ *  Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -121,83 +125,114 @@ import org.drip.measure.statistics.UnivariateDiscreteThin;
  * @author Lakshmi Krishnamurthy
  */
 
-public class RefinancingEnsemblePnLThinStatistics
+public class RefinancingPathGenerator
 {
-	private UnivariateDiscreteThin _taxable = null;
-	private UnivariateDiscreteThin _taxExempt = null;
-	private UnivariateDiscreteThin _taxableGovvieCurveDirtyPrice = null;
-	private UnivariateDiscreteThin _taxExemptGovvieCurveDirtyPrice = null;
+	private BondComponent _issueBond = null;
+	private TreeMap<JulianDate, IssueCurveMeasures> _inceptionIssueCurveMeasuresMap = null;
 
 	/**
-	 * <i>RefinancingEnsemblePnLThinStatistics</i> Constructor
+	 * <i>RefinancingPathGenerator</i> Constructor
 	 * 
-	 * @param taxExemptGovvieCurveDirtyPrice Tax-exempt Govvie Curve Dirty Price
-	 * 										 <i>UnivariateDiscreteThin</i> Instance
-	 * @param taxableGovvieCurveDirtyPrice Taxable Govvie Curve Dirty Price <i>UnivariateDiscreteThin</i>
-	 * 									   Instance
-	 * @param taxExempt Tax-exempt PnL <i>UnivariateDiscreteThin</i> Instance
-	 * @param taxable Taxable PnL <i>UnivariateDiscreteThin</i> Instance
+	 * @param issueBond Issue Bond
+	 * @param inceptionIssueCurveMeasuresMap Date Map of Issue Bond Curve Measures
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public RefinancingEnsemblePnLThinStatistics (
-		final UnivariateDiscreteThin taxExemptGovvieCurveDirtyPrice,
-		final UnivariateDiscreteThin taxableGovvieCurveDirtyPrice,
-		final UnivariateDiscreteThin taxExempt,
-		final UnivariateDiscreteThin taxable)
+	public RefinancingPathGenerator (
+		final BondComponent issueBond,
+		final TreeMap<JulianDate, IssueCurveMeasures> inceptionIssueCurveMeasuresMap)
 		throws Exception
 	{
-		if (null == (_taxExemptGovvieCurveDirtyPrice = taxExemptGovvieCurveDirtyPrice) ||
-			null == (_taxableGovvieCurveDirtyPrice = taxableGovvieCurveDirtyPrice) ||
-			null == (_taxExempt = taxExempt) ||
-			null == (_taxable = taxable))
+		if (null == (_issueBond = issueBond) ||
+			null == (_inceptionIssueCurveMeasuresMap = inceptionIssueCurveMeasuresMap) ||
+				_inceptionIssueCurveMeasuresMap.isEmpty())
 		{
-			throw new Exception ("RefinancingEnsemblePnLThinStatistics Constructor => Invalid Inputs");
+			throw new Exception ("RefinancingPathGenerator Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Tax-exempt Govvie Curve Dirty Price <i>UnivariateDiscreteThin</i> Instance
+	 * Retrieve the Issue Bond
 	 * 
-	 * @return Tax-exempt Govvie Curve Dirty Price <i>UnivariateDiscreteThin</i> Instance
+	 * @return Issue Bond
 	 */
 
-	public UnivariateDiscreteThin taxExemptGovvieCurveDirtyPrice()
+	public BondComponent issueBond()
 	{
-		return _taxExemptGovvieCurveDirtyPrice;
+		return _issueBond;
 	}
 
 	/**
-	 * Retrieve the Taxable Govvie Curve Dirty Price <i>UnivariateDiscreteThin</i> Instance
+	 * Retrieve the Date Map of Issue Bond Curve Measures
 	 * 
-	 * @return Taxable Govvie Curve Dirty Price <i>UnivariateDiscreteThin</i> Instance
+	 * @return Date Map of Issue Bond Curve Measures
 	 */
 
-	public UnivariateDiscreteThin taxableGovvieCurveDirtyPrice()
+	public TreeMap<JulianDate, IssueCurveMeasures> inceptionIssueCurveMeasuresMap()
 	{
-		return _taxableGovvieCurveDirtyPrice;
+		return _inceptionIssueCurveMeasuresMap;
 	}
 
 	/**
-	 * Retrieve the Tax-exempt PnL <i>UnivariateDiscreteThin</i> Instance
+	 * Generate the Date to <i>RefinancingPathPnLEntry</i> Map
 	 * 
-	 * @return Tax-exempt PnL <i>UnivariateDiscreteThin</i> Instance
+	 * @param deGuillaumeRebonatoPogudinPath Simulated <i>DeGuillaumeRebonatoPogudinPath</i> Instance
+	 * 
+	 * @return Date to <i>RefinancingPathPnLEntry</i> Map
 	 */
 
-	public UnivariateDiscreteThin taxExempt()
+	public TreeMap<JulianDate, RefinancingPathEntry> generate (
+		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath)
 	{
-		return _taxExempt;
-	}
+		if (null == deGuillaumeRebonatoPogudinPath) {
+			return null;
+		}
 
-	/**
-	 * Retrieve the Taxable PnL <i>UnivariateDiscreteThin</i> Instance
-	 * 
-	 * @return Taxable PnL <i>UnivariateDiscreteThin</i> Instance
-	 */
+		TreeMap<JulianDate, RefinancingPathEntry> dateEntryMap =
+			new TreeMap<JulianDate, RefinancingPathEntry>();
 
-	public UnivariateDiscreteThin taxable()
-	{
-		return _taxable;
+		TreeMap<JulianDate, GovvieCurve> dateTaxableGovvieCurveMap =
+			deGuillaumeRebonatoPogudinPath.dateTaxableGovvieCurveMap();
+
+		TreeMap<JulianDate, GovvieCurve> dateTaxExemptGovvieCurveMap =
+			deGuillaumeRebonatoPogudinPath.dateTaxExemptGovvieCurveMap();
+
+		for (JulianDate asOfDate : _inceptionIssueCurveMeasuresMap.keySet()) {
+			int asOfDateJulian = asOfDate.julian();
+
+			ValuationParams valuationParams = ValuationParams.Spot (asOfDateJulian);
+
+			IssueCurveMeasures inceptionMarketSimulatedMeasure =
+				_inceptionIssueCurveMeasuresMap.get (asOfDate);
+
+			double accrued = inceptionMarketSimulatedMeasure.accrual();
+
+			try {
+				dateEntryMap.put (
+					asOfDate,
+					new RefinancingPathEntry (
+						inceptionMarketSimulatedMeasure.taxExemptCleanPrice() + accrued,
+						inceptionMarketSimulatedMeasure.taxableCleanPrice() + accrued,
+						IssueCurveMeasures.PriceFromGovvie (
+							_issueBond,
+							valuationParams,
+							dateTaxExemptGovvieCurveMap.get (asOfDate)
+						) + accrued,
+						IssueCurveMeasures.PriceFromGovvie (
+							_issueBond,
+							valuationParams,
+							dateTaxableGovvieCurveMap.get (asOfDate)
+						) + accrued
+					)
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return null;
+			}
+		}
+
+		return dateEntryMap;
 	}
 }

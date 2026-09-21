@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -87,59 +95,60 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>JurisdictionIBORIndexDefinition</i> demonstrates the functionality to retrieve the IBOR settings for
- * the various Jurisdictions.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></li>
- *  </ul>
- * <br><br>
+ * 	the various Jurisdictions.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class JurisdictionIBORIndexDefinition {
+public class JurisdictionIBORIndexDefinition
+{
+
 	private static final String AccrualType (
-		final int iAccrualCompounding)
+		final int accrualCompounding)
 	{
-		return CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_ARITHMETIC == iAccrualCompounding ? "ARITHMETIC" : " GEOMETRIC";
+		return CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_ARITHMETIC == accrualCompounding ?
+			"ARITHMETIC" : " GEOMETRIC";
 	}
 
 	private static final void DisplayNameOvernightSetting (
-		final String strName)
+		final String name)
 	{
-		IBORIndex index = IBORIndexContainer.IndexFromName (strName);
+		IBORIndex iborIndex = IBORIndexContainer.IndexFromName (name);
 
-		String strLongestMaturity = index.longestMaturity();
+		String strLongestMaturity = iborIndex.longestMaturity();
 
-		String strShortestMaturity = index.shortestMaturity();
+		String strShortestMaturity = iborIndex.shortestMaturity();
 
-		System.out.println ("\t[" +
-			index.currency() + "] => " +
-			index.dayCount() + " | " +
-			index.spotLag() + " | " +
-			AccrualType (index.accrualCompoundingRule()) + " | " +
-			(strShortestMaturity.isEmpty() ? "  " : strShortestMaturity) + " | " +
-			(strLongestMaturity.isEmpty() ? "   " : strLongestMaturity) + " | " +
-			index.name()
+		System.out.println (
+			"\t|| [" + iborIndex.currency() + "] => " + iborIndex.dayCount() + " | " + iborIndex.spotLag() +
+				" | " + AccrualType (iborIndex.accrualCompoundingRule()) + " | " + (
+					strShortestMaturity.isEmpty() ? "  " : strShortestMaturity
+				) + " | " + (strLongestMaturity.isEmpty() ? "   " : strLongestMaturity
+				) + " | " + iborIndex.name()
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		String[] args)
+		String[] argumentArray)
 	{
 		EnvManager.InitEnv ("");
 
-		System.out.println ("\n\t---------------\n\t---------------\n");
+		System.out.println ("\n\t||---------------\n\t||---------------\n");
 
 		DisplayNameOvernightSetting ("CHF-LIBOR");
 
@@ -153,7 +162,7 @@ public class JurisdictionIBORIndexDefinition {
 
 		DisplayNameOvernightSetting ("USD-LIBOR");
 
-		System.out.println ("\n\t---------------\n\t---------------\n");
+		System.out.println ("\n\t||---------------\n\t||---------------\n");
 
 		DisplayNameOvernightSetting ("AUD-LIBOR");
 

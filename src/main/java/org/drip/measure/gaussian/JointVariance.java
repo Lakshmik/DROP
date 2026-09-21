@@ -118,8 +118,11 @@ import org.drip.numerical.linearalgebra.R1MatrixUtil;
 
 public class JointVariance
 {
+	private double[] _varianceArray = null;
+	private double[] _volatilityArray = null;
 	private double[][] _precisionMatrix = null;
 	private double[][] _covarianceMatrix = null;
+	private double[][] _correlationMatrix = null;
 
 	/**
 	 * <i>JointVariance</i> Constructor
@@ -141,12 +144,27 @@ public class JointVariance
 			throw new Exception ("JointVariance Constructor => Invalid Inputs!");
 		}
 
+		_varianceArray = new double[_covarianceMatrix.length];
+		_volatilityArray = new double[_covarianceMatrix.length];
+		_correlationMatrix = new double[_covarianceMatrix.length][_covarianceMatrix.length];
+
 		for (int variateIndex = 0; variateIndex < _covarianceMatrix.length; ++variateIndex) {
 			if (null == _covarianceMatrix[variateIndex] ||
 				_covarianceMatrix.length != _covarianceMatrix[variateIndex].length ||
 				!NumberUtil.IsValid (_covarianceMatrix[variateIndex]))
 			{
 				throw new Exception ("JointVariance Constructor => Invalid Inputs!");
+			}
+
+			_volatilityArray[variateIndex] = Math.sqrt (
+				_varianceArray[variateIndex] = _covarianceMatrix[variateIndex][variateIndex]
+			);
+		}
+
+		for (int variateIndexI = 0; variateIndexI < _covarianceMatrix.length; ++variateIndexI) {
+			for (int variateIndexJ = 0; variateIndexJ < _covarianceMatrix.length; ++variateIndexJ) {
+				_correlationMatrix[variateIndexI][variateIndexJ] =
+					_covarianceMatrix[variateIndexI][variateIndexJ] /_varianceArray[variateIndexJ];
 			}
 		}
 
@@ -196,13 +214,7 @@ public class JointVariance
 
 	public double[] varianceArray()
 	{
-		double[] varianceArray = new double[_covarianceMatrix.length];
-
-		for (int variateIndex = 0; variateIndex < _covarianceMatrix.length; ++variateIndex) {
-			varianceArray[variateIndex] = _covarianceMatrix[variateIndex][variateIndex];
-		}
-
-		return varianceArray;
+		return _varianceArray;
 	}
 
 	/**
@@ -213,13 +225,7 @@ public class JointVariance
 
 	public double[] volatilityArray()
 	{
-		double[] volatilityArray = new double[_covarianceMatrix.length];
-
-		for (int variateIndex = 0; variateIndex < _covarianceMatrix.length; ++variateIndex) {
-			volatilityArray[variateIndex] = Math.sqrt (_covarianceMatrix[variateIndex][variateIndex]);
-		}
-
-		return volatilityArray;
+		return _volatilityArray;
 	}
 
 	/**
@@ -230,19 +236,6 @@ public class JointVariance
 
 	public double[][] correlationMatrix()
 	{
-		double[][] correlationMatrix = new double[_covarianceMatrix.length][_covarianceMatrix.length];
-
-		double[] volatilityArray = volatilityArray();
-
-		for (int variateIndexI = 0; variateIndexI < _covarianceMatrix.length; ++variateIndexI) {
-			for (int variateIndexJ = 0; variateIndexJ < _covarianceMatrix.length; ++variateIndexJ) {
-				correlationMatrix[variateIndexI][variateIndexJ] =
-					_covarianceMatrix[variateIndexI][variateIndexJ] / (
-						volatilityArray[variateIndexI] * volatilityArray[variateIndexJ]
-					);
-			}
-		}
-
-		return correlationMatrix;
+		return _correlationMatrix;
 	}
 }

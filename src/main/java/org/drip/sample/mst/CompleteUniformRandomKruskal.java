@@ -3,7 +3,7 @@ package org.drip.sample.mst;
 
 import org.drip.graph.mst.CompleteRandomGraph;
 import org.drip.graph.mst.CompleteRandomGraphEnsemble;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 
@@ -200,7 +200,7 @@ public class CompleteUniformRandomKruskal
 				pathCount
 			);
 
-			UnivariateDiscreteThin univariateDiscreteThin = new UnivariateDiscreteThin (
+			UnivariateCentralMeasures univariateDiscreteThin = new UnivariateCentralMeasures (
 				mstLengthArray
 			);
 

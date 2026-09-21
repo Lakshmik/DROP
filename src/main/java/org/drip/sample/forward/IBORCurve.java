@@ -1,8 +1,6 @@
 
 package org.drip.sample.forward;
 
-import java.util.List;
-
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.*;
 import org.drip.market.otc.*;
@@ -29,6 +27,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -105,202 +111,207 @@ import org.drip.state.inference.*;
  */
 
 /**
- * <i>IBORCurve</i> illustrates the Construction and Usage of the IBOR Forward Curve.
- *  
- * <br><br>
+ * <i>IBORCurve</i> illustrates the Construction and Usage of the IBOR Forward Curve. It exposes the
+ * 	following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></li>
+ * 		<li>Construct the Custom IBOR Sample Curve</li>
+ * 		<li>Construct the Custom IBOR Sample Curve #2</li>
+ * 		<li>Display the Forward Jacobian</li>
  *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class IBORCurve {
+public class IBORCurve
+{
 
 	private static final FloatFloatComponent OTCFloatFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strDerivedTenor,
-		final String strMaturityTenor,
-		final double dblBasis)
+		final JulianDate spotDate,
+		final String currency,
+		final String derivedTenor,
+		final String maturityTenor,
+		final double basis)
 	{
-		FloatFloatSwapConvention ffConv = IBORFloatFloatContainer.ConventionFromJurisdiction (strCurrency);
-
-		return ffConv.createFloatFloatComponent (
-			dtSpot,
-			strDerivedTenor,
-			strMaturityTenor,
-			dblBasis,
+		return IBORFloatFloatContainer.ConventionFromJurisdiction (
+			currency
+		).createFloatFloatComponent (
+			spotDate,
+			derivedTenor,
+			maturityTenor,
+			basis,
 			1.
 		);
 	}
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strLocation,
-		final String strMaturityTenor,
-		final String strIndex,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String location,
+		final String maturityTenor,
+		final String index,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
-			strLocation,
-			strMaturityTenor,
-			strIndex
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
+			location,
+			maturityTenor,
+			index
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
 	private static final ComponentPair OTCComponentPair (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strDerivedTenor,
-		final String strMaturityTenor,
-		final double dblReferenceFixedCoupon,
-		final double dblDerivedFixedCoupon,
-		final double dblBasis)
+		final JulianDate spotDate,
+		final String currency,
+		final String derivedTenor,
+		final String maturityTenor,
+		final double referenceFixedCoupon,
+		final double derivedFixedCoupon,
+		final double basis)
 	{
-		FloatFloatSwapConvention ffConv = IBORFloatFloatContainer.ConventionFromJurisdiction (strCurrency);
-
-		return ffConv.createFixFloatComponentPair (
-			dtSpot,
-			strDerivedTenor,
-			strMaturityTenor,
-			dblReferenceFixedCoupon,
-			dblDerivedFixedCoupon,
-			dblBasis,
+		return IBORFloatFloatContainer.ConventionFromJurisdiction (
+			currency
+		).createFixFloatComponentPair (
+			spotDate,
+			derivedTenor,
+			maturityTenor,
+			referenceFixedCoupon,
+			derivedFixedCoupon,
+			basis,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositFromMaturityDays (
-		final JulianDate dtEffective,
-		final String[] astrMaturityTenor,
-		final ForwardLabel fri)
+		final JulianDate effectiveDate,
+		final String[] maturityTenorArray,
+		final ForwardLabel forwardLabel)
 		throws Exception
 	{
-		if (null == astrMaturityTenor || 0 == astrMaturityTenor.length) return null;
+		if (null == maturityTenorArray || 0 == maturityTenorArray.length) {
+			return null;
+		}
 
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[astrMaturityTenor.length];
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addTenor (astrMaturityTenor[i]),
-				fri
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			depositArray[tenorIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addTenor (maturityTenorArray[tenorIndex]),
+				forwardLabel
 			);
+		}
 
-		return aDeposit;
+		return depositArray;
 	}
 
-	/*
-	 * Construct the Array of FRA from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FRAStandardComponent[] FRAFromMaturityDays (
-		final JulianDate dtEffective,
-		final ForwardLabel fri,
-		final String[] astrMaturityTenor,
-		final double[] adblFRAStrike)
+		final JulianDate effectiveDate,
+		final ForwardLabel forwardLabel,
+		final String[] maturityTenorArray,
+		final double[] fraStrikeArray)
 		throws Exception
 	{
-		if (null == astrMaturityTenor || null == adblFRAStrike || 0 == astrMaturityTenor.length) return null;
+		if (null == maturityTenorArray || null == fraStrikeArray || 0 == maturityTenorArray.length) {
+			return null;
+		}
 
-		FRAStandardComponent[] aFRA = new FRAStandardComponent[astrMaturityTenor.length];
+		FRAStandardComponent[] fraArray = new FRAStandardComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFRA[i] = SingleStreamComponentBuilder.FRAStandard (
-				dtEffective.addTenor (astrMaturityTenor[i]),
-				fri,
-				adblFRAStrike[i]
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			fraArray[tenorIndex] = SingleStreamComponentBuilder.FRAStandard (
+				effectiveDate.addTenor (maturityTenorArray[tenorIndex]),
+				forwardLabel,
+				fraStrikeArray[tenorIndex]
 			);
+		}
 
-		return aFRA;
+		return fraArray;
 	}
 
 	private static final FixFloatComponent[] FixFloatSwap2 (
-		final JulianDate dtEffective,
-		final ForwardLabel fri,
-		final String[] astrMaturityTenor)
+		final JulianDate effectiveDate,
+		final ForwardLabel forwardLabel,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		if (null == astrMaturityTenor || 0 == astrMaturityTenor.length) return null;
+		if (null == maturityTenorArray || 0 == maturityTenorArray.length) {
+			return null;
+		}
 
-		FixFloatComponent[] aFixFloat = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFixFloat[i] = OTCIRS (
-				dtEffective,
-				fri.currency(),
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			irsArray[tenorIndex] = OTCIRS (
+				effectiveDate,
+				forwardLabel.currency(),
 				"ALL",
-				astrMaturityTenor[i],
+				maturityTenorArray[tenorIndex],
 				"MAIN",
 				0.
 			);
+		}
 
-		return aFixFloat;
+		return irsArray;
 	}
 
 	private static final FixFloatComponent[] FixFloatSwap (
-		final JulianDate dtValue,
-		final ForwardLabel fri,
-		final String[] astrMaturityTenor)
+		final JulianDate valueDate,
+		final ForwardLabel forwardLabel,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		if (null == astrMaturityTenor || 0 == astrMaturityTenor.length) return null;
+		if (null == maturityTenorArray || 0 == maturityTenorArray.length) {
+			return null;
+		}
 
-		JulianDate dtEffective = dtValue.addDays (2);
+		String currency = forwardLabel.currency();
 
-		String strCurrency = fri.currency();
+		JulianDate effectiveDate = valueDate.addDays (2);
 
-		FixFloatComponent[] aFFC = new FixFloatComponent[astrMaturityTenor.length];
+		int tenorInMonths = Integer.parseInt (forwardLabel.tenor().split ("M")[0]);
 
-		int iTenorInMonths = Integer.parseInt (fri.tenor().split ("M")[0]);
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
 
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
+		UnitCouponAccrualSetting fixedUnitCouponAccrualSetting = new UnitCouponAccrualSetting (
 			1,
 			"Act/360",
 			false,
 			"Act/360",
 			false,
-			strCurrency,
+			currency,
 			true,
 			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
 		);
 
-		ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-			fri.tenor(),
+		ComposableFloatingUnitSetting composableFloatingUnitSetting = new ComposableFloatingUnitSetting (
+			forwardLabel.tenor(),
 			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
 			null,
-			fri,
+			forwardLabel,
 			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
 			0.
 		);
 
-		CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-			12 / iTenorInMonths,
-			fri.tenor(),
-			strCurrency,
+		CompositePeriodSetting floatingCompositePeriodSetting = new CompositePeriodSetting (
+			12 / tenorInMonths,
+			forwardLabel.tenor(),
+			currency,
 			null,
 			-1.,
 			null,
@@ -309,205 +320,176 @@ public class IBORCurve {
 			null
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			int iTenorCompare = Helper.TenorCompare (
-				astrMaturityTenor[i],
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			String fixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[tenorIndex],
 				"6M"
+			) ? maturityTenorArray[tenorIndex] : "6M";
+
+			irsArray[tenorIndex] = new FixFloatComponent (
+				new Stream (
+					CompositePeriodBuilder.FixedCompositeUnit (
+						CompositePeriodBuilder.BackwardEdgeDates (
+							effectiveDate,
+							effectiveDate.addTenor (maturityTenorArray[tenorIndex]),
+							"1Y",
+							null,
+							CompositePeriodBuilder.SHORT_STUB
+						),
+						new CompositePeriodSetting (
+							1,
+							fixedTenor,
+							currency,
+							null,
+							1.,
+							null,
+							null,
+							null,
+							null
+						),
+						fixedUnitCouponAccrualSetting,
+						new ComposableFixedUnitSetting (
+							fixedTenor,
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+							null,
+							0.,
+							0.,
+							currency
+						)
+					)
+				),
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							forwardLabel.tenor(),
+							maturityTenorArray[tenorIndex],
+							null
+						),
+						floatingCompositePeriodSetting,
+						composableFloatingUnitSetting
+					)
+				),
+				cashSettleParams
 			);
 
-			String strFixedTenor = Helper.LEFT_TENOR_LESSER == iTenorCompare ? astrMaturityTenor[i] : "6M";
-
-			ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-				strFixedTenor,
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-				null,
-				0.,
-				0.,
-				strCurrency
-			);
-
-			CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-				1,
-				strFixedTenor,
-				strCurrency,
-				null,
-				1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.BackwardEdgeDates (
-				dtEffective,
-				dtEffective.addTenor (astrMaturityTenor[i]),
-				"1Y",
-				null,
-				CompositePeriodBuilder.SHORT_STUB
-			);
-
-			List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				fri.tenor(),
-				astrMaturityTenor[i],
-				null
-			);
-
-			Stream floatingStream = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsFloatingStreamEdgeDate,
-					cpsFloating,
-					cfusFloating
-				)
-			);
-
-			Stream fixedStream = new Stream (
-				CompositePeriodBuilder.FixedCompositeUnit (
-					lsFixedStreamEdgeDate,
-					cpsFixed,
-					ucasFixed,
-					cfusFixed
-				)
-			);
-
-			aFFC[i] = new FixFloatComponent (
-				fixedStream,
-				floatingStream,
-				csp
-			);
-
-			aFFC[i].setPrimaryCode ("FixFloat:" + astrMaturityTenor[i]);
+			irsArray[tenorIndex].setPrimaryCode ("FixFloat:" + maturityTenorArray[tenorIndex]);
 		}
 
-		return aFFC;
+		return irsArray;
 	}
-
-	/*
-	 * Construct an array of float-float swaps from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FloatFloatComponent[] FloatFloatSwap (
-		final JulianDate dtSpot,
-		final ForwardLabel fri,
-		final String[] astrMaturityTenor)
+		final JulianDate spotDate,
+		final ForwardLabel forwardLabel,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		if (null == astrMaturityTenor || 0 == astrMaturityTenor.length) return null;
+		if (null == maturityTenorArray || 0 == maturityTenorArray.length) {
+			return null;
+		}
 
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		int iTenorInMonths = Integer.parseInt (fri.tenor().split ("M")[0]);
+		int tenorInMonths = Integer.parseInt (forwardLabel.tenor().split ("M")[0]);
 
-		String strCurrency = fri.currency();
+		String currency = forwardLabel.currency();
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aFFC[i] = OTCFloatFloat (
-				dtSpot,
-				strCurrency,
-				iTenorInMonths + "M",
-				astrMaturityTenor[i],
-				0.
-			);
-
-		return aFFC;
-	}
-
-	/*
-	 * Construct an array of fix-float component pairs from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
-	private static final ComponentPair[] FixFloatComponentPair (
-		final JulianDate dtSpot,
-		final CurveSurfaceQuoteContainer csqs,
-		final ForwardLabel friDerived,
-		final String[] astrMaturityTenor)
-		throws Exception
-	{
-		if (null == astrMaturityTenor || 0 == astrMaturityTenor.length) return null;
-
-		ComponentPair[] aFFCP = new ComponentPair[astrMaturityTenor.length];
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			friDerived.currency()
-		);
-
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			ComponentPair cp = OTCComponentPair (
-				dtSpot,
-				friDerived.currency(),
-				friDerived.tenor(),
-				astrMaturityTenor[i],
-				0.,
-				0.,
-				0.
-			);
-
-			double dblReferenceFixedCoupon = cp.referenceComponent().measureValue (
-				valParams,
-				null,
-				csqs,
-				null,
-				"FairPremium"
-			);
-
-			double dblDerivedFixedCoupon = cp.derivedComponent().measureValue (
-				valParams,
-				null,
-				csqs,
-				null,
-				"FairPremium"
-			);
-
-			aFFCP[i] = OTCComponentPair (
-				dtSpot,
-				friDerived.currency(),
-				friDerived.tenor(),
-				astrMaturityTenor[i],
-				dblReferenceFixedCoupon,
-				dblDerivedFixedCoupon,
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			floatFloatComponentArray[tenorIndex] = OTCFloatFloat (
+				spotDate,
+				currency,
+				tenorInMonths + "M",
+				maturityTenorArray[tenorIndex],
 				0.
 			);
 		}
 
-		return aFFCP;
+		return floatFloatComponentArray;
+	}
+
+	private static final ComponentPair[] FixFloatComponentPair (
+		final JulianDate spotDate,
+		final CurveSurfaceQuoteContainer curveSurfaceQuoteContainer,
+		final ForwardLabel derivedForwardLabel,
+		final String[] maturityTenorArray)
+		throws Exception
+	{
+		if (null == maturityTenorArray || 0 == maturityTenorArray.length) {
+			return null;
+		}
+
+		String tenor = derivedForwardLabel.tenor();
+
+		String currency = derivedForwardLabel.currency();
+
+		ComponentPair[] componentPairArray = new ComponentPair[maturityTenorArray.length];
+
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
+
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
+			ComponentPair componentPair = OTCComponentPair (
+				spotDate,
+				currency,
+				tenor,
+				maturityTenorArray[tenorIndex],
+				0.,
+				0.,
+				0.
+			);
+
+			componentPairArray[tenorIndex] = OTCComponentPair (
+				spotDate,
+				currency,
+				tenor,
+				maturityTenorArray[tenorIndex],
+				componentPair.referenceComponent().measureValue (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null,
+					"FairPremium"
+				),
+				componentPair.derivedComponent().measureValue (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null,
+					"FairPremium"
+				),
+				0.
+			);
+		}
+
+		return componentPairArray;
 	}
 
 	/**
 	 * Construct the Custom IBOR Sample Curve
 	 * 
-	 * @param dc Discount Curve
-	 * @param fcReference Reference Forward Curve
-	 * @param fri Floating Rate Index
-	 * @param scbc Segment Custom Builder Control
-	 * @param astrDepositTenor Deposit Tenor Array
-	 * @param adblDepositQuote Deposit Quote Array
-	 * @param strDepositCalibMeasure Deposit Calibration Measure
-	 * @param astrFRATenor FRA Tenor Array
-	 * @param adblFRAQuote FRA Quote Array
-	 * @param strFRACalibMeasure FRA Calibration Measure Array
-	 * @param astrFixFloatTenor Fix-Float Tenor Array
-	 * @param adblFixFloatQuote Fix-Float Quote Array
-	 * @param strFixFloatCalibMeasure Fix-Float Calibration Measure
-	 * @param astrFloatFloatTenor Float-float Tenor Array
-	 * @param adblFloatFloatQuote Float-Float Quote Array
-	 * @param strFloatFloatCalibMeasure Float-float Calibration Measure
-	 * @param astrSyntheticFloatFloatTenor Synthetic Float-float Tenor Array
-	 * @param adblSyntheticFloatFloatQuote Synthetic Float-float Quote Array
-	 * @param strSyntheticFloatFloatCalibMeasure Synthetic Float-float Measure
-	 * @param strHeaderComment Header Comment
-	 * @param bPrintMetric TRUE - Print Metric
+	 * @param discountCurve Discount Curve
+	 * @param referenceForwardCurve Reference Forward Curve
+	 * @param forwardLabel Floating Rate Index
+	 * @param segmentCustomBuilderControl Segment Custom Builder Control
+	 * @param depositTenorArray Deposit Tenor Array
+	 * @param depositQuoteArray Deposit Quote Array
+	 * @param depositCalibrationMeasure Deposit Calibration Measure
+	 * @param fraTenorArray FRA Tenor Array
+	 * @param fraQuoteArray FRA Quote Array
+	 * @param fraCalibrationMeasure FRA Calibration Measure Array
+	 * @param fixFloatTenorArray Fix-Float Tenor Array
+	 * @param fixFloatQuoteArray Fix-Float Quote Array
+	 * @param fixFloatCalibrationMeasure Fix-Float Calibration Measure
+	 * @param floatFloatTenorArray Float-float Tenor Array
+	 * @param floatFloatQuoteArray Float-Float Quote Array
+	 * @param floatFloatCalibrationMeasure Float-float Calibration Measure
+	 * @param syntheticFloatFloatTenorArray Synthetic Float-float Tenor Array
+	 * @param syntheticFloatFloatQuoteArray Synthetic Float-float Quote Array
+	 * @param syntheticFloatFloatCalibrationMeasure Synthetic Float-float Measure
+	 * @param headerComment Header Comment
+	 * @param printMetric TRUE - Print Metric
 	 * 
 	 * @return The Custom IBOR Sample Curve
 	 * 
@@ -515,162 +497,79 @@ public class IBORCurve {
 	 */
 
 	public static final ForwardCurve CustomIBORBuilderSample (
-		final MergedDiscountForwardCurve dc,
-		final ForwardCurve fcReference,
-		final ForwardLabel fri,
-		final SegmentCustomBuilderControl scbc,
-		final String[] astrDepositTenor,
-		final double[] adblDepositQuote,
-		final String strDepositCalibMeasure,
-		final String[] astrFRATenor,
-		final double[] adblFRAQuote,
-		final String strFRACalibMeasure,
-		final String[] astrFixFloatTenor,
-		final double[] adblFixFloatQuote,
-		final String strFixFloatCalibMeasure,
-		final String[] astrFloatFloatTenor,
-		final double[] adblFloatFloatQuote,
-		final String strFloatFloatCalibMeasure,
-		final String[] astrSyntheticFloatFloatTenor,
-		final double[] adblSyntheticFloatFloatQuote,
-		final String strSyntheticFloatFloatCalibMeasure,
-		final String strHeaderComment,
-		final boolean bPrintMetric)
+		final MergedDiscountForwardCurve discountCurve,
+		final ForwardCurve referenceForwardCurve,
+		final ForwardLabel forwardLabel,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final String[] depositTenorArray,
+		final double[] depositQuoteArray,
+		final String depositCalibrationMeasure,
+		final String[] fraTenorArray,
+		final double[] fraQuoteArray,
+		final String fraCalibrationMeasure,
+		final String[] fixFloatTenorArray,
+		final double[] fixFloatQuoteArray,
+		final String fixFloatCalibrationMeasure,
+		final String[] floatFloatTenorArray,
+		final double[] floatFloatQuoteArray,
+		final String floatFloatCalibrationMeasure,
+		final String[] syntheticFloatFloatTenorArray,
+		final double[] syntheticFloatFloatQuoteArray,
+		final String syntheticFloatFloatCalibrationMeasure,
+		final String headerComment,
+		final boolean printMetric)
 		throws Exception
 	{
-		if (bPrintMetric) {
-			System.out.println ("\n\t----------------------------------------------------------------");
+		if (printMetric) {
+			System.out.println ("\n\t||----------------------------------------------------------------");
 
-			System.out.println ("\t     " + strHeaderComment);
+			System.out.println ("\t||     " + headerComment);
 
-			System.out.println ("\t----------------------------------------------------------------");
+			System.out.println ("\t||----------------------------------------------------------------");
 		}
 
-		JulianDate dtValue = dc.epoch();
+		JulianDate valueDate = discountCurve.epoch();
 
-		SingleStreamComponent[] aDeposit = DepositFromMaturityDays (
-			dtValue,
-			astrDepositTenor,
-			fri
+		SingleStreamComponent[] depositArray = DepositFromMaturityDays (
+			valueDate,
+			depositTenorArray,
+			forwardLabel
 		);
 
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"DEPOSIT",
-			aDeposit,
-			strDepositCalibMeasure,
-			adblDepositQuote
+		FRAStandardComponent[] fraArray = FRAFromMaturityDays (
+			valueDate,
+			forwardLabel,
+			fraTenorArray,
+			fraQuoteArray
 		);
 
-		FRAStandardComponent[] aFRA = FRAFromMaturityDays (
-			dtValue,
-			fri,
-			astrFRATenor,
-			adblFRAQuote
+		FixFloatComponent[] fixFloatComponentArray = FixFloatSwap2 (
+			valueDate,
+			forwardLabel,
+			fixFloatTenorArray
 		);
 
-		/*
-		 * Construct the FRA Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec fraStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"FRA",
-			aFRA,
-			strFRACalibMeasure,
-			adblFRAQuote
+		FloatFloatComponent[] floatFloatComponentArray = FloatFloatSwap (
+			valueDate,
+			forwardLabel,
+			floatFloatTenorArray
 		);
 
-		FixFloatComponent[] aFixFloat = FixFloatSwap2 (
-			dtValue,
-			fri,
-			astrFixFloatTenor
+		FloatFloatComponent[] syntheticFloatFloatComponentArray = FloatFloatSwap (
+			valueDate,
+			forwardLabel,
+			syntheticFloatFloatTenorArray
 		);
 
-		/*
-		 * Construct the Fix-Float Component Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec fixFloatStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"FIXFLOAT",
-			aFixFloat,
-			strFixFloatCalibMeasure,
-			adblFixFloatQuote
+		ValuationParams valuationParams = new ValuationParams (
+			valueDate,
+			valueDate,
+			forwardLabel.currency()
 		);
 
-		FloatFloatComponent[] aFloatFloat = FloatFloatSwap (
-			dtValue,
-			fri,
-			astrFloatFloatTenor
-		);
-
-		/*
-		 * Construct the Float-Float Component Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec floatFloatStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"FLOATFLOAT",
-			aFloatFloat,
-			strFloatFloatCalibMeasure,
-			adblFloatFloatQuote
-		);
-
-		FloatFloatComponent[] aSyntheticFloatFloat = FloatFloatSwap (
-			dtValue,
-			fri,
-			astrSyntheticFloatFloatTenor
-		);
-
-		/*
-		 * Construct the Synthetic Float-Float Component Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec syntheticFloatFloatStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"SYNTHETICFLOATFLOAT",
-			aSyntheticFloatFloat,
-			strSyntheticFloatFloatCalibMeasure,
-			adblSyntheticFloatFloatQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			fraStretch,
-			fixFloatStretch,
-			floatFloatStretch,
-			syntheticFloatFloatStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			scbc,
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtValue,
-			dtValue,
-			fri.currency()
-		);
-
-		/*
-		 * Set the discount curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
-			fcReference,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
+			referenceForwardCurve,
 			null,
 			null,
 			null,
@@ -679,147 +578,286 @@ public class IBORCurve {
 			null
 		);
 
-		/*
-		 * Construct the Shape Preserving Forward Curve by applying the linear curve calibrator to the array
-		 *  of Deposit and Swap Stretches.
-		 */
-
-		ForwardCurve fcDerived = ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
-			lcc,
-			aStretchSpec,
-			fri,
-			valParams,
+		ForwardCurve derivedForwardCurve = ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
+			new LinearLatentStateCalibrator (
+				segmentCustomBuilderControl,
+				BoundarySettings.NaturalStandard(),
+				MultiSegmentSequence.CALIBRATE,
+				null,
+				null
+			),
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"DEPOSIT",
+					depositArray,
+					depositCalibrationMeasure,
+					depositQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"FRA",
+					fraArray,
+					fraCalibrationMeasure,
+					fraQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"FIXFLOAT",
+					fixFloatComponentArray,
+					fixFloatCalibrationMeasure,
+					fixFloatQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"FLOATFLOAT",
+					floatFloatComponentArray,
+					floatFloatCalibrationMeasure,
+					floatFloatQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"SYNTHETICFLOATFLOAT",
+					syntheticFloatFloatComponentArray,
+					syntheticFloatFloatCalibrationMeasure,
+					syntheticFloatFloatQuoteArray
+				)
+			},
+			forwardLabel,
+			valuationParams,
 			null,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null,
-			null == adblDepositQuote || 0 == adblDepositQuote.length ? adblFRAQuote[0] : adblDepositQuote[0]
+			null == depositQuoteArray || 0 == depositQuoteArray.length ?
+				fraQuoteArray[0] : depositQuoteArray[0]
 		);
 
-		/*
-		 * Set the discount curve + cubic polynomial forward curve based component market parameters.
-		 */
+		curveSurfaceQuoteContainer.setForwardState (derivedForwardCurve);
 
-		mktParams.setForwardState (fcDerived);
+		if (printMetric) {
+			if (null != depositArray && null != depositQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-		if (bPrintMetric) {
-			/*
-			 * Cross-Comparison of the Deposit Calibration Instrument "Forward" metric.
-			 */
+				System.out.println ("\t||     DEPOSIT INSTRUMENTS QUOTE RECOVERY");
 
-			if (null != aDeposit && null != adblDepositQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t     DEPOSIT INSTRUMENTS QUOTE RECOVERY");
-
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aDeposit.length; ++i)
-					System.out.println ("\t[" + aDeposit[i].effectiveDate() + " - " + aDeposit[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aDeposit[i].measureValue (valParams, null, mktParams, null, strDepositCalibMeasure), 1, 6, 1.) +
-							" | " + FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aDeposit[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+					System.out.println (
+						"\t|| [" + depositArray[depositIndex].effectiveDate() + " - " +
+							depositArray[depositIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+								depositArray[depositIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									depositCalibrationMeasure
+								),
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								depositQuoteArray[depositIndex],
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									depositArray[depositIndex].maturityDate()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the FRA Calibration Instrument "Forward" metric.
-			 */
+			if (null != fraArray && null != fraQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aFRA && null != adblFRAQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     FRA INSTRUMENTS QUOTE RECOVERY");
 
-				System.out.println ("\t     FRA INSTRUMENTS QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aFRA.length; ++i)
-					System.out.println ("\t[" + aFRA[i].effectiveDate() + " - " + aFRA[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aFRA[i].measureValue (valParams, null, mktParams, null, strFRACalibMeasure), 1, 6, 1.) +
-							" | " + FormatUtil.FormatDouble (adblFRAQuote[i], 1, 6, 1.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aFRA[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int fraIndex = 0; fraIndex < fraArray.length; ++fraIndex) {
+					System.out.println (
+						"\t|| [" + fraArray[fraIndex].effectiveDate() + " - " +
+							fraArray[fraIndex].maturityDate() + "] =>" + FormatUtil.FormatDouble (
+								fraArray[fraIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									fraCalibrationMeasure
+								),
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								fraQuoteArray[fraIndex],
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (fraArray[fraIndex].maturityDate()),
+								1,
+								4,
+								100.
+							) + "%"
+						);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the Fix-Float Calibration Instrument "DerivedParBasisSpread" metric.
-			 */
+			if (null != fixFloatComponentArray && null != fixFloatQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aFixFloat && null != adblFixFloatQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     FIX-FLOAT INSTRUMENTS QUOTE RECOVERY");
 
-				System.out.println ("\t     FIX-FLOAT INSTRUMENTS QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aFixFloat.length; ++i)
-					System.out.println ("\t[" + aFixFloat[i].effectiveDate() + " - " + aFixFloat[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aFixFloat[i].measureValue (valParams, null, mktParams, null, strFixFloatCalibMeasure), 1, 4, 100.) +
-							"% | " + FormatUtil.FormatDouble (adblFixFloatQuote[i], 1, 4, 100.) + "% | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aFixFloat[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int fixFloatIndex = 0; fixFloatIndex < fixFloatComponentArray.length; ++fixFloatIndex) {
+					System.out.println (
+						"\t|| [" + fixFloatComponentArray[fixFloatIndex].effectiveDate() + " - " +
+							fixFloatComponentArray[fixFloatIndex].maturityDate() + "] =>" +
+							FormatUtil.FormatDouble (
+								fixFloatComponentArray[fixFloatIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									fixFloatCalibrationMeasure
+								),
+								1,
+								4,
+								100.
+							) + "% | " + FormatUtil.FormatDouble (
+								fixFloatQuoteArray[fixFloatIndex],
+								1,
+								4,
+								100.
+							) + "% | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									fixFloatComponentArray[fixFloatIndex].maturityDate()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the Float-Float Calibration Instrument "DerivedParBasisSpread" metric.
-			 */
+			if (null != floatFloatComponentArray && null != floatFloatQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aFloatFloat && null != adblFloatFloatQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     FLOAT-FLOAT INSTRUMENTS QUOTE RECOVERY");
 
-				System.out.println ("\t     FLOAT-FLOAT INSTRUMENTS QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aFloatFloat.length; ++i)
-					System.out.println ("\t[" + aFloatFloat[i].effectiveDate() + " - " + aFloatFloat[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aFloatFloat[i].measureValue (valParams, null, mktParams, null, strFloatFloatCalibMeasure), 1, 2, 1.) +
-							" | " + FormatUtil.FormatDouble (adblFloatFloatQuote[i], 1, 2, 10000.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aFloatFloat[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int floatFloatIndex = 0;
+					floatFloatIndex < floatFloatComponentArray.length;
+					++floatFloatIndex)
+				{
+					System.out.println (
+						"\t|| [" + floatFloatComponentArray[floatFloatIndex].effectiveDate() + " - " +
+							floatFloatComponentArray[floatFloatIndex].maturityDate() + "] =>" +
+							FormatUtil.FormatDouble (
+								floatFloatComponentArray[floatFloatIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									floatFloatCalibrationMeasure
+								),
+								1,
+								2,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								floatFloatQuoteArray[floatFloatIndex],
+								1,
+								2,
+								10000.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									floatFloatComponentArray[floatFloatIndex].maturityDate()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the Synthetic Float-Float Calibration Instrument "DerivedParBasisSpread" metric.
-			 */
+			if (null != syntheticFloatFloatComponentArray && null != syntheticFloatFloatQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aSyntheticFloatFloat && null != adblSyntheticFloatFloatQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     SYNTHETIC FLOAT-FLOAT INSTRUMENTS QUOTE RECOVERY");
 
-				System.out.println ("\t     SYNTHETIC FLOAT-FLOAT INSTRUMENTS QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aSyntheticFloatFloat.length; ++i)
-					System.out.println ("\t[" + aSyntheticFloatFloat[i].effectiveDate() + " - " + aSyntheticFloatFloat[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aSyntheticFloatFloat[i].measureValue (valParams, null, mktParams, null, strSyntheticFloatFloatCalibMeasure), 1, 2, 1.) +
-							" | " + FormatUtil.FormatDouble (adblSyntheticFloatFloatQuote[i], 1, 2, 10000.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aSyntheticFloatFloat[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int syntheticFloatFloatIndex = 0;
+					syntheticFloatFloatIndex < syntheticFloatFloatComponentArray.length;
+					++syntheticFloatFloatIndex)
+				{
+					System.out.println (
+						"\t|| [" +
+							syntheticFloatFloatComponentArray[syntheticFloatFloatIndex].effectiveDate() +
+							" - " +
+							syntheticFloatFloatComponentArray[syntheticFloatFloatIndex].maturityDate() +
+							"] =>" + FormatUtil.FormatDouble (
+								syntheticFloatFloatComponentArray[syntheticFloatFloatIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									syntheticFloatFloatCalibrationMeasure
+								),
+								1,
+								2,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								syntheticFloatFloatQuoteArray[syntheticFloatFloatIndex],
+								1,
+								2,
+								10000.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									syntheticFloatFloatComponentArray[syntheticFloatFloatIndex].maturityDate()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 		}
 
-		return fcDerived;
+		return derivedForwardCurve;
 	}
 
 	/**
 	 * Construct the Custom IBOR Sample Curve #2
 	 * 
-	 * @param dc Discount Curve
-	 * @param fcReference Reference Forward Curve
-	 * @param fri Floating Rate Index
-	 * @param scbc Segment Custom Builder Control
-	 * @param astrDepositTenor Deposit Tenor Array
-	 * @param adblDepositQuote Deposit Quote Array
-	 * @param strDepositCalibMeasure Deposit Calibration Measure
-	 * @param astrFRATenor FRA Tenor Array
-	 * @param adblFRAQuote FRA Quote Array
-	 * @param strFRACalibMeasure FRA Calibration Measure Array
-	 * @param astrFixFloatTenor Fix-Float Tenor Array
-	 * @param adblFixFloatQuote Fix-Float Quote Array
-	 * @param strFixFloatCalibMeasure Fix-Float Calibration Measure
-	 * @param astrComponentPairTenor Component Pair Tenor Array
-	 * @param adblComponentPairQuote Component Pair Quote Array
-	 * @param strComponentPairCalibMeasure Component Pair Calibration Measure
-	 * @param astrSyntheticComponentPairTenor Synthetic Component Pair Tenor Array
-	 * @param adblSyntheticComponentPairQuote Synthetic Component Pair Quote Array
-	 * @param strSyntheticComponentPairCalibMeasure Synthetic Component Pair Measure
-	 * @param strHeaderComment Header Comment
-	 * @param bPrintMetric TRUE - Print Metric
+	 * @param discountCurve Discount Curve
+	 * @param referenceForwardCurve Reference Forward Curve
+	 * @param forwardLabel Floating Rate Index
+	 * @param segmentCustomBuilderControl Segment Custom Builder Control
+	 * @param depositTenorArray Deposit Tenor Array
+	 * @param depositQuoteArray Deposit Quote Array
+	 * @param depositCalibrationMeasure Deposit Calibration Measure
+	 * @param fraTenorArray FRA Tenor Array
+	 * @param fraQuoteArray FRA Quote Array
+	 * @param fraCalibrationMeasure FRA Calibration Measure Array
+	 * @param fixFloatTenorArray Fix-Float Tenor Array
+	 * @param fixFloatQuoteArray Fix-Float Quote Array
+	 * @param fixFloatCalibrationMeasure Fix-Float Calibration Measure
+	 * @param componentPairTenorArray Component Pair Tenor Array
+	 * @param componentPairQuoteArray Component Pair Quote Array
+	 * @param componentPairCalibrationMeasure Component Pair Calibration Measure
+	 * @param syntheticComponentPairTenorArray Synthetic Component Pair Tenor Array
+	 * @param syntheticComponentPairQuoteArray Synthetic Component Pair Quote Array
+	 * @param syntheticComponentPairCalibrationMeasure Synthetic Component Pair Measure
+	 * @param headerComment Header Comment
+	 * @param printMetric TRUE - Print Metric
 	 * 
 	 * @return The Custom IBOR Sample Curve
 	 * 
@@ -827,52 +865,48 @@ public class IBORCurve {
 	 */
 
 	public static final ForwardCurve CustomIBORBuilderSample2 (
-		final MergedDiscountForwardCurve dc,
-		final ForwardCurve fcReference,
-		final ForwardLabel fri,
-		final SegmentCustomBuilderControl scbc,
-		final String[] astrDepositTenor,
-		final double[] adblDepositQuote,
-		final String strDepositCalibMeasure,
-		final String[] astrFRATenor,
-		final double[] adblFRAQuote,
-		final String strFRACalibMeasure,
-		final String[] astrFixFloatTenor,
-		final double[] adblFixFloatQuote,
-		final String strFixFloatCalibMeasure,
-		final String[] astrComponentPairTenor,
-		final double[] adblComponentPairQuote,
-		final String strComponentPairCalibMeasure,
-		final String[] astrSyntheticComponentPairTenor,
-		final double[] adblSyntheticComponentPairQuote,
-		final String strSyntheticComponentPairCalibMeasure,
-		final String strHeaderComment,
-		final boolean bPrintMetric)
+		final MergedDiscountForwardCurve discountCurve,
+		final ForwardCurve referenceForwardCurve,
+		final ForwardLabel forwardLabel,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final String[] depositTenorArray,
+		final double[] depositQuoteArray,
+		final String depositCalibrationMeasure,
+		final String[] fraTenorArray,
+		final double[] fraQuoteArray,
+		final String fraCalibrationMeasure,
+		final String[] fixFloatTenorArray,
+		final double[] fixFloatQuoteArray,
+		final String fixFloatCalibrationMeasure,
+		final String[] componentPairTenorArray,
+		final double[] componentPairQuoteArray,
+		final String componentPairCalibrationMeasure,
+		final String[] syntheticComponentPairTenorArray,
+		final double[] syntheticComponentPairQuoteArray,
+		final String syntheticComponentPairCalibrationMeasure,
+		final String headerComment,
+		final boolean printMetric)
 		throws Exception
 	{
-		if (bPrintMetric) {
+		if (printMetric) {
 			System.out.println ("\n\t----------------------------------------------------------------");
 
-			System.out.println ("\t     " + strHeaderComment);
+			System.out.println ("\t     " + headerComment);
 
 			System.out.println ("\t----------------------------------------------------------------");
 		}
 
-		JulianDate dtValue = dc.epoch();
+		JulianDate valueDate = discountCurve.epoch();
 
-		ValuationParams valParams = new ValuationParams (
-			dtValue,
-			dtValue,
-			fri.currency()
+		ValuationParams valuationParams = new ValuationParams (
+			valueDate,
+			valueDate,
+			forwardLabel.currency()
 		);
 
-		/*
-		 * Set the discount curve based component market parameters.
-		 */
-
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
-			fcReference,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
+			referenceForwardCurve,
 			null,
 			null,
 			null,
@@ -881,287 +915,339 @@ public class IBORCurve {
 			null
 		);
 
-		SingleStreamComponent[] aDeposit = DepositFromMaturityDays (
-			dtValue,
-			astrDepositTenor,
-			fri
+		SingleStreamComponent[] depositArray = DepositFromMaturityDays (
+			valueDate,
+			depositTenorArray,
+			forwardLabel
 		);
 
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"DEPOSIT",
-			aDeposit,
-			strDepositCalibMeasure,
-			adblDepositQuote
+		FRAStandardComponent[] fraArray = FRAFromMaturityDays (
+			valueDate,
+			forwardLabel,
+			fraTenorArray,
+			fraQuoteArray
 		);
 
-		FRAStandardComponent[] aFRA = FRAFromMaturityDays (
-			dtValue,
-			fri,
-			astrFRATenor,
-			adblFRAQuote
+		FixFloatComponent[] fixFloatComponentArray = FixFloatSwap (
+			valueDate,
+			forwardLabel,
+			fixFloatTenorArray
 		);
 
-		/*
-		 * Construct the FRA Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec fraStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"FRA",
-			aFRA,
-			strFRACalibMeasure,
-			adblFRAQuote
+		ComponentPair[] componentPairArray = FixFloatComponentPair (
+			valueDate,
+			curveSurfaceQuoteContainer,
+			forwardLabel,
+			componentPairTenorArray
 		);
 
-		FixFloatComponent[] aFixFloat = FixFloatSwap (
-			dtValue,
-			fri,
-			astrFixFloatTenor
+		ComponentPair[] syntheticComponentPairArray = FixFloatComponentPair (
+			valueDate,
+			curveSurfaceQuoteContainer,
+			forwardLabel,
+			syntheticComponentPairTenorArray
 		);
 
-		/*
-		 * Construct the Fix-Float Component Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec fixFloatStretch = LatentStateStretchBuilder.ForwardStretchSpec (
-			"FIXFLOAT",
-			aFixFloat,
-			strFixFloatCalibMeasure,
-			adblFixFloatQuote
-		);
-
-		org.drip.product.fx.ComponentPair[] aComponentPair = FixFloatComponentPair (
-			dtValue,
-			mktParams,
-			fri,
-			astrComponentPairTenor
-		);
-
-		/*
-		 * Construct the Float-Float Component Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec fixFloatCPStretch = LatentStateStretchBuilder.ComponentPairForwardStretch (
-			"FIXFLOATCP",
-			aComponentPair,
-			valParams,
-			mktParams,
-			adblComponentPairQuote,
-			true,
-			true
-		);
-
-		org.drip.product.fx.ComponentPair[] aSyntheticComponentPair = FixFloatComponentPair (
-			dtValue,
-			mktParams,
-			fri,
-			astrSyntheticComponentPairTenor
-		);
-
-		/*
-		 * Construct the Synthetic Fix-Float Component Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec syntheticFixFloatCPStretch = LatentStateStretchBuilder.ComponentPairForwardStretch (
-			"SYNTHETICFIXFLOATCP",
-			aSyntheticComponentPair,
-			valParams,
-			mktParams,
-			adblSyntheticComponentPairQuote,
-			true,
-			true
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			fraStretch,
-			fixFloatStretch,
-			fixFloatCPStretch,
-			syntheticFixFloatCPStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			scbc,
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
+		ForwardCurve derivedForwardCurve = ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
+			new LinearLatentStateCalibrator (
+				segmentCustomBuilderControl,
+				BoundarySettings.NaturalStandard(),
+				MultiSegmentSequence.CALIBRATE,
+				null,
+				null
+			),
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"DEPOSIT",
+					depositArray,
+					depositCalibrationMeasure,
+					depositQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"FRA",
+					fraArray,
+					fraCalibrationMeasure,
+					fraQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardStretchSpec (
+					"FIXFLOAT",
+					fixFloatComponentArray,
+					fixFloatCalibrationMeasure,
+					fixFloatQuoteArray
+				),
+				LatentStateStretchBuilder.ComponentPairForwardStretch (
+					"FIXFLOATCP",
+					componentPairArray,
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					componentPairQuoteArray,
+					true,
+					true
+				),
+				LatentStateStretchBuilder.ComponentPairForwardStretch (
+					"SYNTHETICFIXFLOATCP",
+					syntheticComponentPairArray,
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					syntheticComponentPairQuoteArray,
+					true,
+					true
+				)
+			},
+			forwardLabel,
+			valuationParams,
 			null,
-			null
+			curveSurfaceQuoteContainer,
+			null,
+			null == depositQuoteArray || 0 == depositQuoteArray.length ? fraQuoteArray[0] : depositQuoteArray[0]
 		);
 
-		/*
-		 * Construct the Shape Preserving Forward Curve by applying the linear curve calibrator to the array
-		 *  of Deposit and Swap Stretches.
-		 */
+		curveSurfaceQuoteContainer.setForwardState (derivedForwardCurve);
 
-		ForwardCurve fcDerived = ScenarioForwardCurveBuilder.ShapePreservingForwardCurve (
-			lcc,
-			aStretchSpec,
-			fri,
-			valParams,
-			null,
-			mktParams,
-			null,
-			null == adblDepositQuote || 0 == adblDepositQuote.length ? adblFRAQuote[0] : adblDepositQuote[0]
-		);
+		if (printMetric) {
+			if (null != depositArray && null != depositQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-		/*
-		 * Set the discount curve + cubic polynomial forward curve based component market parameters.
-		 */
+				System.out.println ("\t||     DEPOSIT INSTRUMENTS QUOTE RECOVERY");
 
-		mktParams.setForwardState (fcDerived);
+				System.out.println ("\t||----------------------------------------------------------------");
 
-		if (bPrintMetric) {
-			/*
-			 * Cross-Comparison of the Deposit Calibration Instrument "Forward" metric.
-			 */
-
-			if (null != aDeposit && null != adblDepositQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
-
-				System.out.println ("\t     DEPOSIT INSTRUMENTS QUOTE RECOVERY");
-
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aDeposit.length; ++i)
-					System.out.println ("\t[" + aDeposit[i].effectiveDate() + " - " + aDeposit[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aDeposit[i].measureValue (valParams, null, mktParams, null, strDepositCalibMeasure), 1, 6, 1.) +
-							" | " + FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aDeposit[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+					System.out.println (
+						"\t|| [" + depositArray[depositIndex].effectiveDate() + " - " +
+							depositArray[depositIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+								depositArray[depositIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									depositCalibrationMeasure
+								),
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								depositQuoteArray[depositIndex],
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (depositArray[depositIndex].maturityDate()),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the FRA Calibration Instrument "Forward" metric.
-			 */
+			if (null != fraArray && null != fraQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aFRA && null != adblFRAQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     FRA INSTRUMENTS QUOTE RECOVERY");
 
-				System.out.println ("\t     FRA INSTRUMENTS QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aFRA.length; ++i)
-					System.out.println ("\t[" + aFRA[i].effectiveDate() + " - " + aFRA[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aFRA[i].measureValue (valParams, null, mktParams, null, strFRACalibMeasure), 1, 6, 1.) +
-							" | " + FormatUtil.FormatDouble (adblFRAQuote[i], 1, 6, 1.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aFRA[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int fraIndex = 0; fraIndex < fraArray.length; ++fraIndex) {
+					System.out.println (
+						"\t|| [" + fraArray[fraIndex].effectiveDate() + " - " +
+							fraArray[fraIndex].maturityDate() + "] =>" + FormatUtil.FormatDouble (
+								fraArray[fraIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									fraCalibrationMeasure
+								),
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								fraQuoteArray[fraIndex],
+								1,
+								6,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (fraArray[fraIndex].maturityDate()),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the Fix-Float Calibration Instrument "DerivedParBasisSpread" metric.
-			 */
+			if (null != fixFloatComponentArray && null != fixFloatQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aFixFloat && null != adblFixFloatQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     FIX-FLOAT INSTRUMENTS QUOTE RECOVERY");
 
-				System.out.println ("\t     FIX-FLOAT INSTRUMENTS QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aFixFloat.length; ++i)
-					System.out.println ("\t[" + aFixFloat[i].effectiveDate() + " - " + aFixFloat[i].maturityDate() + "] = " +
-						FormatUtil.FormatDouble (aFixFloat[i].measureValue (valParams, null, mktParams, null, strFixFloatCalibMeasure), 1, 2, 100.) +
-							"% | " + FormatUtil.FormatDouble (adblFixFloatQuote[i], 1, 2, 100.) + "% | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aFixFloat[i].maturityDate()), 1, 4, 100.) + "%");
+				for (int fixFloatIndex = 0; fixFloatIndex < fixFloatComponentArray.length; ++fixFloatIndex) {
+					System.out.println (
+						"\t|| [" + fixFloatComponentArray[fixFloatIndex].effectiveDate() + " - " +
+							fixFloatComponentArray[fixFloatIndex].maturityDate() + "] =>" +
+							FormatUtil.FormatDouble (
+								fixFloatComponentArray[fixFloatIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									fixFloatCalibrationMeasure
+								),
+								1,
+								2,
+								100.
+							) + "% | " + FormatUtil.FormatDouble (
+								fixFloatQuoteArray[fixFloatIndex],
+								1,
+								2,
+								100.
+							) + "% | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									fixFloatComponentArray[fixFloatIndex].maturityDate()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the Fix-Float Component Pair "DerivedParBasisSpread" metric.
-			 */
+			if (null != componentPairArray && null != componentPairQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aComponentPair && null != adblComponentPairQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     FIX-FLOAT COMPONENT PAIR QUOTE RECOVERY");
 
-				System.out.println ("\t     FIX-FLOAT COMPONENT PAIR QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aComponentPair.length; ++i)
-					System.out.println ("\t[" + aComponentPair[i].effective() + " - " + aComponentPair[i].maturity() + "] = " +
-						FormatUtil.FormatDouble (aComponentPair[i].measureValue (valParams, null, mktParams, null, strComponentPairCalibMeasure), 1, 2, 1.) +
-							" | " + FormatUtil.FormatDouble (adblComponentPairQuote[i], 1, 2, 10000.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aComponentPair[i].maturity()), 1, 4, 100.) + "%");
+				for (int componentPairIndex = 0;
+					componentPairIndex < componentPairArray.length;
+					++componentPairIndex)
+				{
+					System.out.println (
+						"\t|| [" + componentPairArray[componentPairIndex].effective() + " - " +
+							componentPairArray[componentPairIndex].maturity() + "] =>" +
+							FormatUtil.FormatDouble (
+								componentPairArray[componentPairIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									componentPairCalibrationMeasure
+								),
+								1,
+								2,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								componentPairQuoteArray[componentPairIndex],
+								1,
+								2,
+								10000.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									componentPairArray[componentPairIndex].maturity()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 
-			/*
-			 * Cross-Comparison of the Synthetic Float-Float Component Pair "DerivedParBasisSpread" metric.
-			 */
+			if (null != syntheticComponentPairArray && null != syntheticComponentPairQuoteArray) {
+				System.out.println ("\t||----------------------------------------------------------------");
 
-			if (null != aSyntheticComponentPair && null != adblSyntheticComponentPairQuote) {
-				System.out.println ("\t----------------------------------------------------------------");
+				System.out.println ("\t||     SYNTHETIC FIX-FLOAT COMPONENT PAIR QUOTE RECOVERY");
 
-				System.out.println ("\t     SYNTHETIC FIX-FLOAT COMPONENT PAIR QUOTE RECOVERY");
+				System.out.println ("\t||----------------------------------------------------------------");
 
-				System.out.println ("\t----------------------------------------------------------------");
-
-				for (int i = 0; i < aSyntheticComponentPair.length; ++i)
-					System.out.println ("\t[" + aSyntheticComponentPair[i].effective() + " - " + aSyntheticComponentPair[i].maturity() + "] = " +
-						FormatUtil.FormatDouble (aSyntheticComponentPair[i].measureValue (valParams, null, mktParams, null, strSyntheticComponentPairCalibMeasure), 1, 2, 1.) +
-							" | " + FormatUtil.FormatDouble (adblSyntheticComponentPairQuote[i], 1, 2, 10000.) + " | " +
-								FormatUtil.FormatDouble (fcDerived.forward (aSyntheticComponentPair[i].maturity()), 1, 4, 100.) + "%");
+				for (int syntheticComponentPairIndex = 0;
+					syntheticComponentPairIndex < syntheticComponentPairArray.length;
+					++syntheticComponentPairIndex)
+				{
+					System.out.println (
+						"\t|| [" + syntheticComponentPairArray[syntheticComponentPairIndex].effective() +
+							" - " + syntheticComponentPairArray[syntheticComponentPairIndex].maturity() +
+							"] =>" + FormatUtil.FormatDouble (
+								syntheticComponentPairArray[syntheticComponentPairIndex].measureValue (
+									valuationParams,
+									null,
+									curveSurfaceQuoteContainer,
+									null,
+									syntheticComponentPairCalibrationMeasure
+								),
+								1,
+								2,
+								1.
+							) + " | " + FormatUtil.FormatDouble (
+								syntheticComponentPairQuoteArray[syntheticComponentPairIndex],
+								1,
+								2,
+								10000.
+							) + " | " + FormatUtil.FormatDouble (
+								derivedForwardCurve.forward (
+									syntheticComponentPairArray[syntheticComponentPairIndex].maturity()
+								),
+								1,
+								4,
+								100.
+							) + "%"
+					);
+				}
 			}
 		}
 
-		return fcDerived;
+		return derivedForwardCurve;
 	}
 
 	private static final void ForwardJack (
-		final JulianDate dt,
-		final ForwardCurve fc,
-		final String strStartDateTenor,
-		final String strManifestMeasure)
+		final JulianDate date,
+		final ForwardCurve forwardCurve,
+		final String startDateTenor,
+		final String manifestMeasure)
 	{
-		JulianDate dtJack = dt.addTenor (strStartDateTenor);
+		JulianDate jacobianDate = date.addTenor (startDateTenor);
 
-		System.out.println ("\t" + 
-			dtJack + " | " +
-			strStartDateTenor + ": " +
-			fc.jackDForwardDManifestMeasure (
-				strManifestMeasure,
-				dtJack).displayString()
-			);
+		System.out.println (
+			"\t|| " +  jacobianDate + " | " + startDateTenor + ": " +
+			forwardCurve.jackDForwardDManifestMeasure (manifestMeasure, jacobianDate).displayString()
+		);
 	}
 
 	/**
 	 * Display the Forward Jacobian
 	 * 
-	 * @param dt Date
-	 * @param strHeaderComment Header Comment
-	 * @param fc Forward Curve
-	 * @param strManifestMeasure Manifest Measure
+	 * @param date Date
+	 * @param headerComment Header Comment
+	 * @param forwardCurve Forward Curve
+	 * @param manifestMeasure Manifest Measure
 	 */
 
 	public static final void ForwardJack (
-		final JulianDate dt,
-		final String strHeaderComment,
-		final ForwardCurve fc,
-		final String strManifestMeasure)
+		final JulianDate date,
+		final String headerComment,
+		final ForwardCurve forwardCurve,
+		final String manifestMeasure)
 	{
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t" + strHeaderComment);
+		System.out.println ("\t||" + headerComment);
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		ForwardJack (dt, fc, "1Y", strManifestMeasure);
+		ForwardJack (date, forwardCurve, "1Y", manifestMeasure);
 
-		ForwardJack (dt, fc, "2Y", strManifestMeasure);
+		ForwardJack (date, forwardCurve, "2Y", manifestMeasure);
 
-		ForwardJack (dt, fc, "3Y", strManifestMeasure);
+		ForwardJack (date, forwardCurve, "3Y", manifestMeasure);
 
-		ForwardJack (dt, fc, "5Y", strManifestMeasure);
+		ForwardJack (date, forwardCurve, "5Y", manifestMeasure);
 
-		ForwardJack (dt, fc, "7Y", strManifestMeasure);
+		ForwardJack (date, forwardCurve, "7Y", manifestMeasure);
 	}
 }

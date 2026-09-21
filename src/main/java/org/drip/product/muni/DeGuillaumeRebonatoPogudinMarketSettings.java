@@ -404,7 +404,7 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 	 * @return Bond Spot Curve Measures
 	 */
 
-	public CurveMeasures spotCurveMeasures (
+	public IssueCurveMeasures spotCurveMeasures (
 		final BondComponent bond)
 	{
 		int spotDateJulian = _spotDate.julian();
@@ -412,9 +412,9 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 		ValuationParams valuationParams = ValuationParams.Spot (spotDateJulian);
 
 		try {
-			return new CurveMeasures (
-				CurveMeasures.GovvieCurvePrice (bond, valuationParams, spotTaxExemptGovvieCurve()),
-				CurveMeasures.GovvieCurvePrice (bond, valuationParams, spotTaxableGovvieCurve()),
+			return new IssueCurveMeasures (
+				IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, spotTaxExemptGovvieCurve()),
+				IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, spotTaxableGovvieCurve()),
 				bond.accrued (spotDateJulian, null)
 			);
 		} catch (Exception e) {

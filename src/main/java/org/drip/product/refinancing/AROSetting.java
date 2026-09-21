@@ -1,12 +1,9 @@
 
-package org.drip.product.muni;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+package org.drip.product.refinancing;
 
 import org.drip.analytics.date.JulianDate;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.product.credit.BondComponent;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -85,9 +82,7 @@ import org.drip.measure.statistics.UnivariateDiscreteThin;
  */
 
 /**
- * <i>RefinancingEnsemblePnL</i> holds the Ensemble of Bond PnL's incurred across multiple Paths and Dates by
- *  re-financing using simulated Muni Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The
- * 	References are:
+ * <i>AROSetting</i> holds the Settings of an Advanced Refunding Option for an EOS Bonds. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -119,114 +114,105 @@ import org.drip.measure.statistics.UnivariateDiscreteThin;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/README.md">Product Components/Baskets for Credit, FRA, FX, Govvie, Rates, and Option Asset Classes</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/muni/README.md">Refunding and Optimal Exercise Mechanics</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/refinancing/README.md">Evaluation of Product Re-financing PnL</a></td></tr>
  *  </table>
  *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class RefinancingEnsemblePnL
+public class AROSetting
 {
-	private TreeMap<JulianDate, List<RefinancingPathPnLEntry>> _dateToPnLListMap = null;
+	private BondComponent _escrowBond = null;
+	private JulianDate _refinancingDate = null;
+	private double _refinancingCharge = Double.NaN;
+	private JulianDate _embeddedOptionExerciseDate = null;
+	private double _embeddedOptionExercisePrice = Double.NaN;
 
 	/**
-	 * Empty <i>RefinancingEnsemblePnL</i> Constructor
+	 * <i>AROSetting</i> Constructor
+	 * 
+	 * @param refinancingDate ARO Re-financing Date
+	 * @param embeddedOptionExerciseDate ARO Embedded Option Exercise Date
+	 * @param embeddedOptionExercisePrice ARO Embedded Option Exercise Price
+	 * @param escrowBond ARO Escrow Bond
+	 * @param refinancingCharge Re-financing Charge
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
-	public RefinancingEnsemblePnL()
+	public AROSetting (
+		final JulianDate refinancingDate,
+		final JulianDate embeddedOptionExerciseDate,
+		final double embeddedOptionExercisePrice,
+		final BondComponent escrowBond,
+		final double refinancingCharge)
+		throws Exception
 	{
-		_dateToPnLListMap = new TreeMap<JulianDate, List<RefinancingPathPnLEntry>>();
+		if (null == (_refinancingDate = refinancingDate) ||
+			null == (_embeddedOptionExerciseDate = embeddedOptionExerciseDate) ||
+				_embeddedOptionExerciseDate.julian() <= _refinancingDate.julian() ||
+			!NumberUtil.IsValid (_embeddedOptionExercisePrice = embeddedOptionExercisePrice) ||
+				0. >= _embeddedOptionExercisePrice ||
+			null == (_escrowBond = escrowBond) ||
+			!NumberUtil.IsValid (_refinancingCharge = refinancingCharge) || 0. >= _refinancingCharge)
+		{
+			throw new Exception ("AROSetting Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
-	 * Retrieve the Map of Date to PnL List
+	 * Retrieve the ARO Re-financing Date
 	 * 
-	 * @return Map of Date to PnL List
+	 * @return ARO Re-financing Date
 	 */
 
-	public TreeMap<JulianDate, List<RefinancingPathPnLEntry>> dateToPnLListMap()
+	public JulianDate refinancingDate()
 	{
-		return _dateToPnLListMap;
+		return _refinancingDate;
 	}
 
 	/**
-	 * Add the <i>RefinancingPathPnLEntry</i> Instance at the Specified Date
+	 * Retrieve the ARO Embedded Option Exercise Date
 	 * 
-	 * @param date Date
-	 * @param refinancingPathPnLEntry <i>RefinancingPathPnLEntry</i> Instance
-	 * 
-	 * @return TRUE -The <i>RefinancingPathPnLEntry</i> Instance successfully added at the Specified Date
+	 * @return ARO Embedded Option Exercise Date
 	 */
 
-	public boolean add (
-		final JulianDate date,
-		final RefinancingPathPnLEntry refinancingPathPnLEntry)
+	public JulianDate embeddedOptionExerciseDate()
 	{
-		if (null == date || null == refinancingPathPnLEntry) {
-			return false;
-		}
-
-		if (!_dateToPnLListMap.containsKey (date)) {
-			_dateToPnLListMap.put (date, new ArrayList<RefinancingPathPnLEntry>());
-		}
-
-		_dateToPnLListMap.get (date).add (refinancingPathPnLEntry);
-
-		return true;
+		return _embeddedOptionExerciseDate;
 	}
 
 	/**
-	 * Construct a Map of Date to <i>RefinancingEnsemblePnLThinStatistics</i> Instance
+	 * Retrieve the ARO Embedded Option Exercise Price
 	 * 
-	 * @return Map of Date to <i>RefinancingEnsemblePnLThinStatistics</i> Instance
+	 * @return ARO Embedded Option Exercise Price
 	 */
 
-	public TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics> dateThinStatisticsMap()
+	public double embeddedOptionExercisePrice()
 	{
-		TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics> dateThinStatisticsMap =
-			new TreeMap<JulianDate, RefinancingEnsemblePnLThinStatistics>();
+		return _embeddedOptionExercisePrice;
+	}
 
-		for (JulianDate date : _dateToPnLListMap.keySet()) {
-			List<Double> taxExemptGovvieCurveDirtyPriceList = new ArrayList<Double>();
+	/**
+	 * Retrieve the ARO Escrow Bond
+	 * 
+	 * @return ARO Escrow Bond
+	 */
 
-			List<Double> taxableGovvieCurveDirtyPriceList = new ArrayList<Double>();
+	public BondComponent escrowBond()
+	{
+		return _escrowBond;
+	}
 
-			List<Double> taxExempt = new ArrayList<Double>();
+	/**
+	 * Retrieve the ARO Re-financing Charge
+	 * 
+	 * @return ARO Re-financing Charge
+	 */
 
-			List<Double> taxable = new ArrayList<Double>();
-
-			for (RefinancingPathPnLEntry refinancingPathPnLEntry : _dateToPnLListMap.get (date)) {
-				taxExemptGovvieCurveDirtyPriceList.add (
-					refinancingPathPnLEntry.taxExemptGovvieCurveCleanPrice()
-				);
-
-				taxableGovvieCurveDirtyPriceList.add (
-					refinancingPathPnLEntry.taxableGovvieCurveCleanPrice()
-				);
-
-				taxExempt.add (refinancingPathPnLEntry.taxExempt());
-
-				taxable.add (refinancingPathPnLEntry.taxable());
-			}
-
-			try {
-				dateThinStatisticsMap.put (
-					date,
-					new RefinancingEnsemblePnLThinStatistics (
-						UnivariateDiscreteThin.FromList (taxExemptGovvieCurveDirtyPriceList),
-						UnivariateDiscreteThin.FromList (taxableGovvieCurveDirtyPriceList),
-						UnivariateDiscreteThin.FromList (taxExempt),
-						UnivariateDiscreteThin.FromList (taxable)
-					)
-				);
-			} catch (Exception e) {
-				e.printStackTrace();
-
-				return null;
-			}
-		}
-
-		return dateThinStatisticsMap;
+	public double refinancingCharge()
+	{
+		return _refinancingCharge;
 	}
 }

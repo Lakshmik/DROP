@@ -198,7 +198,7 @@ public class InceptionMarketSettings
 	 * @return Map of Simulation Dates and Prices/Accruals off of Initial Curves
 	 */
 
-	public TreeMap<JulianDate, CurveMeasures> dateInceptionMarketSimulatedMeasureMap (
+	public TreeMap<JulianDate, IssueCurveMeasures> dateInceptionMarketSimulatedMeasureMap (
 		final BondComponent bond,
 		final List<JulianDate> simulationDateList)
 	{
@@ -206,8 +206,8 @@ public class InceptionMarketSettings
 			return null;
 		}
 
-		TreeMap<JulianDate, CurveMeasures> dateInceptionMarketSimulatedMeasureMap =
-			new TreeMap<JulianDate, CurveMeasures>();
+		TreeMap<JulianDate, IssueCurveMeasures> dateInceptionMarketSimulatedMeasureMap =
+			new TreeMap<JulianDate, IssueCurveMeasures>();
 
 		for (JulianDate simulationDate : simulationDateList) {
 			try {
@@ -217,9 +217,9 @@ public class InceptionMarketSettings
 
 				dateInceptionMarketSimulatedMeasureMap.put (
 					simulationDate,
-					new CurveMeasures (
-						CurveMeasures.GovvieCurvePrice (bond, valuationParams, _taxExemptGovvieCurve),
-						CurveMeasures.GovvieCurvePrice (bond, valuationParams, _taxableGovvieCurve),
+					new IssueCurveMeasures (
+						IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, _taxExemptGovvieCurve),
+						IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, _taxableGovvieCurve),
 						bond.accrued (simulationDateJulian, null)
 					)
 				);

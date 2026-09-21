@@ -9,7 +9,7 @@ import org.drip.measure.bridge.BrokenDateInterpolatorLinearT;
 import org.drip.measure.crng.RandomSequenceGenerator;
 import org.drip.measure.dynamics.*;
 import org.drip.measure.realization.*;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.identifier.OTCFixFloatLabel;
@@ -435,29 +435,29 @@ public class CollateralizedFundingPayable
 	{
 		System.out.println();
 
-		UnivariateDiscreteThin cvaUnivariateDiscreteThin = exposureAdjustmentDigest.cva();
+		UnivariateCentralMeasures cvaUnivariateDiscreteThin = exposureAdjustmentDigest.cva();
 
-		UnivariateDiscreteThin dvaUnivariateDiscreteThin = exposureAdjustmentDigest.dva();
+		UnivariateCentralMeasures dvaUnivariateDiscreteThin = exposureAdjustmentDigest.dva();
 
-		UnivariateDiscreteThin fcaUnivariateDiscreteThin = exposureAdjustmentDigest.fca();
+		UnivariateCentralMeasures fcaUnivariateDiscreteThin = exposureAdjustmentDigest.fca();
 
-		UnivariateDiscreteThin fbaUnivariateDiscreteThin = exposureAdjustmentDigest.fba();
+		UnivariateCentralMeasures fbaUnivariateDiscreteThin = exposureAdjustmentDigest.fba();
 
-		UnivariateDiscreteThin fdaUnivariateDiscreteThin = exposureAdjustmentDigest.fda();
+		UnivariateCentralMeasures fdaUnivariateDiscreteThin = exposureAdjustmentDigest.fda();
 
-		UnivariateDiscreteThin fvaUnivariateDiscreteThin = exposureAdjustmentDigest.fva();
+		UnivariateCentralMeasures fvaUnivariateDiscreteThin = exposureAdjustmentDigest.fva();
 
-		UnivariateDiscreteThin sfvaUnivariateDiscreteThin = exposureAdjustmentDigest.sfva();
+		UnivariateCentralMeasures sfvaUnivariateDiscreteThin = exposureAdjustmentDigest.sfva();
 
-		UnivariateDiscreteThin ucvaUnivariateDiscreteThin = exposureAdjustmentDigest.ucva();
+		UnivariateCentralMeasures ucvaUnivariateDiscreteThin = exposureAdjustmentDigest.ucva();
 
-		UnivariateDiscreteThin cvaclUnivariateDiscreteThin = exposureAdjustmentDigest.cvacl();
+		UnivariateCentralMeasures cvaclUnivariateDiscreteThin = exposureAdjustmentDigest.cvacl();
 
-		UnivariateDiscreteThin ftdcvaUnivariateDiscreteThin = exposureAdjustmentDigest.ftdcva();
+		UnivariateCentralMeasures ftdcvaUnivariateDiscreteThin = exposureAdjustmentDigest.ftdcva();
 
-		UnivariateDiscreteThin ucolvaUnivariateDiscreteThin = exposureAdjustmentDigest.ucolva();
+		UnivariateCentralMeasures ucolvaUnivariateDiscreteThin = exposureAdjustmentDigest.ucolva();
 
-		UnivariateDiscreteThin ftdcolvaUnivariateDiscreteThin = exposureAdjustmentDigest.ftdcolva();
+		UnivariateCentralMeasures ftdcolvaUnivariateDiscreteThin = exposureAdjustmentDigest.ftdcolva();
 
 		System.out.println (
 			"\t||-----------------------------------------------------------------------------------------------------------------------------------||"

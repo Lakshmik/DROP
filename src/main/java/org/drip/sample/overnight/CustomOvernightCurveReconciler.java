@@ -13,6 +13,7 @@ import org.drip.product.rates.*;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.spline.basis.PolynomialFunctionSetParams;
+import org.drip.spline.grid.OverlappingStretchSpan;
 import org.drip.spline.params.*;
 import org.drip.spline.stretch.*;
 import org.drip.state.curve.DiscountFactorDiscountCurve;
@@ -26,6 +27,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -105,119 +114,100 @@ import org.drip.state.inference.*;
  * <i>CustomOvernightCurveReconciler</i> demonstrates the multi-stretch transition custom Overnight curve
  *  construction, turns application, discount factor extraction, and calibration quote recovery.
  *
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/overnight/README.md">Shape Preserving Stretch Overnight Curve</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/overnight/README.md">Shape Preserving Stretch Overnight Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CustomOvernightCurveReconciler {
+public class CustomOvernightCurveReconciler
+{
 
 	private static final FixFloatComponent OTCOISFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = OvernightFixedFloatContainer.FundConventionFromJurisdiction (
-			strCurrency
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		return OvernightFixedFloatContainer.FundConventionFromJurisdiction (
+			currency
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				OvernightLabel.Create (
-					strCurrency
-				)
+		OvernightLabel overnightLabel = OvernightLabel.Create (currency);
+
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				overnightLabel
 			);
+		}
 
-		return aDeposit;
+		return depositArray;
 	}
-
-	/*
-	 * Construct the Array of Overnight Index Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final FixFloatComponent[] OISFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOIS[i] = OTCOISFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisArray[maturityIndex] = OTCOISFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
 			);
+		}
 
-		return aOIS;
+		return oisArray;
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Future Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFuturesFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrStartTenor,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] startTenorArray,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOISFutures = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisFuturesArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aOISFutures[i] = OTCOISFixFloat (
-				dtSpot.addTenor (astrStartTenor[i]),
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisFuturesArray[maturityIndex] = OTCOISFixFloat (
+				spotDate.addTenor (startTenorArray[maturityIndex]),
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
 			);
+		}
 
-		return aOISFutures;
+		return oisFuturesArray;
 	}
 
 	/*
@@ -246,96 +236,60 @@ public class CustomOvernightCurveReconciler {
 	 * 	- Update the discount curve with the turn list.
 	 * 	- Compare the discount factor implied the discount curve with and without applying the turns
 	 * 		adjustment.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final void SplineLinearOISDiscountCurve (
-		final JulianDate dtSpot,
-		final SegmentCustomBuilderControl prbp,
-		final String strHeaderComment,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final String headerComment,
+		final String currency)
 		throws Exception
 	{
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\t" + strHeaderComment);
+		System.out.println ("\t||  " + headerComment);
 
-		/*
-		 * Setup the linear curve calibrator
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			prbp,
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
-				1, 2, 3
+		SingleStreamComponent[] depositArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
+				1,
+				2,
+				3
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.0004, 0.0004, 0.0004		 // Deposit
+		double[] depositQuoteArray =
+		{
+			0.0004,
+			0.0004,
+			0.0004		 // Deposit
 		};
 
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"   DEPOSIT   ",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of Short End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblShortEndOISQuote = new double[] {
+		double[] shortEndOISQuoteArray =
+		{
 			0.00070,    //   1W
 			0.00069,    //   2W
 			0.00078,    //   3W
 			0.00074     //   1M
 		};
 
-		CalibratableComponent[] aShortEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1W", "2W", "3W", "1M"
+		CalibratableComponent[] shortEndOISArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1W",
+				"2W",
+				"3W",
+				"1M"
 			},
-			adblShortEndOISQuote
+			shortEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Short End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisShortEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"SHORT END OIS",
-			aShortEndOISComp,
-			"SwapRate",
-			adblShortEndOISQuote
-		);
-
-		/*
-		 * Construct the Array of OIS Futures Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblOISFutureQuote = new double[] {
+		double[] oisFutureQuoteArray =
+		{
 			 0.00046,    //   1M x 1M
 			 0.00016,    //   2M x 1M
 			-0.00007,    //   3M x 1M
@@ -343,34 +297,30 @@ public class CustomOvernightCurveReconciler {
 			-0.00014     //   5M x 1M
 		};
 
-		CalibratableComponent[] aOISFutureComp = OISFuturesFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1M", "2M", "3M", "4M", "5M"
+		CalibratableComponent[] oisFuturesArray = OISFuturesFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1M",
+				"2M",
+				"3M",
+				"4M",
+				"5M"
 			},
-			new java.lang.String[] {
-				"1M", "1M", "1M", "1M", "1M"
+			new String[]
+			{
+				"1M",
+				"1M",
+				"1M",
+				"1M",
+				"1M"
 			},
-			adblOISFutureQuote
+			oisFutureQuoteArray
 		);
 
-		/*
-		 * Construct the OIS Future Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisFutureStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			" OIS FUTURE  ",
-			aOISFutureComp,
-			"SwapRate",
-			adblOISFutureQuote
-		);
-
-		/*
-		 * Construct the Array of Long End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblLongEndOISQuote = new double[] {
+		double[] longEndOISQuoteArray =
+		{
 			0.00002,    //  15M
 			0.00008,    //  18M
 			0.00021,    //  21M
@@ -391,355 +341,425 @@ public class CustomOvernightCurveReconciler {
 			0.02038     //  30Y
 		};
 
-		CalibratableComponent[] aLongEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"15M", "18M", "21M", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
+		CalibratableComponent[] longEndOISArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"15M",
+				"18M",
+				"21M",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
 			},
-			adblLongEndOISQuote
+			longEndOISQuoteArray
 		);
 
-		/*
-		 * Construct the Long End OIS Instrument Set Stretch Builder
-		 */
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		LatentStateStretchSpec oisLongEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"LONG END OIS ",
-			aLongEndOISComp,
-			"SwapRate",
-			adblLongEndOISQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			oisShortEndStretch,
-			oisFutureStretch,
-			oisLongEndStretch
-		};
-
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit and Swap Stretches.
-		 */
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		/*
-		 * Calibrate over the instrument set to generate a new overlapping latent state span instance
-		 */
-
-		org.drip.spline.grid.OverlappingStretchSpan ors = lcc.calibrateSpan (
-			aStretchSpec,
+		OverlappingStretchSpan overlappingStretchSpan = new LinearLatentStateCalibrator (
+			segmentCustomBuilderControl,
+			BoundarySettings.NaturalStandard(),
+			MultiSegmentSequence.CALIBRATE,
+			null,
+			null
+		).calibrateSpan (
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"   DEPOSIT   ",
+					depositArray,
+					"ForwardRate",
+					depositQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"SHORT END OIS",
+					shortEndOISArray,
+					"SwapRate",
+					shortEndOISQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					" OIS FUTURE  ",
+					oisFuturesArray,
+					"SwapRate",
+					oisFutureQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"LONG END OIS ",
+					longEndOISArray,
+					"SwapRate",
+					longEndOISQuoteArray
+				)
+			},
 			1.,
-			valParams,
+			valuationParams,
 			null,
 			null,
 			null
 		);
 
-		/*
-		 * Retrieve the "Deposit" stretch from the span
-		 */
+		MultiSegmentSequence depositMultiSegmentSequence =
+			overlappingStretchSpan.getStretch ("   DEPOSIT   ");
 
-		MultiSegmentSequence mssDeposit = ors.getStretch ("   DEPOSIT   ");
+		MultiSegmentSequence oisShortEndMultiSegmentSequence =
+			overlappingStretchSpan.getStretch ("SHORT END OIS");
 
-		/*
-		 * Retrieve the OIS Short End stretch from the span
-		 */
+		MultiSegmentSequence oisFutureMultiSegmentSequence =
+			overlappingStretchSpan.getStretch (" OIS FUTURE  ");
 
-		MultiSegmentSequence mssOISShortEnd = ors.getStretch ("SHORT END OIS");
+		MultiSegmentSequence oisLongEndMultiSegmentSequence =
+			overlappingStretchSpan.getStretch ("LONG END OIS ");
 
-		/*
-		 * Retrieve the OIS Future stretch from the span
-		 */
+		MergedDiscountForwardCurve discountCurve =
+			new DiscountFactorDiscountCurve (currency, overlappingStretchSpan);
 
-		MultiSegmentSequence mssOISFuture = ors.getStretch (" OIS FUTURE  ");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		/*
-		 * Retrieve the OIS Long End stretch from the span
-		 */
+		System.out.println ("\t||     DEPOSITS DF           DFDC       STRETCH        LOCAL");
 
-		MultiSegmentSequence mssOISLongEnd = ors.getStretch ("LONG END OIS ");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		/*
-		 * Create a discount curve instance by converting the overlapping stretch to an exclusive
-		 * 	non-overlapping stretch.
-		 */
-
-		MergedDiscountForwardCurve dfdc = new DiscountFactorDiscountCurve (
-			strCurrency,
-			ors
+		int depositWidth = (int) (
+			0.25 * (
+				depositMultiSegmentSequence.getRightPredictorOrdinateEdge() -
+					depositMultiSegmentSequence.getLeftPredictorOrdinateEdge()
+			)
 		);
 
-		/*
-		 * Compare the discount factors and their monotonicity emitted from the discount curve, the
-		 * non-overlapping span, and the "Deposit" stretch across the range of tenor predictor ordinates.
-		 */
+		if (0 == depositWidth) {
+			depositWidth = 1;
+		}
 
-		System.out.println ("\t----------------------------------------------------------------");
-
-		System.out.println ("\t     DEPOSITS DF           DFDC       STRETCH        LOCAL");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		int iDepositWidth = (int) (0.25 * (mssDeposit.getRightPredictorOrdinateEdge() - mssDeposit.getLeftPredictorOrdinateEdge()));
-
-		if (0 == iDepositWidth) iDepositWidth = 1;
-
-		for (int iX = (int) mssDeposit.getLeftPredictorOrdinateEdge(); iX <= (int) mssDeposit.getRightPredictorOrdinateEdge();
-			iX += iDepositWidth) {
+		for (int x = (int) depositMultiSegmentSequence.getLeftPredictorOrdinateEdge();
+			x <= (int) depositMultiSegmentSequence.getRightPredictorOrdinateEdge();
+			x += depositWidth)
+		{
 			try {
-				System.out.println ("\tDEPOSIT [" + new JulianDate (iX) + "] = " +
-					FormatUtil.FormatDouble (dfdc.df (iX), 1, 8, 1.) + " || " +
-						ors.getContainingStretch (iX).name() + " || " +
-							FormatUtil.FormatDouble (mssDeposit.responseValue (iX), 1, 8, 1.) + " | " +
-								mssDeposit.monotoneType (iX));
-			} catch (java.lang.Exception e) {
+				System.out.println (
+					"\t|| DEPOSIT [" + new JulianDate (x) + "] = " + FormatUtil.FormatDouble (
+						discountCurve.df (x),
+						1,
+						8,
+						1.
+					) + " || " + overlappingStretchSpan.getContainingStretch (x).name() + " || " +
+					FormatUtil.FormatDouble (
+						depositMultiSegmentSequence.responseValue (x),
+						1,
+						8,
+						1.
+					) + " | " + depositMultiSegmentSequence.monotoneType (x));
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		/*
-		 * Compare the discount factors and their monotonicity emitted from the discount curve, the
-		 * non-overlapping span, and the OIS SHORT END stretch across the range of tenor predictor ordinates.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||SHORT END OIS DF        DFDC       STRETCH        LOCAL");
 
-		System.out.println ("\tSHORT END OIS DF        DFDC       STRETCH        LOCAL");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		double shortEndOISWidth = 0.2 * (
+			oisShortEndMultiSegmentSequence.getRightPredictorOrdinateEdge() -
+				oisShortEndMultiSegmentSequence.getLeftPredictorOrdinateEdge()
+		);
 
-		double dblShortOISWidth = 0.2 * (mssOISShortEnd.getRightPredictorOrdinateEdge() - mssOISShortEnd.getLeftPredictorOrdinateEdge());
-
-		for (int iX = (int) mssOISShortEnd.getLeftPredictorOrdinateEdge(); iX <= (int) mssOISShortEnd.getRightPredictorOrdinateEdge();
-			iX += dblShortOISWidth) {
-				System.out.println ("\tOIS [" + new JulianDate (iX) + "] = " +
-					FormatUtil.FormatDouble (dfdc.df (iX), 1, 8, 1.) + " || " +
-						ors.getContainingStretch (iX).name() + " || " +
-							FormatUtil.FormatDouble (mssOISShortEnd.responseValue (iX), 1, 8, 1.) + " | " +
-								mssOISShortEnd.monotoneType (iX));
+		for (int x = (int) oisShortEndMultiSegmentSequence.getLeftPredictorOrdinateEdge();
+			x <= (int) oisShortEndMultiSegmentSequence.getRightPredictorOrdinateEdge();
+			x += shortEndOISWidth)
+		{
+			System.out.println (
+				"\t||OIS [" + new JulianDate (x) + "] = " + FormatUtil.FormatDouble (
+					discountCurve.df (x),
+					1,
+					8,
+					1.
+				) + " || " + overlappingStretchSpan.getContainingStretch (x).name() + " || " +
+				FormatUtil.FormatDouble (
+					oisShortEndMultiSegmentSequence.responseValue (x),
+					1,
+					8,
+					1.
+				) + " | " + oisShortEndMultiSegmentSequence.monotoneType (x)
+			);
 		}
 
-		/*
-		 * Compare the discount factors and their monotonicity emitted from the discount curve, the
-		 * non-overlapping span, and the OIS FUTURE stretch across the range of tenor predictor ordinates.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
 		System.out.println ("\t OIS FUTURE DF          DFDC       STRETCH        LOCAL");
 
 		System.out.println ("\t----------------------------------------------------------------");
 
-		int iOISFutureWidth = (int) (0.2 * (mssOISFuture.getRightPredictorOrdinateEdge() - mssOISFuture.getLeftPredictorOrdinateEdge()));
-
-		for (int iX = (int) mssOISFuture.getLeftPredictorOrdinateEdge(); iX <= (int) mssOISFuture.getRightPredictorOrdinateEdge();
-			iX += iOISFutureWidth) {
-				System.out.println ("\tOIS [" + new JulianDate (iX) + "] = " +
-					FormatUtil.FormatDouble (dfdc.df (iX), 1, 8, 1.) + " || " +
-						ors.getContainingStretch (iX).name() + " || " +
-							FormatUtil.FormatDouble (mssOISFuture.responseValue (iX), 1, 8, 1.) + " | " +
-								mssOISFuture.monotoneType (iX));
-		}
-
-		/*
-		 * Compare the discount factors and their monotonicity emitted from the discount curve, the
-		 * non-overlapping span, and the OIS LONG END stretch across the range of tenor predictor ordinates.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\tLONG END OIS DF         DFDC      STRETCH         LOCAL");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int iX = (int) mssOISFuture.getLeftPredictorOrdinateEdge(); iX <= (int) mssOISFuture.getRightPredictorOrdinateEdge();
-			iX += iOISFutureWidth) {
-				System.out.println ("\tOIS [" + new JulianDate (iX) + "] = " +
-					FormatUtil.FormatDouble (dfdc.df (iX), 1, 8, 1.) + " || " +
-						ors.getContainingStretch (iX).name() + " || " +
-							FormatUtil.FormatDouble (mssOISFuture.responseValue (iX), 1, 8, 1.) + " | " +
-								mssOISFuture.monotoneType (iX));
-		}
-
-		int iLongOISWidth = ((int) mssOISLongEnd.getRightPredictorOrdinateEdge() - (int) mssOISLongEnd.getLeftPredictorOrdinateEdge()) / 10;
-
-		for (int iX = (int) mssOISLongEnd.getLeftPredictorOrdinateEdge() + iLongOISWidth; iX <= (int) mssOISLongEnd.getRightPredictorOrdinateEdge();
-			iX += iLongOISWidth) {
-				System.out.println ("\tOIS [" + new JulianDate (iX) + "] = " +
-					FormatUtil.FormatDouble (dfdc.df (iX), 1, 8, 1.) + " || " +
-						ors.getContainingStretch (iX).name() + " || " +
-							FormatUtil.FormatDouble (mssOISLongEnd.responseValue (iX), 1, 8, 1.) + " | " +
-								mssOISLongEnd.monotoneType (iX));
-		}
-
-		System.out.println ("\tOIS [" + dtSpot.addTenor ("60Y") + "] = " +
-			FormatUtil.FormatDouble (dfdc.df (dtSpot.addTenor ("60Y")), 1, 8, 1.));
-
-		/*
-		 * Cross-Recovery of the Deposit Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aDepositComp.length; ++i)
-			System.out.println ("\t[" + aDepositComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aDepositComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dfdc, null, null, null, null, null, null),
-						null, "Rate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.));
-
-		/*
-		 * Cross-Recovery of the OIS Short End Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t      OIS SHORT END INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aShortEndOISComp.length; ++i)
-			System.out.println ("\t[" + aShortEndOISComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aShortEndOISComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dfdc, null, null, null, null, null, null),
-						null, "SwapRate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblShortEndOISQuote[i], 1, 6, 1.));
-
-		/*
-		 * Cross-Recovery of the OIS Future Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t      OIS FUTURES INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aOISFutureComp.length; ++i)
-			System.out.println ("\t[" + aOISFutureComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aOISFutureComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dfdc, null, null, null, null, null, null),
-						null, "SwapRate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblOISFutureQuote[i], 1, 6, 1.));
-
-		/*
-		 * Cross-Recovery of the OIS Long End Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
-
-		System.out.println ("\n\t----------------------------------------------------------------");
-
-		System.out.println ("\t      OIS LONG END INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aLongEndOISComp.length; ++i)
-			System.out.println ("\t[" + aLongEndOISComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aLongEndOISComp[i].measureValue (valParams, null,
-					MarketParamsBuilder.Create (dfdc, null, null, null, null, null, null),
-						null, "CalibSwapRate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblLongEndOISQuote[i], 1, 6, 1.));
-
-		/*
-		 * Create a turn list instance and add new turn instances
-		 */
-
-		TurnListDiscountFactor tldc = new TurnListDiscountFactor();
-
-		tldc.addTurn (
-			new Turn (
-				dtSpot.addTenor ("5Y").julian(),
-				dtSpot.addTenor ("40Y").julian(),
-				0.001
+		int oisFuturesWidth = (int) (
+			0.2 * (
+				oisFutureMultiSegmentSequence.getRightPredictorOrdinateEdge() -
+					oisFutureMultiSegmentSequence.getLeftPredictorOrdinateEdge()
 			)
 		);
 
-		/*
-		 * Update the discount curve with the turn list.
-		 */
+		for (int x = (int) oisFutureMultiSegmentSequence.getLeftPredictorOrdinateEdge();
+			x <= (int) oisFutureMultiSegmentSequence.getRightPredictorOrdinateEdge();
+			x += oisFuturesWidth)
+		{
+			System.out.println (
+				"\t|| OIS [" + new JulianDate (x) + "] = " + FormatUtil.FormatDouble (
+					discountCurve.df (x),
+					1,
+					8,
+					1.
+				) + " || " + overlappingStretchSpan.getContainingStretch (x).name() + " || " +
+				FormatUtil.FormatDouble (
+					oisFutureMultiSegmentSequence.responseValue (x),
+					1,
+					8,
+					1.
+				) + " | " + oisFutureMultiSegmentSequence.monotoneType (x)
+			);
+		}
 
-		dfdc.setTurns (tldc);
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		/*
-		 * Compare the discount factor implied the discount curve with and without applying the turns
-		 * 	adjustment.
-		 */
+		System.out.println ("\t|| LONG END OIS DF         DFDC      STRETCH         LOCAL");
 
-		System.out.println ("\n\t-------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t  TURNS ADJ DF         DFDC");
+		for (int x = (int) oisFutureMultiSegmentSequence.getLeftPredictorOrdinateEdge();
+			x <= (int) oisFutureMultiSegmentSequence.getRightPredictorOrdinateEdge();
+			x += oisFuturesWidth)
+		{
+			System.out.println (
+				"\t|| OIS [" + new JulianDate (x) + "] = " + FormatUtil.FormatDouble (
+					discountCurve.df (x),
+					1,
+					8,
+					1.
+				) + " || " + overlappingStretchSpan.getContainingStretch (x).name() + " || " +
+				FormatUtil.FormatDouble (
+					oisFutureMultiSegmentSequence.responseValue (x),
+					1,
+					8,
+					1.
+				) + " | " + oisFutureMultiSegmentSequence.monotoneType (x)
+			);
+		}
 
-		System.out.println ("\t-------------------------------");
+		int longEndOISWidth = (
+			(int) oisLongEndMultiSegmentSequence.getRightPredictorOrdinateEdge() -
+				(int) oisLongEndMultiSegmentSequence.getLeftPredictorOrdinateEdge()
+		) / 10;
 
-		for (int iX = (int) mssOISShortEnd.getLeftPredictorOrdinateEdge(); iX <= (int) mssOISLongEnd.getRightPredictorOrdinateEdge();
-			iX += 0.05 * (mssOISLongEnd.getRightPredictorOrdinateEdge() - mssOISShortEnd.getLeftPredictorOrdinateEdge())) {
-				System.out.println ("\tOIS [" + new JulianDate (iX) + "] = " +
-					FormatUtil.FormatDouble (dfdc.df (iX), 1, 8, 1.));
+		for (int x = (int) oisLongEndMultiSegmentSequence.getLeftPredictorOrdinateEdge() + longEndOISWidth;
+			x <= (int) oisLongEndMultiSegmentSequence.getRightPredictorOrdinateEdge();
+			x += longEndOISWidth)
+		{
+			System.out.println (
+				"\t|| OIS [" + new JulianDate (x) + "] = " + FormatUtil.FormatDouble (
+					discountCurve.df (x),
+					1,
+					8,
+					1.
+				) + " || " + overlappingStretchSpan.getContainingStretch (x).name() + " || " +
+				FormatUtil.FormatDouble (
+					oisLongEndMultiSegmentSequence.responseValue (x),
+					1,
+					8,
+					1.
+				) + " | " + oisLongEndMultiSegmentSequence.monotoneType (x)
+			);
+		}
+
+		System.out.println (
+			"\t|| OIS [" + spotDate.addTenor ("60Y") + "] = " +
+			FormatUtil.FormatDouble (discountCurve.df (spotDate.addTenor ("60Y")), 1, 8, 1.)
+		);
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+			System.out.println (
+				"\t|| [" + depositArray[depositIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams, null,
+						MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					depositQuoteArray[depositIndex],
+					1,
+					6,
+					1.
+				)
+			);
+		}
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||      OIS SHORT END INSTRUMENTS CALIBRATION RECOVERY");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int shortEndOISIndex = 0; shortEndOISIndex < shortEndOISArray.length; ++shortEndOISIndex) {
+			System.out.println (
+				"\t|| [" + shortEndOISArray[shortEndOISIndex].maturityDate() + "] = " +
+					FormatUtil.FormatDouble (
+						shortEndOISArray[shortEndOISIndex].measureValue (
+							valuationParams,
+							null,
+							MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+							null,
+							"SwapRate"
+						),
+						1,
+						6,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						shortEndOISQuoteArray[shortEndOISIndex],
+						1,
+						6,
+						1.
+					)
+				);
+		}
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||      OIS FUTURES INSTRUMENTS CALIBRATION RECOVERY");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int oisFuturesIndex = 0; oisFuturesIndex < oisFuturesArray.length; ++oisFuturesIndex) {
+			System.out.println (
+				"\t|| [" + oisFuturesArray[oisFuturesIndex].maturityDate() + "] = " +
+					FormatUtil.FormatDouble (
+						oisFuturesArray[oisFuturesIndex].measureValue (
+							valuationParams, null,
+							MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+							null,
+							"SwapRate"
+						),
+						1,
+						6,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						oisFutureQuoteArray[oisFuturesIndex],
+						1,
+						6,
+						1.
+					)
+			);
+		}
+
+		System.out.println ("\n\t||----------------------------------------------------------------");
+
+		System.out.println ("\t||      OIS LONG END INSTRUMENTS CALIBRATION RECOVERY");
+
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		for (int longEndOISIndex = 0; longEndOISIndex < longEndOISArray.length; ++longEndOISIndex) {
+			System.out.println (
+				"\t|| [" + longEndOISArray[longEndOISIndex].maturityDate() + "] = " +
+					FormatUtil.FormatDouble (
+						longEndOISArray[longEndOISIndex].measureValue (
+							valuationParams,
+							null,
+							MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null),
+							null,
+							"CalibSwapRate"
+						),
+						1,
+						6,
+						1.
+					) + " | " + FormatUtil.FormatDouble (
+						longEndOISQuoteArray[longEndOISIndex],
+						1,
+						6,
+						1.
+					)
+			);
+		}
+
+		TurnListDiscountFactor turnListDiscountFactor = new TurnListDiscountFactor();
+
+		turnListDiscountFactor.addTurn (
+			new Turn (spotDate.addTenor ("5Y").julian(), spotDate.addTenor ("40Y").julian(), 0.001)
+		);
+
+		discountCurve.setTurns (turnListDiscountFactor);
+
+		System.out.println ("\n\t||-------------------------------");
+
+		System.out.println ("\t||  TURNS ADJ DF         DFDC");
+
+		System.out.println ("\t||-------------------------------");
+
+		for (int x = (int) oisShortEndMultiSegmentSequence.getLeftPredictorOrdinateEdge();
+			x <= (int) oisLongEndMultiSegmentSequence.getRightPredictorOrdinateEdge();
+			x += 0.05 * (oisLongEndMultiSegmentSequence.getRightPredictorOrdinateEdge() -
+				oisShortEndMultiSegmentSequence.getLeftPredictorOrdinateEdge()))
+		{
+			System.out.println (
+				"\t|| OIS [" + new JulianDate (x) + "] = " + FormatUtil.FormatDouble (
+					discountCurve.df (x),
+					1,
+					8,
+					1.
+				)
+			);
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		/*
-		 * Construct the segment Custom builder using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 */
-
-		SegmentCustomBuilderControl prbpPolynomial = new SegmentCustomBuilderControl (
+		SegmentCustomBuilderControl segmentCustomBuilderControlPolynomial = new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
-			new ResponseScalingShapeControl (
-				true,
-				new QuadraticRationalShapeControl (0.)
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
+			new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
 			null
 		);
 
-		String strCurrency = "EUR";
+		String currency = "EUR";
 
-		JulianDate dtToday = DateUtil.Today().addTenor ("0D");
-
-		/*
-		 * Runs the full spline linear discount curve builder sample using the overnight index discount curve.
-		 */
+		JulianDate today = DateUtil.Today().addTenor ("0D");
 
 		SplineLinearOISDiscountCurve (
-			dtToday,
-			prbpPolynomial,
+			today,
+			segmentCustomBuilderControlPolynomial,
 			"---- DISCOUNT CURVE WITH OVERNIGHT INDEX ---",
-			strCurrency
+			currency
 		);
 
 		EnvManager.TerminateEnv();

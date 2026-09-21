@@ -7,8 +7,6 @@ import org.drip.service.env.EnvManager;
 import org.drip.spline.basis.ExponentialTensionSetParams;
 import org.drip.spline.params.*;
 import org.drip.spline.stretch.MultiSegmentSequenceBuilder;
-import org.drip.state.discount.*;
-import org.drip.state.forward.ForwardCurve;
 import org.drip.state.identifier.ForwardLabel;
 
 /*
@@ -16,6 +14,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -93,98 +99,59 @@ import org.drip.state.identifier.ForwardLabel;
 
 /**
  * <i>IBOR12MCubicKLKHyperbolic</i> illustrates the Construction and Usage of the IBOR 12M Forward Curve
- * Using Vanilla Cubic KLK Hyperbolic Tension B-Splines.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></li>
- *  </ul>
- * <br><br>
+ * 	Using Vanilla Cubic KLK Hyperbolic Tension B-Splines.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class IBOR12MCubicKLKHyperbolic {
+public class IBOR12MCubicKLKHyperbolic
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtValue = DateUtil.CreateFromYMD (
-			2012,
-			DateUtil.DECEMBER,
-			11
-		);
+		JulianDate valueDate = DateUtil.CreateFromYMD (2012, DateUtil.DECEMBER, 11);
 
-		String strTenor = "12M";
-		String strCurrency = "USD";
-
-		ForwardLabel fri = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
-
-		MergedDiscountForwardCurve dcEONIA = OvernightIndexCurve.MakeDC (
-			dtValue,
-			strCurrency
-		);
-
-		SegmentCustomBuilderControl scbcCubicKLKHyperbolic = new SegmentCustomBuilderControl (
-			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
-			new ExponentialTensionSetParams (1.),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
-			new ResponseScalingShapeControl (
-				true,
-				new QuadraticRationalShapeControl (0.)
-			),
-			null
-		);
-
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		double[] adblDepositQuote = new double[] {
+		String tenor = "12M";
+		String currency = "USD";
+		double[] depositQuoteArray =
+		{
 			0.006537,
 			0.006187,
 			0.005772,
 			0.005563,
 			0.005400
 		};
-
-		String[] astrDepositTenor = new String[] {
+		String[] depositTenorArray =
+		{
 			 "1M",
 			 "3M",
 			 "6M",
 			 "9M",
 			"12M"
 		};
-
-		/*
-		 * Construct the Array of Fix-Float Component and their Quotes from the given set of parameters
-		 */
-
-		double[] adblFRAQuote = new double[] {
+		double[] fraQuoteArray =
+		{
 			0.004974,
 			0.004783,
 			0.004822,
@@ -192,8 +159,8 @@ public class IBOR12MCubicKLKHyperbolic {
 			0.005481,
 			0.006025
 		};
-
-		String[] astrFRATenor = new String[] {
+		String[] fraTenor =
+		{
 			 "3M",
 			 "6M",
 			 "9M",
@@ -201,12 +168,8 @@ public class IBOR12MCubicKLKHyperbolic {
 			"15M",
 			"18M",
 		};
-
-		/*
-		 * Construct the Array of Float-Float Component and their Quotes from the given set of parameters
-		 */
-
-		double[] adblFloatFloatQuote = new double[] {
+		double[] floatFloatQuoteArray =
+		{
 			-0.002070,	//  3Y
 			-0.001640,	//  4Y
 			-0.001510,	//  5Y
@@ -222,8 +185,8 @@ public class IBOR12MCubicKLKHyperbolic {
 			-0.000720,	// 25Y
 			-0.000660	// 30Y
 		};
-
-		String[] astrFloatFloatTenor = new String[] {
+		String[] floatFloatTenorArray =
+		{
 			  "3Y",
 			  "4Y",
 			  "5Y",
@@ -239,60 +202,55 @@ public class IBOR12MCubicKLKHyperbolic {
 			 "25Y",
 			 "30Y"
 		};
-
-		/*
-		 * Construct the Array of Terminal Synthetic Float-Float Components and their Quotes from the given set of parameters
-		 */
-
-		String[] astrSyntheticFloatFloatTenor = new String[] {
+		String[] syntheticFloatFloatTenorArray =
+		{
 			"35Y",
 			"40Y",
 			"50Y",
 			"60Y"
 		};
-
-		double[] adblSyntheticFloatFloatQuote = new double[] {
+		double[] syntheticFloatFloatQuoteArray =
+		{
 			-0.000660,
 			-0.000660,
 			-0.000660,
 			-0.000660
 		};
 
-		ForwardCurve fc6M = IBOR6MCubicPolyVanilla.Make6MForward (
-			dtValue,
-			strCurrency,
-			"6M",
-			true
-		);
-
-		ForwardCurve fc12M = IBORCurve.CustomIBORBuilderSample (
-			dcEONIA,
-			fc6M,
-			fri,
-			scbcCubicKLKHyperbolic,
-			astrDepositTenor,
-			adblDepositQuote,
-			"ForwardRate",
-			astrFRATenor,
-			adblFRAQuote,
-			"ParForwardRate",
-			null,
-			null,
-			"SwapRate",
-			astrFloatFloatTenor,
-			adblFloatFloatQuote,
-			"ReferenceParBasisSpread",
-			astrSyntheticFloatFloatTenor,
-			adblSyntheticFloatFloatQuote,
-			"ReferenceParBasisSpread",
-			"---- VANILLA CUBIC KLK HYPERBOLIC TENSION B-SPLINE FORWARD CURVE ---",
-			true
+		SegmentCustomBuilderControl quarticSegmentCustomBuilderControl = new SegmentCustomBuilderControl (
+			MultiSegmentSequenceBuilder.BASIS_SPLINE_KLK_HYPERBOLIC_TENSION,
+			new ExponentialTensionSetParams (1.),
+			SegmentInelasticDesignControl.Create (2, 2),
+			new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+			null
 		);
 
 		IBORCurve.ForwardJack (
-			dtValue,
-			"---- VANILLA CUBIC KLK HYPERBOLIC TENSION B-SPLINE FORWARD CURVE SENSITIVITY ---",
-			fc12M,
+			valueDate,
+			"---- VANILLA QUARTIC POLYNOMIAL FORWARD CURVE SENSITIVITY ---",
+			IBORCurve.CustomIBORBuilderSample (
+				OvernightIndexCurve.MakeDC (valueDate, currency),
+				IBOR6MCubicPolyVanilla.Make6MForward (valueDate, currency, "6M", true),
+				ForwardLabel.Create (currency, tenor),
+				quarticSegmentCustomBuilderControl,
+				depositTenorArray,
+				depositQuoteArray,
+				"ForwardRate",
+				fraTenor,
+				fraQuoteArray,
+				"ParForwardRate",
+				null,
+				null,
+				"SwapRate",
+				floatFloatTenorArray,
+				floatFloatQuoteArray,
+				"ReferenceParBasisSpread",
+				syntheticFloatFloatTenorArray,
+				syntheticFloatFloatQuoteArray,
+				"ReferenceParBasisSpread",
+				"---- VANILLA QUARTIC POLYNOMIAL FORWARD CURVE ---",
+				true
+			),
 			"DerivedParBasisSpread"
 		);
 

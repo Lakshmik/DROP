@@ -25,6 +25,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,7 +112,7 @@ import org.drip.state.identifier.*;
 
 /**
  * <i>MultiStreamSwapMeasures</i> illustrates the creation, invocation, and usage of the MultiStreamSwap. It
- * shows how to:
+ * 	shows how to:
  *  
  * <br><br>
  *  <ul>
@@ -121,84 +129,73 @@ import org.drip.state.identifier.*;
  * 			Value the Rates Basket.
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/funding/README.md">Shape Preserving Local Funding Curve</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/funding/README.md">Shape Preserving Local Funding Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultiStreamSwapMeasures {
+public class MultiStreamSwapMeasures
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Sample demonstrating building of rates curve from deposit/future/swaps
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static MergedDiscountForwardCurve BuildRatesCurveFromInstruments (
-		final JulianDate dtStart,
-		final String[] astrDepositTenor,
-		final double[] adblDepositRate,
-		final String[] astrIRSTenor,
-		final double[] adblIRSRate,
-		final double dblBump,
-		final String strCurrency)
+		final JulianDate startDate,
+		final String[] depositTenorArray,
+		final double[] depositRateArray,
+		final String[] irsTenorArray,
+		final double[] irsRateArray,
+		final double bump,
+		final String currency)
 		throws Exception
 	{
-		int iNumDCInstruments = astrDepositTenor.length + adblIRSRate.length;
-		int aiDate[] = new int[iNumDCInstruments];
-		double adblRate[] = new double[iNumDCInstruments];
-		String astrCalibMeasure[] = new String[iNumDCInstruments];
-		double adblCompCalibValue[] = new double[iNumDCInstruments];
-		CalibratableComponent aCompCalib[] = new CalibratableComponent[iNumDCInstruments];
+		int instrumentCount = depositTenorArray.length + irsRateArray.length;
+		CalibratableComponent calibratableComponentArray[] = new CalibratableComponent[instrumentCount];
+		double componentCalibrationValueArray[] = new double[instrumentCount];
+		String calibrationMeasureArray[] = new String[instrumentCount];
+		double rateArray[] = new double[instrumentCount];
+		int dateArray[] = new int[instrumentCount];
 
-		// Deposit Calibration
+		ComposableFloatingUnitSetting depositComposableFloatingUnitSetting =
+			new ComposableFloatingUnitSetting (
+				"3M",
+				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
+				null,
+				ForwardLabel.Create (currency, "3M"),
+				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+				0.
+			);
 
-		ComposableFloatingUnitSetting cfusDeposit = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
-			null,
-			ForwardLabel.Create (
-				strCurrency,
-				"3M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
-
-		CompositePeriodSetting cpsDeposit = new CompositePeriodSetting (
+		CompositePeriodSetting depositCompositePeriodSetting = new CompositePeriodSetting (
 			4,
 			"3M",
-			strCurrency,
+			currency,
 			null,
 			1.,
 			null,
@@ -207,85 +204,70 @@ public class MultiStreamSwapMeasures {
 			null
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-		for (int i = 0; i < astrDepositTenor.length; ++i) {
-			astrCalibMeasure[i] = "Rate";
-			adblRate[i] = java.lang.Double.NaN;
-			adblCompCalibValue[i] = adblDepositRate[i] + dblBump;
+		for (int depositIndex = 0; depositIndex < depositTenorArray.length; ++depositIndex) {
+			rateArray[depositIndex] = Double.NaN;
+			calibrationMeasureArray[depositIndex] = "Rate";
+			componentCalibrationValueArray[depositIndex] = depositRateArray[depositIndex] + bump;
 
-			aCompCalib[i] = new SingleStreamComponent (
-				"DEPOSIT_" + astrDepositTenor[i],
+			calibratableComponentArray[depositIndex] = new SingleStreamComponent (
+				"DEPOSIT_" + depositTenorArray[depositIndex],
 				new Stream (
 					CompositePeriodBuilder.FloatingCompositeUnit (
 						CompositePeriodBuilder.EdgePair (
-							dtStart,
-							new JulianDate (aiDate[i] = dtStart.addTenor (astrDepositTenor[i]).julian())
+							startDate,
+							new JulianDate (
+								dateArray[depositIndex] =
+									startDate.addTenor (depositTenorArray[depositIndex]).julian()
+							)
 						),
-						cpsDeposit,
-						cfusDeposit
+						depositCompositePeriodSetting,
+						depositComposableFloatingUnitSetting
 					)
 				),
-				csp
+				cashSettleParams
 			);
 
-			aCompCalib[i].setPrimaryCode (astrDepositTenor[i]);
+			calibratableComponentArray[depositIndex].setPrimaryCode (depositTenorArray[depositIndex]);
 		}
 
-		// IRS Calibration
-
-		for (int i = 0; i < astrIRSTenor.length; ++i) {
-			astrCalibMeasure[i + astrDepositTenor.length] = "Rate";
-			adblRate[i + astrDepositTenor.length] = java.lang.Double.NaN;
-			adblCompCalibValue[i + astrDepositTenor.length] = adblIRSRate[i] + dblBump;
+		for (int irsIndex = 0; irsIndex < irsTenorArray.length; ++irsIndex) {
+			rateArray[irsIndex + depositTenorArray.length] = Double.NaN;
+			calibrationMeasureArray[irsIndex + depositTenorArray.length] = "Rate";
+			componentCalibrationValueArray[irsIndex + depositTenorArray.length] =
+				irsRateArray[irsIndex] + bump;
 
 			FixFloatComponent irs = OTCIRS (
-				dtStart,
-				strCurrency,
-				astrIRSTenor[i],
-				adblIRSRate[i] + dblBump
+				startDate,
+				currency,
+				irsTenorArray[irsIndex],
+				irsRateArray[irsIndex] + bump
 			);
 
-			irs.setPrimaryCode ("IRS." + astrIRSTenor[i] + "." + strCurrency);
+			irs.setPrimaryCode ("IRS." + irsTenorArray[irsIndex] + "." + currency);
 
-			aCompCalib[i + astrDepositTenor.length] = irs;
+			calibratableComponentArray[irsIndex + depositTenorArray.length] = irs;
 		}
 
-		/*
-		 * Build the IR curve from the components, their calibration measures, and their calibration quotes.
-		 */
-
 		return ScenarioDiscountCurveBuilder.NonlinearBuild (
-			dtStart,
-			strCurrency,
-			aCompCalib,
-			adblCompCalibValue,
-			astrCalibMeasure,
+			startDate,
+			currency,
+			calibratableComponentArray,
+			componentCalibrationValueArray,
+			calibrationMeasureArray,
 			null
 		);
 	}
 
-	/*
-	 * Sample demonstrating creation of a rates basket instance from component fixed and floating streams
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final RatesBasket MakeRatesBasket (
-		final JulianDate dtEffective)
+		final JulianDate effectiveDate)
 		throws Exception
 	{
-		/*
-		 * Create a sequence of Fixed Streams
-		 */
+		Stream[] fixedStreamArray = new Stream[3];
+		Stream[] floatStreamArray = new Stream[3];
 
-		Stream[] aFixedStream = new Stream[3];
-
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
+		UnitCouponAccrualSetting fixedUnitCouponAccrualSetting = new UnitCouponAccrualSetting (
 			2,
 			"Act/360",
 			false,
@@ -296,34 +278,7 @@ public class MultiStreamSwapMeasures {
 			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
 		);
 
-		ComposableFixedUnitSetting cfusFixed3Y = new ComposableFixedUnitSetting (
-			"6M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			0.03,
-			0.,
-			"USD"
-		);
-
-		ComposableFixedUnitSetting cfusFixed5Y = new ComposableFixedUnitSetting (
-			"6M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			0.05,
-			0.,
-			"USD"
-		);
-
-		ComposableFixedUnitSetting cfusFixed7Y = new ComposableFixedUnitSetting (
-			"6M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			0.07,
-			0.,
-			"USD"
-		);
-
-		CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
+		CompositePeriodSetting fixedCompositePeriodSetting = new CompositePeriodSetting (
 			2,
 			"6M",
 			"USD",
@@ -335,89 +290,70 @@ public class MultiStreamSwapMeasures {
 			null
 		);
 
-		aFixedStream[0] = new Stream (
+		fixedStreamArray[0] = new Stream (
 			CompositePeriodBuilder.FixedCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective,
+					effectiveDate,
 					"6M",
 					"3Y",
 					null
 				),
-				cpsFixed,
-				ucasFixed,
-				cfusFixed3Y
+				fixedCompositePeriodSetting,
+				fixedUnitCouponAccrualSetting,
+				new ComposableFixedUnitSetting (
+					"6M",
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+					null,
+					0.03,
+					0.,
+					"USD"
+				)
 			)
 		);
 
-		aFixedStream[1] = new Stream (
+		fixedStreamArray[1] = new Stream (
 			CompositePeriodBuilder.FixedCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective,
+					effectiveDate,
 					"6M",
 					"5Y",
 					null
 				),
-				cpsFixed,
-				ucasFixed,
-				cfusFixed5Y
+				fixedCompositePeriodSetting,
+				fixedUnitCouponAccrualSetting,
+				new ComposableFixedUnitSetting (
+					"6M",
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+					null,
+					0.05,
+					0.,
+					"USD"
+				)
 			)
 		);
 
-		aFixedStream[2] = new Stream (
+		fixedStreamArray[2] = new Stream (
 			CompositePeriodBuilder.FixedCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective,
+					effectiveDate,
 					"6M",
 					"7Y",
 					null
 				),
-				cpsFixed,
-				ucasFixed,
-				cfusFixed7Y
+				fixedCompositePeriodSetting,
+				fixedUnitCouponAccrualSetting,
+				new ComposableFixedUnitSetting (
+					"6M",
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+					null,
+					0.07,
+					0.,
+					"USD"
+				)
 			)
 		);
 
-		/*
-		 * Create a sequence of Float Streams
-		 */
-
-		Stream[] aFloatStream = new Stream[3];
-
-		ComposableFloatingUnitSetting cfusFloat3Y = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
-			null,
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.03
-		);
-
-		ComposableFloatingUnitSetting cfusFloat5Y = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
-			null,
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.05
-		);
-
-		ComposableFloatingUnitSetting cfusFloat7Y = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
-			null,
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.07
-		);
+		ForwardLabel forwardLabel = ForwardLabel.Create ("USD", "3M");
 
 		CompositePeriodSetting cpsFloat = new CompositePeriodSetting (
 			4,
@@ -431,155 +367,178 @@ public class MultiStreamSwapMeasures {
 			null
 		);
 
-		aFloatStream[0] = new Stream (
+		floatStreamArray[0] = new Stream (
 			CompositePeriodBuilder.FloatingCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective,
+					effectiveDate,
 					"6M",
 					"3Y",
 					null
 				),
 				cpsFloat,
-				cfusFloat3Y
+				new ComposableFloatingUnitSetting (
+					"3M",
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
+					null,
+					forwardLabel,
+					CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+					0.03
+				)
 			)
 		);
 
-		aFloatStream[1] = new Stream (
+		floatStreamArray[1] = new Stream (
 			CompositePeriodBuilder.FloatingCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective,
+					effectiveDate,
 					"6M",
 					"5Y",
 					null
 				),
 				cpsFloat,
-				cfusFloat5Y
+				new ComposableFloatingUnitSetting (
+					"3M",
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
+					null,
+					forwardLabel,
+					CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+					0.05
+				)
 			)
 		);
 
-		aFloatStream[2] = new Stream (
+		floatStreamArray[2] = new Stream (
 			CompositePeriodBuilder.FloatingCompositeUnit (
 				CompositePeriodBuilder.RegularEdgeDates (
-					dtEffective,
+					effectiveDate,
 					"6M",
 					"7Y",
 					null
 				),
 				cpsFloat,
-				cfusFloat7Y
+				new ComposableFloatingUnitSetting (
+					"3M",
+					CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
+					null,
+					forwardLabel,
+					CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+					0.07
+				)
 			)
 		);
 
-		/*
-		 * Create a Rates Basket instance containing the fixed and floating streams
-		 */
-
-		return new RatesBasket (
-			"RATESBASKET",
-			aFixedStream,
-			aFloatStream
-		);
+		return new RatesBasket ("RATESBASKET", fixedStreamArray, floatStreamArray);
 	}
-
-	/*
-	 * Sample demonstrating creation of discount curve from cash/futures/swaps
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final void MultiLegSwapSample()
 		throws Exception
 	{
-		JulianDate dtValue = DateUtil.Today();
+		JulianDate valueDate = DateUtil.Today();
 
-		/*
-		 * Create the Discount Curve from the rates instruments
-		 */
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		String[] astrCashTenor = new String[] {"3M"};
-		double[] adblCashRate = new double[] {0.00276};
-		String[] astrIRSTenor = new String[] {   "1Y",    "2Y",    "3Y",    "4Y",    "5Y",    "6Y",    "7Y",
-		   "8Y",    "9Y",   "10Y",   "11Y",   "12Y",   "15Y",   "20Y",   "25Y",   "30Y",   "40Y",   "50Y"};
-		double[] adblIRSRate = new double[]  {0.00367, 0.00533, 0.00843, 0.01238, 0.01609, 0.01926, 0.02191,
-			0.02406, 0.02588, 0.02741, 0.02870, 0.02982, 0.03208, 0.03372, 0.03445, 0.03484, 0.03501, 0.03484};
-
-		MergedDiscountForwardCurve dc = BuildRatesCurveFromInstruments (
-			dtValue,
-			astrCashTenor,
-			adblCashRate,
-			astrIRSTenor,
-			adblIRSRate,
-			0.,
-			"USD"
-		);
-
-		/*
-		 * Set up the valuation and the market parameters
-		 */
-
-		ValuationParams valParams = ValuationParams.Spot (
-			dtValue,
-			0,
-			"",
-			Convention.DATE_ROLL_ACTUAL
-		);
-
-		double dblUSDABCFXRate = 1.;
-
-		CurveSurfaceQuoteContainer mktParams = new CurveSurfaceQuoteContainer();
-
-		mktParams.setFundingState (dc);
-
-		CurrencyPair cp = CurrencyPair.FromCode ("USD/ABC");
-
-		mktParams.setFXState (
-			ScenarioFXCurveBuilder.CubicPolynomialCurve (
-				"FX::" + cp.code(),
-				dtValue,
-				cp,
-				new String[] {"10Y"},
-				new double[] {dblUSDABCFXRate},
-				dblUSDABCFXRate
+		curveSurfaceQuoteContainer.setFundingState (
+			BuildRatesCurveFromInstruments (
+				valueDate,
+				new String[]
+				{
+					"3M"
+				},
+				new double[]
+				{
+					0.00276
+				},
+				new String[]
+				{
+					"1Y",
+					"2Y",
+					"3Y",
+					"4Y",
+					"5Y",
+					"6Y",
+					"7Y",
+					"8Y",
+					"9Y",
+					"10Y",
+					"11Y",
+					"12Y",
+					"15Y",
+					"20Y",
+					"25Y",
+					"30Y",
+					"40Y",
+					"50Y"
+				},
+				new double[]
+				{
+					0.00367,
+					0.00533,
+					0.00843,
+					0.01238,
+					0.01609,
+					0.01926,
+					0.02191,
+					0.02406,
+					0.02588,
+					0.02741,
+					0.02870,
+					0.02982,
+					0.03208,
+					0.03372,
+					0.03445,
+					0.03484,
+					0.03501,
+					0.03484
+				},
+				0.,
+				"USD"
 			)
 		);
 
-		/*
-		 * Create the Rates Basket from the streams
-		 */
+		CurrencyPair currencyPair = CurrencyPair.FromCode ("USD/ABC");
 
-		RatesBasket rb = MakeRatesBasket (dtValue);
-
-		/*
-		 * Value the Rates Basket
-		 */
-
-		CaseInsensitiveTreeMap<Double> mapRBResults = rb.value (
-			valParams,
-			null,
-			mktParams,
-			null
+		curveSurfaceQuoteContainer.setFXState (
+			ScenarioFXCurveBuilder.CubicPolynomialCurve (
+				"FX::" + currencyPair.code(),
+				valueDate,
+				currencyPair,
+				new String[]
+				{
+					"10Y"
+				},
+				new double[]
+				{
+					1.
+				},
+				1.
+			)
 		);
 
-		System.out.println (mapRBResults);
+		System.out.println (
+			MakeRatesBasket (
+				valueDate
+			).value (
+				ValuationParams.Spot (valueDate, 0, "", Convention.DATE_ROLL_ACTUAL),
+				null,
+				curveSurfaceQuoteContainer,
+				null
+			)
+		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		// String strConfig = "c:\\Lakshmi\\BondAnal\\Config.xml";
-
-		String strConfig = "";
-
-		EnvManager.InitEnv (strConfig);
+		EnvManager.InitEnv ("");
 
 		MultiLegSwapSample();
 

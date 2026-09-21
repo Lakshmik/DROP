@@ -1,8 +1,6 @@
 
 package org.drip.sample.forward;
 
-import java.util.List;
-
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.*;
 import org.drip.function.r1tor1custom.QuadraticRationalShapeControl;
@@ -27,6 +25,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,409 +110,345 @@ import org.drip.state.inference.*;
 
 /**
  * <i>OvernightIndexCurve</i> illustrates the Construction and Usage of the Overnight Index Discount Curve.
- *  
- * <br><br>
+ * 	It exposes the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></li>
+ * 		<li>Construct the Merged Forward Discount Curve</li>
+ * 		<li>Construct an Elaborate Overnight Discount Curve</li>
  *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/forward/README.md">IBOR Spline Forward Curve Construction</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class OvernightIndexCurve {
-
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
+public class OvernightIndexCurve
+{
 
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay,
-		final FloaterIndex fi)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray,
+		final FloaterIndex floaterIndex)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
 
-		for (int i = 0; i < aiDay.length; ++i)
-			aDeposit[i] = SingleStreamComponentBuilder.Deposit (
-				dtEffective,
-				dtEffective.addBusDays (
-					aiDay[i],
-					strCurrency
-				),
-				null == fi ? OvernightLabel.Create (
-					strCurrency
-				) : ForwardLabel.Create (
-					fi,
-					"ON"
-				)
+		ForwardLabel forwardLabel = null == floaterIndex ?
+			OvernightLabel.Create (currency) : ForwardLabel.Create (floaterIndex, "ON");
+
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveDate,
+				effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency),
+				forwardLabel
 			);
+		}
 
-		return aDeposit;
+		return depositArray;
 	}
 
 	private static final FixFloatComponent OTCOISFixFloat (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = OvernightFixedFloatContainer.FundConventionFromJurisdiction (
-			strCurrency
-		);
-
-		return null == ffConv ? null : ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		return OvernightFixedFloatContainer.FundConventionFromJurisdiction (
+			currency
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			if (null == (aOIS[i] = OTCOISFixFloat (
-				dtSpot,
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
-			)))
-			return null;
+		for (int maturityTenorIndex = 0;
+			maturityTenorIndex < maturityTenorArray.length;
+			++maturityTenorIndex)
+		{
+			oisArray[maturityTenorIndex] = OTCOISFixFloat (
+				spotDate,
+				currency,
+				maturityTenorArray[maturityTenorIndex],
+				couponArray[maturityTenorIndex]
+			);
 		}
 
-		return aOIS;
+		return oisArray;
 	}
 
 	private static final FixFloatComponent[] OvernightIndexFromMaturityTenor (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon,
-		final FloaterIndex fi)
+		final JulianDate effectiveDate,
+		final String currency,
+		final String[] maturityTenorArray,
+		final double[] couponArray,
+		final FloaterIndex floaterIndex)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisArray = new FixFloatComponent[maturityTenorArray.length];
 
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
+		UnitCouponAccrualSetting fixedUnitCouponAccrualSetting = new UnitCouponAccrualSetting (
 			2,
 			"Act/360",
 			false,
 			"Act/360",
 			false,
-			strCurrency,
+			currency,
 			false,
 			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			java.lang.String strFixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+		ForwardLabel forwardLabel = null == floaterIndex ?
+			OvernightLabel.Create (currency) : ForwardLabel.Create (floaterIndex, "ON");
+
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			String fixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[maturityIndex],
 				"6M"
-			) ? astrMaturityTenor[i] : "6M";
+			) ? maturityTenorArray[maturityIndex] : "6M";
 
-			java.lang.String strFloatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+			String floatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[maturityIndex],
 				"3M"
-			) ? astrMaturityTenor[i] : "3M";
-
-			ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-				"ON",
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
-				null,
-				null == fi ? OvernightLabel.Create (
-					strCurrency
-				) : ForwardLabel.Create (
-					fi,
-					"ON"
-				),
-				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-				0.
-			);
-
-			ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-				strFixedTenor,
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-				null,
-				adblCoupon[i],
-				0.,
-				strCurrency
-			);
-
-			CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-				4,
-				strFloatingTenor,
-				strCurrency,
-				null,
-				-1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-				2,
-				strFixedTenor,
-				strCurrency,
-				null,
-				1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				strFixedTenor,
-				astrMaturityTenor[i],
-				null
-			);
-
-			List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				strFloatingTenor,
-				astrMaturityTenor[i],
-				null
-			);
-
-			Stream floatingStream = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsFloatingStreamEdgeDate,
-					cpsFloating,
-					cfusFloating
-				)
-			);
-
-			Stream fixedStream = new Stream (
-				CompositePeriodBuilder.FixedCompositeUnit (
-					lsFixedStreamEdgeDate,
-					cpsFixed,
-					ucasFixed,
-					cfusFixed
-				)
-			);
+			) ? maturityTenorArray[maturityIndex] : "3M";
 
 			FixFloatComponent ois = new FixFloatComponent (
-				fixedStream,
-				floatingStream,
-				csp
+				new Stream (
+					CompositePeriodBuilder.FixedCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							fixedTenor,
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							2,
+							fixedTenor,
+							currency,
+							null,
+							1.,
+							null,
+							null,
+							null,
+							null
+						),
+						fixedUnitCouponAccrualSetting,
+						new ComposableFixedUnitSetting (
+							fixedTenor,
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+							null,
+							couponArray[maturityIndex],
+							0.,
+							currency
+						)
+					)
+				),
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							floatingTenor,
+							maturityTenorArray[maturityIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							4,
+							floatingTenor,
+							currency,
+							null,
+							-1.,
+							null,
+							null,
+							null,
+							null
+						),
+						new ComposableFloatingUnitSetting (
+							"ON",
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
+							null,
+							forwardLabel,
+							CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+							0.
+						)
+					)
+				),
+				cashSettleParams
 			);
 
-			ois.setPrimaryCode ("OIS." + astrMaturityTenor[i] + "." + strCurrency);
+			ois.setPrimaryCode ("OIS." + maturityTenorArray[maturityIndex] + "." + currency);
 
-			aOIS[i] = ois;
+			oisArray[maturityIndex] = ois;
 		}
 
-		return aOIS;
+		return oisArray;
 	}
 
-	/*
-	 * Construct the Array of Overnight Index Future Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] OISFuturesFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrStartTenor,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] startTenorArray,
+		final String[] maturityTenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		FixFloatComponent[] aOISFutures = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] oisFuturesArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			if (null == (aOISFutures[i] = OTCOISFixFloat (
-				dtSpot.addTenor (astrStartTenor[i]),
-				strCurrency,
-				astrMaturityTenor[i],
-				adblCoupon[i]
-			)))
-			return null;
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			oisFuturesArray[maturityIndex] = OTCOISFixFloat (
+				spotDate.addTenor (startTenorArray[maturityIndex]),
+				currency,
+				maturityTenorArray[maturityIndex],
+				couponArray[maturityIndex]
+			);
 		}
 
-		return aOISFutures;
+		return oisFuturesArray;
 	}
 
 	private static final FixFloatComponent[] OvernightIndexFutureFromMaturityTenor (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String[] astrStartTenor,
-		final String[] astrMaturityTenor,
-		final double[] adblCoupon,
-		final FloaterIndex fi)
+		final JulianDate spotDate,
+		final String currency,
+		final String[] startTenorArray,
+		final String[] maturityTenorArray,
+		final double[] couponArray,
+		final FloaterIndex floaterIndex)
 		throws Exception
 	{
-		FixFloatComponent[] aOIS = new FixFloatComponent[astrStartTenor.length];
+		ForwardLabel forwardLabel = null == floaterIndex ?
+			OvernightLabel.Create (currency) : ForwardLabel.Create (floaterIndex, "ON");
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		FixFloatComponent[] oisArray = new FixFloatComponent[startTenorArray.length];
 
-		for (int i = 0; i < astrStartTenor.length; ++i) {
-			JulianDate dtEffective = dtSpot.addTenor (astrStartTenor[i]);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-			java.lang.String strFixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
+		for (int tenorIndex = 0; tenorIndex < startTenorArray.length; ++tenorIndex) {
+			JulianDate effectiveDate = spotDate.addTenor (startTenorArray[tenorIndex]);
+
+			String fixedTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+				maturityTenorArray[tenorIndex],
 				"6M"
-			) ? astrMaturityTenor[i] : "6M";
-
-			java.lang.String strFloatingTenor = Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
-				astrMaturityTenor[i],
-				"3M"
-			) ? astrMaturityTenor[i] : "3M";
-
-			ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-				strFixedTenor,
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-				null,
-				adblCoupon[i],
-				0.,
-				strCurrency
-			);
-
-			UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
-				2,
-				"Act/360",
-				false,
-				"Act/360",
-				false,
-				strCurrency,
-				false,
-				CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
-			);
-
-			ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-				"ON",
-				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
-				null,
-				null == fi ? OvernightLabel.Create (
-					strCurrency
-				) : ForwardLabel.Create (
-					fi,
-					"ON"
-				),
-				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-				0.
-			);
-
-			CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-				4,
-				strFloatingTenor,
-				strCurrency,
-				null,
-				-1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-				2,
-				strFixedTenor,
-				strCurrency,
-				null,
-				1.,
-				null,
-				null,
-				null,
-				null
-			);
-
-			List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				"6M",
-				astrMaturityTenor[i],
-				null
-			);
-
-			List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				"3M",
-				astrMaturityTenor[i],
-				null
-			);
-
-			Stream floatingStream = new Stream (
-				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsFloatingStreamEdgeDate,
-					cpsFloating,
-					cfusFloating
-				)
-			);
-
-			Stream fixedStream = new Stream (
-				CompositePeriodBuilder.FixedCompositeUnit (
-					lsFixedStreamEdgeDate,
-					cpsFixed,
-					ucasFixed,
-					cfusFixed
-				)
-			);
+			) ? maturityTenorArray[tenorIndex] : "6M";
 
 			FixFloatComponent ois = new FixFloatComponent (
-				fixedStream,
-				floatingStream,
-				csp
+				new Stream (
+					CompositePeriodBuilder.FixedCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							"6M",
+							maturityTenorArray[tenorIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							2,
+							fixedTenor,
+							currency,
+							null,
+							1.,
+							null,
+							null,
+							null,
+							null
+						),
+						new UnitCouponAccrualSetting (
+							2,
+							"Act/360",
+							false,
+							"Act/360",
+							false,
+							currency,
+							false,
+							CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
+						),
+						new ComposableFixedUnitSetting (
+							fixedTenor,
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+							null,
+							couponArray[tenorIndex],
+							0.,
+							currency
+						)
+					)
+				),
+				new Stream (
+					CompositePeriodBuilder.FloatingCompositeUnit (
+						CompositePeriodBuilder.RegularEdgeDates (
+							effectiveDate,
+							"3M",
+							maturityTenorArray[tenorIndex],
+							null
+						),
+						new CompositePeriodSetting (
+							4,
+							Helper.LEFT_TENOR_LESSER == Helper.TenorCompare (
+								maturityTenorArray[tenorIndex],
+								"3M"
+							) ? maturityTenorArray[tenorIndex] : "3M",
+							currency,
+							null,
+							-1.,
+							null,
+							null,
+							null,
+							null
+						),
+						new ComposableFloatingUnitSetting (
+							"ON",
+							CompositePeriodBuilder.EDGE_DATE_SEQUENCE_OVERNIGHT,
+							null,
+							forwardLabel,
+							CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+							0.
+						)
+					)
+				),
+				cashSettleParams
 			);
 
-			ois.setPrimaryCode ("OIS." + astrMaturityTenor[i] + "." + strCurrency);
+			ois.setPrimaryCode ("OIS." + maturityTenorArray[tenorIndex] + "." + currency);
 
-			aOIS[i] = ois;
+			oisArray[tenorIndex] = ois;
 		}
 
-		return aOIS;
+		return oisArray;
 	}
 
 	/**
 	 * Construct the Merged Forward Discount Curve
 	 * 
-	 * @param strCurrency Currency
-	 * @param dtSpot Spot Date
-	 * @param aiDepositMaturityDays Deposit Maturity Days Array
-	 * @param adblDepositQuote Deposit Quote Array
-	 * @param astrShortEndOISMaturityTenor Short End OIS Maturity Array
-	 * @param adblShortEndOISQuote Short End OIS Quote Array
-	 * @param astrOISFutureTenor OIS Tenor Future Array
-	 * @param astrOISFutureMaturityTenor OIS Tenor Future Maturity Array
-	 * @param adblOISFutureQuote OIS Tenor Quote Array
-	 * @param astrLongEndOISMaturityTenor Long End OIS Maturity Array
-	 * @param adblLongEndOISQuote Long End OIS Quote Array
-	 * @param scbc Segment Custom Builder Control
-	 * @param fi Floater Index
+	 * @param currency Currency
+	 * @param spotDate Spot Date
+	 * @param depositMaturityDaysArray Deposit Maturity Days Array
+	 * @param depositQuoteArray Deposit Quote Array
+	 * @param shortEndOISMaturityTenorArray Short End OIS Maturity Array
+	 * @param shortEndOISQuoteArray Short End OIS Quote Array
+	 * @param oisFutureTenorArray OIS Tenor Future Array
+	 * @param oisFutureMaturityTenorArray OIS Tenor Future Maturity Array
+	 * @param oisFutureQuoteArray OIS Tenor Quote Array
+	 * @param longEndOISMaturityTenorArray Long End OIS Maturity Array
+	 * @param longEndOISQuoteArray Long End OIS Quote Array
+	 * @param segmentCustomBuilderControl Segment Custom Builder Control
+	 * @param floaterIndex Floater Index
 	 * 
 	 * @return The Merged Forward Discount Curve
 	 * 
@@ -514,178 +456,167 @@ public class OvernightIndexCurve {
 	 */
 
 	public static final MergedDiscountForwardCurve MakeDC (
-		final String strCurrency,
-		final JulianDate dtSpot,
-		final int[] aiDepositMaturityDays,
-		final double[] adblDepositQuote,
-		final String[] astrShortEndOISMaturityTenor,
-		final double[] adblShortEndOISQuote,
-		final String[] astrOISFutureTenor,
-		final String[] astrOISFutureMaturityTenor,
-		final double[] adblOISFutureQuote,
-		final String[] astrLongEndOISMaturityTenor,
-		final double[] adblLongEndOISQuote,
-		final SegmentCustomBuilderControl scbc,
-		final FloaterIndex fi)
+		final String currency,
+		final JulianDate spotDate,
+		final int[] depositMaturityDaysArray,
+		final double[] depositQuoteArray,
+		final String[] shortEndOISMaturityTenorArray,
+		final double[] shortEndOISQuoteArray,
+		final String[] oisFutureTenorArray,
+		final String[] oisFutureMaturityTenorArray,
+		final double[] oisFutureQuoteArray,
+		final String[] longEndOISMaturityTenorArray,
+		final double[] longEndOISQuoteArray,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final FloaterIndex floaterIndex)
 		throws Exception
 	{
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			aiDepositMaturityDays,
-			fi
-		);
-
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"DEPOSIT",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of Short End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		CalibratableComponent[] aShortEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1W", "2W", "3W", "1M"
+		CalibratableComponent[] shortEndOISArray = OISFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1W",
+				"2W",
+				"3W",
+				"1M"
 			},
-			adblShortEndOISQuote
+			shortEndOISQuoteArray
 		);
 
-		if (null == aShortEndOISComp)
-			aShortEndOISComp = OvernightIndexFromMaturityTenor (dtSpot,
-				strCurrency,
-				new java.lang.String[] {
-					"1W", "2W", "3W", "1M"
+		if (null == shortEndOISArray) {
+			shortEndOISArray = OvernightIndexFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"1W",
+					"2W",
+					"3W",
+					"1M"
 				},
-				adblShortEndOISQuote,
-				fi
+				shortEndOISQuoteArray,
+				floaterIndex
 			);
+		}
 
-		/*
-		 * Construct the Short End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisShortEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"OIS_SHORT_END",
-			aShortEndOISComp,
-			"SwapRate",
-			adblShortEndOISQuote
+		CalibratableComponent[] oisFuturesArray = OISFuturesFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"1M",
+				"2M",
+				"3M",
+				"4M",
+				"5M"
+			},
+			new String[]
+			{
+				"1M",
+				"1M",
+				"1M",
+				"1M",
+				"1M"
+			},
+			oisFutureQuoteArray
 		);
 
-		/*
-		 * Construct the Array of OIS Futures Instruments and their Quotes from the given set of parameters
-		 */
-
-		CalibratableComponent[] aOISFutureComp = OISFuturesFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"1M", "2M", "3M", "4M", "5M"
-			},
-			new java.lang.String[] {
-				"1M", "1M", "1M", "1M", "1M"
-			},
-			adblOISFutureQuote
-		);
-
-		if (null == aOISFutureComp)
-			aOISFutureComp = OvernightIndexFutureFromMaturityTenor (
-				dtSpot,
-				strCurrency,
-				new java.lang.String[] {
-					"1M", "2M", "3M", "4M", "5M"
+		if (null == oisFuturesArray) {
+			oisFuturesArray = OvernightIndexFutureFromMaturityTenor (
+				spotDate,
+				currency,
+				new String[]
+				{
+					"1M",
+					"2M",
+					"3M",
+					"4M",
+					"5M"
 				},
-				new java.lang.String[] {
-					"1M", "1M", "1M", "1M", "1M"
+				new String[]
+				{
+					"1M",
+					"1M",
+					"1M",
+					"1M",
+					"1M"
 				},
-				adblOISFutureQuote,
-				fi
+				oisFutureQuoteArray,
+				floaterIndex
 			);
-
-		/*
-		 * Construct the OIS Future Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisFutureStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"OIS_FUTURE",
-			aOISFutureComp,
-			"SwapRate",
-			adblOISFutureQuote
-		);
-
-		/*
-		 * Construct the Array of Long End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		CalibratableComponent[] aLongEndOISComp = OISFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"15M", "18M", "21M", "2Y", "3Y", "4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y"
-			},
-			adblLongEndOISQuote
-		);
-
-		/*
-		 * Construct the Long End OIS Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec oisLongEndStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"OIS_LONG_END",
-			aLongEndOISComp,
-			"SwapRate",
-			adblLongEndOISQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			oisShortEndStretch,
-			oisFutureStretch,
-			oisLongEndStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			scbc,
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit and Swap Stretches.
-		 */
+		}
 
 		return ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
+			currency,
+			new LinearLatentStateCalibrator (
+				segmentCustomBuilderControl,
+				BoundarySettings.NaturalStandard(),
+				MultiSegmentSequence.CALIBRATE,
+				null,
+				null
+			),
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"DEPOSIT",
+					DepositInstrumentsFromMaturityDays (
+						spotDate,
+						currency,
+						depositMaturityDaysArray,
+						floaterIndex
+					),
+					"ForwardRate",
+					depositQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"OIS_SHORT_END",
+					shortEndOISArray,
+					"SwapRate",
+					shortEndOISQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"OIS_FUTURE",
+					oisFuturesArray,
+					"SwapRate",
+					oisFutureQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"OIS_LONG_END",
+					OISFromMaturityTenor (
+						spotDate,
+						currency,
+						new String[]
+						{
+							"15M",
+							"18M",
+							"21M",
+							"2Y",
+							"3Y",
+							"4Y",
+							"5Y",
+							"6Y",
+							"7Y",
+							"8Y",
+							"9Y",
+							"10Y",
+							"11Y",
+							"12Y",
+							"15Y",
+							"20Y",
+							"25Y",
+							"30Y"
+						},
+						longEndOISQuoteArray
+					),
+					"SwapRate",
+					longEndOISQuoteArray
+				)
+			},
 			new ValuationParams (
-				dtSpot,
-				dtSpot,
-				strCurrency
+				spotDate,
+				spotDate,
+				currency
 			),
 			null,
 			null,
@@ -695,156 +626,123 @@ public class OvernightIndexCurve {
 	}
 
 	/**
-	 * Construct an elaborate EONIA Discount Curve
+	 * Construct an Elaborate Overnight Discount Curve
 	 * 
-	 * @param dtSpot The Spot Date
-	 * @param strCurrency The Currency
+	 * @param spotDate The Spot Date
+	 * @param currency The Currency
 	 * 
-	 * @return Instance of the EONIA Discount Curve
+	 * @return Instance of the Overnight Discount Curve
 	 * 
-	 * @throws Exception Thrown if the OIS Discount Curve Could not be created
+	 * @throws Exception Thrown if the Overnight Discount Curve Could not be created
 	 */
 
 	public static final MergedDiscountForwardCurve MakeDC (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		int[] aiDepositMaturityDays = new int[] {
-			1,
-			2,
-			3
-		};
-
-		double[] adblDepositQuote = new double[] {
-			0.0004,	// 1D
-			0.0004,	// 2D
-			0.0004	// 3D
-		};
-
-		/*
-		 * Construct the Array of Short End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		String[] astrShortEndOISMaturityTenor = new java.lang.String[] {
-			"1W",
-			"2W",
-			"3W",
-			"1M"
-		};
-
-		double[] adblShortEndOISQuote = new double[] {
-			0.00070,    //   1W
-			0.00069,    //   2W
-			0.00078,    //   3W
-			0.00074     //   1M
-		};
-
-		/*
-		 * Construct the Array of OIS Futures Instruments and their Quotes from the given set of parameters
-		 */
-
-		final String[] astrOISFutureTenor = new java.lang.String[] {
-			"1M",
-			"1M",
-			"1M",
-			"1M",
-			"1M"
-		};
-
-		final String[] astrOISFutureMaturityTenor = new java.lang.String[] {
-			"1M",
-			"2M",
-			"3M",
-			"4M",
-			"5M"
-		};
-
-		double[] adblOISFutureQuote = new double[] {
-			 0.00046,    //   1M x 1M
-			 0.00016,    //   2M x 1M
-			-0.00007,    //   3M x 1M
-			-0.00013,    //   4M x 1M
-			-0.00014     //   5M x 1M
-		};
-
-		/*
-		 * Construct the Array of Long End OIS Instruments and their Quotes from the given set of parameters
-		 */
-
-		String[] astrLongEndOISMaturityTenor = new java.lang.String[] {
-			"15M",
-			"18M",
-			"21M",
-			"2Y",
-			"3Y",
-			"4Y",
-			"5Y",
-			"6Y",
-			"7Y",
-			"8Y",
-			"9Y",
-			"10Y",
-			"11Y",
-			"12Y",
-			"15Y",
-			"20Y",
-			"25Y",
-			"30Y"
-		};
-
-		double[] adblLongEndOISQuote = new double[] {
-			0.00002,    //  15M
-			0.00008,    //  18M
-			0.00021,    //  21M
-			0.00036,    //   2Y
-			0.00127,    //   3Y
-			0.00274,    //   4Y
-			0.00456,    //   5Y
-			0.00647,    //   6Y
-			0.00827,    //   7Y
-			0.00996,    //   8Y
-			0.01147,    //   9Y
-			0.01280,    //  10Y
-			0.01404,    //  11Y
-			0.01516,    //  12Y
-			0.01764,    //  15Y
-			0.01939,    //  20Y
-			0.02003,    //  25Y
-			0.02038     //  30Y
-		};
-
-		SegmentCustomBuilderControl scbcCubic = new SegmentCustomBuilderControl (
-			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
-			new ResponseScalingShapeControl (
-				true,
-				new QuadraticRationalShapeControl (0.)
-			),
-			null
-		);
-
 		return MakeDC (
-			strCurrency,
-			dtSpot,
-			aiDepositMaturityDays,
-			adblDepositQuote,
-			astrShortEndOISMaturityTenor,
-			adblShortEndOISQuote,
-			astrOISFutureTenor,
-			astrOISFutureMaturityTenor,
-			adblOISFutureQuote,
-			astrLongEndOISMaturityTenor,
-			adblLongEndOISQuote,
-			scbcCubic,
+			currency,
+			spotDate,
+			new int[]
+			{
+				1,
+				2,
+				3
+			},
+			new double[]
+			{
+				0.0004,	// 1D
+				0.0004,	// 2D
+				0.0004	// 3D
+			},
+			new String[]
+			{
+				"1W",
+				"2W",
+				"3W",
+				"1M"
+			},
+			new double[]
+			{
+				0.00070,    //   1W
+				0.00069,    //   2W
+				0.00078,    //   3W
+				0.00074     //   1M
+			},
+			new String[]
+			{
+				"1M",
+				"1M",
+				"1M",
+				"1M",
+				"1M"
+			},
+			new String[]
+			{
+				"1M",
+				"2M",
+				"3M",
+				"4M",
+				"5M"
+			},
+			new double[]
+			{
+				 0.00046,    //   1M x 1M
+				 0.00016,    //   2M x 1M
+				-0.00007,    //   3M x 1M
+				-0.00013,    //   4M x 1M
+				-0.00014     //   5M x 1M
+			},
+			new String[]
+			{
+				"15M",
+				"18M",
+				"21M",
+				"2Y",
+				"3Y",
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y"
+			},
+			new double[]
+			{
+				0.00002,    //  15M
+				0.00008,    //  18M
+				0.00021,    //  21M
+				0.00036,    //   2Y
+				0.00127,    //   3Y
+				0.00274,    //   4Y
+				0.00456,    //   5Y
+				0.00647,    //   6Y
+				0.00827,    //   7Y
+				0.00996,    //   8Y
+				0.01147,    //   9Y
+				0.01280,    //  10Y
+				0.01404,    //  11Y
+				0.01516,    //  12Y
+				0.01764,    //  15Y
+				0.01939,    //  20Y
+				0.02003,    //  25Y
+				0.02038     //  30Y
+			},
+			new SegmentCustomBuilderControl (
+				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+				new PolynomialFunctionSetParams (4),
+				SegmentInelasticDesignControl.Create (2, 2),
+				new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+				null
+			),
 			null
 		);
 	}

@@ -29,7 +29,7 @@ import org.drip.measure.dynamics.HazardJumpEvaluator;
 import org.drip.measure.gaussian.NormalQuadrature;
 import org.drip.measure.realization.DiffusionEvolver;
 import org.drip.measure.realization.JumpDiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.product.rates.FixFloatComponent;
 import org.drip.service.common.FormatUtil;
@@ -768,7 +768,7 @@ public class EnsembleVariationMarginEstimate
 			denseExposureDateIndex < denseExposureDateCount;
 			++denseExposureDateIndex)
 		{
-			UnivariateDiscreteThin denseVMThinStatistics = new UnivariateDiscreteThin
+			UnivariateCentralMeasures denseVMThinStatistics = new UnivariateCentralMeasures
 				(denseVariationMarginTranspose[denseExposureDateIndex]);
 
 			System.out.println (

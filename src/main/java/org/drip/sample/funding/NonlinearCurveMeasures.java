@@ -1,6 +1,8 @@
 
 package org.drip.sample.funding;
 
+import org.drip.analytics.date.DateUtil;
+
 /*
  * Credit Product imports
  */
@@ -15,6 +17,7 @@ import org.drip.product.creator.*;
 import org.drip.product.definition.*;
 import org.drip.product.rates.*;
 import org.drip.param.creator.*;
+import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.ScenarioDiscountCurveBuilder;
@@ -26,6 +29,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -105,7 +116,7 @@ import org.drip.state.identifier.ForwardLabel;
 
 /**
  * <i>NonlinearCurveMeasures</i> contains a demo of the Non-linear Rates Analytics API Usage. It shows the
- * following:
+ * 	following:
  *  
  * <br><br>
  *  <ul>
@@ -120,108 +131,90 @@ import org.drip.state.identifier.ForwardLabel;
  * 			Compute the PVDF Wengert Jacobian across all the instruments used in the curve construction.
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/funding/README.md">Shape Preserving Local Funding Curve</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/funding/README.md">Shape Preserving Local Funding Curve</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class NonlinearCurveMeasures {
+public class NonlinearCurveMeasures
+{
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Sample API demonstrating the creation of the discount curve from the rates input instruments
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static void DiscountCurveFromRatesInstruments()
 		throws Exception
 	{
 		int NUM_DC_INSTR = 30;
-		double adblRate[] = new double[NUM_DC_INSTR];
-		int aiMaturityDate[] = new int[NUM_DC_INSTR];
-		String astrCalibMeasure[] = new String[NUM_DC_INSTR];
-		double adblCompCalibValue[] = new double[NUM_DC_INSTR];
-		CalibratableComponent aCompCalib[] = new CalibratableComponent[NUM_DC_INSTR];
+		double rateArray[] = new double[NUM_DC_INSTR];
+		int maturityDateArray[] = new int[NUM_DC_INSTR];
+		String calibrationMeasureArray[] = new String[NUM_DC_INSTR];
+		double componentCalibrationValueArray[] = new double[NUM_DC_INSTR];
+		CalibratableComponent calibratableComponentArray[] = new CalibratableComponent[NUM_DC_INSTR];
 
-		JulianDate dtStart = org.drip.analytics.date.DateUtil.CreateFromYMD (
-			2011,
-			4,
-			6
-		);
+		JulianDate startDate = DateUtil.CreateFromYMD (2011, 4, 6);
 
-		// First 7 instruments - cash calibration
+		JulianDate cashEffectiveDateArray = startDate.addBusDays (1, "USD");
 
-		JulianDate dtCashEffective = dtStart.addBusDays (1, "USD");
+		maturityDateArray[0] = cashEffectiveDateArray.addBusDays (1, "USD").julian(); // ON
 
-		aiMaturityDate[0] = dtCashEffective.addBusDays (1, "USD").julian(); // ON
+		maturityDateArray[1] = cashEffectiveDateArray.addBusDays (2, "USD").julian(); // 1D (TN)
 
-		aiMaturityDate[1] = dtCashEffective.addBusDays (2, "USD").julian(); // 1D (TN)
+		maturityDateArray[2] = cashEffectiveDateArray.addBusDays (7, "USD").julian(); // 1W
 
-		aiMaturityDate[2] = dtCashEffective.addBusDays (7, "USD").julian(); // 1W
+		maturityDateArray[3] = cashEffectiveDateArray.addBusDays (14, "USD").julian(); // 2W
 
-		aiMaturityDate[3] = dtCashEffective.addBusDays (14, "USD").julian(); // 2W
+		maturityDateArray[4] = cashEffectiveDateArray.addBusDays (30, "USD").julian(); // 1M
 
-		aiMaturityDate[4] = dtCashEffective.addBusDays (30, "USD").julian(); // 1M
+		maturityDateArray[5] = cashEffectiveDateArray.addBusDays (60, "USD").julian(); // 2M
 
-		aiMaturityDate[5] = dtCashEffective.addBusDays (60, "USD").julian(); // 2M
+		maturityDateArray[6] = cashEffectiveDateArray.addBusDays (90, "USD").julian(); // 3M
 
-		aiMaturityDate[6] = dtCashEffective.addBusDays (90, "USD").julian(); // 3M
+		componentCalibrationValueArray[0] = 0.0013;
+		componentCalibrationValueArray[1] = 0.0017;
+		componentCalibrationValueArray[2] = 0.0017;
+		componentCalibrationValueArray[3] = 0.0018;
+		componentCalibrationValueArray[4] = 0.0020;
+		componentCalibrationValueArray[5] = 0.0023;
+		componentCalibrationValueArray[6] = 0.0026;
 
-		/*
-		 * Cash Rate Quotes
-		 */
+		ForwardLabel forwardLabel = ForwardLabel.Create ("USD", "3M");
 
-		adblCompCalibValue[0] = .0013;
-		adblCompCalibValue[1] = .0017;
-		adblCompCalibValue[2] = .0017;
-		adblCompCalibValue[3] = .0018;
-		adblCompCalibValue[4] = .0020;
-		adblCompCalibValue[5] = .0023;
-		adblCompCalibValue[6] = .0026;
-
-		ComposableFloatingUnitSetting cfus = new ComposableFloatingUnitSetting (
+		ComposableFloatingUnitSetting composableFloatingUnitSetting = new ComposableFloatingUnitSetting (
 			"3M",
 			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
 			null,
-			ForwardLabel.Create (
-				"USD",
-				"3M"
-			),
+			forwardLabel,
 			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
 			0.
 		);
 
-		CompositePeriodSetting cps = new CompositePeriodSetting (
+		CompositePeriodSetting compositePeriodSetting = new CompositePeriodSetting (
 			4,
 			"3M",
 			"USD",
@@ -233,82 +226,60 @@ public class NonlinearCurveMeasures {
 			null
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			"USD",
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, "USD", 0);
 
 		for (int i = 0; i < 7; ++i) {
-			adblRate[i] = 0.01;
-			astrCalibMeasure[i] = "Rate";
+			rateArray[i] = 0.01;
+			calibrationMeasureArray[i] = "Rate";
 
-			aCompCalib[i] = SingleStreamComponentBuilder.Deposit (
-				dtCashEffective, // Effective
-				new JulianDate (aiMaturityDate[i]).addBusDays (
-					2,
-					"USD"
-				), // Maturity
-				ForwardLabel.Create (
-					"USD",
-					"3M"
-				)
+			calibratableComponentArray[i] = SingleStreamComponentBuilder.Deposit (
+				cashEffectiveDateArray, // Effective
+				new JulianDate (maturityDateArray[i]).addBusDays (2, "USD"), // Maturity
+				forwardLabel
 			);
 
-			aCompCalib[i] = new SingleStreamComponent (
-				"DEPOSIT_" + aiMaturityDate[i],
+			calibratableComponentArray[i] = new SingleStreamComponent (
+				"DEPOSIT_" + maturityDateArray[i],
 				new Stream (
 					CompositePeriodBuilder.FloatingCompositeUnit (
 						CompositePeriodBuilder.EdgePair (
-							dtStart,
-							new JulianDate (aiMaturityDate[i]).addBusDays (
-								2,
-								"USD"
-							)
+							startDate,
+							new JulianDate (maturityDateArray[i]).addBusDays (2, "USD")
 						),
-						cps,
-						cfus
+						compositePeriodSetting,
+						composableFloatingUnitSetting
 					)
 				),
-				csp
+				cashSettleParams
 			);
 
-			aCompCalib[i].setPrimaryCode (aCompCalib[i].name());
+			calibratableComponentArray[i].setPrimaryCode (calibratableComponentArray[i].name());
 		}
 
-		// Next 8 instruments - EDF calibration
+		componentCalibrationValueArray[7] = 0.0027;
+		componentCalibrationValueArray[8] = 0.0032;
+		componentCalibrationValueArray[9] = 0.0041;
+		componentCalibrationValueArray[10] = 0.0054;
+		componentCalibrationValueArray[11] = 0.0077;
+		componentCalibrationValueArray[12] = 0.0104;
+		componentCalibrationValueArray[13] = 0.0134;
+		componentCalibrationValueArray[14] = 0.0160;
 
-		adblCompCalibValue[7] = .0027;
-		adblCompCalibValue[8] = .0032;
-		adblCompCalibValue[9] = .0041;
-		adblCompCalibValue[10] = .0054;
-		adblCompCalibValue[11] = .0077;
-		adblCompCalibValue[12] = .0104;
-		adblCompCalibValue[13] = .0134;
-		adblCompCalibValue[14] = .0160;
-
-		CalibratableComponent[] aEDF = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtStart,
-			8,
-			"USD"
-		);
+		CalibratableComponent[] futuresArray =
+			SingleStreamComponentBuilder.ForwardRateFuturesPack (startDate, 8, "USD");
 
 		for (int i = 0; i < 8; ++i) {
-			adblRate[i + 7] = 0.01;
-			aCompCalib[i + 7] = aEDF[i];
-			astrCalibMeasure[i + 7] = "Rate";
+			rateArray[i + 7] = 0.01;
+			calibrationMeasureArray[i + 7] = "Rate";
+			calibratableComponentArray[i + 7] = futuresArray[i];
 
-			aiMaturityDate[i + 7] = aEDF[i].maturityDate().julian();
+			maturityDateArray[i + 7] = futuresArray[i].maturityDate().julian();
 		}
 
-		// Final 15 instruments - IRS calibration
+		JulianDate irsEffectiveDate = startDate.addBusDays (2, "USD");
 
-		JulianDate dtIRSEffective = dtStart.addBusDays (
-			2,
-			"USD"
-		);
-
-		String[] astrIRSTenor = new String[] {
+		String[] irsTenorArray =
+		{
 			"4Y",
 			"5Y",
 			"6Y",
@@ -326,133 +297,134 @@ public class NonlinearCurveMeasures {
 			"50Y",
 		};
 
-		aiMaturityDate[15] = dtIRSEffective.addTenor (astrIRSTenor[0]).julian();
+		maturityDateArray[15] = irsEffectiveDate.addTenor (irsTenorArray[0]).julian();
 
-		aiMaturityDate[16] = dtIRSEffective.addTenor (astrIRSTenor[1]).julian();
+		maturityDateArray[16] = irsEffectiveDate.addTenor (irsTenorArray[1]).julian();
 
-		aiMaturityDate[17] = dtIRSEffective.addTenor (astrIRSTenor[2]).julian();
+		maturityDateArray[17] = irsEffectiveDate.addTenor (irsTenorArray[2]).julian();
 
-		aiMaturityDate[18] = dtIRSEffective.addTenor (astrIRSTenor[3]).julian();
+		maturityDateArray[18] = irsEffectiveDate.addTenor (irsTenorArray[3]).julian();
 
-		aiMaturityDate[19] = dtIRSEffective.addTenor (astrIRSTenor[4]).julian();
+		maturityDateArray[19] = irsEffectiveDate.addTenor (irsTenorArray[4]).julian();
 
-		aiMaturityDate[20] = dtIRSEffective.addTenor (astrIRSTenor[5]).julian();
+		maturityDateArray[20] = irsEffectiveDate.addTenor (irsTenorArray[5]).julian();
 
-		aiMaturityDate[21] = dtIRSEffective.addTenor (astrIRSTenor[6]).julian();
+		maturityDateArray[21] = irsEffectiveDate.addTenor (irsTenorArray[6]).julian();
 
-		aiMaturityDate[22] = dtIRSEffective.addTenor (astrIRSTenor[7]).julian();
+		maturityDateArray[22] = irsEffectiveDate.addTenor (irsTenorArray[7]).julian();
 
-		aiMaturityDate[23] = dtIRSEffective.addTenor (astrIRSTenor[8]).julian();
+		maturityDateArray[23] = irsEffectiveDate.addTenor (irsTenorArray[8]).julian();
 
-		aiMaturityDate[24] = dtIRSEffective.addTenor (astrIRSTenor[9]).julian();
+		maturityDateArray[24] = irsEffectiveDate.addTenor (irsTenorArray[9]).julian();
 
-		aiMaturityDate[25] = dtIRSEffective.addTenor (astrIRSTenor[10]).julian();
+		maturityDateArray[25] = irsEffectiveDate.addTenor (irsTenorArray[10]).julian();
 
-		aiMaturityDate[26] = dtIRSEffective.addTenor (astrIRSTenor[11]).julian();
+		maturityDateArray[26] = irsEffectiveDate.addTenor (irsTenorArray[11]).julian();
 
-		aiMaturityDate[27] = dtIRSEffective.addTenor (astrIRSTenor[12]).julian();
+		maturityDateArray[27] = irsEffectiveDate.addTenor (irsTenorArray[12]).julian();
 
-		aiMaturityDate[28] = dtIRSEffective.addTenor (astrIRSTenor[13]).julian();
+		maturityDateArray[28] = irsEffectiveDate.addTenor (irsTenorArray[13]).julian();
 
-		aiMaturityDate[29] = dtIRSEffective.addTenor (astrIRSTenor[14]).julian();
+		maturityDateArray[29] = irsEffectiveDate.addTenor (irsTenorArray[14]).julian();
 
-		adblCompCalibValue[15] = .0166;
-		adblCompCalibValue[16] = .0206;
-		adblCompCalibValue[17] = .0241;
-		adblCompCalibValue[18] = .0269;
-		adblCompCalibValue[19] = .0292;
-		adblCompCalibValue[20] = .0311;
-		adblCompCalibValue[21] = .0326;
-		adblCompCalibValue[22] = .0340;
-		adblCompCalibValue[23] = .0351;
-		adblCompCalibValue[24] = .0375;
-		adblCompCalibValue[25] = .0393;
-		adblCompCalibValue[26] = .0402;
-		adblCompCalibValue[27] = .0407;
-		adblCompCalibValue[28] = .0409;
-		adblCompCalibValue[29] = .0409;
+		componentCalibrationValueArray[15] = .0166;
+		componentCalibrationValueArray[16] = .0206;
+		componentCalibrationValueArray[17] = .0241;
+		componentCalibrationValueArray[18] = .0269;
+		componentCalibrationValueArray[19] = .0292;
+		componentCalibrationValueArray[20] = .0311;
+		componentCalibrationValueArray[21] = .0326;
+		componentCalibrationValueArray[22] = .0340;
+		componentCalibrationValueArray[23] = .0351;
+		componentCalibrationValueArray[24] = .0375;
+		componentCalibrationValueArray[25] = .0393;
+		componentCalibrationValueArray[26] = .0402;
+		componentCalibrationValueArray[27] = .0407;
+		componentCalibrationValueArray[28] = .0409;
+		componentCalibrationValueArray[29] = .0409;
 
 		for (int i = 0; i < 15; ++i) {
-			astrCalibMeasure[i + 15] = "Rate";
-			adblRate[i + 15] = 0.01;
+			rateArray[i + 15] = 0.01;
+			calibrationMeasureArray[i + 15] = "Rate";
 
-			aCompCalib[i + 15] = OTCIRS (
-				dtIRSEffective,
-				"USD",
-				astrIRSTenor[i],
-				0.
-			);
+			calibratableComponentArray[i + 15] = OTCIRS (irsEffectiveDate, "USD", irsTenorArray[i], 0.);
 		}
 
-		/*
-		 * Build the IR curve from the components, their calibration measures, and their calibration quotes.
-		 */
-
-		MergedDiscountForwardCurve dc = ScenarioDiscountCurveBuilder.NonlinearBuild (
-			dtStart,
+		MergedDiscountForwardCurve discountCurve = ScenarioDiscountCurveBuilder.NonlinearBuild (
+			startDate,
 			"USD",
-			aCompCalib,
-			adblCompCalibValue,
-			astrCalibMeasure,
+			calibratableComponentArray,
+			componentCalibrationValueArray,
+			calibrationMeasureArray,
 			null
 		);
 
-		/*
-		 * Re-calculate the component input measure quotes from the calibrated discount curve object
-		 */
+		ValuationParams valuationParams = new ValuationParams (startDate, startDate, "USD");
 
-		for (int i = 0; i < aCompCalib.length; ++i)
-			System.out.println (astrCalibMeasure[i] + "[" + i + "] = " +
-				FormatUtil.FormatDouble (aCompCalib[i].measureValue (new ValuationParams (dtStart, dtStart, "USD"), null,
-					MarketParamsBuilder.Create (dc, null, null, null, null, null, null),
-						null, astrCalibMeasure[i]), 1, 5, 1.) + " | " + FormatUtil.FormatDouble (adblCompCalibValue[i], 1, 5, 1.));
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer =
+			MarketParamsBuilder.Create (discountCurve, null, null, null, null, null, null);
 
-		for (int i = 0; i < aCompCalib.length; ++i) {
-			WengertJacobian wjComp = aCompCalib[i].jackDDirtyPVDManifestMeasure (
-				new ValuationParams (
-					dtStart,
-					dtStart,
-					"USD"
-				),
-				null,
-				MarketParamsBuilder.Create (
-					dc,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null
-				),
-				null
+		for (int componentIndex = 0; componentIndex < calibratableComponentArray.length; ++componentIndex) {
+			System.out.println (
+				"\t|| " +calibrationMeasureArray[componentIndex] + "[" + componentIndex + "] =>" +
+				FormatUtil.FormatDouble (
+					calibratableComponentArray[componentIndex].measureValue (
+						valuationParams,
+						null,
+						curveSurfaceQuoteContainer,
+						null,
+						calibrationMeasureArray[componentIndex]
+					),
+					1,
+					5,
+					1.
+				) + " |" + FormatUtil.FormatDouble (
+					componentCalibrationValueArray[componentIndex],
+					1,
+					5,
+					1.
+				)
 			);
+		}
 
-			System.out.println ("PV/DF Micro Jack[" + aCompCalib[i].name() + "]=" +
-				(null == wjComp ? null : wjComp.displayString()));
+		for (int componentIndex = 0; componentIndex < calibratableComponentArray.length; ++componentIndex) {
+			WengertJacobian componentWengertJacobian =
+				calibratableComponentArray[componentIndex].jackDDirtyPVDManifestMeasure (
+					valuationParams,
+					null,
+					curveSurfaceQuoteContainer,
+					null
+				);
+
+			System.out.println (
+				"\t|| PV/DF Micro Jack[" + calibratableComponentArray[componentIndex].name() + "]=> " + (
+					null == componentWengertJacobian ? null : componentWengertJacobian.displayString()
+				)
+			);
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String astrArgs[])
+		final String[] argumentArray)
 		throws Exception
 	{
-		String strConfig = "";
+		EnvManager.InitEnv ("");
 
-		EnvManager.InitEnv (strConfig);
-
-		long lStart = System.nanoTime();
+		long startTime = System.nanoTime();
 
 		DiscountCurveFromRatesInstruments();
 
-		System.out.println ("Time Taken: " + ((int)(1.e-09 * (System.nanoTime() - lStart))) + " sec");
+		System.out.println (
+			"\t|| Time Taken: " + ((int)(1.e-09 * (System.nanoTime() - startTime))) + " sec"
+		);
 
 		EnvManager.TerminateEnv();
 	}

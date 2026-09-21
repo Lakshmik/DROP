@@ -134,6 +134,7 @@ import org.drip.numerical.common.NumberUtil;
 
 public class DeGuillaumeRebonatoPogudin
 {
+	private double[][] _yieldCorrelationMatrix = null;
 	private Map<String, DiffusionEvolver> _tenorEscrowEvolverMap = null;
 	private Map<String, DiffusionEvolver> _tenorTaxableEvolverMap = null;
 	private Map<String, DiffusionEvolver> _tenorTaxExemptEvolverMap = null;
@@ -145,6 +146,7 @@ public class DeGuillaumeRebonatoPogudin
 	 * @param taxableOrnsteinUhlenbeckDriftWander <i>OrnsteinUhlenbeckDriftWander</i> Instance
 	 * @param escrowOrnsteinUhlenbeckDriftWander <i>OrnsteinUhlenbeckDriftWander</i> Instance
 	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
+	 * @param yieldCorrelationMatrix Matrix of Yield Correlation Weiners
 	 * 
 	 * @return Standard Instance of <i>DeGuillaumeRebonatoPogudin</i>
 	 */
@@ -153,7 +155,8 @@ public class DeGuillaumeRebonatoPogudin
 		final OrnsteinUhlenbeckDriftWander taxExemptOrnsteinUhlenbeckDriftWander,
 		final OrnsteinUhlenbeckDriftWander taxableOrnsteinUhlenbeckDriftWander,
 		final OrnsteinUhlenbeckDriftWander escrowOrnsteinUhlenbeckDriftWander,
-		final DeGuillaumeRebonatoPogudinMarketSettings marketYield)
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield,
+		final double[][] yieldCorrelationMatrix)
 	{
 		if (null == taxExemptOrnsteinUhlenbeckDriftWander ||
 			null == taxableOrnsteinUhlenbeckDriftWander ||
@@ -185,8 +188,8 @@ public class DeGuillaumeRebonatoPogudin
 					new DiffusionEvolver (
 						DiffusionEvaluatorOrnsteinUhlenbeck.Standard (
 							taxExemptMarketYieldTermStructure.infiniteHorizonTenorValueMap().get (tenorKey),
-							taxExemptOrnsteinUhlenbeckDriftWander.burstiness(),
-							taxExemptOrnsteinUhlenbeckDriftWander.relaxationTime()
+							taxExemptOrnsteinUhlenbeckDriftWander.burstinessFunction(),
+							taxExemptOrnsteinUhlenbeckDriftWander.relaxationTimeFunction()
 						)
 					)
 				);
@@ -196,8 +199,8 @@ public class DeGuillaumeRebonatoPogudin
 					new DiffusionEvolver (
 						DiffusionEvaluatorOrnsteinUhlenbeck.Standard (
 							taxableMarketYieldTermStructure.infiniteHorizonTenorValueMap().get (tenorKey),
-							taxableOrnsteinUhlenbeckDriftWander.burstiness(),
-							taxableOrnsteinUhlenbeckDriftWander.relaxationTime()
+							taxableOrnsteinUhlenbeckDriftWander.burstinessFunction(),
+							taxableOrnsteinUhlenbeckDriftWander.relaxationTimeFunction()
 						)
 					)
 				);
@@ -207,8 +210,8 @@ public class DeGuillaumeRebonatoPogudin
 					new DiffusionEvolver (
 						DiffusionEvaluatorOrnsteinUhlenbeck.Standard (
 							escrowMarketYieldTermStructure.infiniteHorizonTenorValueMap().get (tenorKey),
-							escrowOrnsteinUhlenbeckDriftWander.burstiness(),
-							escrowOrnsteinUhlenbeckDriftWander.relaxationTime()
+							escrowOrnsteinUhlenbeckDriftWander.burstinessFunction(),
+							escrowOrnsteinUhlenbeckDriftWander.relaxationTimeFunction()
 						)
 					)
 				);
@@ -217,7 +220,8 @@ public class DeGuillaumeRebonatoPogudin
 			DeGuillaumeRebonatoPogudin deGuillaumeRebonatoPogudin = new DeGuillaumeRebonatoPogudin (
 				tenorTaxExemptEvolverMap,
 				tenorTaxableEvolverMap,
-				tenorEscrowEvolverMap
+				tenorEscrowEvolverMap,
+				yieldCorrelationMatrix
 			);
 
 			return deGuillaumeRebonatoPogudin;
@@ -233,19 +237,22 @@ public class DeGuillaumeRebonatoPogudin
 	 * 
 	 * @param ornsteinUhlenbeckDriftWander Common <i>OrnsteinUhlenbeckDriftWander</i> Instance
 	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
+	 * @param yieldCorrelationMatrix Matrix of Yield Correlation Weiners
 	 * 
 	 * @return Standard Instance of <i>DeGuillaumeRebonatoPogudin</i>
 	 */
 
 	public static final DeGuillaumeRebonatoPogudin Standard (
 		final OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander,
-		final DeGuillaumeRebonatoPogudinMarketSettings marketYield)
+		final DeGuillaumeRebonatoPogudinMarketSettings marketYield,
+		final double[][] yieldCorrelationMatrix)
 	{
 		return Standard (
 			ornsteinUhlenbeckDriftWander,
 			ornsteinUhlenbeckDriftWander,
 			ornsteinUhlenbeckDriftWander,
-			marketYield
+			marketYield,
+			yieldCorrelationMatrix
 		);
 	}
 
@@ -270,20 +277,6 @@ public class DeGuillaumeRebonatoPogudin
 			spotDate,
 			marketYield.escrowMarketYieldTermStructure().spotTenorValueMap()
 		) ? deGuillaumeRebonatoPogudinRun : null;
-	}
-
-	private static final JumpDiffusionEdgeUnit[] JumpDiffusionEdgeUnitArray (
-		final double[] timeIncrementArray)
-	{
-		JumpDiffusionEdgeUnit[] jumpDiffusionEdgeUnitArray =
-			new JumpDiffusionEdgeUnit[timeIncrementArray.length];
-
-		for (int incrementIndex = 0; incrementIndex < timeIncrementArray.length; ++incrementIndex) {
-			jumpDiffusionEdgeUnitArray[incrementIndex] =
-				JumpDiffusionEdgeUnit.GaussianDiffusion (timeIncrementArray[incrementIndex]);
-		}
-
-		return jumpDiffusionEdgeUnitArray;
 	}
 
 	private static final double[] TimeIncrementArray (
@@ -326,7 +319,8 @@ public class DeGuillaumeRebonatoPogudin
 		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun,
 		final Map<String, Double> spotTenorValueMap,
 		final Set<String> tenorKeySet,
-		final double[] timeIncrementArray)
+		final double[] timeIncrementArray,
+		final JumpDiffusionEdgeUnit[] jumpDiffusionEdgeUnitArray)
 	{
 		for (String tenorKey : tenorKeySet) {
 			try {
@@ -334,7 +328,7 @@ public class DeGuillaumeRebonatoPogudin
 					tenorKey
 				).vertexSequence (
 					new JumpDiffusionVertex (0., spotTenorValueMap.get (tenorKey), 0., false),
-					JumpDiffusionEdgeUnitArray (timeIncrementArray),
+					jumpDiffusionEdgeUnitArray,
 					timeIncrementArray
 				);
 
@@ -364,7 +358,8 @@ public class DeGuillaumeRebonatoPogudin
 		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun,
 		final Map<String, Double> spotTenorValueMap,
 		final Set<String> tenorKeySet,
-		final double[] timeIncrementArray)
+		final double[] timeIncrementArray,
+		final JumpDiffusionEdgeUnit[] jumpDiffusionEdgeUnitArray)
 	{
 		for (String tenorKey : tenorKeySet) {
 			try {
@@ -372,7 +367,7 @@ public class DeGuillaumeRebonatoPogudin
 					tenorKey
 				).vertexSequence (
 					new JumpDiffusionVertex (0., spotTenorValueMap.get (tenorKey), 0., false),
-					JumpDiffusionEdgeUnitArray (timeIncrementArray),
+					jumpDiffusionEdgeUnitArray,
 					timeIncrementArray
 				);
 
@@ -402,7 +397,8 @@ public class DeGuillaumeRebonatoPogudin
 		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinRun,
 		final Map<String, Double> spotTenorValueMap,
 		final Set<String> tenorKeySet,
-		final double[] timeIncrementArray)
+		final double[] timeIncrementArray,
+		final JumpDiffusionEdgeUnit[] jumpDiffusionEdgeUnitArray)
 	{
 		for (String tenorKey : tenorKeySet) {
 			try {
@@ -410,7 +406,7 @@ public class DeGuillaumeRebonatoPogudin
 					tenorKey
 				).vertexSequence (
 					new JumpDiffusionVertex (0., spotTenorValueMap.get (tenorKey), 0., false),
-					JumpDiffusionEdgeUnitArray (timeIncrementArray),
+					jumpDiffusionEdgeUnitArray,
 					timeIncrementArray
 				);
 
@@ -441,6 +437,7 @@ public class DeGuillaumeRebonatoPogudin
 	 * @param tenorTaxExemptEvolverMap Map of Tenor to Tax-exempt <i>DiffusionEvolver</i> Evolver
 	 * @param tenorTaxableEvolverMap Map of Tenor to Taxable <i>DiffusionEvolver</i> Evolver
 	 * @param tenorEscrowEvolverMap Map of Tenor to Escrow <i>DiffusionEvolver</i> Evolver
+	 * @param yieldCorrelationMatrix Matrix of Yield Correlation Weiners
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
@@ -448,7 +445,8 @@ public class DeGuillaumeRebonatoPogudin
 	public DeGuillaumeRebonatoPogudin (
 		final Map<String, DiffusionEvolver> tenorTaxExemptEvolverMap,
 		final Map<String, DiffusionEvolver> tenorTaxableEvolverMap,
-		final Map<String, DiffusionEvolver> tenorEscrowEvolverMap)
+		final Map<String, DiffusionEvolver> tenorEscrowEvolverMap,
+		final double[][] yieldCorrelationMatrix)
 		throws Exception
 	{
 		if (null == (_tenorTaxExemptEvolverMap = tenorTaxExemptEvolverMap) ||
@@ -463,6 +461,8 @@ public class DeGuillaumeRebonatoPogudin
 		if (0 == size || size != _tenorTaxableEvolverMap.size() || size != _tenorEscrowEvolverMap.size()) {
 			throw new Exception ("DeGuillaumeRebonatoPogudin Constructor => Invalid Inputs");
 		}
+
+		_yieldCorrelationMatrix = yieldCorrelationMatrix;
 	}
 
 	/**
@@ -499,6 +499,17 @@ public class DeGuillaumeRebonatoPogudin
 	}
 
 	/**
+	 * Retrieve the Matrix of Yield Correlation Weiners
+	 * 
+	 * @return Matrix of Yield Correlation Weiners
+	 */
+
+	public double[][] yieldCorrelationMatrix()
+	{
+		return _yieldCorrelationMatrix;
+	}
+
+	/**
 	 * Generate an Instance of <i>DeGuillaumeRebonatoPogudinRun</i> Instance
 	 * 
 	 * @param marketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
@@ -532,24 +543,30 @@ public class DeGuillaumeRebonatoPogudin
 
 		double[] timeIncrementArray = TimeIncrementArray (increment, terminalTime);
 
+		JumpDiffusionEdgeUnit[][] jumpDiffusionEdgeUnitGrid =
+			JumpDiffusionEdgeUnit.Grid (_yieldCorrelationMatrix, timeIncrementArray);
+
 		return taxExemptYieldPathsRun (
 			spotDate,
 			deGuillaumeRebonatoPogudinRun,
 			marketYield.taxExemptMarketYieldTermStructure().spotTenorValueMap(),
 			tenorKeySet,
-			timeIncrementArray
+			timeIncrementArray,
+			jumpDiffusionEdgeUnitGrid[0]
 		) && taxableYieldPathsRun (
 			spotDate,
 			deGuillaumeRebonatoPogudinRun,
 			marketYield.taxableMarketYieldTermStructure().spotTenorValueMap(),
 			tenorKeySet,
-			timeIncrementArray
+			timeIncrementArray,
+			jumpDiffusionEdgeUnitGrid[1]
 		) && escrowYieldPathsRun (
 			spotDate,
 			deGuillaumeRebonatoPogudinRun,
 			marketYield.escrowMarketYieldTermStructure().spotTenorValueMap(),
 			tenorKeySet,
-			timeIncrementArray
+			timeIncrementArray,
+			jumpDiffusionEdgeUnitGrid[2]
 		) ? deGuillaumeRebonatoPogudinRun : null;
 	}
 
@@ -582,24 +599,30 @@ public class DeGuillaumeRebonatoPogudin
 
 		double[] timeIncrementArray = TimeIncrementArray (spotDate, simulationDateList);
 
+		JumpDiffusionEdgeUnit[][] jumpDiffusionEdgeUnitGrid =
+			JumpDiffusionEdgeUnit.Grid (_yieldCorrelationMatrix, timeIncrementArray);
+
 		return taxExemptYieldPathsRun (
 			spotDate,
 			deGuillaumeRebonatoPogudinRun,
 			marketYield.taxExemptMarketYieldTermStructure().spotTenorValueMap(),
 			tenorKeySet,
-			timeIncrementArray
+			timeIncrementArray,
+			jumpDiffusionEdgeUnitGrid[0]
 		) && taxableYieldPathsRun (
 			spotDate,
 			deGuillaumeRebonatoPogudinRun,
 			marketYield.taxableMarketYieldTermStructure().spotTenorValueMap(),
 			tenorKeySet,
-			timeIncrementArray
+			timeIncrementArray,
+			jumpDiffusionEdgeUnitGrid[1]
 		) && escrowYieldPathsRun (
 			spotDate,
 			deGuillaumeRebonatoPogudinRun,
 			marketYield.escrowMarketYieldTermStructure().spotTenorValueMap(),
 			tenorKeySet,
-			timeIncrementArray
+			timeIncrementArray,
+			jumpDiffusionEdgeUnitGrid[2]
 		) && deGuillaumeRebonatoPogudinRun.setUpGovvieCurveMap (
 			marketYield.currency()
 		) ? deGuillaumeRebonatoPogudinRun : null;

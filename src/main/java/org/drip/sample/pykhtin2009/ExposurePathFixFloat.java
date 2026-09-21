@@ -35,7 +35,7 @@ import org.drip.measure.dynamics.HazardJumpEvaluator;
 import org.drip.measure.gaussian.NormalQuadrature;
 import org.drip.measure.realization.DiffusionEvolver;
 import org.drip.measure.realization.JumpDiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.product.rates.FixFloatComponent;
 import org.drip.service.common.FormatUtil;
@@ -814,8 +814,8 @@ public class ExposurePathFixFloat
 			}
 		}
 
-		UnivariateDiscreteThin[] univariateDiscreteThinArray = new
-			UnivariateDiscreteThin[denseExposureDateCount];
+		UnivariateCentralMeasures[] univariateDiscreteThinArray = new
+			UnivariateCentralMeasures[denseExposureDateCount];
 
 		System.out.println ("\t||-----------------------------------------------------||");
 
@@ -845,7 +845,7 @@ public class ExposurePathFixFloat
 		{
 			int dateIndex = denseExposureDate - spotDate.julian();
 
-			univariateDiscreteThinArray[dateIndex] = new UnivariateDiscreteThin
+			univariateDiscreteThinArray[dateIndex] = new UnivariateCentralMeasures
 				(pathDenseExposureDistribution[dateIndex]);
 
 			System.out.println (

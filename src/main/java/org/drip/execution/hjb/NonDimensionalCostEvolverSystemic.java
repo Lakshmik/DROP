@@ -148,14 +148,16 @@ public class NonDimensionalCostEvolverSystemic extends org.drip.execution.hjb.No
 		final org.drip.execution.hjb.NonDimensionalCost ndc,
 		final org.drip.execution.latent.MarketState ms,
 		final double[] adblMarketStateTweak,
-		final double dblNonDimensionalRiskAversion)
+		final double dblNonDimensionalRiskAversion,
+		final double dblNonDimensionalTime)
 		throws java.lang.Exception
 	{
 		double dblNonDimensionalCost = ndc.realization();
 
 		double dblMarketState = ms.liquidity() + adblMarketStateTweak[0];
 
-		double dblBurstiness = ornsteinUnlenbeckProcess().referenceBurstiness();
+		double dblBurstiness =
+			ornsteinUnlenbeckProcess().referenceBurstinessFunction().evaluate (dblNonDimensionalTime);
 
 		org.drip.execution.hjb.NonDimensionalCostSystemic ndcs =
 			(org.drip.execution.hjb.NonDimensionalCostSystemic) ndc;
@@ -203,30 +205,32 @@ public class NonDimensionalCostEvolverSystemic extends org.drip.execution.hjb.No
 
 		double dblMarketStateExponentiation = java.lang.Math.exp (dblMarketState);
 
-		if (asymptoticEulerUrgencyThreshold() * dblNonDimensionalTime < 1.) {
-			if (!asymptoticEnhancedEulerCorrection())
-				return org.drip.execution.hjb.NonDimensionalCostSystemic.LinearThreshold
-					(dblMarketStateExponentiation, dblNonDimensionalTime);
-
-			double dblBurstiness = ornsteinUnlenbeckProcess().referenceBurstiness();
-
-			double dblNonDimensionalCostCross = -0.5 * dblMarketState * dblMarketStateExponentiation;
-
-			return org.drip.execution.hjb.NonDimensionalCostSystemic.EulerEnhancedLinearThreshold
-				(dblMarketState, ((1. / dblNonDimensionalTimeIncrement) + 0.25 * dblBurstiness *
-					dblBurstiness) * java.lang.Math.exp (dblMarketState) + dblNonDimensionalCostCross,
-						dblNonDimensionalCostCross);
-		}
-
 		try {
-			double dblCostIncrementMid = advance (ndc, ms, new double[] {0.}, dblNonDimensionalRiskAversion)
-				* dblNonDimensionalTimeIncrement;
+			if (asymptoticEulerUrgencyThreshold() * dblNonDimensionalTime < 1.) {
+				if (!asymptoticEnhancedEulerCorrection())
+					return org.drip.execution.hjb.NonDimensionalCostSystemic.LinearThreshold
+							(dblMarketStateExponentiation, dblNonDimensionalTime);
+
+				double dblBurstiness = ornsteinUnlenbeckProcess().referenceBurstinessFunction().evaluate (
+					dblNonDimensionalTime
+				);
+
+				double dblNonDimensionalCostCross = -0.5 * dblMarketState * dblMarketStateExponentiation;
+
+				return org.drip.execution.hjb.NonDimensionalCostSystemic.EulerEnhancedLinearThreshold
+					(dblMarketState, ((1. / dblNonDimensionalTimeIncrement) + 0.25 * dblBurstiness *
+						dblBurstiness) * java.lang.Math.exp (dblMarketState) + dblNonDimensionalCostCross,
+							dblNonDimensionalCostCross);
+			}
+
+			double dblCostIncrementMid = advance (ndc, ms, new double[] {0.}, dblNonDimensionalRiskAversion,
+				dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementUp = advance (ndc, ms, new double[] {dblMarketStateIncrement},
-				dblNonDimensionalRiskAversion) * dblNonDimensionalTimeIncrement;
+				dblNonDimensionalRiskAversion, dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblCostIncrementDown = advance (ndc, ms, new double[] {-1. * dblMarketStateIncrement},
-				dblNonDimensionalRiskAversion) * dblNonDimensionalTimeIncrement;
+				dblNonDimensionalRiskAversion, dblNonDimensionalTime) * dblNonDimensionalTimeIncrement;
 
 			double dblCost = ndc.realization() + dblCostIncrementMid;
 

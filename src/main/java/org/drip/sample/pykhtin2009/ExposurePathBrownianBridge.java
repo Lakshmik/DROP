@@ -33,7 +33,7 @@ import org.drip.measure.dynamics.HazardJumpEvaluator;
 import org.drip.measure.gaussian.NormalQuadrature;
 import org.drip.measure.realization.DiffusionEvolver;
 import org.drip.measure.realization.JumpDiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
@@ -757,8 +757,8 @@ public class ExposurePathBrownianBridge
 
 		int denseExposureDateCount = sparseExposureDateArray[sparseExposurePeriodCount] - spotDate + 1;
 		double[][] pathDenseExposureDistribution = new double[denseExposureDateCount][pathCount];
-		UnivariateDiscreteThin[] univariateDiscreteThinArray = new
-			UnivariateDiscreteThin[denseExposureDateCount];
+		UnivariateCentralMeasures[] univariateDiscreteThinArray = new
+			UnivariateCentralMeasures[denseExposureDateCount];
 
 		for (int pathIndex = 0; pathIndex < pathCount; ++pathIndex)
 		{
@@ -797,7 +797,7 @@ public class ExposurePathBrownianBridge
 		{
 			int dateIndex = denseExposureDate - spotDate;
 
-			univariateDiscreteThinArray[dateIndex] = new UnivariateDiscreteThin
+			univariateDiscreteThinArray[dateIndex] = new UnivariateCentralMeasures
 				(pathDenseExposureDistribution[dateIndex]);
 
 			System.out.println (

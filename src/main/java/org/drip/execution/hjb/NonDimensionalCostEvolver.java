@@ -131,7 +131,8 @@ public abstract class NonDimensionalCostEvolver {
 		final org.drip.execution.hjb.NonDimensionalCost ndc,
 		final org.drip.execution.latent.MarketState ms,
 		final double[] adblMarketStateTweak,
-		final double dblNonDimensionalRiskAversion)
+		final double dblNonDimensionalRiskAversion,
+		final double dblNonDimensionalTime)
 		throws java.lang.Exception;
 
 	protected NonDimensionalCostEvolver (

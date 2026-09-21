@@ -6,7 +6,7 @@ import org.drip.measure.crng.CorrelatedFactorsPathVertexRealization;
 import org.drip.measure.crng.RandomNumberGenerator;
 import org.drip.measure.dynamics.DiffusionEvaluatorLogarithmic;
 import org.drip.measure.realization.DiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.param.creator.MarketParamsBuilder;
 import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.valuation.ValuationParams;
@@ -558,17 +558,17 @@ public class PathVertexExerciseMetrics {
 
 		System.out.println();
 
-		UnivariateDiscreteThin udtOptimalExercisePrice = new UnivariateDiscreteThin (adblOptimalExercisePrice);
+		UnivariateCentralMeasures udtOptimalExercisePrice = new UnivariateCentralMeasures (adblOptimalExercisePrice);
 
-		UnivariateDiscreteThin udtOptimalExercisePV = new UnivariateDiscreteThin (adblOptimalExercisePV);
+		UnivariateCentralMeasures udtOptimalExercisePV = new UnivariateCentralMeasures (adblOptimalExercisePV);
 
-		UnivariateDiscreteThin udtOptimalExerciseOAS = new UnivariateDiscreteThin (adblOptimalExerciseOAS);
+		UnivariateCentralMeasures udtOptimalExerciseOAS = new UnivariateCentralMeasures (adblOptimalExerciseOAS);
 
-		UnivariateDiscreteThin udtOptimalExerciseOASGap = new UnivariateDiscreteThin (adblOptimalExerciseOASGap);
+		UnivariateCentralMeasures udtOptimalExerciseOASGap = new UnivariateCentralMeasures (adblOptimalExerciseOASGap);
 
-		UnivariateDiscreteThin udtOptimalExerciseDuration = new UnivariateDiscreteThin (adblOptimalExerciseDuration);
+		UnivariateCentralMeasures udtOptimalExerciseDuration = new UnivariateCentralMeasures (adblOptimalExerciseDuration);
 
-		UnivariateDiscreteThin udtOptimalExerciseConvexity = new UnivariateDiscreteThin (adblOptimalExerciseConvexity);
+		UnivariateCentralMeasures udtOptimalExerciseConvexity = new UnivariateCentralMeasures (adblOptimalExerciseConvexity);
 
 		System.out.println ("\t||-------------------------------------------------------------||");
 

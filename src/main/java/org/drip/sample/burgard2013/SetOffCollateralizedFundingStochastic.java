@@ -10,7 +10,7 @@ import org.drip.measure.crng.CorrelatedFactorsPathVertexRealization;
 import org.drip.measure.crng.RandomNumberGenerator;
 import org.drip.measure.dynamics.*;
 import org.drip.measure.realization.*;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
@@ -759,29 +759,29 @@ public class SetOffCollateralizedFundingStochastic
 	{
 		System.out.println();
 
-		UnivariateDiscreteThin cvaUnivariateDiscreteThin = ead.cva();
+		UnivariateCentralMeasures cvaUnivariateDiscreteThin = ead.cva();
 
-		UnivariateDiscreteThin dvaUnivariateDiscreteThin = ead.dva();
+		UnivariateCentralMeasures dvaUnivariateDiscreteThin = ead.dva();
 
-		UnivariateDiscreteThin fbaUnivariateDiscreteThin = ead.fba();
+		UnivariateCentralMeasures fbaUnivariateDiscreteThin = ead.fba();
 
-		UnivariateDiscreteThin fcaUnivariateDiscreteThin = ead.fca();
+		UnivariateCentralMeasures fcaUnivariateDiscreteThin = ead.fca();
 
-		UnivariateDiscreteThin fdaUnivariateDiscreteThin = ead.fda();
+		UnivariateCentralMeasures fdaUnivariateDiscreteThin = ead.fda();
 
-		UnivariateDiscreteThin fvaUnivariateDiscreteThin = ead.fva();
+		UnivariateCentralMeasures fvaUnivariateDiscreteThin = ead.fva();
 
-		UnivariateDiscreteThin sfvaUnivariateDiscreteThin = ead.sfva();
+		UnivariateCentralMeasures sfvaUnivariateDiscreteThin = ead.sfva();
 
-		UnivariateDiscreteThin ucvaUnivariateDiscreteThin = ead.ucva();
+		UnivariateCentralMeasures ucvaUnivariateDiscreteThin = ead.ucva();
 
-		UnivariateDiscreteThin cvaclUnivariateDiscreteThin = ead.cvacl();
+		UnivariateCentralMeasures cvaclUnivariateDiscreteThin = ead.cvacl();
 
-		UnivariateDiscreteThin ftdcvaUnivariateDiscreteThin = ead.ftdcva();
+		UnivariateCentralMeasures ftdcvaUnivariateDiscreteThin = ead.ftdcva();
 
-		UnivariateDiscreteThin ucolvaUnivariateDiscreteThin = ead.ucolva();
+		UnivariateCentralMeasures ucolvaUnivariateDiscreteThin = ead.ucolva();
 
-		UnivariateDiscreteThin ftdcolvaUnivariateDiscreteThin = ead.ftdcolva();
+		UnivariateCentralMeasures ftdcolvaUnivariateDiscreteThin = ead.ftdcolva();
 
 		System.out.println (
 			"\t||-----------------------------------------------------------------------------------------------------------------------------------||"

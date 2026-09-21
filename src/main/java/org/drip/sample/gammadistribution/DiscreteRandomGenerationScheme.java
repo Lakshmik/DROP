@@ -4,7 +4,7 @@ package org.drip.sample.gammadistribution;
 import org.drip.function.definition.R1ToR1;
 import org.drip.function.definition.R2ToR1;
 import org.drip.measure.gamma.R1ShapeScaleDistribution;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.specialfunction.digamma.CumulativeSeriesEstimator;
@@ -148,9 +148,9 @@ public class DiscreteRandomGenerationScheme
 	}
 
 	private static final void StatisticsArray (
-		final UnivariateDiscreteThin inverseCDFThinStatistics,
-		final UnivariateDiscreteThin ahrensDieterThinStatistics,
-		final UnivariateDiscreteThin marsagliaThinStatistics)
+		final UnivariateCentralMeasures inverseCDFThinStatistics,
+		final UnivariateCentralMeasures ahrensDieterThinStatistics,
+		final UnivariateCentralMeasures marsagliaThinStatistics)
 		throws Exception
 	{
 		System.out.println (
@@ -195,8 +195,8 @@ public class DiscreteRandomGenerationScheme
 	}
 
 	private static final void StatisticsArray2 (
-		final UnivariateDiscreteThin ahrensDieterThinStatistics,
-		final UnivariateDiscreteThin marsagliaThinStatistics)
+		final UnivariateCentralMeasures ahrensDieterThinStatistics,
+		final UnivariateCentralMeasures marsagliaThinStatistics)
 		throws Exception
 	{
 		System.out.println (
@@ -310,13 +310,13 @@ public class DiscreteRandomGenerationScheme
 			);
 
 			StatisticsArray (
-				new UnivariateDiscreteThin (
+				new UnivariateCentralMeasures (
 					inverseCDFRandomArray
 				),
-				new UnivariateDiscreteThin (
+				new UnivariateCentralMeasures (
 					ahrensDieterRandomArray
 				),
-				new UnivariateDiscreteThin (
+				new UnivariateCentralMeasures (
 					marsagliaRandomArray
 				)
 			);
@@ -336,10 +336,10 @@ public class DiscreteRandomGenerationScheme
 			);
 
 			StatisticsArray2 (
-				new UnivariateDiscreteThin (
+				new UnivariateCentralMeasures (
 					ahrensDieterRandomArray
 				),
-				new UnivariateDiscreteThin (
+				new UnivariateCentralMeasures (
 					marsagliaRandomArray
 				)
 			);

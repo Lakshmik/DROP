@@ -2,10 +2,6 @@
 package org.drip.product.muni;
 
 import org.drip.numerical.common.NumberUtil;
-import org.drip.param.market.CurveSurfaceQuoteContainer;
-import org.drip.param.valuation.ValuationParams;
-import org.drip.product.credit.BondComponent;
-import org.drip.state.govvie.GovvieCurve;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -84,8 +80,9 @@ import org.drip.state.govvie.GovvieCurve;
  */
 
 /**
- * <i>CurveMeasures</i> holds the Bond Measures computed at the Specified Dates using the Market Yield
- *  Curves. The References are:
+ * <i>RefinancingPathEntry</i> contains the Entries corresponding to the Single Path/Date Bond PnL incurred
+ *  by re-financing using Muni Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The References
+ *  are:
  *
  *  <br><br>
  *  <ul>
@@ -124,95 +121,110 @@ import org.drip.state.govvie.GovvieCurve;
  * @author Lakshmi Krishnamurthy
  */
 
-public class CurveMeasures
+public class RefinancingPathEntry
 {
-	private double _accrual = Double.NaN;
-	private double _taxableCleanPrice = Double.NaN;
-	private double _taxExemptCleanPrice = Double.NaN;
+	private double _taxableGovvieCurveCleanPrice = Double.NaN;
+	private double _taxExemptGovvieCurveCleanPrice = Double.NaN;
+	private double _initialTaxableGovvieCurveCleanPrice = Double.NaN;
+	private double _initialTaxExemptGovvieCurveCleanPrice = Double.NaN;
 
 	/**
-	 * Compute the Bond Price using the Govvie Curve at the Specified Date
+	 * <i>RefinancingPathEntry</i> Constructor
 	 * 
-	 * @param bond Bond
-	 * @param valuationParams Valuation Parameters
-	 * @param govvieCurve Govvie Curve
+	 * @param initialTaxExemptGovvieCurveCleanPrice Price generated from the Initial Tax-exempt Govvie Clean
+	 * 												Curve
+	 * @param initialTaxableGovvieCurveCleanPrice Price generated from the Initial Taxable Govvie Clean Curve
+	 * @param taxExemptGovvieCurveCleanPrice Price generated from the Tax-exempt Govvie Clean Curve
+	 * @param taxableGovvieCurveCleanPrice Price generated from the Taxable Govvie Clean Curve
 	 * 
-	 * @return Bond Price using the Govvie Curve at the Specified Date
-	 * 
-	 * @throws Exception Thrown if the Price cannot be calculated
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public static final double GovvieCurvePrice (
-		final BondComponent bond,
-		final ValuationParams valuationParams,
-		final GovvieCurve govvieCurve)
+	public RefinancingPathEntry (
+		final double initialTaxExemptGovvieCurveCleanPrice,
+		final double initialTaxableGovvieCurveCleanPrice,
+		final double taxExemptGovvieCurveCleanPrice,
+		final double taxableGovvieCurveCleanPrice)
 		throws Exception
 	{
-		if (null == bond) {
-			throw new Exception ("CurveMeasures::GovvieCurvePrice => NULL Bond");
-		}
-
-		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
-
-		curveSurfaceQuoteContainer.setGovvieState (govvieCurve);
-
-		return bond.priceFromGSpread (valuationParams, curveSurfaceQuoteContainer, null, 0.);
-	}
-
-	/**
-	 * <i>CurveMeasures</i> Constructor
-	 * 
-	 * @param taxExemptCleanPrice Tax-exempt Clean Price
-	 * @param taxableCleanPrice Taxable Clean Price
-	 * @param accrual Simulation Date Accrual
-	 * 
-	 * @throws Exception Thrown if Inputs are Invalid
-	 */
-
-	public CurveMeasures (
-		final double taxExemptCleanPrice,
-		final double taxableCleanPrice,
-		final double accrual)
-		throws Exception
-	{
-		if (!NumberUtil.IsValid (_taxExemptCleanPrice = taxExemptCleanPrice) || 0. > _taxExemptCleanPrice ||
-			!NumberUtil.IsValid (_taxableCleanPrice = taxableCleanPrice) || 0. > _taxableCleanPrice ||
-			!NumberUtil.IsValid (_accrual = accrual))
+		if (!NumberUtil.IsValid (
+				_initialTaxExemptGovvieCurveCleanPrice = initialTaxExemptGovvieCurveCleanPrice
+			) || 0. > _initialTaxExemptGovvieCurveCleanPrice ||
+			!NumberUtil.IsValid (
+				_initialTaxableGovvieCurveCleanPrice = initialTaxableGovvieCurveCleanPrice
+			) || 0. > _initialTaxableGovvieCurveCleanPrice ||
+			!NumberUtil.IsValid (_taxExemptGovvieCurveCleanPrice = taxExemptGovvieCurveCleanPrice) ||
+				0. > _taxExemptGovvieCurveCleanPrice ||
+			!NumberUtil.IsValid (_taxableGovvieCurveCleanPrice = taxableGovvieCurveCleanPrice) ||
+				0. > _taxableGovvieCurveCleanPrice)
 		{
-			throw new Exception ("CurveMeasures Constructor => Invalid Inputs");
+			throw new Exception ("RefinancingPathEntry Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Tax-Exempt Clean Price
+	 * Return the Price generated from the Initial Tax-exempt Govvie Clean Curve
 	 * 
-	 * @return Tax-Exempt Clean Price
+	 * @return Price generated from the Initial Tax-exempt Govvie Clean Curve
 	 */
 
-	public double taxExemptCleanPrice()
+	public double initialTaxExemptGovvieCurveCleanPrice()
 	{
-		return _taxExemptCleanPrice;
+		return _initialTaxExemptGovvieCurveCleanPrice;
 	}
 
 	/**
-	 * Retrieve the Taxable Clean Price
+	 * Return the Price generated from the Initial Taxable Govvie Clean Curve
 	 * 
-	 * @return Taxable Clean Price
+	 * @return Price generated from the Initial Taxable Govvie Clean Curve
 	 */
 
-	public double taxableCleanPrice()
+	public double initialTaxableGovvieCurveCleanPrice()
 	{
-		return _taxableCleanPrice;
+		return _initialTaxableGovvieCurveCleanPrice;
 	}
 
 	/**
-	 * Retrieve the Simulation Date Accrual
+	 * Return the Price generated from the Tax-exempt Govvie Clean Curve
 	 * 
-	 * @return Simulation Date Accrual
+	 * @return Price generated from the Tax-exempt Govvie Clean Curve
 	 */
 
-	public double accrual()
+	public double taxExemptGovvieCurveCleanPrice()
 	{
-		return _accrual;
+		return _taxExemptGovvieCurveCleanPrice;
+	}
+
+	/**
+	 * Return the Price generated from the Taxable Govvie Clean Curve
+	 * 
+	 * @return Price generated from the Taxable Govvie Clean Curve
+	 */
+
+	public double taxableGovvieCurveCleanPrice()
+	{
+		return _taxableGovvieCurveCleanPrice;
+	}
+
+	/**
+	 * Retrieve the Tax-exempt PnL
+	 * 
+	 * @return Tax-exempt PnL
+	 */
+
+	public double taxExemptPnL()
+	{
+		return _taxExemptGovvieCurveCleanPrice - _initialTaxExemptGovvieCurveCleanPrice;
+	}
+
+	/**
+	 * Retrieve the Taxable PnL
+	 * 
+	 * @return Taxable PnL
+	 */
+
+	public double taxablePnL()
+	{
+		return _taxableGovvieCurveCleanPrice - _initialTaxableGovvieCurveCleanPrice;
 	}
 }

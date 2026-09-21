@@ -30,7 +30,7 @@ import org.drip.measure.dynamics.DiffusionEvaluatorLogarithmic;
 import org.drip.measure.dynamics.HazardJumpEvaluator;
 import org.drip.measure.realization.DiffusionEvolver;
 import org.drip.measure.realization.JumpDiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.numerical.linearalgebra.R1MatrixUtil;
 import org.drip.product.rates.FixFloatComponent;
 import org.drip.service.common.FormatUtil;
@@ -600,7 +600,7 @@ public class OTCPayerCSAConservative
 
 	private static final void DisplayThinStatistics (
 		final String annotation,
-		final UnivariateDiscreteThin univariateDiscreteThin)
+		final UnivariateCentralMeasures univariateDiscreteThin)
 		throws Exception
 	{
 		System.out.println (

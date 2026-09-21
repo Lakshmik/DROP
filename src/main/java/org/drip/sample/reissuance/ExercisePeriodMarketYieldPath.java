@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.function.r1tor1operator.Flat;
 import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
@@ -404,8 +405,9 @@ public class ExercisePeriodMarketYieldPath
 			);
 
 		DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath = DeGuillaumeRebonatoPogudin.Standard (
-			new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime),
-			deGuillaumeRebonatoPogudinMarketYield
+			new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
+			deGuillaumeRebonatoPogudinMarketYield,
+			null
 		).evolve (
 			deGuillaumeRebonatoPogudinMarketYield,
 			simulationDateList

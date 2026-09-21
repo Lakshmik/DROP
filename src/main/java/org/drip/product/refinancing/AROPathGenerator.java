@@ -1,12 +1,14 @@
 
-package org.drip.product.muni;
+package org.drip.product.refinancing;
 
 import java.util.TreeMap;
 
 import org.drip.analytics.date.JulianDate;
-import org.drip.param.market.CurveSurfaceQuoteContainer;
+import org.drip.analytics.daycount.Convention;
 import org.drip.param.valuation.ValuationParams;
 import org.drip.product.credit.BondComponent;
+import org.drip.product.muni.DeGuillaumeRebonatoPogudinPath;
+import org.drip.product.muni.IssueCurveMeasures;
 import org.drip.state.govvie.GovvieCurve;
 
 /*
@@ -86,8 +88,8 @@ import org.drip.state.govvie.GovvieCurve;
  */
 
 /**
- * <i>RefinancingPathPnLGenerator</i> generates the Single Path Bond PnL incurred by re-financing using Muni
- *  Sub-markets, i.e., Tax-exempt, and Taxable Path Yield Curves. The References are:
+ * <i>AROPathGenerator</i> generates the Single Path incurred by the ARO Process using the Muni Sub-markets,
+ * 	i.e., Tax-exempt, and Taxable Path Yield Curves. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -119,129 +121,146 @@ import org.drip.state.govvie.GovvieCurve;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/README.md">Product Components/Baskets for Credit, FRA, FX, Govvie, Rates, and Option Asset Classes</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/muni/README.md">Refunding and Optimal Exercise Mechanics</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/product/refinancing/README.md">Evaluation of Product Re-financing PnL</a></td></tr>
  *  </table>
  *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class RefinancingPathPnLGenerator
+public class AROPathGenerator
 {
-	private BondComponent _bond = null;
-	private TreeMap<JulianDate, CurveMeasures> _dateInceptionMarketSimulatedMeasureMap =
-		null;
-
-	private double govvieCurvePrice (
-		final ValuationParams valuationParams,
-		final GovvieCurve govvieCurve)
-		throws Exception
-	{
-		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
-
-		curveSurfaceQuoteContainer.setGovvieState (govvieCurve);
-
-		return _bond.priceFromGSpread (valuationParams, curveSurfaceQuoteContainer, null, 0.);
-	}
+	private AROSetting _setting = null;
+	private BondComponent _issueBond = null;
 
 	/**
-	 * <i>RefinancingPathPnLGenerator</i> Constructor
+	 * <i>AROPathGenerator</i> Constructor
 	 * 
-	 * @param bond Underlying Bond
-	 * @param dateInceptionMarketSimulatedMeasureMap Date Map of <i>InceptionMarketSimulatedMeasure</i>
-	 * 												 Instances
+	 * @param issueBond Issue Bond
+	 * @param setting <i>AROSetting</i> Instance
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public RefinancingPathPnLGenerator (
-		final BondComponent bond,
-		final TreeMap<JulianDate, CurveMeasures> dateInceptionMarketSimulatedMeasureMap)
+	public AROPathGenerator (
+		final BondComponent issueBond,
+		final AROSetting setting)
 		throws Exception
 	{
-		if (null == (_bond = bond) ||
-			null == (_dateInceptionMarketSimulatedMeasureMap = dateInceptionMarketSimulatedMeasureMap) ||
-				_dateInceptionMarketSimulatedMeasureMap.isEmpty())
-		{
-			throw new Exception ("RefinancingPathPnLGenerator Constructor => Invalid Inputs");
+		if (null == (_issueBond = issueBond) || null == (_setting = setting)) {
+			throw new Exception ("AROPathGenerator Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Underlying Bond
+	 * Retrieve the Issue Bond
 	 * 
-	 * @return Underlying Bond
+	 * @return Issue Bond
 	 */
 
-	public BondComponent bond()
+	public BondComponent issueBond()
 	{
-		return _bond;
+		return _issueBond;
 	}
 
 	/**
-	 * Retrieve the Date Map of <i>InceptionMarketSimulatedMeasure</i>
+	 * Retrieve the <i>AROSetting</i> Instance
 	 * 
-	 * @return Date Map of <i>InceptionMarketSimulatedMeasure</i>
+	 * @return <i>AROSetting</i> Instance
 	 */
 
-	public TreeMap<JulianDate, CurveMeasures> dateInceptionMarketSimulatedMeasureMap()
+	public AROSetting setting()
 	{
-		return _dateInceptionMarketSimulatedMeasureMap;
+		return _setting;
 	}
 
 	/**
-	 * Generate the Date to <i>RefinancingPathPnLEntry</i> Map
+	 * Generate <i>AROPathEntry</i> Instance
 	 * 
 	 * @param deGuillaumeRebonatoPogudinPath Simulated <i>DeGuillaumeRebonatoPogudinPath</i> Instance
+	 * @param taxExempt TRUE - Apply Tax-exempt Re-financing
 	 * 
-	 * @return Date to <i>RefinancingPathPnLEntry</i> Map
+	 * @return <i>AROPathEntry</i> Instance
 	 */
 
-	public TreeMap<JulianDate, RefinancingPathPnLEntry> dateEntryMap (
-		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath)
+	public AROPathEntry generate (
+		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath,
+		final boolean taxExempt)
 	{
 		if (null == deGuillaumeRebonatoPogudinPath) {
 			return null;
 		}
 
-		TreeMap<JulianDate, RefinancingPathPnLEntry> dateEntryMap =
-			new TreeMap<JulianDate, RefinancingPathPnLEntry>();
+		BondComponent escrowBond = _setting.escrowBond();
 
-		TreeMap<JulianDate, GovvieCurve> dateTaxableGovvieCurveMap =
-			deGuillaumeRebonatoPogudinPath.dateTaxableGovvieCurveMap();
+		JulianDate refinancingDate = _setting.refinancingDate();
 
-		TreeMap<JulianDate, GovvieCurve> dateTaxExemptGovvieCurveMap =
+		int refinancingDateJulian = refinancingDate.julian();
+
+		JulianDate embeddedOptionExerciseDate = _setting.embeddedOptionExerciseDate();
+
+		int embeddedOptionExerciseJulian = embeddedOptionExerciseDate.julian();
+
+		ValuationParams refinancingDateValuationParameters = ValuationParams.Spot (refinancingDateJulian);
+
+		ValuationParams embeddedOptionExerciseDateValuationParameters =
+			ValuationParams.Spot (embeddedOptionExerciseDate.julian());
+
+		TreeMap<JulianDate, GovvieCurve> dateEscrowGovvieCurveMap =
+			deGuillaumeRebonatoPogudinPath.dateEscrowGovvieCurveMap();
+
+		TreeMap<JulianDate, GovvieCurve> dateIssuerGovvieCurveMap = taxExempt ?
+			deGuillaumeRebonatoPogudinPath.dateTaxableGovvieCurveMap() :
 			deGuillaumeRebonatoPogudinPath.dateTaxExemptGovvieCurveMap();
 
-		for (JulianDate asOfDate : _dateInceptionMarketSimulatedMeasureMap.keySet()) {
-			int asOfDateJulian = asOfDate.julian();
-
-			ValuationParams valuationParams = ValuationParams.Spot (asOfDateJulian);
-
-			CurveMeasures inceptionMarketSimulatedMeasure =
-				_dateInceptionMarketSimulatedMeasureMap.get (asOfDate);
-
-			double accrued = inceptionMarketSimulatedMeasure.accrual();
-
-			try {
-				dateEntryMap.put (
-					asOfDate,
-					new RefinancingPathPnLEntry (
-						inceptionMarketSimulatedMeasure.taxExemptCleanPrice() + accrued,
-						inceptionMarketSimulatedMeasure.taxableCleanPrice() + accrued,
-						govvieCurvePrice (valuationParams, dateTaxExemptGovvieCurveMap.get (asOfDate)) +
-							accrued,
-						govvieCurvePrice (valuationParams, dateTaxableGovvieCurveMap.get (asOfDate)) +
-							accrued
-					)
-				);
-			} catch (Exception e) {
-				e.printStackTrace();
-
-				return null;
-			}
+		try {
+			return new AROPathEntry (
+				IssueCurveMeasures.PriceFromGovvie (
+					_issueBond,
+					refinancingDateValuationParameters,
+					dateIssuerGovvieCurveMap.get (refinancingDate)
+				),
+				_setting.embeddedOptionExercisePrice(),
+				_issueBond.couponMetrics (
+					embeddedOptionExerciseJulian,
+					refinancingDateValuationParameters,
+					null
+				).rate() * Convention.YearFraction (
+					refinancingDateJulian,
+					embeddedOptionExerciseJulian,
+					_issueBond.couponDC(),
+					false,
+					null,
+					_issueBond.currency()
+				),
+				IssueCurveMeasures.PriceFromGovvie (
+					escrowBond,
+					refinancingDateValuationParameters,
+					dateEscrowGovvieCurveMap.get (refinancingDate)
+				),
+				IssueCurveMeasures.PriceFromGovvie (
+					escrowBond,
+					embeddedOptionExerciseDateValuationParameters,
+					dateEscrowGovvieCurveMap.get (embeddedOptionExerciseDate)
+				),
+				escrowBond.couponMetrics (
+					embeddedOptionExerciseJulian,
+					refinancingDateValuationParameters,
+					null
+				).rate() * Convention.YearFraction (
+					refinancingDateJulian,
+					embeddedOptionExerciseJulian,
+					escrowBond.couponDC(),
+					false,
+					null,
+					escrowBond.currency()
+				),
+				_setting.refinancingCharge()
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		return dateEntryMap;
+		return null;
 	}
 }

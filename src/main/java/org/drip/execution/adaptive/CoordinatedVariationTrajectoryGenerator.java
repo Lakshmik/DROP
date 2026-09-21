@@ -303,16 +303,17 @@ public class CoordinatedVariationTrajectoryGenerator
 
 		double referenceVolatility = _coordinatedVariation.referenceVolatility();
 
-		double relaxationTime =
-			_nonDimensionalCostEvolver.ornsteinUnlenbeckProcess().referenceRelaxationTime();
-
 		double meanMarketUrgency = referenceVolatility * Math.sqrt (
 			_meanVarianceObjectiveUtility.riskAversion() / referenceLiquidity
 		);
 
-		double tradeRateScale = executionSize / relaxationTime;
-
 		try {
+			double relaxationTime =
+				_nonDimensionalCostEvolver.ornsteinUnlenbeckProcess().referenceRelaxationTimeFunction().evaluate
+					(0.);
+
+			double tradeRateScale = executionSize / relaxationTime;
+
 			return new CoordinatedVariationTrajectoryDeterminant (
 				executionSize,
 				relaxationTime,
@@ -401,6 +402,7 @@ public class CoordinatedVariationTrajectoryGenerator
 			return null;
 		}
 
+		double relaxationTime = Double.NaN;
 		int timeNodeCount = marketStateArray.length;
 
 		if (1 >= timeNodeCount) {
@@ -413,8 +415,15 @@ public class CoordinatedVariationTrajectoryGenerator
 
 		double referenceVolatility = _coordinatedVariation.referenceVolatility();
 
-		double relaxationTime =
-			_nonDimensionalCostEvolver.ornsteinUnlenbeckProcess().referenceRelaxationTime();
+		try {
+			relaxationTime =
+				_nonDimensionalCostEvolver.ornsteinUnlenbeckProcess().referenceRelaxationTimeFunction().evaluate
+					(0.);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
 
 		double nonDimensionalTimeIncrement =
 			_orderSpecification.maxExecutionTime() / (timeNodeCount - 1) / relaxationTime;
@@ -526,6 +535,7 @@ public class CoordinatedVariationTrajectoryGenerator
 			return null;
 		}
 
+		double relaxationTime = Double.NaN;
 		int timeNodeCount = marketStateArray.length;
 		double[] nonDimensionalCostArray = 0 == timeNodeCount ? null : new double[timeNodeCount];
 		double[] nonDimensionalHoldingsArray = 0 == timeNodeCount ? null : new double[timeNodeCount];
@@ -545,8 +555,15 @@ public class CoordinatedVariationTrajectoryGenerator
 
 		double referenceVolatility = _coordinatedVariation.referenceVolatility();
 
-		double relaxationTime =
-			_nonDimensionalCostEvolver.ornsteinUnlenbeckProcess().referenceRelaxationTime();
+		try {
+			relaxationTime =
+				_nonDimensionalCostEvolver.ornsteinUnlenbeckProcess().referenceRelaxationTimeFunction().evaluate
+					(0.);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
 
 		double meanMarketUrgency = referenceVolatility * Math.sqrt (riskAversion / referenceLiquidity);
 

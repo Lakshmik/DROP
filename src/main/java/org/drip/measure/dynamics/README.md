@@ -40,6 +40,9 @@ DROP Measure Dynamics contains Jump Diffusion Evolution Evaluator Variants.
  * [***OrnsteinUhlenbeckPair***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/OrnsteinUhlenbeckPair.java)
  <i>OrnsteinUhlenbeckPair</i> guides the Random Variable Evolution according to 2D Ornstein-Uhlenbeck Mean Reverting Process.
 
+ * [***OrnsteinUhlenbeckDriftWander***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/OrnsteinUhlenbeckDriftWander.java)
+ <i>OrnsteinUhlenbeckDriftWander</i> contains the Drift/Wander Reference Parameter the guide the Random Variable Evolution according to Ornstein-Uhlenbeck Mean Reverting Process.
+
  * [***SingleJumpEvaluator***](https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/measure/dynamics/SingleJumpEvaluator.java)
  <i>SingleJumpEvaluator</i> implements the Single Point Jump Event Indication Evaluator that guides the One
  Factor Jump Random Process Variable Evolution.

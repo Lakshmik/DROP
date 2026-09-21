@@ -5,7 +5,7 @@ import org.drip.function.definition.R1ToR1;
 import org.drip.function.definition.R2ToR1;
 import org.drip.measure.gamma.R1ShapeScaleComposite;
 import org.drip.measure.gamma.R1ShapeScaleDiscrete;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.specialfunction.digamma.CumulativeSeriesEstimator;
@@ -149,8 +149,8 @@ public class DiscreteBeta
 	}
 
 	private static final void StatisticsArray (
-		final UnivariateDiscreteThin ahrensDieterThinStatistics,
-		final UnivariateDiscreteThin marsagliaThinStatistics)
+		final UnivariateCentralMeasures ahrensDieterThinStatistics,
+		final UnivariateCentralMeasures marsagliaThinStatistics)
 		throws Exception
 	{
 		System.out.println (
@@ -291,10 +291,10 @@ public class DiscreteBeta
 		);
 
 		StatisticsArray (
-			new UnivariateDiscreteThin (
+			new UnivariateCentralMeasures (
 				ahrensDieterRandomArray
 			),
-			new UnivariateDiscreteThin (
+			new UnivariateCentralMeasures (
 				marsagliaRandomArray
 			)
 		);

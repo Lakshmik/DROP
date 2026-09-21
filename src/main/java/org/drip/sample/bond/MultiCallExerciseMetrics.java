@@ -5,7 +5,7 @@ import org.drip.analytics.date.*;
 import org.drip.analytics.output.BondEOSMetrics;
 import org.drip.measure.dynamics.DiffusionEvaluatorLogarithmic;
 import org.drip.measure.realization.DiffusionEvolver;
-import org.drip.measure.statistics.UnivariateDiscreteThin;
+import org.drip.measure.statistics.UnivariateCentralMeasures;
 import org.drip.param.creator.MarketParamsBuilder;
 import org.drip.param.valuation.ValuationParams;
 import org.drip.product.creator.BondBuilder;
@@ -371,17 +371,17 @@ public class MultiCallExerciseMetrics {
 			iNumPath
 		);
 
-		UnivariateDiscreteThin udtOptimalExercisePrice = bem.optimalExercisePrice();
+		UnivariateCentralMeasures udtOptimalExercisePrice = bem.optimalExercisePrice();
 
-		UnivariateDiscreteThin udtOptimalExercisePV = bem.optimalExerciseValue();
+		UnivariateCentralMeasures udtOptimalExercisePV = bem.optimalExerciseValue();
 
-		UnivariateDiscreteThin udtOptimalExerciseOAS = bem.optimalExerciseOAS();
+		UnivariateCentralMeasures udtOptimalExerciseOAS = bem.optimalExerciseOAS();
 
-		UnivariateDiscreteThin udtOptimalExerciseOASGap = bem.optimalExerciseOASGap();
+		UnivariateCentralMeasures udtOptimalExerciseOASGap = bem.optimalExerciseOASGap();
 
-		UnivariateDiscreteThin udtOptimalExerciseDuration = bem.optimalExerciseDuration();
+		UnivariateCentralMeasures udtOptimalExerciseDuration = bem.optimalExerciseDuration();
 
-		UnivariateDiscreteThin udtOptimalExerciseConvexity = bem.optimalExerciseConvexity();
+		UnivariateCentralMeasures udtOptimalExerciseConvexity = bem.optimalExerciseConvexity();
 
 		System.out.println();
 

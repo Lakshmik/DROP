@@ -3,6 +3,7 @@ package org.drip.sample.lmm;
 
 import java.util.*;
 
+import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.definition.MarketSurface;
 import org.drip.analytics.support.CompositePeriodBuilder;
@@ -34,6 +35,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -127,51 +136,43 @@ import org.drip.state.inference.*;
  * 				Mathematical Finance 7 (2), 127-155.
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/lmm/README.md">LMM Multi-Factor Monte Carlo</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/lmm/README.md">LMM Multi-Factor Monte Carlo</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FixFloatMonteCarloEvolver {
-
-	/*
-	 * Construct the Array of Deposit Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
+public class FixFloatMonteCarloEvolver
+{
 
 	private static final SingleStreamComponent[] DepositInstrumentsFromMaturityDays (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final int[] aiDay)
+		final JulianDate effectiveDate,
+		final String currency,
+		final int[] maturityDaysArray)
 		throws Exception
 	{
-		SingleStreamComponent[] aDeposit = new SingleStreamComponent[aiDay.length];
+		SingleStreamComponent[] depositArray = new SingleStreamComponent[maturityDaysArray.length];
 
-		ComposableFloatingUnitSetting cfus = new ComposableFloatingUnitSetting (
+		ComposableFloatingUnitSetting composableFloatingUnitSetting = new ComposableFloatingUnitSetting (
 			"3M",
 			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_SINGLE,
 			null,
-			ForwardLabel.Create (
-				strCurrency,
-				"3M"
-			),
+			ForwardLabel.Create (currency, "3M"),
 			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
 			0.
 		);
 
-		CompositePeriodSetting cps = new CompositePeriodSetting (
+		CompositePeriodSetting compositePeriodSetting = new CompositePeriodSetting (
 			4,
 			"3M",
-			strCurrency,
+			currency,
 			null,
 			1.,
 			null,
@@ -180,177 +181,132 @@ public class FixFloatMonteCarloEvolver {
 			null
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, currency, 0);
 
-		for (int i = 0; i < aiDay.length; ++i) {
-			aDeposit[i] = new SingleStreamComponent (
-				"DEPOSIT_" + aiDay[i],
+		for (int maturityIndex = 0; maturityIndex < maturityDaysArray.length; ++maturityIndex) {
+			depositArray[maturityIndex] = new SingleStreamComponent (
+				"DEPOSIT_" + maturityDaysArray[maturityIndex],
 				new Stream (
 					CompositePeriodBuilder.FloatingCompositeUnit (
 						CompositePeriodBuilder.EdgePair (
-							dtEffective,
-							dtEffective.addBusDays (
-								aiDay[i],
-								strCurrency
-							)
+							effectiveDate,
+							effectiveDate.addBusDays (maturityDaysArray[maturityIndex], currency)
 						),
-						cps,
-						cfus
+						compositePeriodSetting,
+						composableFloatingUnitSetting
 					)
 				),
-				csp
+				cashSettleParams
 			);
 
-			aDeposit[i].setPrimaryCode (aiDay[i] + "D");
+			depositArray[maturityIndex].setPrimaryCode (maturityDaysArray[maturityIndex] + "D");
 		}
 
-		return aDeposit;
+		return depositArray;
 	}
 
-	/*
-	 * Construct the Swap Instrument from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent SwapInstrumentFromMaturityTenor (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final double dblFixedCoupon,
-		final String strMaturityTenor)
+		final JulianDate effectiveDate,
+		final String currency,
+		final double fixedCoupon,
+		final String maturityTenor)
 		throws Exception
 	{
-		UnitCouponAccrualSetting ucasFixed = new UnitCouponAccrualSetting (
-			4,
-			"Act/360",
-			false,
-			"Act/360",
-			false,
-			strCurrency,
-			true,
-			CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
-		);
-
-		ComposableFloatingUnitSetting cfusFloating = new ComposableFloatingUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Create (
-				strCurrency,
-				"3M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
-
-		ComposableFixedUnitSetting cfusFixed = new ComposableFixedUnitSetting (
-			"3M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			dblFixedCoupon,
-			0.,
-			strCurrency
-		);
-
-		CompositePeriodSetting cpsFloating = new CompositePeriodSetting (
-			4,
-			"3M",
-			strCurrency,
-			null,
-			-1.,
-			null,
-			null,
-			null,
-			null
-		);
-
-		CompositePeriodSetting cpsFixed = new CompositePeriodSetting (
-			4,
-			"3M",
-			strCurrency,
-			null,
-			1.,
-			null,
-			null,
-			null,
-			null
-		);
-
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strCurrency,
-			0
-		);
-
-		List<Integer> lsFixedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			"3M",
-			strMaturityTenor,
-			null
-		);
-
-		List<Integer> lsFloatingStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-			dtEffective,
-			"3M",
-			strMaturityTenor,
-			null
-		);
-
-		Stream floatingStream = new Stream (
-			CompositePeriodBuilder.FloatingCompositeUnit (
-				lsFloatingStreamEdgeDate,
-				cpsFloating,
-				cfusFloating
-			)
-		);
-
-		Stream fixedStream = new Stream (
-			CompositePeriodBuilder.FixedCompositeUnit (
-				lsFixedStreamEdgeDate,
-				cpsFixed,
-				ucasFixed,
-				cfusFixed
-			)
-		);
-
 		FixFloatComponent irs = new FixFloatComponent (
-			fixedStream,
-			floatingStream,
-			csp
+			new Stream (
+				CompositePeriodBuilder.FixedCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						"3M",
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						4,
+						"3M",
+						currency,
+						null,
+						1.,
+						null,
+						null,
+						null,
+						null
+					),
+					new UnitCouponAccrualSetting (
+						4,
+						"Act/360",
+						false,
+						"Act/360",
+						false,
+						currency,
+						true,
+						CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC
+					),
+					new ComposableFixedUnitSetting (
+						"3M",
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						fixedCoupon,
+						0.,
+						currency
+					)
+				)
+			),
+			new Stream (
+				CompositePeriodBuilder.FloatingCompositeUnit (
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						"3M",
+						maturityTenor,
+						null
+					),
+					new CompositePeriodSetting (
+						4,
+						"3M",
+						currency,
+						null,
+						-1.,
+						null,
+						null,
+						null,
+						null
+					),
+					new ComposableFloatingUnitSetting (
+						"3M",
+						CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+						null,
+						ForwardLabel.Create (currency, "3M"),
+						CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+						0.
+					)
+				)
+			),
+			new CashSettleParams (0, currency, 0)
 		);
 
-		irs.setPrimaryCode ("IRS." + strMaturityTenor + "." + strCurrency);
+		irs.setPrimaryCode ("IRS." + maturityTenor + "." + currency);
 
 		return irs;
 	}
 
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] SwapInstrumentsFromMaturityTenor (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final String[] astrMaturityTenor)
+		final JulianDate effectiveDate,
+		final String currency,
+		final String[] maturityTenorArray)
 		throws Exception
 	{
-		FixFloatComponent[] aIRS = new FixFloatComponent[astrMaturityTenor.length];
+		FixFloatComponent[] irsArray = new FixFloatComponent[maturityTenorArray.length];
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i)
-			aIRS[i] = SwapInstrumentFromMaturityTenor (
-				dtEffective,
-				strCurrency,
+		for (int maturityIndex = 0; maturityIndex < maturityTenorArray.length; ++maturityIndex) {
+			irsArray[maturityIndex] = SwapInstrumentFromMaturityTenor (
+				effectiveDate,
+				currency,
 				0.,
-				astrMaturityTenor[i]
+				maturityTenorArray[maturityIndex]
 			);
+		}
 
-		return aIRS;
+		return irsArray;
 	}
 
 	/*
@@ -367,152 +323,144 @@ public class FixFloatMonteCarloEvolver {
 	 * 		of Cash and Swap Stretches.
 	 * 	- Cross-Comparison of the Cash/Swap Calibration Instrument "Rate" metric across the different curve
 	 * 		construction methodologies.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
 	 */
 
 	private static final MergedDiscountForwardCurve OTCInstrumentCurve (
-		final JulianDate dtSpot,
-		final String strCurrency)
+		final JulianDate spotDate,
+		final String currency)
 		throws Exception
 	{
-		/*
-		 * Construct the Array of Deposit Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aDepositComp = DepositInstrumentsFromMaturityDays (
-			dtSpot,
-			strCurrency,
-			new int[] {
-				1, 2, 7, 14, 30, 60
+		SingleStreamComponent[] depositArray = DepositInstrumentsFromMaturityDays (
+			spotDate,
+			currency,
+			new int[]
+			{
+				1,
+				2,
+				7,
+				14,
+				30,
+				60
 			}
 		);
 
-		double[] adblDepositQuote = new double[] {
-			0.0013, 0.0017, 0.0017, 0.0018, 0.0020, 0.0023
+		double[] depositQuoteArray =
+		{
+			0.0013,
+			0.0017,
+			0.0017,
+			0.0018,
+			0.0020,
+			0.0023
 		};
 
-		/*
-		 * Construct the Deposit Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec depositStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"DEPOSIT",
-			aDepositComp,
-			"ForwardRate",
-			adblDepositQuote
-		);
-
-		/*
-		 * Construct the Array of EDF Instruments and their Quotes from the given set of parameters
-		 */
-
-		SingleStreamComponent[] aEDFComp = SingleStreamComponentBuilder.ForwardRateFuturesPack (
-			dtSpot,
+		SingleStreamComponent[] futuresArray = SingleStreamComponentBuilder.ForwardRateFuturesPack (
+			spotDate,
 			8,
-			strCurrency
+			currency
 		);
 
-		double[] adblEDFQuote = new double[] {
-			0.0027, 0.0032, 0.0041, 0.0054, 0.0077, 0.0104, 0.0134, 0.0160
+		double[] futuresQuoteArray =
+		{
+			0.0027,
+			0.0032,
+			0.0041,
+			0.0054,
+			0.0077,
+			0.0104,
+			0.0134,
+			0.0160
 		};
 
-		/*
-		 * Construct the EDF Instrument Set Stretch Builder
-		 */
-
-		LatentStateStretchSpec edfStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"EDF",
-			aEDFComp,
-			"ForwardRate",
-			adblEDFQuote
-		);
-
-		/*
-		 * Construct the Array of Swap Instruments and their Quotes from the given set of parameters
-		 */
-
-		FixFloatComponent[] aSwapComp = SwapInstrumentsFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			new java.lang.String[] {
-				"4Y", "5Y", "6Y", "7Y", "8Y", "9Y", "10Y", "11Y", "12Y", "15Y", "20Y", "25Y", "30Y", "40Y", "50Y"
+		FixFloatComponent[] irsArray = SwapInstrumentsFromMaturityTenor (
+			spotDate,
+			currency,
+			new String[]
+			{
+				"4Y",
+				"5Y",
+				"6Y",
+				"7Y",
+				"8Y",
+				"9Y",
+				"10Y",
+				"11Y",
+				"12Y",
+				"15Y",
+				"20Y",
+				"25Y",
+				"30Y",
+				"40Y",
+				"50Y"
 			}
 		);
 
-		double[] adblSwapQuote = new double[] {
-			0.0166, 0.0206, 0.0241, 0.0269, 0.0292, 0.0311, 0.0326, 0.0340, 0.0351, 0.0375, 0.0393, 0.0402, 0.0407, 0.0409, 0.0409
+		double[] swapQuoteArray =
+		{
+			0.0166,
+			0.0206,
+			0.0241,
+			0.0269,
+			0.0292,
+			0.0311,
+			0.0326,
+			0.0340,
+			0.0351,
+			0.0375,
+			0.0393,
+			0.0402,
+			0.0407,
+			0.0409,
+			0.0409
 		};
 
-		/*
-		 * Construct the Swap Instrument Set Stretch Builder
-		 */
+		ValuationParams valuationParams = new ValuationParams (spotDate, spotDate, currency);
 
-		LatentStateStretchSpec swapStretch = LatentStateStretchBuilder.ForwardFundingStretchSpec (
-			"SWAP",
-			aSwapComp,
-			"SwapRate",
-			adblSwapQuote
-		);
-
-		LatentStateStretchSpec[] aStretchSpec = new LatentStateStretchSpec[] {
-			depositStretch,
-			edfStretch,
-			swapStretch
-		};
-
-		/*
-		 * Set up the Linear Curve Calibrator using the following parameters:
-		 * 	- Cubic Exponential Mixture Basis Spline Set
-		 * 	- Ck = 2, Segment Curvature Penalty = 2
-		 * 	- Quadratic Rational Shape Controller
-		 * 	- Natural Boundary Setting
-		 */
-
-		LinearLatentStateCalibrator lcc = new LinearLatentStateCalibrator (
-			new SegmentCustomBuilderControl (
-				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
-				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
+		MergedDiscountForwardCurve discountCurve = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+			currency,
+			new LinearLatentStateCalibrator (
+				new SegmentCustomBuilderControl (
+					MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
+					new PolynomialFunctionSetParams (4),
+					SegmentInelasticDesignControl.Create (2, 2),
+					new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
+					null
 				),
-				new ResponseScalingShapeControl (
-					true,
-					new QuadraticRationalShapeControl (0.)
-				),
+				BoundarySettings.NaturalStandard(),
+				MultiSegmentSequence.CALIBRATE,
+				null,
 				null
 			),
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		/*
-		 * Construct the Shape Preserving Discount Curve by applying the linear curve calibrator to the array
-		 *  of Deposit, Futures, and Swap Stretches.
-		 */
-
-		MergedDiscountForwardCurve dc = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strCurrency,
-			lcc,
-			aStretchSpec,
-			valParams,
+			new LatentStateStretchSpec[]
+			{
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"DEPOSIT",
+					depositArray,
+					"ForwardRate",
+					depositQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"EDF",
+					futuresArray,
+					"ForwardRate",
+					futuresQuoteArray
+				),
+				LatentStateStretchBuilder.ForwardFundingStretchSpec (
+					"SWAP",
+					irsArray,
+					"SwapRate",
+					swapQuoteArray
+				)
+			},
+			valuationParams,
 			null,
 			null,
 			null,
 			1.
 		);
 
-		CurveSurfaceQuoteContainer csqs = MarketParamsBuilder.Create (
-			dc,
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
 			null,
 			null,
 			null,
@@ -521,80 +469,131 @@ public class FixFloatMonteCarloEvolver {
 			null
 		);
 
-		/*
-		 * Cross-Comparison of the Deposit Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\t     DEPOSIT INSTRUMENTS CALIBRATION RECOVERY");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t----------------------------------------------------------------");
+		for (int depositIndex = 0; depositIndex < depositArray.length; ++depositIndex) {
+			System.out.println (
+				"\t|| [" + depositArray[depositIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+					depositArray[depositIndex].measureValue (
+						valuationParams,
+						null,
+						curveSurfaceQuoteContainer,
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					depositQuoteArray[depositIndex],
+					1,
+					6,
+					1.
+				)
+			);
+		}
 
-		for (int i = 0; i < aDepositComp.length; ++i)
-			System.out.println ("\t[" + aDepositComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aDepositComp[i].measureValue (valParams, null, csqs,
-					null, "Rate"), 1, 6, 1.) + " | " + FormatUtil.FormatDouble (adblDepositQuote[i], 1, 6, 1.));
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		/*
-		 * Cross-Comparison of the EDF Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		System.out.println ("\t||     EDF INSTRUMENTS CALIBRATION RECOVERY");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\t     EDF INSTRUMENTS CALIBRATION RECOVERY");
+		for (int futuresIndex = 0; futuresIndex < futuresArray.length; ++futuresIndex) {
+			System.out.println (
+				"\t|| [" + futuresArray[futuresIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+					futuresArray[futuresIndex].measureValue (
+						valuationParams,
+						null,
+						curveSurfaceQuoteContainer,
+						null,
+						"Rate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					futuresQuoteArray[futuresIndex],
+					1,
+					6,
+					1.
+				)
+			);
+		}
 
-		System.out.println ("\t----------------------------------------------------------------");
+		System.out.println ("\n\t||----------------------------------------------------------------");
 
-		for (int i = 0; i < aEDFComp.length; ++i)
-			System.out.println ("\t[" + aEDFComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aEDFComp[i].measureValue (valParams, null, csqs, null, "Rate"), 1, 6, 1.)
-					+ " | " + FormatUtil.FormatDouble (adblEDFQuote[i], 1, 6, 1.));
+		System.out.println ("\t||     SWAP INSTRUMENTS CALIBRATION RECOVERY");
 
-		/*
-		 * Cross-Comparison of the Swap Calibration Instrument "Rate" metric across the different curve
-		 * 	construction methodologies.
-		 */
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		System.out.println ("\n\t----------------------------------------------------------------");
+		for (int irsIndex = 0; irsIndex < irsArray.length; ++irsIndex) {
+			System.out.println (
+				"\t|| [" + irsArray[irsIndex].maturityDate() + "] = " + FormatUtil.FormatDouble (
+					irsArray[irsIndex].measureValue (
+						valuationParams,
+						null,
+						curveSurfaceQuoteContainer,
+						null,
+						"CalibSwapRate"
+					),
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					swapQuoteArray[irsIndex],
+					1,
+					6,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					irsArray[irsIndex].measureValue (
+						valuationParams,
+						null,
+						curveSurfaceQuoteContainer,
+						null,
+						"FairPremium"
+					),
+					1,
+					6,
+					1.
+				)
+			);
+		}
 
-		System.out.println ("\t     SWAP INSTRUMENTS CALIBRATION RECOVERY");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aSwapComp.length; ++i)
-			System.out.println ("\t[" + aSwapComp[i].maturityDate() + "] = " +
-				FormatUtil.FormatDouble (aSwapComp[i].measureValue (valParams, null, csqs, null, "CalibSwapRate"), 1, 6, 1.)
-					+ " | " + FormatUtil.FormatDouble (adblSwapQuote[i], 1, 6, 1.) + " | " +
-						FormatUtil.FormatDouble (aSwapComp[i].measureValue (valParams, null, csqs, null, "FairPremium"), 1, 6, 1.));
-
-		return dc;
+		return discountCurve;
 	}
 
 	private static final ForwardCurve LIBORSpan (
-		final MergedDiscountForwardCurve dc,
+		final MergedDiscountForwardCurve discountCurve,
 		final ForwardLabel forwardLabel,
-		final SegmentCustomBuilderControl scbc,
-		final JulianDate dtView,
-		final int iNumForwardTenor)
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final JulianDate viewDate,
+		final int forwardTenorCount)
 		throws Exception
 	{
-		int[] aiDate = new int[iNumForwardTenor + 1];
-		double[] adblLIBOR = new double[iNumForwardTenor + 1];
-		SegmentCustomBuilderControl[] aSCBC = new SegmentCustomBuilderControl[iNumForwardTenor];
+		int[] dateArray = new int[forwardTenorCount + 1];
+		double[] liborArray = new double[forwardTenorCount + 1];
+		SegmentCustomBuilderControl[] segmentCustomBuilderControlArray =
+			new SegmentCustomBuilderControl[forwardTenorCount];
 
-		JulianDate dtForward = dtView.subtractTenor (forwardLabel.tenor());
+		String forwardTenor = forwardLabel.tenor();
 
-		for (int i = 0; i <= iNumForwardTenor; ++i) {
-			if (iNumForwardTenor != i) aSCBC[i] = scbc;
+		JulianDate forwardDate = viewDate.subtractTenor (forwardTenor);
 
-			aiDate[i] = dtForward.julian();
+		for (int forwardTenorIndex = 0; forwardTenorIndex <= forwardTenorCount; ++forwardTenorIndex) {
+			if (forwardTenorCount != forwardTenorIndex) {
+				segmentCustomBuilderControlArray[forwardTenorIndex] = segmentCustomBuilderControl;
+			}
 
-			adblLIBOR[i] = dc.libor (dtForward, forwardLabel.tenor());
+			liborArray[forwardTenorIndex] = discountCurve.libor (forwardDate, forwardTenor);
 
-			dtForward = dtForward.addTenor (forwardLabel.tenor());
+			dateArray[forwardTenorIndex] = forwardDate.julian();
+
+			forwardDate = forwardDate.addTenor (forwardTenor);
 		}
 
 		return new BasisSplineForwardRate (
@@ -602,9 +601,9 @@ public class FixFloatMonteCarloEvolver {
 			new OverlappingStretchSpan (
 				MultiSegmentSequenceBuilder.CreateCalibratedStretchEstimator (
 					"SPOT_QM_LIBOR",
-					aiDate,
-					adblLIBOR,
-					aSCBC,
+					dateArray,
+					liborArray,
+					segmentCustomBuilderControlArray,
 					null,
 					BoundarySettings.NaturalStandard(),
 					MultiSegmentSequence.CALIBRATE
@@ -614,56 +613,89 @@ public class FixFloatMonteCarloEvolver {
 	}
 
 	private static final MarketSurface FlatVolatilitySurface (
-		final JulianDate dtStart,
-		final String strCurrency,
-		final double dblFlatVol)
+		final JulianDate startDate,
+		final String currency,
+		final double flatVolatility)
 		throws Exception
 	{
+		double[] nodeDateArray =
+		{
+			startDate.julian(),
+			startDate.addYears (2).julian(),
+			startDate.addYears (4).julian(),
+			startDate.addYears (6).julian(),
+			startDate.addYears (8).julian(),
+			startDate.addYears (10).julian()
+		};
+
 		return ScenarioMarketSurfaceBuilder.CustomSplineWireSurface (
 			"VIEW_TARGET_VOLATILITY_SURFACE",
-			dtStart,
-			strCurrency,
-			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
-			},
-			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
-			},
-			new double[][] {
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
+			startDate,
+			currency,
+			nodeDateArray,
+			nodeDateArray,
+			new double[][]
+			{
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
 			},
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			)
@@ -671,29 +703,29 @@ public class FixFloatMonteCarloEvolver {
 	}
 
 	private static final LognormalLIBORVolatility LLVInstance (
-		final int iSpotDate,
+		final int spotDate,
 		final ForwardLabel forwardLabel,
-		final MarketSurface[] aMS,
-		final double[][] aadblCorrelation,
-		final int iNumFactor)
+		final MarketSurface[] marketSurfaceArray,
+		final double[][] correlationMatrix,
+		final int factorCount)
 		throws Exception
 	{
-		UnivariateSequenceGenerator[] aUSG = new UnivariateSequenceGenerator[aMS.length];
+		UnivariateSequenceGenerator[] univariateSequenceGeneratorArray =
+			new UnivariateSequenceGenerator[marketSurfaceArray.length];
 
-		for (int i = 0; i < aUSG.length; ++i)
-			aUSG[i] = new BoxMullerGaussian (
-				0.,
-				1.
-			);
+		for (int sequenceIndex = 0; sequenceIndex < univariateSequenceGeneratorArray.length; ++sequenceIndex)
+		{
+			univariateSequenceGeneratorArray[sequenceIndex] = new BoxMullerGaussian (0., 1.);
+		}
 
 		return new LognormalLIBORVolatility (
-			iSpotDate,
+			spotDate,
 			forwardLabel,
-			aMS,
+			marketSurfaceArray,
 			new PrincipalFactorSequenceGenerator (
-				aUSG,
-				aadblCorrelation,
-				iNumFactor
+				univariateSequenceGeneratorArray,
+				correlationMatrix,
+				factorCount
 			)
 		);
 	}
@@ -701,169 +733,137 @@ public class FixFloatMonteCarloEvolver {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strForwardTenor = "3M";
-		String strViewTenor = "6M";
-		String strSimulationTenor = "6M";
-		String strSwapTenor = "5Y";
-		String strCurrency = "USD";
-		double dblFlatVol1 = 0.35;
-		double dblFlatVol2 = 0.42;
-		double dblFlatVol3 = 0.27;
-		int iNumForwardTenor = 30;
-		int iNumFactor = 2;
-		int iNumRun = 100;
-
-		double[][] aadblCorrelation = new double[][] {
-			{1.0, 0.1, 0.2},
-			{0.1, 1.0, 0.2},
-			{0.2, 0.1, 1.0}
+		int runCount = 100;
+		int factorCount = 2;
+		String currency = "USD";
+		String swapTenor = "5Y";
+		String viewTenor = "6M";
+		int forwardTenorCount = 30;
+		String forwardTenor = "3M";
+		double flatVolatility1 = 0.35;
+		double flatVolatility2 = 0.42;
+		double flatVolatility3 = 0.27;
+		String simulationTenor = "6M";
+		double[][] correlationMatrix =
+		{
+			{
+				1.0,
+				0.1,
+				0.2
+			},
+			{
+				0.1,
+				1.0,
+				0.2
+			},
+			{
+				0.2,
+				0.1,
+				1.0
+			}
 		};
 
-		SegmentCustomBuilderControl scbc = new SegmentCustomBuilderControl (
+		SegmentCustomBuilderControl segmentCustomBuilderControl = new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
-			new ResponseScalingShapeControl (
-				true,
-				new QuadraticRationalShapeControl (1.)
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
+			new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (1.)),
 			null
 		);
 
-		JulianDate dtSpot = org.drip.analytics.date.DateUtil.Today();
+		JulianDate spotDate = DateUtil.Today();
 
-		MarketSurface[] aMS = new MarketSurface[] {
-			FlatVolatilitySurface (
-				dtSpot,
-				strCurrency,
-				dblFlatVol1
-			),
-			FlatVolatilitySurface (
-				dtSpot,
-				strCurrency,
-				dblFlatVol2
-			),
-			FlatVolatilitySurface (
-				dtSpot,
-				strCurrency,
-				dblFlatVol3
-			)
-		};
+		int spotDateJulian = spotDate.julian();
 
-		FundingLabel fundingLabel = FundingLabel.Standard (
-			strCurrency
-		);
+		JulianDate viewDate = spotDate.addTenor (viewTenor);
 
-		ForwardLabel forwardLabel = ForwardLabel.Create (
-			strCurrency,
-			strForwardTenor
-		);
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
 
-		JulianDate dtView = dtSpot.addTenor (
-			strViewTenor
-		);
+		JulianDate simulationEndDate = spotDate.addTenor (simulationTenor);
 
-		JulianDate dtSimulationEnd = dtSpot.addTenor (
-			strSimulationTenor
-		);
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, forwardTenor);
 
-		MergedDiscountForwardCurve dc = OTCInstrumentCurve (
-			dtSpot,
-			strCurrency
-		);
+		MergedDiscountForwardCurve discountCurve = OTCInstrumentCurve (spotDate, currency);
 
-		FixFloatComponent ffcFixFloat = SwapInstrumentFromMaturityTenor (
-			dtView,
-			strCurrency,
+		FixFloatComponent fixFloatComponent = SwapInstrumentFromMaturityTenor (
+			viewDate,
+			currency,
 			0.,
-			strSwapTenor
+			swapTenor
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtSpot,
-			strCurrency
-		);
-
-		ForwardCurve fc = LIBORSpan (
-			dc,
+		ForwardCurve forwardCurve = LIBORSpan (
+			discountCurve,
 			forwardLabel,
-			scbc,
-			dtView,
-			iNumForwardTenor
+			segmentCustomBuilderControl,
+			viewDate,
+			forwardTenorCount
 		);
 
-		CurveSurfaceQuoteContainer csqs = MarketParamsBuilder.DiscountForward (
-			dc,
-			fc
-		);
-
-		double dblBaselineSwapRate = ffcFixFloat.value (
-			valParams,
+		double baselineSwapRate = fixFloatComponent.value (
+			new ValuationParams (spotDate, spotDate, currency),
 			null,
-			csqs,
+			MarketParamsBuilder.DiscountForward (discountCurve, forwardCurve),
 			null
 		).get (
 			"FairPremium"
 		);
 
-		ffcFixFloat = SwapInstrumentFromMaturityTenor (
-			dtSpot,
-			strCurrency,
-			dblBaselineSwapRate,
-			strSwapTenor
+		fixFloatComponent = SwapInstrumentFromMaturityTenor (
+			spotDate,
+			currency,
+			baselineSwapRate,
+			swapTenor
 		);
 
-		LognormalLIBORCurveEvolver llce = LognormalLIBORCurveEvolver.Create (
+		ForwardCurve[] fowardCurveArray = LognormalLIBORCurveEvolver.Create (
 			fundingLabel,
 			forwardLabel,
-			iNumForwardTenor,
-			scbc
-		);
-
-		BGMCurveUpdate bgmInitial = BGMCurveUpdate.Create (
-			fundingLabel,
-			forwardLabel,
-			dtSpot.julian(),
-			dtSpot.julian(),
-			fc,
-			null,
-			dc,
-			null,
-			null,
-			null,
-			null,
-			null,
-			LLVInstance (
-				dtSpot.julian(),
-				forwardLabel,
-				aMS,
-				aadblCorrelation,
-				iNumFactor
-			)
-		);
-
-		ForwardCurve[] aFCLIBOR = llce.simulateTerminalLatentState (
-			dtSpot.julian(),
-			dtSimulationEnd.julian(),
+			forwardTenorCount,
+			segmentCustomBuilderControl
+		).simulateTerminalLatentState (
+			spotDateJulian,
+			simulationEndDate.julian(),
 			1,
-			dtView.julian(),
-			bgmInitial,
-			iNumRun
+			viewDate.julian(),
+			BGMCurveUpdate.Create (
+				fundingLabel,
+				forwardLabel,
+				spotDateJulian,
+				spotDateJulian,
+				forwardCurve,
+				null,
+				discountCurve,
+				null,
+				null,
+				null,
+				null,
+				null,
+				LLVInstance (
+					spotDateJulian,
+					forwardLabel,
+					new MarketSurface[]
+					{
+						FlatVolatilitySurface (spotDate, currency, flatVolatility1),
+						FlatVolatilitySurface (spotDate, currency, flatVolatility2),
+						FlatVolatilitySurface (spotDate, currency, flatVolatility3)
+					},
+					correlationMatrix,
+					factorCount
+				)
+			),
+			runCount
 		);
 
 		System.out.println ("\n\t||---------------------------------||");
@@ -872,40 +872,39 @@ public class FixFloatMonteCarloEvolver {
 
 		System.out.println ("\t||---------------------------------||");
 
-		int iNumITM = 0;
-		double dblOptionPayout = 0.;
+		double optionPayout = 0.;
+		int inTheMoneyPathCount = 0;
 
-		for (int i = 0; i < iNumRun; ++i) {
-			Map<String, Double> mapScenOutput = ffcFixFloat.value (
-				new ValuationParams (
-					dtSimulationEnd,
-					dtSimulationEnd,
-					strCurrency
-				),
+		ValuationParams simulationValuationParams = new ValuationParams (
+			simulationEndDate,
+			simulationEndDate,
+			currency
+		);
+
+		for (int runIndex = 0; runIndex < runCount; ++runIndex) {
+			Map<String, Double> scenarioMeasureMap = fixFloatComponent.value (
+				simulationValuationParams,
 				null,
-				MarketParamsBuilder.DiscountForward (
-					dc,
-					aFCLIBOR[i]
-				),
+				MarketParamsBuilder.DiscountForward (discountCurve, fowardCurveArray[runIndex]),
 				null
 			);
 
-			double dblSimulatedPayout = mapScenOutput.get ("PV");
+			double simulatedSwapRate = scenarioMeasureMap.get ("FairPremium");
 
-			double dblSimulatedSwapRate = mapScenOutput.get ("FairPremium");
+			double simulatedPayout = scenarioMeasureMap.get ("PV");
 
-			boolean bITM = dblSimulatedSwapRate < dblBaselineSwapRate;
+			boolean inTheMoney = simulatedSwapRate < baselineSwapRate;
 
-			if (bITM) {
-				++iNumITM;
-				dblOptionPayout += dblSimulatedPayout;
+			if (inTheMoney) {
+				++inTheMoneyPathCount;
+				optionPayout += simulatedPayout;
 			}
 
-			System.out.println ("\t|| " +
-				FormatUtil.FormatDouble (dblSimulatedSwapRate, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblBaselineSwapRate, 1, 2, 100.) + "% | " +
-				FormatUtil.FormatDouble (dblSimulatedPayout, 1, 2, 1.) + " | " +
-				(bITM ? " OUI  ||" : " NON  ||")
+			System.out.println (
+				"\t|| " + FormatUtil.FormatDouble (simulatedSwapRate, 1, 2, 100.) + "% | " +
+				FormatUtil.FormatDouble (baselineSwapRate, 1, 2, 100.) + "% | " +
+				FormatUtil.FormatDouble (simulatedPayout, 1, 2, 1.) + " | " +
+				(inTheMoney ? " OUI  ||" : " NON  ||")
 			);
 		}
 
@@ -913,16 +912,22 @@ public class FixFloatMonteCarloEvolver {
 
 		System.out.println ("\n\t||---------------------------||");
 
-		System.out.println ("\t||  ITM Success Rate:" +
-			FormatUtil.FormatDouble (((double) iNumITM) / iNumRun, 2, 2, 100.) + "% ||"
+		System.out.println (
+			"\t||  ITM Success Rate:" +
+				FormatUtil.FormatDouble (((double) inTheMoneyPathCount) / runCount, 2, 2, 100.) + "% ||"
 		);
 
-		System.out.println ("\t||  Option Payout   :" +
-			FormatUtil.FormatDouble (dblOptionPayout / iNumRun, 1, 4, 1.) + " ||"
+		System.out.println (
+			"\t||  Option Payout   :" + FormatUtil.FormatDouble (optionPayout / runCount, 1, 4, 1.) + " ||"
 		);
 
-		System.out.println ("\t||  Option PV       :" +
-			FormatUtil.FormatDouble (dblOptionPayout * dc.df (dtSimulationEnd) / iNumRun, 1, 4, 1.) + " ||"
+		System.out.println (
+			"\t||  Option PV       :" + FormatUtil.FormatDouble (
+				optionPayout * discountCurve.df (simulationEndDate) / runCount,
+				1,
+				4,
+				1.
+			) + " ||"
 		);
 
 		System.out.println ("\t||---------------------------||");

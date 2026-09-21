@@ -8,6 +8,7 @@ import java.util.Map;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.CaseInsensitiveHashMap;
+import org.drip.function.r1tor1operator.Flat;
 import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
@@ -15,8 +16,8 @@ import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
 import org.drip.product.muni.InceptionMarketSettings;
 import org.drip.product.muni.MarketYieldTermStructure;
-import org.drip.product.muni.RefinancingPathPnLEntry;
-import org.drip.product.muni.RefinancingPathPnLGenerator;
+import org.drip.product.muni.RefinancingPathEntry;
+import org.drip.product.muni.RefinancingPathGenerator;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.creator.ScenarioGovvieCurveBuilder;
@@ -522,14 +523,15 @@ public class ExercisePeriodMarketPnLPath
 			)
 		);
 
-		Map<JulianDate, RefinancingPathPnLEntry> refinancingPathPnLEntryMap =
-			new RefinancingPathPnLGenerator (
+		Map<JulianDate, RefinancingPathEntry> refinancingPathPnLEntryMap =
+			new RefinancingPathGenerator (
 				bond,
 				inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (bond, simulationDateList)
-			).dateEntryMap (
+			).generate (
 				DeGuillaumeRebonatoPogudin.Standard (
-					new OrnsteinUhlenbeckDriftWander (burstiness, relaxationTime),
-					deGuillaumeRebonatoPogudinMarketYield
+					new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
+					deGuillaumeRebonatoPogudinMarketYield,
+					null
 				).evolve (
 					deGuillaumeRebonatoPogudinMarketYield,
 					simulationDateList
@@ -557,7 +559,7 @@ public class ExercisePeriodMarketPnLPath
 				continue;
 			}
 
-			RefinancingPathPnLEntry refinancingPathPnLEntry = refinancingPathPnLEntryMap.get (date);
+			RefinancingPathEntry refinancingPathPnLEntry = refinancingPathPnLEntryMap.get (date);
 
 			System.out.println (
 				"\t|| " + date + " =>" + FormatUtil.FormatDouble (
@@ -566,7 +568,7 @@ public class ExercisePeriodMarketPnLPath
 					3, 
 					100.
 				) + " |" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.taxExempt(),
+					refinancingPathPnLEntry.taxExemptPnL(),
 					2,
 					3, 
 					100.
@@ -576,7 +578,7 @@ public class ExercisePeriodMarketPnLPath
 					3, 
 					100.
 				) + " |" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.taxable(),
+					refinancingPathPnLEntry.taxablePnL(),
 					2,
 					3, 
 					100.

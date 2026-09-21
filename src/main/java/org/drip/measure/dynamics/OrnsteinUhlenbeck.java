@@ -1,6 +1,8 @@
 
 package org.drip.measure.dynamics;
 
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -118,8 +120,8 @@ package org.drip.measure.dynamics;
  * 	It provides the following Functionality:
  *
  *  <ul>
- * 		<li>Retrieve the Reference Relaxation Time Scale</li>
- * 		<li>Retrieve the Reference Burstiness Scale</li>
+ * 		<li>Retrieve the Reference Relaxation Time Scale Function</li>
+ * 		<li>Retrieve the Reference Burstiness Scale Function</li>
  * 		<li>Retrieve the Reference Mean Reversion Level Scale</li>
  *  </ul>
  *
@@ -139,20 +141,20 @@ public interface OrnsteinUhlenbeck
 {
 
 	/**
-	 * Retrieve the Reference Relaxation Time Scale
+	 * Retrieve the Reference Relaxation Time Scale Function
 	 * 
-	 * @return The Reference Relaxation Time Scale
+	 * @return The Reference Relaxation Time Scale Function
 	 */
 
-	public abstract double referenceRelaxationTime();
+	public abstract R1ToR1 referenceRelaxationTimeFunction();
 
 	/**
-	 * Retrieve the Reference Burstiness Scale
+	 * Retrieve the Reference Burstiness Scale Function
 	 * 
-	 * @return The Reference Burstiness Scale
+	 * @return The Reference Burstiness Scale Function
 	 */
 
-	public abstract double referenceBurstiness();
+	public abstract R1ToR1 referenceBurstinessFunction();
 
 	/**
 	 * Retrieve the Reference Mean Reversion Level Scale

@@ -1,6 +1,7 @@
 
 package org.drip.sample.lmm;
 
+import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.definition.MarketSurface;
 import org.drip.dynamics.lmm.*;
@@ -20,6 +21,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -114,72 +123,106 @@ import org.drip.state.identifier.*;
  * 				Mathematical Finance 7 (2), 127-155.
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/lmm/README.md">LMM Multi-Factor Monte Carlo</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/lmm/README.md">LMM Multi-Factor Monte Carlo</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PointCoreMetricsDynamics {
+public class PointCoreMetricsDynamics
+{
 
 	private static final MarketSurface FlatVolatilitySurface (
-		final JulianDate dtStart,
-		final String strCurrency,
-		final double dblFlatVol)
+		final JulianDate startDate,
+		final String currency,
+		final double flatVolatility)
 		throws Exception
 	{
+		double[] nodeDateArray =
+		{
+			startDate.julian(),
+			startDate.addYears (2).julian(),
+			startDate.addYears (4).julian(),
+			startDate.addYears (6).julian(),
+			startDate.addYears (8).julian(),
+			startDate.addYears (10).julian()
+		};
+
 		return ScenarioMarketSurfaceBuilder.CustomSplineWireSurface (
 			"VIEW_TARGET_VOLATILITY_SURFACE",
-			dtStart,
-			strCurrency,
-			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
-			},
-			new double[] {
-				dtStart.julian(),
-				dtStart.addYears (2).julian(),
-				dtStart.addYears (4).julian(),
-				dtStart.addYears (6).julian(),
-				dtStart.addYears (8).julian(),
-				dtStart.addYears (10).julian()
-			},
-			new double[][] {
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
-				{dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol, dblFlatVol},
+			startDate,
+			currency,
+			nodeDateArray,
+			nodeDateArray,
+			new double[][]
+			{
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
+				{
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility,
+					flatVolatility
+				},
 			},
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			),
 			new SegmentCustomBuilderControl (
 				MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 				new PolynomialFunctionSetParams (4),
-				SegmentInelasticDesignControl.Create (
-					2,
-					2
-				),
+				SegmentInelasticDesignControl.Create (2, 2),
 				null,
 				null
 			)
@@ -187,202 +230,279 @@ public class PointCoreMetricsDynamics {
 	}
 
 	private static final LognormalLIBORVolatility LLVInstance (
-		final int iSpotDate,
+		final int spotDate,
 		final ForwardLabel forwardLabel,
-		final MarketSurface[] aMS,
-		final double[][] aadblCorrelation,
-		final int iNumFactor)
+		final MarketSurface[] marketSurfaceArray,
+		final double[][] correlationMatrix,
+		final int factorCount)
 		throws Exception
 	{
-		UnivariateSequenceGenerator[] aUSG = new UnivariateSequenceGenerator[aMS.length];
+		UnivariateSequenceGenerator[] univariateSequenceGeneratorArray =
+			new UnivariateSequenceGenerator[marketSurfaceArray.length];
 
-		for (int i = 0; i < aUSG.length; ++i)
-			aUSG[i] = new BoxMullerGaussian (
-				0.,
-				1.
-			);
+		for (int sequenceIndex = 0; sequenceIndex < univariateSequenceGeneratorArray.length; ++sequenceIndex)
+		{
+			univariateSequenceGeneratorArray[sequenceIndex] = new BoxMullerGaussian (0., 1.);
+		}
 
 		return new LognormalLIBORVolatility (
-			iSpotDate,
+			spotDate,
 			forwardLabel,
-			aMS,
+			marketSurfaceArray,
 			new PrincipalFactorSequenceGenerator (
-				aUSG,
-				aadblCorrelation,
-				iNumFactor
+				univariateSequenceGeneratorArray,
+				correlationMatrix,
+				factorCount
 			)
 		);
 	}
 
 	private static final void DisplayRunSnap (
-		final BGMPointUpdate bgmRunSnap)
+		final BGMPointUpdate bgmPointUpdate)
 		throws Exception
 	{
 		System.out.println (
-			"\t| [" + new JulianDate (bgmRunSnap.evolutionStartDate()) +
-			" -> " + new JulianDate (bgmRunSnap.evolutionFinishDate()) +
-			"]  => " + FormatUtil.FormatDouble (bgmRunSnap.libor(), 1, 2, 100.) +
-			"% | " + FormatUtil.FormatDouble (bgmRunSnap.liborIncrement(), 2, 0, 10000.) +
-			" | " + FormatUtil.FormatDouble (bgmRunSnap.continuousForwardRate(), 1, 2, 100.) +
-			"% | " + FormatUtil.FormatDouble (bgmRunSnap.continuousForwardRateIncrement(), 2, 0, 10000.) +
-			" | " + FormatUtil.FormatDouble (bgmRunSnap.spotRate(), 1, 2, 100.) +
-			"% | " + FormatUtil.FormatDouble (bgmRunSnap.spotRateIncrement(), 2, 0, 10000.) +
-			" | " + FormatUtil.FormatDouble (bgmRunSnap.discountFactor(), 1, 2, 100.) +
-			" | " + FormatUtil.FormatDouble (bgmRunSnap.discountFactorIncrement(), 2, 0, 10000.) +
-			" | " + FormatUtil.FormatDouble (bgmRunSnap.lognormalLIBORVolatility(), 2, 0, 100.) +
-			"% | " + FormatUtil.FormatDouble (bgmRunSnap.continuouslyCompoundedForwardVolatility(), 1, 2, 100.) +
-			"% | "
+			"\t| [" + new JulianDate (bgmPointUpdate.evolutionStartDate()) + " -> " +
+				new JulianDate (bgmPointUpdate.evolutionFinishDate()) + "]  => " + FormatUtil.FormatDouble (
+					bgmPointUpdate.libor(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.liborIncrement(),
+					2,
+					0,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.continuousForwardRate(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.continuousForwardRateIncrement(),
+					2,
+					0,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.spotRate(),
+					1,
+					2,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.spotRateIncrement(),
+					2,
+					0,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.discountFactor(),
+					1,
+					2,
+					100.
+				) + " | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.discountFactorIncrement(),
+					2,
+					0,
+					10000.
+				) + " | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.lognormalLIBORVolatility(),
+					2,
+					0,
+					100.
+				) + "% | " + FormatUtil.FormatDouble (
+					bgmPointUpdate.continuouslyCompoundedForwardVolatility(),
+					1,
+					2,
+					100.
+				) + "% | "
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		String strTenor = "3M";
-		String strCurrency = "USD";
-		double dblFlatVol1 = 0.35;
-		double dblFlatVol2 = 0.42;
-		double dblFlatVol3 = 0.27;
-		double dblZeroRate = 0.02;
-		double dblFlatForwardRate = 0.02;
-		int iNumRun = 20;
-
-		int[] aiNumFactor = {
-			1, 2, 3
+		int runCount = 20;
+		String tenor = "3M";
+		double zeroRate = 0.02;
+		String currency = "USD";
+		double flatVolatility1 = 0.35;
+		double flatVolatility2 = 0.42;
+		double flatVolatility3 = 0.27;
+		double flatForwardRate = 0.02;
+		int[] factorCountArray =
+		{
+			1,
+			2,
+			3
+		};
+		double[][] correlationMatrix =
+		{
+			{
+				1.0,
+				0.1,
+				0.2
+			},
+			{
+				0.1,
+				1.0,
+				0.2
+			},
+			{
+				0.2,
+				0.1,
+				1.0
+			}
 		};
 
-		double[][] aadblCorrelation = new double[][] {
-			{1.0, 0.1, 0.2},
-			{0.1, 1.0, 0.2},
-			{0.2, 0.1, 1.0}
+		JulianDate spotDate = DateUtil.Today();
+
+		int spotDateJulian = spotDate.julian();
+
+		FundingLabel fundingLabel = FundingLabel.Standard (currency);
+
+		ForwardLabel forwardLabel = ForwardLabel.Create (currency, tenor);
+
+		MarketSurface[] marketSurfaceArray =
+		{
+			FlatVolatilitySurface (spotDate, currency, flatVolatility1),
+			FlatVolatilitySurface (spotDate, currency, flatVolatility2),
+			FlatVolatilitySurface (spotDate, currency, flatVolatility3)
 		};
 
-		ForwardLabel forwardLabel = ForwardLabel.Create (
-			strCurrency,
-			strTenor
-		);
-
-		FundingLabel fundingLabel = FundingLabel.Standard (
-			strCurrency
-		);
-
-		JulianDate dtSpot = org.drip.analytics.date.DateUtil.Today();
-
-		MarketSurface[] aMS = new MarketSurface[] {
-			FlatVolatilitySurface (
-				dtSpot,
-				strCurrency,
-				dblFlatVol1
-			),
-			FlatVolatilitySurface (
-				dtSpot,
-				strCurrency,
-				dblFlatVol2
-			),
-			FlatVolatilitySurface (
-				dtSpot,
-				strCurrency,
-				dblFlatVol3
-			)
-		};
-
-		ForwardCurve fc = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
-			dtSpot,
+		ForwardCurve forwardCurve = ScenarioForwardCurveBuilder.FlatForwardForwardCurve (
+			spotDate,
 			forwardLabel,
-			dblFlatForwardRate
+			flatForwardRate
 		);
 
-		MergedDiscountForwardCurve dc = ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (
-			dtSpot,
-			strCurrency,
-			dblZeroRate
-		);
+		MergedDiscountForwardCurve discountCurve =
+			ScenarioDiscountCurveBuilder.ExponentiallyCompoundedFlatRate (spotDate, currency, zeroRate);
 
-		int iSpotDate = dtSpot.julian();
+		int viewDateJulian = spotDate.addTenor ("1Y").julian();
 
-		int iViewDate = dtSpot.addTenor ("1Y").julian();
+		int viewTimeIncrement = 1;
 
-		int iViewTimeIncrement = 1;
+		for (int factorCount : factorCountArray) {
+			System.out.println (
+				"\n\n\t|----------------------------------------------------------------------------------------------------------|"
+			);
 
-		for (int iNumFactor : aiNumFactor) {
-			System.out.println ("\n\n\t|----------------------------------------------------------------------------------------------------------|");
+			System.out.println (
+				"\t|                                                                                                          |"
+			);
 
-			System.out.println ("\t|                                                                                                          |");
+			System.out.println (
+				"\t|                             LOG-NORMAL LIBOR EVOLVER                                                     |"
+			);
 
-			System.out.println ("\t|                             LOG-NORMAL LIBOR EVOLVER                                                     |");
+			System.out.println (
+				"\t|                             ---------- ----- -------                                                     |"
+			);
 
-			System.out.println ("\t|                             ---------- ----- -------                                                     |");
+			System.out.println (
+				"\t|                                                                                                          |"
+			);
 
-			System.out.println ("\t|                                                                                                          |");
+			System.out.println (
+				"\t|       Num Factors: " + factorCount + "                                                                                     |"
+			);
 
-			System.out.println ("\t|       Num Factors: " + iNumFactor + "                                                                                     |");
+			System.out.println (
+				"\t|       Start Date                                                                                         |"
+			);
 
-			System.out.println ("\t|       Start Date                                                                                         |");
+			System.out.println (
+				"\t|       End Date                                                                                           |"
+			);
 
-			System.out.println ("\t|       End Date                                                                                           |");
+			System.out.println (
+				"\t|       Adjacent Step LIBOR (%)                                                                            |"
+			);
 
-			System.out.println ("\t|       Adjacent Step LIBOR (%)                                                                            |");
+			System.out.println (
+				"\t|       Adjacent Step LIBOR Increment (bp)                                                                 |"
+			);
 
-			System.out.println ("\t|       Adjacent Step LIBOR Increment (bp)                                                                 |");
+			System.out.println (
+				"\t|       Adjacent Step Continuously Compounded Forward Rate (%)                                             |"
+			);
 
-			System.out.println ("\t|       Adjacent Step Continuously Compounded Forward Rate (%)                                             |");
+			System.out.println (
+				"\t|       Adjacent Step Continuously Compounded Forward Rate Increment (bp)                                  |"
+			);
 
-			System.out.println ("\t|       Adjacent Step Continuously Compounded Forward Rate Increment (bp)                                  |");
+			System.out.println (
+				"\t|       Adjacent Step Spot Rate (%)                                                                        |"
+			);
 
-			System.out.println ("\t|       Adjacent Step Spot Rate (%)                                                                        |");
+			System.out.println (
+				"\t|       Adjacent Step Spot Rate Increment (bp)                                                             |"
+			);
 
-			System.out.println ("\t|       Adjacent Step Spot Rate Increment (bp)                                                             |");
+			System.out.println (
+				"\t|       Adjacent Step Discount Function                                                                    |"
+			);
 
-			System.out.println ("\t|       Adjacent Step Discount Function                                                                    |");
+			System.out.println (
+				"\t|       Adjacent Step Discount Function Increment (c)                                                      |"
+			);
 
-			System.out.println ("\t|       Adjacent Step Discount Function Increment (c)                                                      |");
+			System.out.println (
+				"\t|       Log-normal LIBOR Rate Volatility (%)                                                               |"
+			);
 
-			System.out.println ("\t|       Log-normal LIBOR Rate Volatility (%)                                                               |");
+			System.out.println (
+				"\t|       Continuously Compounded Forward Rate Volatility (%)                                                |"
+			);
 
-			System.out.println ("\t|       Continuously Compounded Forward Rate Volatility (%)                                                |");
+			System.out.println (
+				"\t|                                                                                                          |"
+			);
 
-			System.out.println ("\t|                                                                                                          |");
+			System.out.println (
+				"\t|----------------------------------------------------------------------------------------------------------|"
+			);
 
-			System.out.println ("\t|----------------------------------------------------------------------------------------------------------|");
-
-			LognormalLIBORPointEvolver lle = new LognormalLIBORPointEvolver (
+			LognormalLIBORPointEvolver lognormalLIBORPointEvolver = new LognormalLIBORPointEvolver (
 				fundingLabel,
 				forwardLabel,
 				LLVInstance (
-					dtSpot.julian(),
+					spotDateJulian,
 					forwardLabel,
-					aMS,
-					aadblCorrelation,
-					iNumFactor
+					marketSurfaceArray,
+					correlationMatrix,
+					factorCount
 				),
-				fc,
-				dc
+				forwardCurve,
+				discountCurve
 			);
 
-			for (int iRun = 0; iRun < iNumRun; ++iRun)
+			for (int runIndex = 0; runIndex < runCount; ++runIndex) {
 				DisplayRunSnap (
-					lle.evolve (
-						iSpotDate,
-						iViewDate,
-						iViewTimeIncrement,
+					lognormalLIBORPointEvolver.evolve (
+						spotDateJulian,
+						viewDateJulian,
+						viewTimeIncrement,
 						null
 					)
 				);
+			}
 
-			System.out.println ("\t|----------------------------------------------------------------------------------------------------------|");
-
-			EnvManager.TerminateEnv();
+			System.out.println (
+				"\t|----------------------------------------------------------------------------------------------------------|"
+			);
 		}
+
+		EnvManager.TerminateEnv();
 	}
 }

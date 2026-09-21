@@ -91,12 +91,12 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>UnivariateDiscreteThin</i> analyzes and computes the "Thin" Statistics for the Realized Univariate
+ * <i>UnivariateCentralMeasures</i> analyzes and computes the "Thin" Statistics for the Realized Univariate
  * 	Sequence. It provides the following Functionality:
  *
  *  <ul>
- * 		<li>Generate a <i>UnivariateDiscreteThin</i> Instance from the specified List of Double's</li>
- * 		<li><i>UnivariateDiscreteThin</i> Constructor</li>
+ * 		<li>Generate a <i>UnivariateCentralMeasures</i> Instance from the specified List of Double's</li>
+ * 		<li><i>UnivariateCentralMeasures</i> Constructor</li>
  * 		<li>Retrieve the Sequence Average</li>
  * 		<li>Retrieve the Sequence Error</li>
  * 		<li>Retrieve the Sequence Maximum</li>
@@ -115,7 +115,7 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class UnivariateDiscreteThin
+public class UnivariateCentralMeasures
 {
 	private double _error = Double.NaN;
 	private double _average = Double.NaN;
@@ -123,14 +123,14 @@ public class UnivariateDiscreteThin
 	private double _minimum = Double.NaN;
 
 	/**
-	 * Generate a <i>UnivariateDiscreteThin</i> Instance from the specified List of Double's
+	 * Generate a <i>UnivariateCentralMeasures</i> Instance from the specified List of Double's
 	 * 
 	 * @param r1List The List of R<sup>1</sup>
 	 * 
-	 * @return The <i>UnivariateDiscreteThin</i> Instance
+	 * @return The <i>UnivariateCentralMeasures</i> Instance
 	 */
 
-	public static final UnivariateDiscreteThin FromList (
+	public static final UnivariateCentralMeasures FromList (
 		final List<Double> r1List)
 	{
 		if (null == r1List) {
@@ -150,7 +150,7 @@ public class UnivariateDiscreteThin
 		}
 
 		try {
-			return new UnivariateDiscreteThin (sequence);
+			return new UnivariateCentralMeasures (sequence);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -159,19 +159,19 @@ public class UnivariateDiscreteThin
 	}
 
 	/**
-	 * <i>UnivariateDiscreteThin</i> Constructor
+	 * <i>UnivariateCentralMeasures</i> Constructor
 	 * 
 	 * @param sequence The Univariate Sequence
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public UnivariateDiscreteThin (
+	public UnivariateCentralMeasures (
 		final double[] sequence)
 		throws Exception
 	{
 		if (null == sequence) {
-			throw new Exception ("UnivariateDiscreteThin Constructor => Invalid Inputs");
+			throw new Exception ("UnivariateCentralMeasures Constructor => Invalid Inputs");
 		}
 
 		_error = 0.;
@@ -181,12 +181,12 @@ public class UnivariateDiscreteThin
 		int sequenceSize = sequence.length;
 
 		if (0 == sequenceSize) {
-			throw new Exception ("UnivariateDiscreteThin Constructor => Invalid Inputs");
+			throw new Exception ("UnivariateCentralMeasures Constructor => Invalid Inputs");
 		}
 
 		for (int sequenceIndex = 0; sequenceIndex < sequenceSize; ++sequenceIndex) {
 			if (!NumberUtil.IsValid (sequence[sequenceIndex])) {
-				throw new Exception ("UnivariateDiscreteThin Constructor => Invalid Inputs");
+				throw new Exception ("UnivariateCentralMeasures Constructor => Invalid Inputs");
 			}
 
 			if (0 == sequenceIndex) {
