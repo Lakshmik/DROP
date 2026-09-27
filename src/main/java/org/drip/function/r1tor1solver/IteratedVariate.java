@@ -1,6 +1,10 @@
 
 package org.drip.function.r1tor1solver;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -119,6 +123,10 @@ import org.drip.numerical.common.NumberUtil;
 
 public class IteratedVariate
 {
+	private static final List<Double> ITERATED_X_LIST = new ArrayList<Double>();
+
+	private static final List<Double> ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST = new ArrayList<Double>();
+
 	private double _x = Double.NaN;
 	private double _objectiveFunctionValue = Double.NaN;
 
@@ -142,7 +150,13 @@ public class IteratedVariate
 			throw new Exception ("IteratedVariate Constructor: Invalid Inputs");
 		}
 
-		_x = executionInitializationOutput.startingVariate();
+		ITERATED_X_LIST.clear();
+
+		ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.clear();
+
+		ITERATED_X_LIST.add (_x = executionInitializationOutput.startingVariate());
+
+		ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.add (objectiveFunctionValue);
 	}
 
 	/**
@@ -171,7 +185,8 @@ public class IteratedVariate
 			return false;
 		}
 
-		_x = x;
+		ITERATED_X_LIST.add (_x = x);
+
 		return true;
 	}
 
@@ -201,7 +216,80 @@ public class IteratedVariate
 			return false;
 		}
 
-		_objectiveFunctionValue = objectiveFunctionValue;
+		ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.add (_objectiveFunctionValue = objectiveFunctionValue);
+
 		return true;
+	}
+
+	/**
+	 * Compute the First and the Second Derivatives
+	 * 
+	 * @return The First and the Second Derivatives
+	 */
+
+	public double[] firstAndSecondDerivative()
+	{
+		double[] firstAndSecondDerivativeArray = new double[2];
+		firstAndSecondDerivativeArray[1] = Double.NaN;
+		firstAndSecondDerivativeArray[0] = Double.NaN;
+
+		int size = ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.size();
+
+		if (1 >= size) {
+			return firstAndSecondDerivativeArray;
+		}
+
+		double xSizeMinus1 = ITERATED_X_LIST.get (size - 1);
+
+		double xSizeMinus2 = ITERATED_X_LIST.get (size - 2);
+
+		double ySizeMinus1 = ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.get (size - 1);
+
+		double ySizeMinus2 = ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.get (size - 2);
+
+		firstAndSecondDerivativeArray[0] = (ySizeMinus2 - ySizeMinus1) / (xSizeMinus2 - xSizeMinus1);
+
+		if (2 == size) {
+			return firstAndSecondDerivativeArray;
+		}
+
+		TreeMap<Double, Double> xObjectiveFunctionValueMap = new TreeMap<Double, Double>();
+
+		xObjectiveFunctionValueMap.put (xSizeMinus1, ySizeMinus1);
+
+		xObjectiveFunctionValueMap.put (xSizeMinus2, ySizeMinus2);
+
+		xObjectiveFunctionValueMap.put (
+			ITERATED_X_LIST.get (size - 3),
+			ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.get (size - 3)
+		);
+
+		int index = 0;
+		double xLast = Double.NaN;
+		double xFirst = Double.NaN;
+		double xPrevious = Double.NaN;
+		double yPrevious = Double.NaN;
+		firstAndSecondDerivativeArray[1] = 0.;
+
+		for (double x : xObjectiveFunctionValueMap.keySet()) {
+			if (2 < index) {
+				break;
+			}
+
+			double y = xObjectiveFunctionValueMap.get (x);
+
+			if (0 == index) {
+				xFirst = x;
+			} else {
+				firstAndSecondDerivativeArray[1] += ((y - yPrevious) / ((xLast = x) - xPrevious));
+			}
+
+			xPrevious = x;
+			yPrevious = y;
+			++index;
+		}
+
+		firstAndSecondDerivativeArray[1] *= 2. / (xLast - xFirst);
+		return firstAndSecondDerivativeArray;
 	}
 }

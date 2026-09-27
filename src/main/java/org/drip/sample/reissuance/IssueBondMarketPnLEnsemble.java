@@ -101,7 +101,7 @@ import org.drip.state.creator.ScenarioGovvieCurveBuilder;
  */
 
 /**
- * <i>ExercisePeriodMarketPnLEnsemble</i> illustrates the Simulation of Correlated Ensemble of Tax-exempt and
+ * <i>IssueBondMarketPnLEnsemble</i> illustrates the Simulation of Correlated Ensemble of Tax-exempt and
  *  Taxable PnL across the Dates in an Exercise Period. The Simulated PnL's are Anchored at the Dated Nodes.
  *  The References are:
  *
@@ -142,7 +142,7 @@ import org.drip.state.creator.ScenarioGovvieCurveBuilder;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ExercisePeriodMarketPnLEnsemble
+public class IssueBondMarketPnLEnsemble
 {
 
 	private static final List<String> TenorList()
@@ -528,7 +528,12 @@ public class ExercisePeriodMarketPnLEnsemble
 
 		RefinancingPathGenerator refinancingPathPnLGenerator = new RefinancingPathGenerator (
 			bond,
-			inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (bond, simulationDateList)
+			inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (
+				bond,
+				null,
+				null,
+				simulationDateList
+			)
 		);
 
 		RefinancingEnsemble refinancingEnsemble = OrrDeLaNuez2013.Standard (
@@ -538,6 +543,8 @@ public class ExercisePeriodMarketPnLEnsemble
 		).refinancingEnsemble (
 			deGuillaumeRebonatoPogudinMarketYield,
 			refinancingPathPnLGenerator,
+			null,
+			null,
 			simulationDateList
 		);
 
@@ -649,8 +656,6 @@ public class ExercisePeriodMarketPnLEnsemble
 		System.out.println (
 			"\t||--------------------------------------------------------------------------------------------||"
 		);
-
-		System.out.println();
 
 		EnvManager.TerminateEnv();
 	}

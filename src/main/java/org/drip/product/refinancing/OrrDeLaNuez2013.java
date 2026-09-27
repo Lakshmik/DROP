@@ -9,6 +9,8 @@ import org.drip.analytics.date.JulianDate;
 import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
+import org.drip.product.muni.DeGuillaumeRebonatoPogudinPath;
+import org.drip.product.muni.EOSBasis;
 import org.drip.product.muni.RefinancingEnsemble;
 import org.drip.product.muni.RefinancingPathEntry;
 import org.drip.product.muni.RefinancingPathGenerator;
@@ -264,6 +266,8 @@ public class OrrDeLaNuez2013
 	 * 
 	 * @param deGuillaumeRebonatoPogudinMarketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
 	 * @param refinancingPathGenerator Bond <i>RefinancingPathGenerator</i> Instance
+	 * @param taxExemptEOSBasis Tax-exempt <i>EOSBasis</i> Instance
+	 * @param taxableEOSBasis Taxable <i>EOSBasis</i> Instance
 	 * @param simulationDateList List of Simulation Dates
 	 * 
 	 * @return <i>RefinancingEnsemble</i> Instance for the Specified Bond and Market Inputs
@@ -272,6 +276,8 @@ public class OrrDeLaNuez2013
 	public RefinancingEnsemble refinancingEnsemble (
 		final DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield,
 		final RefinancingPathGenerator refinancingPathGenerator,
+		final EOSBasis taxExemptEOSBasis,
+		final EOSBasis taxableEOSBasis,
 		final List<JulianDate> simulationDateList)
 	{
 		if (null == refinancingPathGenerator) {
@@ -297,20 +303,59 @@ public class OrrDeLaNuez2013
 				System.out.println ("\t|| Simulation Path #: " + pathIndex);
 			}
 
+			DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath =
+				deGuillaumeRebonatoPogudin.evolve (
+					deGuillaumeRebonatoPogudinMarketYield,
+					simulationDateList
+				);
+
+			if (null == deGuillaumeRebonatoPogudinPath) {
+				return null;
+			}
+
 			TreeMap<JulianDate, RefinancingPathEntry> refinancingPathPnLEntryMap =
 				refinancingPathGenerator.generate (
-					deGuillaumeRebonatoPogudin.evolve (
-						deGuillaumeRebonatoPogudinMarketYield,
-						simulationDateList
-					)
+					deGuillaumeRebonatoPogudinPath,
+					taxExemptEOSBasis,
+					taxableEOSBasis
 				);
 
 			if (null == refinancingPathPnLEntryMap) {
 				return null;
 			}
 
+			TreeMap<JulianDate, Boolean> dateTaxExemptNegativeArbitrageMap = null == taxExemptEOSBasis ?
+				null : deGuillaumeRebonatoPogudinPath.dateTaxExemptNegativeArbitrageMap (
+					new JulianDate (taxExemptEOSBasis.workoutInfo().date())
+				);
+
+			TreeMap<JulianDate, Boolean> dateTaxableNegativeArbitrageMap = null == taxableEOSBasis ? null :
+				deGuillaumeRebonatoPogudinPath.dateTaxableNegativeArbitrageMap (
+					new JulianDate (taxableEOSBasis.workoutInfo().date())
+				);
+
 			for (JulianDate date : refinancingPathPnLEntryMap.keySet()) {
 				refinancingEnsemble.add (date, refinancingPathPnLEntryMap.get (date));
+
+				if (null != dateTaxExemptNegativeArbitrageMap &&
+					!refinancingEnsemble.updateTaxExemptNegativeArbitrageMap (
+						date,
+						dateTaxExemptNegativeArbitrageMap.get (date)
+					)
+				)
+				{
+					return null;
+				}
+
+				if (null != dateTaxableNegativeArbitrageMap &&
+					!refinancingEnsemble.updateTaxableNegativeArbitrageMap (
+						date,
+						dateTaxableNegativeArbitrageMap.get (date)
+					)
+				)
+				{
+					return null;
+				}
 			}
 		}
 
@@ -322,6 +367,7 @@ public class OrrDeLaNuez2013
 	 * 
 	 * @param deGuillaumeRebonatoPogudinMarketYield <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance
 	 * @param aroPathGenerator Bond <i>AROPathGenerator</i> Instance
+	 * @param eosBasis <i>EOSBasis</i> Instance
 	 * @param taxExempt TRUE - Apply Tax-exempt Re-financing
 	 * 
 	 * @return <i>AROEnsemble</i> Instance for the Specified Bond and Market Inputs
@@ -330,6 +376,7 @@ public class OrrDeLaNuez2013
 	public AROEnsemble aroEnsemble (
 		final DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield,
 		final AROPathGenerator aroPathGenerator,
+		final EOSBasis eosBasis,
 		final boolean taxExempt)
 	{
 		if (null == aroPathGenerator) {
@@ -369,6 +416,7 @@ public class OrrDeLaNuez2013
 						deGuillaumeRebonatoPogudinMarketYield,
 						simulationDateList
 					),
+					eosBasis,
 					taxExempt
 				)
 			))

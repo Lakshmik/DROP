@@ -3,6 +3,7 @@ package org.drip.state.municipal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.drip.numerical.common.NumberUtil;
@@ -146,14 +147,12 @@ public class KalotayWilliamsFabozzi
 	private boolean buildTimeToZeroVolatilityPeriodStateMap (
 		final double yieldBasis)
 	{
-		_timeToZeroVolatilityPeriodStateMap = new TreeMap<Double, ZeroVolatilityPeriodState>();
-
 		double startTime = 0.;
 		double startDiscountFactor = 1.;
 
-		for (double endTime : _timeToCalibrationYieldMap.keySet()) {
-			double timeGap = endTime - startTime;
+		_timeToZeroVolatilityPeriodStateMap = new TreeMap<Double, ZeroVolatilityPeriodState>();
 
+		for (double endTime : _timeToCalibrationYieldMap.keySet()) {
 			double cumulativeMarketYield = _timeToCalibrationYieldMap.get (endTime) + yieldBasis;
 
 			double cumulativeDiscountFactor = Math.pow (1. + cumulativeMarketYield, -1. * endTime);
@@ -165,7 +164,7 @@ public class KalotayWilliamsFabozzi
 					endTime,
 					new ZeroVolatilityPeriodState (
 						new KalotayWilliamsFabozziPeriod (startTime, endTime),
-						((1. / forwardDiscountFactor) - 1.) / timeGap,
+						((1. / forwardDiscountFactor) - 1.) / (endTime - startTime),
 						forwardDiscountFactor,
 						cumulativeDiscountFactor,
 						cumulativeMarketYield
@@ -185,34 +184,14 @@ public class KalotayWilliamsFabozzi
 	}
 
 	/**
-	 * <i>KalotayWilliamsFabozzi</i> Constructor
-	 * 
-	 * @param timeToCalibrationYieldMap Time Map of Calibration Yields
-	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
+	 * Empty <i>KalotayWilliamsFabozzi</i> Constructor
 	 */
 
-	public KalotayWilliamsFabozzi (
-		final TreeMap<Double, Double> timeToCalibrationYieldMap)
-		throws Exception
+	public KalotayWilliamsFabozzi()
 	{
-		if (null == (_timeToCalibrationYieldMap = timeToCalibrationYieldMap) ||
-				0 == _timeToCalibrationYieldMap.size() ||
-			!buildTimeToZeroVolatilityPeriodStateMap (0.))
-		{
-			throw new Exception ("KalotayWilliamsFabozzi Constructor => Invalid Inputs");
-		}
-	}
+		_timeToCalibrationYieldMap = new TreeMap<Double, Double>();
 
-	/**
-	 * Retrieve the Time Map of Calibration Yields
-	 * 
-	 * @return Time Map of Calibration Yields
-	 */
-
-	public TreeMap<Double, Double> timeToCalibrationYieldMap()
-	{
-		return _timeToCalibrationYieldMap;
+		_timeToZeroVolatilityPeriodStateMap = new TreeMap<Double, ZeroVolatilityPeriodState>();
 	}
 
 	/**
@@ -246,6 +225,134 @@ public class KalotayWilliamsFabozzi
 	public TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap()
 	{
 		return _timeToProjectedPeriodStateMap;
+	}
+
+	/**
+	 * Retrieve the Count of Segments
+	 * 
+	 * @return Count of Segments
+	 */
+
+	public int segmentCount()
+	{
+		return _timeToCalibrationYieldMap.size();
+	}
+
+	/**
+	 * Retrieve the Set of Time Pillars
+	 * 
+	 * @return Set of Time Pillars
+	 */
+
+	public Set<Double> timeKeySet()
+	{
+		return _timeToCalibrationYieldMap.keySet();
+	}
+
+	/**
+	 * Augment the <i>ZeroVolatilityPeriodState</i> Map with the Timed Market Yield
+	 * 
+	 * @param endTime End Time Pillar
+	 * @param cumulativeMarketYield Cumulative Market Yield
+	 * 
+	 * @return TRUE - <i>ZeroVolatilityPeriodState</i> Map augmented successfully with the Timed Market Yield
+	 */
+
+	public boolean augmentTimeToZeroVolatilityPeriodStateMap (
+		final double endTime,
+		final double cumulativeMarketYield)
+	{
+		_timeToCalibrationYieldMap.put (endTime, cumulativeMarketYield);
+
+		double forwardDiscountFactor = 1. / (1. + cumulativeMarketYield);
+		double cumulativeEndDiscountFactor = forwardDiscountFactor;
+		double startTime = 0.;
+
+		if (!_timeToZeroVolatilityPeriodStateMap.isEmpty()) {
+			ZeroVolatilityPeriodState zeroVolatilityPeriodState =
+				_timeToZeroVolatilityPeriodStateMap.lastEntry().getValue();
+
+			forwardDiscountFactor = (
+				cumulativeEndDiscountFactor = Math.pow (1. + cumulativeMarketYield, -1. * endTime)
+			) / zeroVolatilityPeriodState.cumulativeEndDiscountFactor();
+
+			startTime = zeroVolatilityPeriodState.period().endTime();
+		}
+
+		try {
+			_timeToZeroVolatilityPeriodStateMap.put (
+				endTime,
+				new ZeroVolatilityPeriodState (
+					new KalotayWilliamsFabozziPeriod (startTime, endTime),
+					((1. / forwardDiscountFactor) - 1.) / (endTime - startTime),
+					forwardDiscountFactor,
+					cumulativeEndDiscountFactor,
+					cumulativeMarketYield
+				)
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Bump the Cumulative Market Yield at the Specified Segment End Time Node
+	 * 
+	 * @param time Segment End Time Node
+	 * @param yieldBump Yield Bump
+	 * 
+	 * @return TRUE - The Cumulative Market Yield successfully set at the Specified Segment End Time Node
+	 */
+
+	public boolean bumpZeroVolatilityPeriodState (
+		final double time,
+		final double yieldBump)
+	{
+		if (!NumberUtil.IsValid (yieldBump)) {
+			return false;
+		}
+
+		double startTime = 0.;
+		double startDiscountFactor = 1.;
+
+		for (double endTime : _timeToCalibrationYieldMap.keySet()) {
+			if (time < endTime) {
+				continue;
+			}
+
+			double cumulativeMarketYield = _timeToCalibrationYieldMap.get (endTime) +
+				(time == endTime ? yieldBump : 0.);
+
+			double cumulativeDiscountFactor = Math.pow (1. + cumulativeMarketYield, -1. * endTime);
+
+			double forwardDiscountFactor = cumulativeDiscountFactor / startDiscountFactor;
+
+			try {
+				_timeToZeroVolatilityPeriodStateMap.put (
+					endTime,
+					new ZeroVolatilityPeriodState (
+						new KalotayWilliamsFabozziPeriod (startTime, endTime),
+						((1. / forwardDiscountFactor) - 1.) / (endTime - startTime),
+						forwardDiscountFactor,
+						cumulativeDiscountFactor,
+						cumulativeMarketYield
+					)
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return false;
+			}
+
+			startDiscountFactor = cumulativeDiscountFactor;
+			startTime = endTime;
+		}
+
+		return true;
 	}
 
 	/**

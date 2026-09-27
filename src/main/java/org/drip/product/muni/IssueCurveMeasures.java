@@ -4,6 +4,7 @@ package org.drip.product.muni;
 import org.drip.numerical.common.NumberUtil;
 import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.valuation.ValuationParams;
+import org.drip.param.valuation.WorkoutInfo;
 import org.drip.product.credit.BondComponent;
 import org.drip.state.govvie.GovvieCurve;
 
@@ -136,6 +137,7 @@ public class IssueCurveMeasures
 	 * @param issueBond Issue Bond
 	 * @param valuationParams Valuation Parameters
 	 * @param govvieCurve Govvie Curve
+	 * @param eosBasis <i>EOSBasis</i> Instance
 	 * 
 	 * @return Issue Bond Price using the Govvie Curve at the Specified Date
 	 * 
@@ -145,7 +147,8 @@ public class IssueCurveMeasures
 	public static final double PriceFromGovvie (
 		final BondComponent issueBond,
 		final ValuationParams valuationParams,
-		final GovvieCurve govvieCurve)
+		final GovvieCurve govvieCurve,
+		final EOSBasis eosBasis)
 		throws Exception
 	{
 		if (null == issueBond) {
@@ -156,7 +159,31 @@ public class IssueCurveMeasures
 
 		curveSurfaceQuoteContainer.setGovvieState (govvieCurve);
 
-		return issueBond.priceFromGSpread (valuationParams, curveSurfaceQuoteContainer, null, 0.);
+		int workoutDate = issueBond.maturityDate().julian();
+
+		double workoutFactor = 1.;
+		double gSpread = 0.;
+
+		if (null != eosBasis) {
+			gSpread = eosBasis.gSpread();
+
+			WorkoutInfo workoutInfo = eosBasis.workoutInfo();
+
+			if (null != workoutInfo) {
+				workoutDate = workoutInfo.date();
+
+				workoutFactor = workoutInfo.factor();
+			}
+		}
+
+		return issueBond.priceFromGSpread (
+			valuationParams,
+			curveSurfaceQuoteContainer,
+			null,
+			workoutDate,
+			workoutFactor,
+			gSpread
+		);
 	}
 
 	/**

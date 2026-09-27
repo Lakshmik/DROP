@@ -1,12 +1,9 @@
 
 package org.drip.sample.dual;
 
-import java.util.List;
-
 import org.drip.analytics.date.JulianDate;
 import org.drip.analytics.support.*;
 import org.drip.market.otc.*;
-import org.drip.numerical.differentiation.WengertJacobian;
 import org.drip.param.market.CurveSurfaceQuoteContainer;
 import org.drip.param.period.*;
 import org.drip.param.valuation.*;
@@ -29,6 +26,14 @@ import org.drip.state.inference.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -106,404 +111,389 @@ import org.drip.state.inference.*;
 
 /**
  * <i>CCBSDiscountCurve</i> demonstrates the setup and construction of the Forward Curve from the CCBS
- * Quotes.
- * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/cross/README.md">G7 Standard Cross Currency Swap</a></li>
- *  </ul>
- * <br><br>
+ * 	Quotes.
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/capfloor/README.md">FRA Standard Cap Floor Valuation</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CCBSDiscountCurve {
-
-	/*
-	 * Construct an array of float-float swaps from the corresponding reference (6M) and the derived legs.
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
+public class CCBSDiscountCurve
+{
 
 	private static final FloatFloatComponent[] MakexM6MBasisSwap (
-		final JulianDate dtEffective,
-		final String strPayCurrency,
-		final String strCouponCurrency,
-		final double dblNotional,
-		final String[] astrMaturityTenor,
-		final int iTenorInMonths)
+		final JulianDate effectiveDate,
+		final String payCurrency,
+		final String couponCurrency,
+		final double notional,
+		final String[] maturityTenorArray,
+		final int tenorInMonths)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFC = new FloatFloatComponent[astrMaturityTenor.length];
+		FloatFloatComponent[] floatFloatComponentArray = new FloatFloatComponent[maturityTenorArray.length];
 
-		ComposableFloatingUnitSetting cfusReference = new ComposableFloatingUnitSetting (
-			"6M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Create (
-				strCouponCurrency,
-				"6M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
+		ComposableFloatingUnitSetting referenceComposableFloatingUnitSetting =
+			new ComposableFloatingUnitSetting (
+				"6M",
+				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+				null,
+				ForwardLabel.Create (couponCurrency, "6M"),
+				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+				0.
+			);
 
-		ComposableFloatingUnitSetting cfusDerived = new ComposableFloatingUnitSetting (
-			iTenorInMonths + "M",
-			CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
-			null,
-			ForwardLabel.Create (
-				strCouponCurrency,
-				iTenorInMonths + "M"
-			),
-			CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
-			0.
-		);
+		ComposableFloatingUnitSetting derivedComposableFloatingUnitSetting =
+			new ComposableFloatingUnitSetting (
+				tenorInMonths + "M",
+				CompositePeriodBuilder.EDGE_DATE_SEQUENCE_REGULAR,
+				null,
+				ForwardLabel.Create (couponCurrency, tenorInMonths + "M"),
+				CompositePeriodBuilder.REFERENCE_PERIOD_IN_ADVANCE,
+				0.
+			);
 
-		CompositePeriodSetting cpsReference = new CompositePeriodSetting (
+		CompositePeriodSetting referenceCompositePeriodSetting = new CompositePeriodSetting (
 			2,
 			"6M",
-			strPayCurrency,
+			payCurrency,
 			null,
-			-1. * dblNotional,
+			-1. * notional,
 			null,
 			null,
-			strPayCurrency.equalsIgnoreCase (strCouponCurrency) ? null :
+			payCurrency.equalsIgnoreCase (couponCurrency) ? null :
 				new FixingSetting (
 					FixingSetting.FIXING_PRESET_STATIC,
 					null,
-					dtEffective.julian()
+					effectiveDate.julian()
 				),
 			null
 		);
 
-		CompositePeriodSetting cpsDerived = new CompositePeriodSetting (
-			12 / iTenorInMonths,
-			iTenorInMonths + "M",
-			strPayCurrency,
+		CompositePeriodSetting derivedCompositePeriodSetting = new CompositePeriodSetting (
+			12 / tenorInMonths,
+			tenorInMonths + "M",
+			payCurrency,
 			null,
-			1. * dblNotional,
+			1. * notional,
 			null,
 			null,
-			strPayCurrency.equalsIgnoreCase (strCouponCurrency) ? null :
-				new FixingSetting (
-					FixingSetting.FIXING_PRESET_STATIC,
-					null,
-					dtEffective.julian()
-				),
+			payCurrency.equalsIgnoreCase (couponCurrency) ?
+				null : new FixingSetting (FixingSetting.FIXING_PRESET_STATIC, null, effectiveDate.julian()),
 			null
 		);
 
-		CashSettleParams csp = new CashSettleParams (
-			0,
-			strPayCurrency,
-			0
-		);
+		CashSettleParams cashSettleParams = new CashSettleParams (0, payCurrency, 0);
 
-		for (int i = 0; i < astrMaturityTenor.length; ++i) {
-			List<Integer> lsReferenceStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				"6M",
-				astrMaturityTenor[i],
-				null
-			);
-
-			List<Integer> lsDerivedStreamEdgeDate = CompositePeriodBuilder.RegularEdgeDates (
-				dtEffective,
-				iTenorInMonths + "M",
-				astrMaturityTenor[i],
-				null
-			);
-
+		for (int tenorIndex = 0; tenorIndex < maturityTenorArray.length; ++tenorIndex) {
 			Stream referenceStream = new Stream (
 				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsReferenceStreamEdgeDate,
-					cpsReference,
-					cfusReference
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						"6M",
+						maturityTenorArray[tenorIndex],
+						null
+					),
+					referenceCompositePeriodSetting,
+					referenceComposableFloatingUnitSetting
 				)
 			);
 
 			Stream derivedStream = new Stream (
 				CompositePeriodBuilder.FloatingCompositeUnit (
-					lsDerivedStreamEdgeDate,
-					cpsDerived,
-					cfusDerived
+					CompositePeriodBuilder.RegularEdgeDates (
+						effectiveDate,
+						tenorInMonths + "M",
+						maturityTenorArray[tenorIndex],
+						null
+					),
+					derivedCompositePeriodSetting,
+					derivedComposableFloatingUnitSetting
 				)
 			);
 
-			aFFC[i] = new FloatFloatComponent (
+			floatFloatComponentArray[tenorIndex] = new FloatFloatComponent (
 				referenceStream,
 				derivedStream,
-				csp
+				cashSettleParams
 			);
 
-			aFFC[i].setPrimaryCode (referenceStream.name() + "||" + derivedStream.name());
+			floatFloatComponentArray[tenorIndex].setPrimaryCode (
+				referenceStream.name() + "||" + derivedStream.name()
+			);
 		}
 
-		return aFFC;
+		return floatFloatComponentArray;
 	}
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Construct the Array of Swap Instruments from the given set of parameters
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final FixFloatComponent[] MakeIRS (
-		final JulianDate dtEffective,
-		final String strCurrency,
-		final String[] astrTenor)
+		final JulianDate effectiveDate,
+		final String currency,
+		final String[] tenorArray)
 		throws Exception
 	{
-		FixFloatComponent[] aCalibComp = new FixFloatComponent[astrTenor.length];
+		FixFloatComponent[] irsArray = new FixFloatComponent[tenorArray.length];
 
-		for (int i = 0; i < astrTenor.length; ++i)
-			aCalibComp[i] = OTCIRS (
-				dtEffective,
-				strCurrency,
-				astrTenor[i],
-				0.
-			);
+		for (int tenorIndex = 0; tenorIndex < tenorArray.length; ++tenorIndex) {
+			irsArray[tenorIndex] = OTCIRS (effectiveDate, currency, tenorArray[tenorIndex], 0.);
+		}
 
-		return aCalibComp;
+		return irsArray;
 	}
 
 	private static final ComponentPair[] MakeCCSP (
-		final JulianDate dtValue,
-		final String strReferenceCurrency,
-		final String strDerivedCurrency,
-		final String[] astrTenor,
-		final int iTenorInMonths)
+		final JulianDate valueDate,
+		final String referenceCurrency,
+		final String derivedCurrency,
+		final String[] tenorArray,
+		final int tenorInMonths)
 		throws Exception
 	{
-		FloatFloatComponent[] aFFCReference = MakexM6MBasisSwap (
-			dtValue,
-			strReferenceCurrency,
-			strReferenceCurrency,
+		FloatFloatComponent[] referenceFloatFloatComponentArray = MakexM6MBasisSwap (
+			valueDate,
+			referenceCurrency,
+			referenceCurrency,
 			1.,
-			astrTenor,
+			tenorArray,
 			3
 		);
 
-		FixFloatComponent[] aIRS = MakeIRS (
-			dtValue,
-			strDerivedCurrency,
-			astrTenor
-		);
+		FixFloatComponent[] irsArray = MakeIRS (valueDate, derivedCurrency, tenorArray);
 
-		ComponentPair[] aCCSP = new ComponentPair[astrTenor.length];
+		ComponentPair[] componentPairArray = new ComponentPair[tenorArray.length];
 
-		for (int i = 0; i < aCCSP.length; ++i)
-			aCCSP[i] = new ComponentPair (
-				"EURUSD_" + astrTenor[i],
-				aFFCReference[i],
-				aIRS[i],
+		for (int componentPairIndex = 0;
+			componentPairIndex < componentPairArray.length;
+			++componentPairIndex)
+		{
+			componentPairArray[componentPairIndex] = new ComponentPair (
+				"EURUSD_" + tenorArray[componentPairIndex],
+				referenceFloatFloatComponentArray[componentPairIndex],
+				irsArray[componentPairIndex],
 				null
 			);
+		}
 
-		return aCCSP;
+		return componentPairArray;
 	}
 
 	private static final void TenorJack (
-		final JulianDate dtStart,
-		final String strTenor,
-		final String strManifestMeasure,
-		final MergedDiscountForwardCurve dc)
+		final JulianDate startDate,
+		final String tenor,
+		final String manifestMeasure,
+		final MergedDiscountForwardCurve discountCurve)
 		throws Exception
 	{
-		String strCurrency = dc.currency();
-
-		CalibratableComponent irsBespoke = OTCIRS (
-			dtStart,
-			strCurrency,
-			strTenor,
-			0.
+		System.out.println (
+			"\t" + tenor + " => " + discountCurve.jackDDFDManifestMeasure (
+				OTCIRS (startDate, discountCurve.currency(), tenor, 0.).maturityDate(),
+				manifestMeasure
+			).displayString()
 		);
-
-		WengertJacobian wjDFQuoteBespokeMat = dc.jackDDFDManifestMeasure (
-			irsBespoke.maturityDate(),
-			strManifestMeasure
-		);
-
-		System.out.println ("\t" + strTenor + " => " + wjDFQuoteBespokeMat.displayString());
 	}
 
 	/**
 	 * Construct the Discount Curve
 	 * 
-	 * @param strReferenceCurrency Reference Currency
-	 * @param strDerivedCurrency Derived Currency
-	 * @param dtValue Valuation Date
-	 * @param dcReference Reference Discount Curve
-	 * @param fc6MReference 6M Reference Forward Curve
-	 * @param fc3MReference 3M Reference Forward Curve
-	 * @param dblRefDerFX Reference to Derived FC
-	 * @param scbc Segment Custom Builder Control
-	 * @param astrTenor Tenor Array
-	 * @param adblCrossCurrencyBasis Cross Currency Basis Array
-	 * @param adblSwapRate Swap Rate Array
-	 * @param bBasisOnDerivedLeg TRUE - Basis on Derived Leg
+	 * @param referenceCurrency Reference Currency
+	 * @param derivedCurrency Derived Currency
+	 * @param valueDate Valuation Date
+	 * @param referenceDiscountCurve Reference Discount Curve
+	 * @param reference6MForwardCurve 6M Reference Forward Curve
+	 * @param reference3MForwardCurve 3M Reference Forward Curve
+	 * @param referenceToDerivedFX Reference to Derived FX
+	 * @param segmentCustomBuilderControl Segment Custom Builder Control
+	 * @param tenorArray Tenor Array
+	 * @param crossCurrencyBasisArray Cross Currency Basis Array
+	 * @param swapRateArray Swap Rate Array
+	 * @param basisOnDerivedLeg TRUE - Basis on Derived Leg
 	 * 
 	 * @throws Exception Thrown if the Discount Curve cannot be constructed
 	 */
 
 	public static final void MakeDiscountCurve (
-		final String strReferenceCurrency,
-		final String strDerivedCurrency,
-		final JulianDate dtValue,
-		final MergedDiscountForwardCurve dcReference,
-		final ForwardCurve fc6MReference,
-		final ForwardCurve fc3MReference,
-		final double dblRefDerFX,
-		final SegmentCustomBuilderControl scbc,
-		final String[] astrTenor,
-		final double[] adblCrossCurrencyBasis,
-		final double[] adblSwapRate,
-		final boolean bBasisOnDerivedLeg)
+		final String referenceCurrency,
+		final String derivedCurrency,
+		final JulianDate valueDate,
+		final MergedDiscountForwardCurve referenceDiscountCurve,
+		final ForwardCurve reference6MForwardCurve,
+		final ForwardCurve reference3MForwardCurve,
+		final double referenceToDerivedFX,
+		final SegmentCustomBuilderControl segmentCustomBuilderControl,
+		final String[] tenorArray,
+		final double[] crossCurrencyBasisArray,
+		final double[] swapRateArray,
+		final boolean basisOnDerivedLeg)
 		throws Exception
 	{
-		ComponentPair[] aCCSP = MakeCCSP (
-			dtValue,
-			strReferenceCurrency,
-			strDerivedCurrency,
-			astrTenor,
+		ComponentPair[] componentPairArray = MakeCCSP (
+			valueDate,
+			referenceCurrency,
+			derivedCurrency,
+			tenorArray,
 			3
 		);
 
-		CurveSurfaceQuoteContainer mktParams = new CurveSurfaceQuoteContainer();
+		CurrencyPair currencyPair = CurrencyPair.FromCode (derivedCurrency + "/" + referenceCurrency);
 
-		mktParams.setFundingState (dcReference);
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		mktParams.setForwardState (fc3MReference);
+		curveSurfaceQuoteContainer.setFundingState (referenceDiscountCurve);
 
-		mktParams.setForwardState (fc6MReference);
+		curveSurfaceQuoteContainer.setForwardState (reference3MForwardCurve);
 
-		CurrencyPair cp = CurrencyPair.FromCode (strDerivedCurrency + "/" + strReferenceCurrency);
+		curveSurfaceQuoteContainer.setForwardState (reference6MForwardCurve);
 
-		FXLabel fxLabel = FXLabel.Standard (cp);
+		FXLabel fxLabel = FXLabel.Standard (currencyPair);
 
-		mktParams.setFXState (
+		curveSurfaceQuoteContainer.setFXState (
 			ScenarioFXCurveBuilder.CubicPolynomialCurve (
 				fxLabel.fullyQualifiedName(),
-				dtValue,
-				cp,
-				new String[] {"10Y"},
-				new double[] {dblRefDerFX},
-				dblRefDerFX
+				valueDate,
+				currencyPair,
+				new String[]
+				{
+					"10Y"
+				},
+				new double[]
+				{
+					referenceToDerivedFX
+				},
+				referenceToDerivedFX
 			)
 		);
 
-		mktParams.setFixing (
-			aCCSP[0].effective(),
+		curveSurfaceQuoteContainer.setFixing (
+			componentPairArray[0].effective(),
 			fxLabel,
-			dblRefDerFX
+			referenceToDerivedFX
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtValue,
-			dtValue,
-			strReferenceCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (valueDate, valueDate, referenceCurrency);
 
-		LinearLatentStateCalibrator llsc = new LinearLatentStateCalibrator (
-			scbc,
-			BoundarySettings.NaturalStandard(),
-			MultiSegmentSequence.CALIBRATE,
-			null,
-			null
-		);
-
-		LatentStateStretchSpec stretchSpec = LatentStateStretchBuilder.ComponentPairDiscountStretch (
-			"FIXFLOAT",
-			aCCSP,
-			valParams,
-			mktParams,
-			adblCrossCurrencyBasis,
-			adblSwapRate,
-			bBasisOnDerivedLeg
-		);
-
-		MergedDiscountForwardCurve dcDerived = ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
-			strDerivedCurrency,
-			llsc,
-			new LatentStateStretchSpec[] {stretchSpec},
-			valParams,
-			null,
-			null,
-			null,
-			1.
-		);
-
-		mktParams.setFundingState (dcDerived);
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		if (bBasisOnDerivedLeg)
-			System.out.println ("\t     IRS INSTRUMENTS QUOTE REVISION FROM CCBS DERIVED BASIS INPUTS");
-		else
-			System.out.println ("\t     IRS INSTRUMENTS QUOTE REVISION FROM CCBS REFERENCE BASIS INPUTS");
-
-		System.out.println ("\t----------------------------------------------------------------");
-
-		for (int i = 0; i < aCCSP.length; ++i) {
-			CalibratableComponent rcDerived = aCCSP[i].derivedComponent();
-
-			CaseInsensitiveTreeMap<Double> mapOP = aCCSP[i].value (
-				valParams,
-				null, 
-				mktParams,
-				null
+		MergedDiscountForwardCurve derivedDiscountCurve =
+			ScenarioDiscountCurveBuilder.ShapePreservingDFBuild (
+				derivedCurrency,
+				new LinearLatentStateCalibrator (
+					segmentCustomBuilderControl,
+					BoundarySettings.NaturalStandard(),
+					MultiSegmentSequence.CALIBRATE,
+					null,
+					null
+				),
+				new LatentStateStretchSpec[]
+				{
+					LatentStateStretchBuilder.ComponentPairDiscountStretch (
+						"FIXFLOAT",
+						componentPairArray,
+						valuationParams,
+						curveSurfaceQuoteContainer,
+						crossCurrencyBasisArray,
+						swapRateArray,
+						basisOnDerivedLeg
+					)
+				},
+				valuationParams,
+				null,
+				null,
+				null,
+				1.
 			);
 
-			double dblCalibSwapRate = mapOP.get (rcDerived.name() + "[SwapRate]");
+		curveSurfaceQuoteContainer.setFundingState (derivedDiscountCurve);
 
-			System.out.println ("\t[" + rcDerived.effectiveDate() + " - " + rcDerived.maturityDate() + "] = " +
-				FormatUtil.FormatDouble (dblCalibSwapRate, 1, 3, 100.) +
-					"% | " + FormatUtil.FormatDouble (adblSwapRate[i], 1, 3, 100.) + "% | " +
-						FormatUtil.FormatDouble (adblSwapRate[i] - dblCalibSwapRate, 2, 0, 10000.) + " | " +
-							FormatUtil.FormatDouble (dcDerived.df (rcDerived.maturityDate()), 1, 4, 1.));
+		System.out.println ("\t||----------------------------------------------------------------");
+
+		if (basisOnDerivedLeg) {
+			System.out.println ("\t||     IRS INSTRUMENTS QUOTE REVISION FROM CCBS DERIVED BASIS INPUTS");
+		} else {
+			System.out.println ("\t||     IRS INSTRUMENTS QUOTE REVISION FROM CCBS REFERENCE BASIS INPUTS");
 		}
 
-		System.out.println ("\t----------------------------------------------------------------------");
+		System.out.println ("\t||----------------------------------------------------------------");
 
-		if (bBasisOnDerivedLeg)
-			System.out.println ("\t     CCBS DERIVED BASIS TENOR JACOBIAN");
-		else
-			System.out.println ("\t     CCBS REFERENCE BASIS TENOR JACOBIAN");
+		for (int componentPairIndex = 0;
+			componentPairIndex < componentPairArray.length;
+			++componentPairIndex)
+	{
+			CalibratableComponent derivedComponent = componentPairArray[componentPairIndex].derivedComponent();
 
-		System.out.println ("\t----------------------------------------------------------------------");
-
-		for (int i = 0; i < aCCSP.length; ++i)
-			TenorJack (
-				dtValue,
-				astrTenor[i],
-				"PV",
-				dcDerived
+			double calibrationSwapRate = componentPairArray[componentPairIndex].value (
+				valuationParams,
+				null, 
+				curveSurfaceQuoteContainer,
+				null
+			).get (
+				derivedComponent.name() + "[SwapRate]"
 			);
+
+			System.out.println (
+				"\t|| [" + derivedComponent.effectiveDate() + " - " +
+					derivedComponent.maturityDate() + "] =>" + FormatUtil.FormatDouble (
+						calibrationSwapRate,
+						1,
+						3,
+						100.
+					) + "% | " + FormatUtil.FormatDouble (
+						swapRateArray[componentPairIndex],
+						1,
+						3,
+						100.
+					) + "% | " + FormatUtil.FormatDouble (
+						swapRateArray[componentPairIndex] - calibrationSwapRate,
+						2,
+						0,
+						10000.
+					) + " | " + FormatUtil.FormatDouble (
+						derivedDiscountCurve.df (derivedComponent.maturityDate()),
+						1,
+						4,
+						1.
+					)
+			);
+		}
+
+		System.out.println ("\t||----------------------------------------------------------------------");
+
+		if (basisOnDerivedLeg) {
+			System.out.println ("\t||     CCBS DERIVED BASIS TENOR JACOBIAN");
+		} else {
+			System.out.println ("\t||     CCBS REFERENCE BASIS TENOR JACOBIAN");
+		}
+
+		System.out.println ("\t||----------------------------------------------------------------------");
+
+		for (int componentPairIndex = 0;
+			componentPairIndex < componentPairArray.length;
+			++componentPairIndex)
+		{
+			TenorJack (valueDate, tenorArray[componentPairIndex], "PV", derivedDiscountCurve);
+		}
 	}
 }

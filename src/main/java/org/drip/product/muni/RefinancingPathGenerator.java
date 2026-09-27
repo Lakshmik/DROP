@@ -178,12 +178,16 @@ public class RefinancingPathGenerator
 	 * Generate the Date to <i>RefinancingPathPnLEntry</i> Map
 	 * 
 	 * @param deGuillaumeRebonatoPogudinPath Simulated <i>DeGuillaumeRebonatoPogudinPath</i> Instance
+	 * @param taxExemptEOSBasis Tax-exempt <i>EOSBasis</i> Instance
+	 * @param taxableEOSBasis Taxable <i>EOSBasis</i> Instance
 	 * 
 	 * @return Date to <i>RefinancingPathPnLEntry</i> Map
 	 */
 
 	public TreeMap<JulianDate, RefinancingPathEntry> generate (
-		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath)
+		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath,
+		final EOSBasis taxExemptEOSBasis,
+		final EOSBasis taxableEOSBasis)
 	{
 		if (null == deGuillaumeRebonatoPogudinPath) {
 			return null;
@@ -217,12 +221,14 @@ public class RefinancingPathGenerator
 						IssueCurveMeasures.PriceFromGovvie (
 							_issueBond,
 							valuationParams,
-							dateTaxExemptGovvieCurveMap.get (asOfDate)
+							dateTaxExemptGovvieCurveMap.get (asOfDate),
+							taxExemptEOSBasis
 						) + accrued,
 						IssueCurveMeasures.PriceFromGovvie (
 							_issueBond,
 							valuationParams,
-							dateTaxableGovvieCurveMap.get (asOfDate)
+							dateTaxableGovvieCurveMap.get (asOfDate),
+							taxableEOSBasis
 						) + accrued
 					)
 				);

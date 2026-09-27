@@ -128,6 +128,8 @@ import org.drip.measure.statistics.UnivariateCentralMeasures;
 
 public class RefinancingEnsemble
 {
+	private TreeMap<JulianDate, Integer> _dateTaxableNegativeArbitrageMap = null;
+	private TreeMap<JulianDate, Integer> _dateTaxExemptNegativeArbitrageMap = null;
 	private TreeMap<JulianDate, List<RefinancingPathEntry>> _dateToPathEntryListMap = null;
 	private TreeMap<JulianDate, UnivariateCentralMeasures> _taxablePnLCentralMeasuresMap = null;
 	private TreeMap<JulianDate, UnivariateCentralMeasures> _taxExemptPnLCentralMeasuresMap = null;
@@ -142,6 +144,10 @@ public class RefinancingEnsemble
 
 	public RefinancingEnsemble()
 	{
+		_dateTaxableNegativeArbitrageMap = new TreeMap<JulianDate, Integer>();
+
+		_dateTaxExemptNegativeArbitrageMap = new TreeMap<JulianDate, Integer>();
+
 		_dateToPathEntryListMap = new TreeMap<JulianDate, List<RefinancingPathEntry>>();
 
 		_taxablePnLCentralMeasuresMap = new TreeMap<JulianDate, UnivariateCentralMeasures>();
@@ -208,6 +214,28 @@ public class RefinancingEnsemble
 	public TreeMap<JulianDate, UnivariateCentralMeasures> taxablePnLCentralMeasuresMap()
 	{
 		return _taxablePnLCentralMeasuresMap;
+	}
+
+	/**
+	 * Retrieve the Map of the Simulation Date to Tax-exempt Negative Arbitrage Indicator at the Target Date
+	 * 
+	 * @return Map of the Simulation Date to Tax-exempt Negative Arbitrage Indicator at the Target Date
+	 */
+
+	public TreeMap<JulianDate, Integer> dateTaxExemptNegativeArbitrageMap()
+	{
+		return _dateTaxExemptNegativeArbitrageMap;
+	}
+
+	/**
+	 * Retrieve the Map of the Simulation Date to Taxable Negative Arbitrage Indicator at the Target Date
+	 * 
+	 * @return Map of the Simulation Date to Taxable Negative Arbitrage Indicator at the Target Date
+	 */
+
+	public TreeMap<JulianDate, Integer> dateTaxableNegativeArbitrageMap()
+	{
+		return _dateTaxableNegativeArbitrageMap;
 	}
 
 	/**
@@ -287,6 +315,62 @@ public class RefinancingEnsemble
 			);
 
 			_taxablePnLCentralMeasuresMap.put (date, UnivariateCentralMeasures.FromList (taxablePnLList));
+		}
+
+		return true;
+	}
+
+	/**
+	 * Update the Tax-exempt Negative Arbitrage Map
+	 * 
+	 * @param date Date 
+	 * @param negativeArbitrageIndicator Negative Arbitrage Indicator
+	 * 
+	 * @return Tax-exempt Negative Arbitrage Map
+	 */
+
+	public boolean updateTaxExemptNegativeArbitrageMap (
+		final JulianDate date,
+		final boolean negativeArbitrageIndicator)
+	{
+		if (null == date) {
+			return false;
+		}
+
+		if (!_dateTaxExemptNegativeArbitrageMap.containsKey (date)) {
+			_dateTaxExemptNegativeArbitrageMap.put (date, 0);
+		}
+
+		if (negativeArbitrageIndicator) {
+			_dateTaxExemptNegativeArbitrageMap.put (date, _dateTaxExemptNegativeArbitrageMap.get (date) + 1);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Update the Taxable Negative Arbitrage Map
+	 * 
+	 * @param date Date 
+	 * @param negativeArbitrageIndicator Negative Arbitrage Indicator
+	 * 
+	 * @return Taxable Negative Arbitrage Map
+	 */
+
+	public boolean updateTaxableNegativeArbitrageMap (
+		final JulianDate date,
+		final boolean negativeArbitrageIndicator)
+	{
+		if (null == date) {
+			return false;
+		}
+
+		if (!_dateTaxableNegativeArbitrageMap.containsKey (date)) {
+			_dateTaxableNegativeArbitrageMap.put (date, 0);
+		}
+
+		if (negativeArbitrageIndicator) {
+			_dateTaxableNegativeArbitrageMap.put (date, _dateTaxableNegativeArbitrageMap.get (date) + 1);
 		}
 
 		return true;

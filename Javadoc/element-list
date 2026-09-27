@@ -328,6 +328,7 @@ org.drip.sample.mporstream
 org.drip.sample.mst
 org.drip.sample.multicurve
 org.drip.sample.municipal
+org.drip.sample.munistate
 org.drip.sample.neldermead
 org.drip.sample.netting
 org.drip.sample.newtoncotes

@@ -4,6 +4,7 @@ package org.drip.product.muni;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.drip.analytics.date.JulianDate;
 import org.drip.market.issue.TreasurySettingContainer;
@@ -138,6 +139,48 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 	private MarketYieldTermStructure _taxableMarketYieldTermStructure = null;
 	private MarketYieldTermStructure _taxExemptMarketYieldTermStructure = null;
 
+	class TenorYield
+	{
+		TreeMap<JulianDate, Double> _dateYieldMap = new TreeMap<JulianDate, Double>();
+
+		boolean add (
+			final String tenor,
+			final double yield)
+		{
+			JulianDate date = _spotDate.addTenor (tenor);
+
+			_dateYieldMap.put (date, yield);
+
+			return true;
+		}
+
+		int[] maturityDateArray()
+		{
+			int i = 0;
+
+			int[] maturityDateArray = new int[_dateYieldMap.size()];
+
+			for (JulianDate date : _dateYieldMap.keySet()) {
+				maturityDateArray[i++] = date.julian();
+			}
+
+			return maturityDateArray;
+		}
+
+		double[] yieldArray()
+		{
+			int i = 0;
+
+			double[] yieldArray = new double[_dateYieldMap.size()];
+
+			for (JulianDate date : _dateYieldMap.keySet()) {
+				yieldArray[i++] = _dateYieldMap.get (date);
+			}
+
+			return yieldArray;
+		}
+	}
+
 	/**
 	 * Construct a <i>DeGuillaumeRebonatoPogudinMarketYield</i> Instance from the Tax Rate
 	 * 
@@ -202,39 +245,6 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 		}
 
 		return null;
-	}
-
-	private static final double[] InitialYieldArray (
-		final MarketYieldTermStructure marketYieldTermStructure)
-	{
-		Map<String, Double> spotTenorValueMap = marketYieldTermStructure.spotTenorValueMap();
-
-		Set<String> tenorKeySet = marketYieldTermStructure.tenorKeySet();
-
-		double[] initialYieldArray = new double[tenorKeySet.size()];
-
-		int i = 0;
-
-		for (String tenorKey : tenorKeySet) {
-			initialYieldArray[i++] = spotTenorValueMap.get (tenorKey);
-		}
-
-		return initialYieldArray;
-	}
-
-	private int[] tenorJulianDateArray()
-	{
-		int i = 0;
-
-		Set<String> tenorKeySet = tenorKeySet();
-
-		int[] tenorJulianDateArray = new int[tenorKeySet.size()];
-
-		for (String tenor : tenorKeySet) {
-			tenorJulianDateArray[i++] = _spotDate.addTenor (tenor).julian();
-		}
-
-		return tenorJulianDateArray;
 	}
 
 	/**
@@ -350,13 +360,21 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 
 	public GovvieCurve spotTaxExemptGovvieCurve()
 	{
+		TenorYield tenorYield = new TenorYield();
+
+		Map<String, Double> spotTenorValueMap = _taxExemptMarketYieldTermStructure.spotTenorValueMap();
+
+		for (String tenor : spotTenorValueMap.keySet()) {
+			tenorYield.add (tenor, spotTenorValueMap.get (tenor));
+		}
+
 		return ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
 			"TAX_EXEMPT_" + _spotDate,
 			_spotDate,
 			TreasurySettingContainer.CurrencyBenchmarkCode (_currency),
 			_currency,
-			tenorJulianDateArray(),
-			InitialYieldArray (_taxExemptMarketYieldTermStructure)
+			tenorYield.maturityDateArray(),
+			tenorYield.yieldArray()
 		);
 	}
 
@@ -368,13 +386,21 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 
 	public GovvieCurve spotTaxableGovvieCurve()
 	{
+		TenorYield tenorYield = new TenorYield();
+
+		Map<String, Double> spotTenorValueMap = _taxableMarketYieldTermStructure.spotTenorValueMap();
+
+		for (String tenor : spotTenorValueMap.keySet()) {
+			tenorYield.add (tenor, spotTenorValueMap.get (tenor));
+		}
+
 		return ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
 			"TAXABLE_" + _spotDate,
 			_spotDate,
 			TreasurySettingContainer.CurrencyBenchmarkCode (_currency),
 			_currency,
-			tenorJulianDateArray(),
-			InitialYieldArray (_taxableMarketYieldTermStructure)
+			tenorYield.maturityDateArray(),
+			tenorYield.yieldArray()
 		);
 	}
 
@@ -386,13 +412,21 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 
 	public GovvieCurve spotEscrowGovvieCurve()
 	{
+		TenorYield tenorYield = new TenorYield();
+
+		Map<String, Double> spotTenorValueMap = _escrowMarketYieldTermStructure.spotTenorValueMap();
+
+		for (String tenor : spotTenorValueMap.keySet()) {
+			tenorYield.add (tenor, spotTenorValueMap.get (tenor));
+		}
+
 		return ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
 			"TAXABLE_" + _spotDate,
 			_spotDate,
 			TreasurySettingContainer.CurrencyBenchmarkCode (_currency),
 			_currency,
-			tenorJulianDateArray(),
-			InitialYieldArray (_escrowMarketYieldTermStructure)
+			tenorYield.maturityDateArray(),
+			tenorYield.yieldArray()
 		);
 	}
 
@@ -400,12 +434,16 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 	 * Generate the Bond Spot Curve Measures
 	 * 
 	 * @param bond Bond
+	 * @param taxExemptEOSBasis Tax-exempt <i>EOSBasis</i> Instance
+	 * @param taxableEOSBasis Taxable <i>EOSBasis</i> Instance
 	 * 
 	 * @return Bond Spot Curve Measures
 	 */
 
 	public IssueCurveMeasures spotCurveMeasures (
-		final BondComponent bond)
+		final BondComponent bond,
+		final EOSBasis taxExemptEOSBasis,
+		final EOSBasis taxableEOSBasis)
 	{
 		int spotDateJulian = _spotDate.julian();
 
@@ -413,8 +451,18 @@ public class DeGuillaumeRebonatoPogudinMarketSettings
 
 		try {
 			return new IssueCurveMeasures (
-				IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, spotTaxExemptGovvieCurve()),
-				IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, spotTaxableGovvieCurve()),
+				IssueCurveMeasures.PriceFromGovvie (
+					bond,
+					valuationParams,
+					spotTaxExemptGovvieCurve(),
+					taxExemptEOSBasis
+				),
+				IssueCurveMeasures.PriceFromGovvie (
+					bond,
+					valuationParams,
+					spotTaxableGovvieCurve(),
+					taxableEOSBasis
+				),
 				bond.accrued (spotDateJulian, null)
 			);
 		} catch (Exception e) {

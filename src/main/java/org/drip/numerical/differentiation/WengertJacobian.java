@@ -153,6 +153,17 @@ public class WengertJacobian {
 	}
 
 	/**
+	 * Retrieve the d{Wengert_i}/d{Parameter_j} Sensitivity Grid
+	 * 
+	 * @return d{Wengert_i}/d{Parameter_j} Sensitivity Grid
+	 */
+
+	public double[][] sensitivityGrid()
+	{
+		return _aadblDWengertDParameter;
+	}
+
+	/**
 	 * Retrieve the number of Wengert Variables
 	 * 
 	 * @return Number of Wengert Variables

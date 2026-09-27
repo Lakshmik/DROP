@@ -1,5 +1,5 @@
 
-package org.drip.sample.kalotaywilliamsfabozzi;
+package org.drip.sample.munistate;
 
 import java.util.TreeMap;
 
@@ -86,8 +86,8 @@ import org.drip.state.municipal.ProxyBondPriceFunction;
  */
 
 /**
- * <i>YieldSpreadCalibration</i> illustrates the Yield Basis Calibration using the Grid Layout as in Kalotay,
- * 	Williams, and Fabozzi (1993). The References are:
+ * <i>OASTermStructure</i> illustrates the Construction of the OAS Term Structure from Bond Prices using the
+ * 	Grid Layout in Kalotay, Williams, and Fabozzi (1993). The References are:
  *  
  * 	<br>
  *  <ul>
@@ -118,14 +118,14 @@ import org.drip.state.municipal.ProxyBondPriceFunction;
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
  *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/kalotaywilliamsfabozzi/README.md">Kalotay, Williams, Fabozzi (1993) Output Reconcilers</a></li>
+ *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/munistate/README.md">Municipal Curve Construction and Jacobian</a></li>
  *  </ul>
  * <br><br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class YieldSpreadCalibration
+public class OASTermStructure
 {
 
 	private static final TreeMap<Double, Double> TimeToCalibrationYieldMapInput()
@@ -195,6 +195,73 @@ public class YieldSpreadCalibration
 		return timeToCalibrationYieldMap;
 	}
 
+	private static final TreeMap<Double, Double> TimeToYieldBasisMap()
+	{
+		TreeMap<Double, Double> timeToYieldBasisMap = new TreeMap<Double, Double>();
+
+		timeToYieldBasisMap.put ( 1., 17.0);
+
+		timeToYieldBasisMap.put ( 2., 19.0);
+
+		timeToYieldBasisMap.put ( 3., 21.9);
+
+		timeToYieldBasisMap.put ( 4., 21.7);
+
+		timeToYieldBasisMap.put ( 5., 23.3);
+
+		timeToYieldBasisMap.put ( 6., 25.5);
+
+		timeToYieldBasisMap.put ( 7., 28.0);
+
+		timeToYieldBasisMap.put ( 8., 30.8);
+
+		timeToYieldBasisMap.put ( 9., 34.1);
+
+		timeToYieldBasisMap.put (10., 38.0);
+
+		timeToYieldBasisMap.put (11., 48.5);
+
+		timeToYieldBasisMap.put (12., 53.7);
+
+		timeToYieldBasisMap.put (13., 60.0);
+
+		timeToYieldBasisMap.put (14., 65.8);
+
+		timeToYieldBasisMap.put (15., 70.9);
+
+		timeToYieldBasisMap.put (16., 75.7);
+
+		timeToYieldBasisMap.put (17., 80.2);
+
+		timeToYieldBasisMap.put (18., 84.0);
+
+		timeToYieldBasisMap.put (19., 87.5);
+
+		timeToYieldBasisMap.put (20., 90.8);
+
+		timeToYieldBasisMap.put (21., 95.2);
+
+		timeToYieldBasisMap.put (22., 97.3);
+
+		timeToYieldBasisMap.put (23., 100.2);
+
+		timeToYieldBasisMap.put (24., 102.6);
+
+		timeToYieldBasisMap.put (25., 105.1);
+
+		timeToYieldBasisMap.put (26., 106.9);
+
+		timeToYieldBasisMap.put (27., 108.3);
+
+		timeToYieldBasisMap.put (28., 109.3);
+
+		timeToYieldBasisMap.put (29., 109.8);
+
+		timeToYieldBasisMap.put (30., 110.1);
+
+		return timeToYieldBasisMap;
+	}
+
 	/**
 	 * Entry Point
 	 * 
@@ -210,128 +277,98 @@ public class YieldSpreadCalibration
 		EnvManager.InitEnv ("");
 
 		double bondCoupon = 0.05;
-		double maturityTime = 15.;
 		double annualizedForwardYieldVolatility = 0.1;
 
 		TreeMap<Double, Double> callPriceSchedule = new TreeMap<Double, Double>();
 
 		callPriceSchedule.put (10., 1.);
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi =
-			new KalotayWilliamsFabozzi (TimeToCalibrationYieldMapInput());
+		TreeMap<Double, Double> timeToCalibrationYieldMapInput = TimeToCalibrationYieldMapInput();
+
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		for (double time : timeToCalibrationYieldMapInput.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMapInput.get (time)
+			);
+		}
 
 		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
 			annualizedForwardYieldVolatility,
 			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
 		);
 
-		ProxyBond proxyBulletBond = ProxyBond.Bullet (maturityTime, bondCoupon);
+		TreeMap<Double, Double> timeToYieldBasisMap = TimeToYieldBasisMap();
 
-		ProxyBond proxyCallableBond = ProxyBond.Callable (maturityTime, bondCoupon, callPriceSchedule);
+		System.out.println ("\t||-----------------------------------||");
 
-		double baseBulletPrice =
-			proxyBulletBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		System.out.println ("\t||        OAS TERM STRUCTURE         ||");
 
-		double baseCallablePrice =
-			proxyCallableBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		System.out.println ("\t||-----------------------------------||");
 
-		kalotayWilliamsFabozzi.applyBasisYield (0.0050);
+		System.out.println ("\t||  L -> R:                          ||");
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
-		);
+		System.out.println ("\t||      - Maturity Time              ||");
 
-		double bumpedBulletPrice =
-			proxyBulletBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		System.out.println ("\t||      - Curve Price                ||");
 
-		double bumpedCallablePrice =
-			proxyCallableBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		System.out.println ("\t||      - Market Price               ||");
 
-		kalotayWilliamsFabozzi.removeBasisYield();
+		System.out.println ("\t||      - Market OAS (bp)            ||");
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
-		);
+		System.out.println ("\t||-----------------------------------||");
 
-		double resetBulletPrice =
-			proxyBulletBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		for (Double endTime : timeToYieldBasisMap.keySet()) {
+			ProxyBond proxyBond = ProxyBond.Callable (endTime, bondCoupon, callPriceSchedule);
 
-		double resetCallablePrice =
-			proxyCallableBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+			double basePrice = proxyBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
 
-		System.out.println ("\t||---------------------------------------------------------------||");
+			kalotayWilliamsFabozzi.applyBasisYield (0.0001 * timeToYieldBasisMap.get (endTime));
 
-		System.out.println (
-			"\t|| Base Bullet Price =>" + FormatUtil.FormatDouble (baseBulletPrice, 3, 4, 100.)
-		);
+			kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+				annualizedForwardYieldVolatility,
+				KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			);
 
-		System.out.println (
-			"\t|| Bumped Bullet Price =>" + FormatUtil.FormatDouble (bumpedBulletPrice, 3, 4, 100.)
-		);
+			double bumpedPrice =
+				proxyBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
 
-		System.out.println (
-			"\t|| Bullet Basis (bp) =>" +
-				FormatUtil.FormatDouble (baseBulletPrice - bumpedBulletPrice, 3, 0, 10000.)
-		);
+			kalotayWilliamsFabozzi.removeBasisYield();
 
-		System.out.println ("\t||---------------------------------------------------------------||");
+			System.out.println (
+				"\t||" + FormatUtil.FormatDouble (
+					endTime,
+					2,
+					0,
+					1.
+				) + " =>" + FormatUtil.FormatDouble (
+					basePrice,
+					3,
+					4,
+					100.
+				) + " |" + FormatUtil.FormatDouble (
+					bumpedPrice,
+					3,
+					4,
+					100.
+				) + " |" + FormatUtil.FormatDouble (
+					new ProxyBondPriceFunction (
+						kalotayWilliamsFabozzi,
+						annualizedForwardYieldVolatility,
+						null,
+						proxyBond
+					).yieldBasisForPrice (
+						bumpedPrice
+					).calibratedState(),
+					3,
+					1,
+					10000.
+				) + " ||"
+			);
+		}
 
-		System.out.println (
-			"\t|| Base Callable Price =>" + FormatUtil.FormatDouble (baseCallablePrice, 3, 4, 100.)
-		);
-
-		System.out.println (
-			"\t|| Bumped Callable Price =>" + FormatUtil.FormatDouble (bumpedCallablePrice, 3, 4, 100.)
-		);
-
-		System.out.println (
-			"\t|| Callable Basis (bp) =>" +
-				FormatUtil.FormatDouble (baseCallablePrice - bumpedCallablePrice, 3, 0, 10000.)
-		);
-
-		System.out.println ("\t||---------------------------------------------------------------||");
-
-		System.out.println (
-			"\t|| Reset Base Callable Price =>" + FormatUtil.FormatDouble (resetBulletPrice, 3, 4, 100.)
-		);
-
-		System.out.println (
-			"\t|| Reset Bumped Callable Price =>" + FormatUtil.FormatDouble (resetCallablePrice, 3, 4, 100.)
-		);
-
-		System.out.println ("\t||---------------------------------------------------------------||");
-
-		double calibratedBulletYieldBasis = new ProxyBondPriceFunction (
-			kalotayWilliamsFabozzi,
-			annualizedForwardYieldVolatility,
-			null,
-			proxyBulletBond
-		).yieldBasisForPrice (
-			bumpedBulletPrice
-		);
-
-		System.out.println (
-			"\t|| Calibrated Bullet Basis (bp) =>" +
-				FormatUtil.FormatDouble (calibratedBulletYieldBasis, 2, 0, 10000.)
-		);
-
-		double calibratedCallableYieldBasis = new ProxyBondPriceFunction (
-			kalotayWilliamsFabozzi,
-			annualizedForwardYieldVolatility,
-			null,
-			proxyCallableBond
-		).yieldBasisForPrice (
-			bumpedCallablePrice
-		);
-
-		System.out.println (
-			"\t|| Calibrated Callable Basis (bp) =>" +
-				FormatUtil.FormatDouble (calibratedCallableYieldBasis, 2, 0, 10000.)
-		);
-
-		System.out.println ("\t||---------------------------------------------------------------||");
+		System.out.println ("\t||-----------------------------------||");
 
 		EnvManager.TerminateEnv();
 	}

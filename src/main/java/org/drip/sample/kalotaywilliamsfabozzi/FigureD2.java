@@ -204,9 +204,16 @@ public class FigureD2
 
 		ProxyBond proxyBulletBond = ProxyBond.Bullet (bondMaturityTime, bondCoupon);
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi (
-			TimeToCalibrationYieldMap()
-		);
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		TreeMap<Double, Double> timeToCalibrationYieldMap = TimeToCalibrationYieldMap();
+
+		for (double time : timeToCalibrationYieldMap.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMap.get (time)
+			);
+		}
 
 		TreeMap<Double, Double> projectedBaseForwardYieldMap = new TreeMap<Double, Double>();
 
@@ -218,7 +225,7 @@ public class FigureD2
 		).baseYieldForPrice (
 			calibrationEndTime,
 			calibrationPrice
-		);
+		).calibratedState();
 
 		System.out.println ("\t|-------------------------------------------------||");
 

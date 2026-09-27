@@ -213,9 +213,16 @@ public class FigureC
 		Map<Double, List<Double>> timeToProjectedForwardYieldListMapReconciler =
 			TimeToProjectedForwardYieldListMapReconciler();
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi (
-			TimeToCalibrationYieldMap()
-		);
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		TreeMap<Double, Double> timeToCalibrationYieldMap = TimeToCalibrationYieldMap();
+
+		for (double time : timeToCalibrationYieldMap.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMap.get (time)
+			);
+		}
 
 		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
 			annualizedForwardVolatility,

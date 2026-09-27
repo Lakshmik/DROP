@@ -158,8 +158,17 @@ public class Table2
 
 		forwardRateMapReconciliation.put (3., 0.05580);
 
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		for (double time : timeToCalibrationYieldMap.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMap.get (time)
+			);
+		}
+
 		Map<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
-			new KalotayWilliamsFabozzi (timeToCalibrationYieldMap).timeToZeroVolatilityPeriodStateMap();
+			kalotayWilliamsFabozzi.timeToZeroVolatilityPeriodStateMap();
 
 		System.out.println ("\t|-----------------------------------------------||");
 

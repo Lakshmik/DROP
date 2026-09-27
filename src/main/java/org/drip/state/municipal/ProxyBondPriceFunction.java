@@ -88,7 +88,7 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>ProxyBondPriceFunction</i> calibrates the specified Base Procy Bond Yield used in the Kalotay,
+ * <i>ProxyBondPriceFunction</i> calibrates the specified Base Proxy Bond Yield used in the Kalotay,
  * 	Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References
  * 	are:
  *  
@@ -276,83 +276,80 @@ public class ProxyBondPriceFunction
 	}
 
 	/**
-	 * Retrieve the Base Yield given the Price
+	 * Retrieve the Base Yield <i>CalibrateAndSensitivity</i> Instance given the Price
 	 * 
 	 * @param calibrationEndTime The Calibration End Time
 	 * @param price Price
 	 * 
-	 * @return Base Yield
-	 * 
-	 * @throws Exception Thrown if the Base Yield cannot be Calibrated
+	 * @return Base Yield <i>CalibrateAndSensitivity</i> Instance
 	 */
 
-	public double baseYieldForPrice (
+	public CalibrateAndSensitivity baseYieldForPrice (
 		final double calibrationEndTime,
 		final double price)
-		throws Exception
 	{
 		if (!NumberUtil.IsValid (calibrationEndTime) || 0. >= calibrationEndTime ||
 			_underlying.maturityTime() < calibrationEndTime)
 		{
-			throw new Exception ("ProxyBondPriceFunction::baseYieldForPrice => Cannot Find Root");
+			return null;
 		}
 
-		return new FixedPointFinderBrent (
-			price,
-			new R1ToR1 (null)
-			{
-				@Override public double evaluate (
-					final double projectedBaseForwardYield)
-					throws Exception
-				{
-					return priceFromBaseForwardYield (calibrationEndTime, projectedBaseForwardYield);
-				}
-			},
-			true
-		).findRoot().root();
+		try {
+			return CalibrateAndSensitivity.Standard (
+				new FixedPointFinderBrent (
+					price,
+					new R1ToR1 (null)
+					{
+						@Override public double evaluate (
+							final double projectedBaseForwardYield)
+							throws Exception
+						{
+							return priceFromBaseForwardYield (calibrationEndTime, projectedBaseForwardYield);
+						}
+					},
+					true
+				).findRoot()
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	/**
-	 * Retrieve the Yield Basis given the Price
+	 * Retrieve the Yield Basis <i>CalibrateAndSensitivity</i> Instance given the Price
 	 * 
 	 * @param price Price
 	 * 
-	 * @return Yield Basis
-	 * 
-	 * @throws Exception Thrown if the Base Yield cannot be Calibrated
+	 * @return Yield Basis <i>CalibrateAndSensitivity</i> Instance
 	 */
 
-	public double yieldBasisForPrice (
+	public CalibrateAndSensitivity yieldBasisForPrice (
 		final double price)
-		throws Exception
 	{
-		FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
-			price,
-			new R1ToR1 (null)
-			{
-				@Override public double evaluate (
-					final double yieldBasis)
-					throws Exception
+		try {
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
+				price,
+				new R1ToR1 (null)
 				{
-					return priceFromYieldBasis (yieldBasis);
-				}
-			},
-			null,
-			VariateIteratorPrimitive.BISECTION,
-			true
-		).findRoot();
+					@Override public double evaluate (
+						final double yieldBasis)
+						throws Exception
+					{
+						return priceFromYieldBasis (yieldBasis);
+					}
+				},
+				null,
+				VariateIteratorPrimitive.BISECTION,
+				true
+			).findRoot();
 
-		if (null == fixedPointFinderOutput ||
-			!_kalotayWilliamsFabozzi.removeBasisYield() ||
-			!_kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-				_annualizedForwardYieldVolatility,
-				KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
-			)
-		)
-		{
-			throw new Exception ("ProxyBondPriceFunction::yieldBasisForPrice => Cannot Find Root");
+			return CalibrateAndSensitivity.Standard (fixedPointFinderOutput);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		return fixedPointFinderOutput.root();
+		return null;
 	}
 }

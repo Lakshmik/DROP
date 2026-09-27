@@ -14,13 +14,12 @@ import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
-import org.drip.product.muni.InceptionMarketSettings;
 import org.drip.product.muni.MarketYieldTermStructure;
-import org.drip.product.muni.RefinancingPathEntry;
-import org.drip.product.muni.RefinancingPathGenerator;
+import org.drip.product.refinancing.AROPathEntry;
+import org.drip.product.refinancing.AROPathGenerator;
+import org.drip.product.refinancing.AROSetting;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
-import org.drip.state.creator.ScenarioGovvieCurveBuilder;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -99,9 +98,8 @@ import org.drip.state.creator.ScenarioGovvieCurveBuilder;
  */
 
 /**
- * <i>ExercisePeriodMarketPnLPath</i> illustrates the Simulation of a single-correlated Path of Tax-exempt
- *  and Taxable PnL across the Dates in an Exercise Period. The Simulated PnL's are Anchored at the Dated
- *  Nodes. The References are:
+ * <i>AROPath</i> illustrates the Simulation of a single-correlated Path of ARO PnL for the specified Bond
+ * 	Issue. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -140,79 +138,8 @@ import org.drip.state.creator.ScenarioGovvieCurveBuilder;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ExercisePeriodMarketPnLPath
+public class AROPath
 {
-
-	private static final List<String> TenorList()
-	{
-		List<String> tenorList = new ArrayList<String>();
-
-		tenorList.add ("3M");
-
-		tenorList.add ("6M");
-
-		tenorList.add ("1Y");
-
-		tenorList.add ("2Y");
-
-		tenorList.add ("3Y");
-
-		tenorList.add ("4Y");
-
-		tenorList.add ("5Y");
-
-		tenorList.add ("7Y");
-
-		tenorList.add ("10Y");
-
-		tenorList.add ("12Y");
-
-		tenorList.add ("15Y");
-
-		tenorList.add ("20Y");
-
-		tenorList.add ("30Y");
-
-		return tenorList;
-	}
-
-	private static final int[] TenorJulianDateArray (
-		final JulianDate initialDate)
-		throws Exception
-	{
-		int i = 0;
-
-		List<String> tenorList = TenorList();
-
-		int[] tenorJulianDateArray = new int[tenorList.size()];
-
-		for (String tenor : tenorList) {
-			tenorJulianDateArray[i++] = initialDate.addTenor (tenor).julian();
-		}
-
-		return tenorJulianDateArray;
-	}
-
-	private static final double[] InitialTaxExemptYieldArray()
-	{
-		double[] initialTaxExemptYieldArray = new double[TenorList().size()];
-
-		int i = 0;
-		initialTaxExemptYieldArray[i++] = 0.00475;
-		initialTaxExemptYieldArray[i++] = 0.00528;
-		initialTaxExemptYieldArray[i++] = 0.00600;
-		initialTaxExemptYieldArray[i++] = 0.00720;
-		initialTaxExemptYieldArray[i++] = 0.00920;
-		initialTaxExemptYieldArray[i++] = 0.00870;
-		initialTaxExemptYieldArray[i++] = 0.01260;
-		initialTaxExemptYieldArray[i++] = 0.01750;
-		initialTaxExemptYieldArray[i++] = 0.02400;
-		initialTaxExemptYieldArray[i++] = 0.02840;
-		initialTaxExemptYieldArray[i++] = 0.03190;
-		initialTaxExemptYieldArray[i++] = 0.03650;
-		initialTaxExemptYieldArray[i++] = 0.04170;
-		return initialTaxExemptYieldArray;
-	}
 
 	private static final MarketYieldTermStructure TaxExemptMarketYieldTermStructure()
 		throws Exception
@@ -274,27 +201,6 @@ public class ExercisePeriodMarketPnLPath
 		infiniteHorizonTenorValueMap.put ("30Y", 0.05409);
 
 		return new MarketYieldTermStructure (spotTenorValueMap, infiniteHorizonTenorValueMap);
-	}
-
-	private static final double[] InitialTaxableYieldArray()
-	{
-		double[] initialTaxableYieldArray = new double[TenorList().size()];
-
-		int i = 0;
-		initialTaxableYieldArray[i++] = 0.00621;
-		initialTaxableYieldArray[i++] = 0.00642;
-		initialTaxableYieldArray[i++] = 0.00692;
-		initialTaxableYieldArray[i++] = 0.00928;
-		initialTaxableYieldArray[i++] = 0.01005;
-		initialTaxableYieldArray[i++] = 0.01035;
-		initialTaxableYieldArray[i++] = 0.01574;
-		initialTaxableYieldArray[i++] = 0.02123;
-		initialTaxableYieldArray[i++] = 0.02851;
-		initialTaxableYieldArray[i++] = 0.03271;
-		initialTaxableYieldArray[i++] = 0.03541;
-		initialTaxableYieldArray[i++] = 0.03822;
-		initialTaxableYieldArray[i++] = 0.04132;
-		return initialTaxableYieldArray;
 	}
 
 	private static final MarketYieldTermStructure TaxableMarketYieldTermStructure()
@@ -421,24 +327,6 @@ public class ExercisePeriodMarketPnLPath
 		return new MarketYieldTermStructure (spotTenorValueMap, infiniteHorizonTenorValueMap);
 	}
 
-	private static final List<JulianDate> SimulationDateArray (
-		final JulianDate simulationStartDate,
-		final int simulationCount)
-		throws Exception
-	{
-		List<JulianDate> simulationDateArray = new ArrayList<JulianDate>();
-
-		JulianDate simulationDate = simulationStartDate;
-
-		simulationDateArray.add (simulationDate);
-
-		for (int simulationIndex = 0; simulationIndex < simulationCount; ++simulationIndex) {
-			simulationDateArray.add (simulationDate = simulationDate.addBusDays (1, "USD"));
-		}
-
-		return simulationDateArray;
-	}
-
 	/**
 	 * Entry Point
 	 * 
@@ -457,42 +345,63 @@ public class ExercisePeriodMarketPnLPath
 		double burstiness = 0.002;
 		double relaxationTime = 50;
 
-		int bondFrequency = 2;
-		double bondCoupon = 0.05;
-		String bondDayCount = "30/360";
+		int issueBondFrequency = 2;
+		double issueBondCoupon = 0.05;
+		String issueBondDayCount = "30/360";
 
-		int simulationDateCount = 50;
+		int escrowBondFrequency = 1;
+		double escrowBondCoupon = 0.;
+		String escrowBondDayCount = "30/360";
+
+		double refinancingCharge = 0.01;
+
+		double embeddedOptionExercisePrice = 1.;
+
+		JulianDate issueBondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
+
+		JulianDate escrowBondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
+
+		JulianDate issueBondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
+
+		JulianDate escrowBondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
 
 		JulianDate spotDate = DateUtil.Today();
 
-		JulianDate exerciseStartDate = spotDate.addYears (1);
+		JulianDate aroExerciseStartDate = spotDate.addYears (1);
 
-		JulianDate bondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
+		JulianDate embeddedOptionExerciseDate = aroExerciseStartDate.addTenor ("3M");
 
-		JulianDate bondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
-
-		BondComponent bond = BondBuilder.CreateSimpleFixed (
+		BondComponent issueBond = BondBuilder.CreateSimpleFixed (
 			"CUSIP",
 			currency,
 			"",
-			bondCoupon,
-			bondFrequency,
-			bondDayCount,
-			bondEffectiveDate,
-			bondMaturityDate,
+			issueBondCoupon,
+			issueBondFrequency,
+			issueBondDayCount,
+			issueBondEffectiveDate,
+			issueBondMaturityDate,
 			null,
 			null
 		);
 
-		JulianDate initialDate = DateUtil.CreateFromYMD (2013, 12, 3);
+		BondComponent escrowBond = BondBuilder.CreateSimpleFixed (
+			"CUSIP",
+			currency,
+			"",
+			escrowBondCoupon,
+			escrowBondFrequency,
+			escrowBondDayCount,
+			escrowBondEffectiveDate,
+			escrowBondMaturityDate,
+			null,
+			null
+		);
 
-		double[] initialTaxableYieldArray = InitialTaxableYieldArray();
+		List<JulianDate> simulationDateList = new ArrayList<JulianDate>();
 
-		int[] tenorDateJulianArray = TenorJulianDateArray (initialDate);
+		simulationDateList.add (aroExerciseStartDate);
 
-		double[] initialTaxExemptYieldArray = InitialTaxExemptYieldArray();
-
-		List<JulianDate> simulationDateList = SimulationDateArray (exerciseStartDate, simulationDateCount);
+		simulationDateList.add (embeddedOptionExerciseDate);
 
 		DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield =
 			new DeGuillaumeRebonatoPogudinMarketSettings (
@@ -503,90 +412,116 @@ public class ExercisePeriodMarketPnLPath
 				EscrowMarketYieldTermStructure()
 			);
 
-		InceptionMarketSettings inceptionMarketSettings = new InceptionMarketSettings (
-			initialDate,
-			ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
-				"TAX_EXEMPT_" + initialDate,
-				initialDate,
-				"UST",
-				currency,
-				tenorDateJulianArray,
-				initialTaxExemptYieldArray
-			),
-			ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
-				"TAXABLE_" + initialDate,
-				initialDate,
-				"UST",
-				currency,
-				tenorDateJulianArray,
-				initialTaxableYieldArray
+		AROPathEntry aroPathEntry = new AROPathGenerator (
+			issueBond,
+			new AROSetting (
+				aroExerciseStartDate,
+				embeddedOptionExerciseDate,
+				embeddedOptionExercisePrice,
+				escrowBond,
+				refinancingCharge
 			)
+		).generate (
+			DeGuillaumeRebonatoPogudin.Standard (
+				new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
+				deGuillaumeRebonatoPogudinMarketYield,
+				null
+			).evolve (
+				deGuillaumeRebonatoPogudinMarketYield,
+				simulationDateList
+			),
+			null,
+			true
 		);
 
-		Map<JulianDate, RefinancingPathEntry> refinancingPathPnLEntryMap =
-			new RefinancingPathGenerator (
-				bond,
-				inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (bond, simulationDateList)
-			).generate (
-				DeGuillaumeRebonatoPogudin.Standard (
-					new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
-					deGuillaumeRebonatoPogudinMarketYield,
-					null
-				).evolve (
-					deGuillaumeRebonatoPogudinMarketYield,
-					simulationDateList
-				)
-			);
+		System.out.println ("\t||---------------------------------------------------|");
 
-		System.out.println ("\t||----------------------------------------------------||");
+		System.out.println ("\t||                  ARO PATH ENTRY                   |");
 
-		System.out.println ("\t||      DATE => RE-FINANCING PATH P&L ENTRY MAP       ||");
+		System.out.println ("\t||---------------------------------------------------|");
 
-		System.out.println ("\t||----------------------------------------------------||");
+		System.out.println (
+			"\t|| Refinancing Issue Price               : " + FormatUtil.FormatDouble (
+				aroPathEntry.refinancingIssuePrice(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		System.out.println ("\t||    - Initial Tax Exempt Govvie Curve Dirty Price   ||");
+		System.out.println (
+			"\t|| Embedded Option Exercise Issue Price  : " + FormatUtil.FormatDouble (
+				aroPathEntry.embeddedOptionExerciseIssuePrice(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		System.out.println ("\t||    - Initial Tax Exempt P&L                        ||");
+		System.out.println (
+			"\t|| Issue Accrual                         : " + FormatUtil.FormatDouble (
+				aroPathEntry.issueAccrual(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		System.out.println ("\t||    - Initial Taxable Govvie Curve Dirty Price      ||");
+		System.out.println (
+			"\t|| Issue PnL                             : " + FormatUtil.FormatDouble (
+				aroPathEntry.issuePnL(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		System.out.println ("\t||    - Initial Taxable P&L                           ||");
+		System.out.println (
+			"\t|| Refinancing Escrow Price              : " + FormatUtil.FormatDouble (
+				aroPathEntry.refinancingEscrowPrice(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		System.out.println ("\t||----------------------------------------------------||");
+		System.out.println (
+			"\t|| Embedded Option Exercise Escrow Price : " + FormatUtil.FormatDouble (
+				aroPathEntry.embeddedOptionExerciseEscrowPrice(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		for (JulianDate date : refinancingPathPnLEntryMap.keySet()) {
-			if (date.equals (spotDate)) {
-				continue;
-			}
+		System.out.println (
+			"\t|| Escrow Accrual                        : " + FormatUtil.FormatDouble (
+				aroPathEntry.escrowAccrual(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-			RefinancingPathEntry refinancingPathPnLEntry = refinancingPathPnLEntryMap.get (date);
+		System.out.println (
+			"\t|| Escrow PnL                            : " + FormatUtil.FormatDouble (
+				aroPathEntry.escrowPnL(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-			System.out.println (
-				"\t|| " + date + " =>" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.initialTaxExemptGovvieCurveCleanPrice(),
-					3,
-					3, 
-					100.
-				) + " |" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.taxExemptPnL(),
-					2,
-					3, 
-					100.
-				) + " |" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.initialTaxableGovvieCurveCleanPrice(),
-					3,
-					3, 
-					100.
-				) + " |" + FormatUtil.FormatDouble (
-					refinancingPathPnLEntry.taxablePnL(),
-					2,
-					3, 
-					100.
-				) + " ||"
-			);
-		}
+		System.out.println (
+			"\t|| Total PnL                             : " + FormatUtil.FormatDouble (
+				aroPathEntry.pnL(),
+				3,
+				4,
+				100.
+			) + " |"
+		);
 
-		System.out.println ("\t------------------------------------------------------||");
+		System.out.println ("\t||---------------------------------------------------|");
 
 		EnvManager.TerminateEnv();
 	}

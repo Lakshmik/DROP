@@ -8,6 +8,7 @@ import org.drip.analytics.daycount.Convention;
 import org.drip.param.valuation.ValuationParams;
 import org.drip.product.credit.BondComponent;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinPath;
+import org.drip.product.muni.EOSBasis;
 import org.drip.product.muni.IssueCurveMeasures;
 import org.drip.state.govvie.GovvieCurve;
 
@@ -178,6 +179,7 @@ public class AROPathGenerator
 	 * Generate <i>AROPathEntry</i> Instance
 	 * 
 	 * @param deGuillaumeRebonatoPogudinPath Simulated <i>DeGuillaumeRebonatoPogudinPath</i> Instance
+	 * @param eosBasis <i>EOSBasis</i> Instance
 	 * @param taxExempt TRUE - Apply Tax-exempt Re-financing
 	 * 
 	 * @return <i>AROPathEntry</i> Instance
@@ -185,6 +187,7 @@ public class AROPathGenerator
 
 	public AROPathEntry generate (
 		final DeGuillaumeRebonatoPogudinPath deGuillaumeRebonatoPogudinPath,
+		final EOSBasis eosBasis,
 		final boolean taxExempt)
 	{
 		if (null == deGuillaumeRebonatoPogudinPath) {
@@ -218,7 +221,8 @@ public class AROPathGenerator
 				IssueCurveMeasures.PriceFromGovvie (
 					_issueBond,
 					refinancingDateValuationParameters,
-					dateIssuerGovvieCurveMap.get (refinancingDate)
+					dateIssuerGovvieCurveMap.get (refinancingDate),
+					eosBasis
 				),
 				_setting.embeddedOptionExercisePrice(),
 				_issueBond.couponMetrics (
@@ -236,12 +240,14 @@ public class AROPathGenerator
 				IssueCurveMeasures.PriceFromGovvie (
 					escrowBond,
 					refinancingDateValuationParameters,
-					dateEscrowGovvieCurveMap.get (refinancingDate)
+					dateEscrowGovvieCurveMap.get (refinancingDate),
+					null
 				),
 				IssueCurveMeasures.PriceFromGovvie (
 					escrowBond,
 					embeddedOptionExerciseDateValuationParameters,
-					dateEscrowGovvieCurveMap.get (embeddedOptionExerciseDate)
+					dateEscrowGovvieCurveMap.get (embeddedOptionExerciseDate),
+					null
 				),
 				escrowBond.couponMetrics (
 					embeddedOptionExerciseJulian,

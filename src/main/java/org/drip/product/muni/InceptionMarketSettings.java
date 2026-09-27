@@ -193,6 +193,8 @@ public class InceptionMarketSettings
 	 * Generate the Map of Simulation Dates and Bond Prices/Accruals off of Initial Curves
 	 * 
 	 * @param bond Bond
+	 * @param taxExemptEOSBasis Tax-exempt <i>EOSBasis</i> Instance
+	 * @param taxableEOSBasis Taxable <i>EOSBasis</i> Instance
 	 * @param simulationDateList List of Simulation Dates
 	 * 
 	 * @return Map of Simulation Dates and Prices/Accruals off of Initial Curves
@@ -200,6 +202,8 @@ public class InceptionMarketSettings
 
 	public TreeMap<JulianDate, IssueCurveMeasures> dateInceptionMarketSimulatedMeasureMap (
 		final BondComponent bond,
+		final EOSBasis taxExemptEOSBasis,
+		final EOSBasis taxableEOSBasis,
 		final List<JulianDate> simulationDateList)
 	{
 		if (null == bond || null == simulationDateList || 0 == simulationDateList.size()) {
@@ -218,8 +222,18 @@ public class InceptionMarketSettings
 				dateInceptionMarketSimulatedMeasureMap.put (
 					simulationDate,
 					new IssueCurveMeasures (
-						IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, _taxExemptGovvieCurve),
-						IssueCurveMeasures.PriceFromGovvie (bond, valuationParams, _taxableGovvieCurve),
+						IssueCurveMeasures.PriceFromGovvie (
+							bond,
+							valuationParams,
+							_taxExemptGovvieCurve,
+							taxExemptEOSBasis
+						),
+						IssueCurveMeasures.PriceFromGovvie (
+							bond,
+							valuationParams,
+							_taxableGovvieCurve,
+							taxableEOSBasis
+						),
 						bond.accrued (simulationDateJulian, null)
 					)
 				);

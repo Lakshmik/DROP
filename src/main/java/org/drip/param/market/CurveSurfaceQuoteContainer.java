@@ -130,6 +130,10 @@ public class CurveSurfaceQuoteContainer {
 		_mapGovvieState = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.govvie.GovvieCurve>();
 
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.municipal.MuniCurve>
+		_mapMuniState = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.municipal.MuniCurve>();
+
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.discount.MergedDiscountForwardCurve>
 		_mapOvernightState = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.discount.MergedDiscountForwardCurve>();
@@ -179,6 +183,10 @@ public class CurveSurfaceQuoteContainer {
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.volatility.VolatilityCurve>
 		_mapGovvieVolatility = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.volatility.VolatilityCurve>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.volatility.VolatilityCurve>
+		_mapMuniVolatility = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.volatility.VolatilityCurve>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.state.volatility.VolatilityCurve>
@@ -234,6 +242,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapCollateralMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapCollateralOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -282,6 +294,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapCreditMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapCreditOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -326,6 +342,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapCustomMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapCustomOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -366,6 +386,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapEquityMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapEquityOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -402,6 +426,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapForwardMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapForwardOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -434,6 +462,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapFundingMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapFundingOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -462,6 +494,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapFXMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapFXOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -486,6 +522,10 @@ public class CurveSurfaceQuoteContainer {
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapGovvieMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapGovvieOvernightCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
@@ -503,6 +543,30 @@ public class CurveSurfaceQuoteContainer {
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
 		_mapGovvieRepoCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapMuniMuniCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapMuniOvernightCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapMuniPaydownCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapMuniRatingCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapMuniRecoveryCorrelation = new
+			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
+
+	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
+		_mapMuniRepoCorrelation = new
 			org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>();
 
 	private org.drip.analytics.support.CaseInsensitiveTreeMap<org.drip.function.definition.R1ToR1>
@@ -895,6 +959,42 @@ public class CurveSurfaceQuoteContainer {
 		if (null == gc) return false;
 
 		_mapGovvieState.put (gc.label().fullyQualifiedName(), gc);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Muni State for the specified Label
+	 * 
+	 * @param muniLabel Muni Latent State Label
+	 * 
+	 * @return Muni Curve for the specified Label
+	 */
+
+	public org.drip.state.municipal.MuniCurve muniState (
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == muniLabel) return null;
+
+		java.lang.String strMuniLabel = muniLabel.fullyQualifiedName();
+
+		return !_mapMuniState.containsKey (strMuniLabel) ? null : _mapMuniState.get (strMuniLabel);
+	}
+
+	/**
+	 * (Re)-set the Muni State Curve
+	 * 
+	 * @param muniCurve Muni State Curve
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniState (
+		final org.drip.state.municipal.MuniCurve muniCurve)
+	{
+		if (null == muniCurve) return false;
+
+		_mapMuniState.put (muniCurve.label().fullyQualifiedName(), muniCurve);
 
 		return true;
 	}
@@ -1376,6 +1476,42 @@ public class CurveSurfaceQuoteContainer {
 		if (null == vcGovvie) return false;
 
 		_mapGovvieVolatility.put (vcGovvie.label().fullyQualifiedName(), vcGovvie);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Volatility Curve for the specified Muni Latent State
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Volatility Curve for the Muni Latent State
+	 */
+
+	public org.drip.state.volatility.VolatilityCurve muniVolatility (
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == muniLabel) return null;
+
+		java.lang.String strMuniLabel = muniLabel.fullyQualifiedName();
+
+		return !_mapMuniVolatility.containsKey (strMuniLabel) ? null : _mapMuniVolatility.get (strMuniLabel);
+	}
+
+	/**
+	 * (Re)-set the Volatility Curve for the Muni Latent State
+	 * 
+	 * @param muniVolatilityCurve The Muni Volatility Curve
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniVolatility (
+		final org.drip.state.volatility.VolatilityCurve muniVolatilityCurve)
+	{
+		if (null == muniVolatilityCurve) return false;
+
+		_mapMuniVolatility.put (muniVolatilityCurve.label().fullyQualifiedName(), muniVolatilityCurve);
 
 		return true;
 	}
@@ -1991,6 +2127,279 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface between the Pair of Muni Latent States
+	 * 
+	 * @param muniLabel1 Muni Latent State Label #1
+	 * @param muniLabel2 Muni Latent State Label #2
+	 * 
+	 * @return The Correlation Surface between the Pair of Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 muniMuniCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel1,
+		final org.drip.state.identifier.MuniLabel muniLabel2)
+	{
+		if (null == muniLabel1 || null == muniLabel2 || muniLabel1.match (muniLabel2))
+			return null;
+
+		java.lang.String strCode = muniLabel1.fullyQualifiedName() + "@#" + muniLabel2.fullyQualifiedName();
+
+		return _mapMuniMuniCorrelation.containsKey (strCode) ? _mapMuniMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface between the Pair of Muni Latent States
+	 * 
+	 * @param muniLabel1 Muni Latent State Label #1
+	 * @param muniLabel2 Muni Latent State Label #2
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniMuniCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel1,
+		final org.drip.state.identifier.MuniLabel muniLabel2,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == muniLabel1 || null == muniLabel2 || muniLabel1.match (muniLabel2) ||
+			null == auCorrelation)
+			return false;
+
+		java.lang.String strMuniLabel1 = muniLabel1.fullyQualifiedName();
+
+		java.lang.String strMuniLabel2 = muniLabel2.fullyQualifiedName();
+
+		_mapMuniMuniCorrelation.put (strMuniLabel1 + "@#" + strMuniLabel2, auCorrelation);
+
+		_mapMuniMuniCorrelation.put (strMuniLabel2 + "@#" + strMuniLabel1, auCorrelation);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Correlation Surface for the specified Muni and the Overnight Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param overnightLabel The Overnight Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Muni and the Overnight Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 muniOvernightCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.OvernightLabel overnightLabel)
+	{
+		if (null == muniLabel || null == overnightLabel) return null;
+
+		java.lang.String strCode = muniLabel.fullyQualifiedName() + "@#" +
+			overnightLabel.fullyQualifiedName();
+
+		return _mapMuniOvernightCorrelation.containsKey (strCode) ? _mapMuniOvernightCorrelation.get
+			(strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Muni and the Overnight Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param overnightLabel The Overnight Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniOvernightCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.OvernightLabel overnightLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == muniLabel || null == overnightLabel || null == auCorrelation) return false;
+
+		_mapMuniOvernightCorrelation.put (muniLabel.fullyQualifiedName() + "@#" +
+			overnightLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Correlation Surface for the specified Muni and the Paydown Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param paydownLabel The Paydown Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Muni and the Paydown Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 muniPaydownCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.PaydownLabel paydownLabel)
+	{
+		if (null == muniLabel || null == paydownLabel) return null;
+
+		java.lang.String strCode = muniLabel.fullyQualifiedName() + "@#" +
+			paydownLabel.fullyQualifiedName();
+
+		return _mapMuniPaydownCorrelation.containsKey (strCode) ? _mapMuniPaydownCorrelation.get
+			(strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Muni and the Paydown Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param paydownLabel The Paydown Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniPaydownCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.PaydownLabel paydownLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == muniLabel || null == paydownLabel || null == auCorrelation) return false;
+
+		_mapMuniPaydownCorrelation.put (muniLabel.fullyQualifiedName() + "@#" +
+			paydownLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Correlation Surface for the specified Muni and the Rating Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param ratingLabel The Rating Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Muni and the Rating Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 muniRatingCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.RatingLabel ratingLabel)
+	{
+		if (null == muniLabel || null == ratingLabel) return null;
+
+		java.lang.String strCode = muniLabel.fullyQualifiedName() + "@#" + ratingLabel.fullyQualifiedName();
+
+		return _mapMuniRatingCorrelation.containsKey (strCode) ? _mapMuniRatingCorrelation.get
+			(strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Muni and the Rating Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param ratingLabel The Rating Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniRatingCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.RatingLabel ratingLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == muniLabel || null == ratingLabel || null == auCorrelation) return false;
+
+		_mapMuniRatingCorrelation.put (muniLabel.fullyQualifiedName() + "@#" +
+			ratingLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Correlation Surface for the specified Muni and the Recovery Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param recoveryLabel The Recovery Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Muni and the Recovery Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 muniRecoveryCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.EntityRecoveryLabel recoveryLabel)
+	{
+		if (null == muniLabel || null == recoveryLabel) return null;
+
+		java.lang.String strCode = muniLabel.fullyQualifiedName() + "@#" +
+			recoveryLabel.fullyQualifiedName();
+
+		return _mapMuniRecoveryCorrelation.containsKey (strCode) ? _mapMuniRecoveryCorrelation.get
+			(strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Muni and the Recovery Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param recoveryLabel The Recovery Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniRecoveryCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.EntityRecoveryLabel recoveryLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == muniLabel || null == recoveryLabel || null == auCorrelation) return false;
+
+		_mapMuniRecoveryCorrelation.put (muniLabel.fullyQualifiedName() + "@#" +
+			recoveryLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Correlation Surface for the specified Muni and the Repo Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param repoLabel The Repo Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Muni and the Repo Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 muniRepoCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.RepoLabel repoLabel)
+	{
+		if (null == muniLabel || null == repoLabel) return null;
+
+		java.lang.String strCode = muniLabel.fullyQualifiedName() + "@#" + repoLabel.fullyQualifiedName();
+
+		return _mapMuniRepoCorrelation.containsKey (strCode) ? _mapMuniRepoCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Muni and the Repo Latent States
+	 * 
+	 * @param muniLabel The Muni Latent State Label
+	 * @param repoLabel The Repo Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setMuniRepoCorrelation (
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.state.identifier.RepoLabel repoLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == muniLabel || null == repoLabel || null == auCorrelation) return false;
+
+		_mapMuniRepoCorrelation.put (muniLabel.fullyQualifiedName() + "@#" + repoLabel.fullyQualifiedName(),
+			auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between the Pair of Overnight Latent States
 	 * 
 	 * @param overnightLabel1 Overnight Latent State Label #1
@@ -2543,6 +2952,53 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface for the specified Collateral and the Muni Latent State Labels
+	 * 
+	 * @param strCollateralCurrency The Collateral Currency
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Collateral and the Muni Latent State Labels
+	 */
+
+	public org.drip.function.definition.R1ToR1 collateralMuniCorrelation (
+		final java.lang.String strCollateralCurrency,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == strCollateralCurrency || strCollateralCurrency.isEmpty() || null == muniLabel)
+			return null;
+
+		java.lang.String strCode = strCollateralCurrency + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapCollateralMuniCorrelation.containsKey (strCode) ?
+			_mapCollateralMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Collateral and Muni Latent State Labels
+	 * 
+	 * @param strCollateralCurrency The Collateral Currency
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setCollateralMuniCorrelation (
+		final java.lang.String strCollateralCurrency,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == strCollateralCurrency || strCollateralCurrency.isEmpty() || null == muniLabel || null
+			== auCorrelation)
+			return false;
+
+		_mapCollateralMuniCorrelation.put (strCollateralCurrency + "@#" + muniLabel.fullyQualifiedName(),
+			auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between the Collateral and the Overnight Latent States
 	 * 
 	 * @param strCollateralCurrency The Collateral Currency
@@ -3047,6 +3503,51 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface between the Credit and the Muni Latent State Labels
+	 * 
+	 * @param creditLabel The Credit Curve Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface between the Credit and the Muni Latent State Labels
+	 */
+
+	public org.drip.function.definition.R1ToR1 creditMuniCorrelation (
+		final org.drip.state.identifier.EntityCDSLabel creditLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == creditLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = creditLabel.fullyQualifiedName() + "@#" +
+			muniLabel.fullyQualifiedName();
+
+		return _mapCreditMuniCorrelation.containsKey (strCode) ?
+			_mapCreditMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface between the Credit and the Muni Latent States
+	 * 
+	 * @param creditLabel The Credit Curve Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setCreditMuniCorrelation (
+		final org.drip.state.identifier.EntityCDSLabel creditLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == creditLabel || null == muniLabel || null == auCorrelation) return false;
+
+		_mapCreditMuniCorrelation.put (creditLabel.fullyQualifiedName() + "@#" +
+			muniLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between the Credit and the Overnight Latent States
 	 * 
 	 * @param creditLabel The Credit Curve Latent State Label
@@ -3495,6 +3996,50 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface between the Custom Metric and the Muni Latent States
+	 * 
+	 * @param customLabel The Custom Metric Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface between the Custom Metric and the Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 customMuniCorrelation (
+		final org.drip.state.identifier.CustomLabel customLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == customLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = customLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapCustomMuniCorrelation.containsKey (strCode) ?
+			_mapCustomMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface between the Custom Metric and the Muni Latent States
+	 * 
+	 * @param customLabel The Custom Metric Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setCustomMuniCorrelation (
+		final org.drip.state.identifier.CustomLabel customLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == customLabel || null == muniLabel) return false;
+
+		_mapCustomMuniCorrelation.put (customLabel.fullyQualifiedName() + "@#" +
+			muniLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between the Custom Metric and the Overnight Latent States
 	 * 
 	 * @param customLabel The Custom Metric Latent State Label
@@ -3898,6 +4443,50 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface between the Equity and the Muni Latent States
+	 * 
+	 * @param equityLabel The Equity Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface between the Equity and the Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 equityMuniCorrelation (
+		final org.drip.state.identifier.EntityEquityLabel equityLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == equityLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = equityLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapEquityMuniCorrelation.containsKey (strCode) ?
+			_mapEquityMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface between the Equity and the Muni Latent States
+	 * 
+	 * @param equityLabel The Equity Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setEquityMuniCorrelation (
+		final org.drip.state.identifier.EntityEquityLabel equityLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == equityLabel || null == muniLabel) return false;
+
+		_mapEquityMuniCorrelation.put (equityLabel.fullyQualifiedName() + "@#" +
+			muniLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between Equity and the Overnight Latent States
 	 * 
 	 * @param equityLabel The Equity Latent State Label
@@ -4256,6 +4845,50 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface between the Forward and the Muni Latent States
+	 * 
+	 * @param forwardLabel The Forward Curve Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface between the Forward and the Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 forwardMuniCorrelation (
+		final org.drip.state.identifier.ForwardLabel forwardLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == forwardLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = forwardLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapForwardMuniCorrelation.containsKey (strCode) ?
+			_mapForwardMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface between the Forward and the Muni Latent States
+	 * 
+	 * @param forwardLabel The Forward Curve Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setForwardMuniCorrelation (
+		final org.drip.state.identifier.ForwardLabel forwardLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == forwardLabel || null == muniLabel || null == auCorrelation) return false;
+
+		_mapForwardMuniCorrelation.put (forwardLabel.fullyQualifiedName() + "@#" + 
+			muniLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between the Forward and the Overnight Latent States
 	 * 
 	 * @param forwardLabel The Forward Latent State Label
@@ -4569,6 +5202,50 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface between the Funding and the Muni Latent States
+	 * 
+	 * @param fundingLabel The Funding Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface between the Funding and the Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 fundingMuniCorrelation (
+		final org.drip.state.identifier.FundingLabel fundingLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == fundingLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = fundingLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapFundingMuniCorrelation.containsKey (strCode) ?
+			_mapFundingMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface between the Funding and the Muni Latent States
+	 * 
+	 * @param fundingLabel The Funding Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setFundingMuniCorrelation (
+		final org.drip.state.identifier.FundingLabel fundingLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == fundingLabel || null == muniLabel || null == auCorrelation) return false;
+
+		_mapFundingMuniCorrelation.put (fundingLabel.fullyQualifiedName() + "@#" +
+			muniLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface between the Funding and the Overnight Latent States
 	 * 
 	 * @param fundingLabel The Funding Latent State Label
@@ -4837,6 +5514,50 @@ public class CurveSurfaceQuoteContainer {
 	}
 
 	/**
+	 * Retrieve the Correlation Surface for the specified FX and the Muni Latent States
+	 * 
+	 * @param fxLabel The FX Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified FX and the Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 fxMuniCorrelation (
+		final org.drip.state.identifier.FXLabel fxLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == fxLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = fxLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapFXMuniCorrelation.containsKey (strCode) ? _mapFXMuniCorrelation.get
+			(strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified FX and the Muni Latent States
+	 * 
+	 * @param fxLabel The FX Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setFXMuniCorrelation (
+		final org.drip.state.identifier.FXLabel fxLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == fxLabel || null == muniLabel || null == auCorrelation) return false;
+
+		_mapFXMuniCorrelation.put (fxLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName(),
+			auCorrelation);
+
+		return true;
+	}
+
+	/**
 	 * Retrieve the Correlation Surface for the specified FX and the Overnight Latent States
 	 * 
 	 * @param fxLabel The FX Latent State Label
@@ -5075,6 +5796,50 @@ public class CurveSurfaceQuoteContainer {
 
 		_mapGovvieOvernightCorrelation.put (govvieLabel.fullyQualifiedName() + "@#" +
 			overnightLabel.fullyQualifiedName(), auCorrelation);
+
+		return true;
+	}
+
+	/**
+	 * Retrieve the Correlation Surface for the specified Govvie and the Muni Latent States
+	 * 
+	 * @param govvieLabel The Govvie Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * 
+	 * @return The Correlation Surface for the specified Govvie and the Muni Latent States
+	 */
+
+	public org.drip.function.definition.R1ToR1 govvieMuniCorrelation (
+		final org.drip.state.identifier.GovvieLabel govvieLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel)
+	{
+		if (null == govvieLabel || null == muniLabel) return null;
+
+		java.lang.String strCode = govvieLabel.fullyQualifiedName() + "@#" + muniLabel.fullyQualifiedName();
+
+		return _mapGovvieMuniCorrelation.containsKey (strCode) ?
+			_mapGovvieMuniCorrelation.get (strCode) : null;
+	}
+
+	/**
+	 * (Re)-set the Correlation Surface for the specified Govvie and the Muni Latent States
+	 * 
+	 * @param govvieLabel The Govvie Latent State Label
+	 * @param muniLabel The Muni Latent State Label
+	 * @param auCorrelation The Correlation Surface
+	 * 
+	 * @return TRUE - Successfully set
+	 */
+
+	public boolean setGovvieMuniCorrelation (
+		final org.drip.state.identifier.GovvieLabel govvieLabel,
+		final org.drip.state.identifier.MuniLabel muniLabel,
+		final org.drip.function.definition.R1ToR1 auCorrelation)
+	{
+		if (null == govvieLabel || null == muniLabel || null == auCorrelation) return false;
+
+		_mapGovvieMuniCorrelation.put (govvieLabel.fullyQualifiedName() + "@#" +
+			muniLabel.fullyQualifiedName(), auCorrelation);
 
 		return true;
 	}

@@ -1,5 +1,5 @@
 
-package org.drip.sample.kalotaywilliamsfabozzi;
+package org.drip.sample.municipal;
 
 import java.util.TreeMap;
 
@@ -86,8 +86,8 @@ import org.drip.state.municipal.ProxyBondSensitivity;
  */
 
 /**
- * <i>SensitivityMeasures</i> illustrates the Computation of the Muni Bond's Sensitivity from Yield Spreads
- * 	using the Grid Layout in Kalotay, Williams, and Fabozzi (1993). The References are:
+ * <i>MuniBondSensitivityMeasures</i> illustrates the Computation of the Muni Bond's Sensitivity from Yield
+ * 	Spreads using the Grid Layout in Kalotay, Williams, and Fabozzi (1993). The References are:
  *  
  * 	<br>
  *  <ul>
@@ -118,14 +118,14 @@ import org.drip.state.municipal.ProxyBondSensitivity;
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
  *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/kalotaywilliamsfabozzi/README.md">Kalotay, Williams, Fabozzi (1993) Output Reconcilers</a></li>
+ *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/municipal/README.md">Municipal Bond Analytics Sample Demonstration</a></li>
  *  </ul>
  * <br><br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class SensitivityMeasures
+public class MuniBondSensitivityMeasures
 {
 
 	private static final TreeMap<Double, Double> TimeToCalibrationYieldMapInput()
@@ -249,7 +249,7 @@ public class SensitivityMeasures
 
 		timeToYieldBasisMap.put (25., 105.1);
 
-		/* timeToYieldBasisMap.put (26., 106.9);
+		timeToYieldBasisMap.put (26., 106.9);
 
 		timeToYieldBasisMap.put (27., 108.3);
 
@@ -257,7 +257,7 @@ public class SensitivityMeasures
 
 		timeToYieldBasisMap.put (29., 109.8);
 
-		timeToYieldBasisMap.put (30., 110.1); */
+		/* timeToYieldBasisMap.put (30., 110.1); */
 
 		return timeToYieldBasisMap;
 	}
@@ -283,8 +283,16 @@ public class SensitivityMeasures
 
 		callPriceSchedule.put (10., 1.);
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi =
-			new KalotayWilliamsFabozzi (TimeToCalibrationYieldMapInput());
+		TreeMap<Double, Double> timeToCalibrationYieldMapInput = TimeToCalibrationYieldMapInput();
+
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		for (double time : timeToCalibrationYieldMapInput.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMapInput.get (time)
+			);
+		}
 
 		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
 			annualizedForwardYieldVolatility,

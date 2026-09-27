@@ -190,8 +190,8 @@ public class ObjectiveFunctionCoordinate
 	public String toString (
 		final String prefix)
 	{
-		return prefix + "[Value: " + FormatUtil.FormatDouble (_value, 1, 4, 1.) + "; " +
-			"Vertex: " + NumberUtil.ArrayRow (_vertex, 1, 4, false) + "]";
+		return prefix + "[Value: " + FormatUtil.FormatDouble (_value, 1, 6, 1.) + "; " +
+			"Vertex: " + NumberUtil.ArrayRow (_vertex, 1, 6, false) + "]";
 	}
 
 	/**

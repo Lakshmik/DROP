@@ -1,13 +1,13 @@
 
-package org.drip.sample.kalotaywilliamsfabozzi;
+package org.drip.sample.munistate;
 
 import java.util.TreeMap;
 
+import org.drip.analytics.date.DateUtil;
+import org.drip.analytics.date.JulianDate;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
-import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.ProxyBond;
-import org.drip.state.municipal.ProxyBondPriceFunction;
+import org.drip.state.municipal.ExplicitBootMuniCurve;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -86,8 +86,8 @@ import org.drip.state.municipal.ProxyBondPriceFunction;
  */
 
 /**
- * <i>OASTermStructure</i> illustrates the Construction of the OAS Term Structure from Bond Prices using the
- * 	Grid Layout in Kalotay, Williams, and Fabozzi (1993). The References are:
+ * <i>KalotayWilliamsFabozziCurve</i> illustrates the Construction and Jacobian of a Bootstrapped Muni-curve
+ * 	using the Grid Layout as in Kalotay, Williams, and Fabozzi (1993). The References are:
  *  
  * 	<br>
  *  <ul>
@@ -118,14 +118,14 @@ import org.drip.state.municipal.ProxyBondPriceFunction;
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
  *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/kalotaywilliamsfabozzi/README.md">Kalotay, Williams, Fabozzi (1993) Output Reconcilers</a></li>
+ *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/munistate/README.md">Municipal Curve Construction and Jacobian</a></li>
  *  </ul>
  * <br><br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class OASTermStructure
+public class KalotayWilliamsFabozziCurve
 {
 
 	private static final TreeMap<Double, Double> TimeToCalibrationYieldMapInput()
@@ -195,73 +195,6 @@ public class OASTermStructure
 		return timeToCalibrationYieldMap;
 	}
 
-	private static final TreeMap<Double, Double> TimeToYieldBasisMap()
-	{
-		TreeMap<Double, Double> timeToYieldBasisMap = new TreeMap<Double, Double>();
-
-		timeToYieldBasisMap.put ( 1., 17.0);
-
-		timeToYieldBasisMap.put ( 2., 19.0);
-
-		timeToYieldBasisMap.put ( 3., 21.9);
-
-		timeToYieldBasisMap.put ( 4., 21.7);
-
-		timeToYieldBasisMap.put ( 5., 23.3);
-
-		timeToYieldBasisMap.put ( 6., 25.5);
-
-		timeToYieldBasisMap.put ( 7., 28.0);
-
-		timeToYieldBasisMap.put ( 8., 30.8);
-
-		timeToYieldBasisMap.put ( 9., 34.1);
-
-		timeToYieldBasisMap.put (10., 38.0);
-
-		timeToYieldBasisMap.put (11., 48.5);
-
-		timeToYieldBasisMap.put (12., 53.7);
-
-		timeToYieldBasisMap.put (13., 60.0);
-
-		timeToYieldBasisMap.put (14., 65.8);
-
-		timeToYieldBasisMap.put (15., 70.9);
-
-		timeToYieldBasisMap.put (16., 75.7);
-
-		timeToYieldBasisMap.put (17., 80.2);
-
-		timeToYieldBasisMap.put (18., 84.0);
-
-		timeToYieldBasisMap.put (19., 87.5);
-
-		timeToYieldBasisMap.put (20., 90.8);
-
-		timeToYieldBasisMap.put (21., 95.2);
-
-		timeToYieldBasisMap.put (22., 97.3);
-
-		timeToYieldBasisMap.put (23., 100.2);
-
-		timeToYieldBasisMap.put (24., 102.6);
-
-		timeToYieldBasisMap.put (25., 105.1);
-
-		timeToYieldBasisMap.put (26., 106.9);
-
-		timeToYieldBasisMap.put (27., 108.3);
-
-		timeToYieldBasisMap.put (28., 109.3);
-
-		timeToYieldBasisMap.put (29., 109.8);
-
-		timeToYieldBasisMap.put (30., 110.1);
-
-		return timeToYieldBasisMap;
-	}
-
 	/**
 	 * Entry Point
 	 * 
@@ -276,91 +209,118 @@ public class OASTermStructure
 	{
 		EnvManager.InitEnv ("");
 
-		double bondCoupon = 0.05;
-		double annualizedForwardYieldVolatility = 0.1;
+		String currency = "USD";
+		String code = "TRADEWEB AAA";
 
-		TreeMap<Double, Double> callPriceSchedule = new TreeMap<Double, Double>();
+		JulianDate spotDate = DateUtil.Today();
 
-		callPriceSchedule.put (10., 1.);
+		TreeMap<Double, Double> timeToCalibrationYieldMapInput = TimeToCalibrationYieldMapInput();
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi =
-			new KalotayWilliamsFabozzi (TimeToCalibrationYieldMapInput());
-
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+		ExplicitBootMuniCurve explicitBootMuniCurve = new ExplicitBootMuniCurve (
+			spotDate.julian(),
+			code,
+			currency
 		);
 
-		TreeMap<Double, Double> timeToYieldBasisMap = TimeToYieldBasisMap();
+		for (double endTime : timeToCalibrationYieldMapInput.keySet()) {
+			explicitBootMuniCurve.setNodeValue ((int) endTime, timeToCalibrationYieldMapInput.get (endTime));
+		}
 
-		System.out.println ("\t||-----------------------------------||");
+		System.out.println ("\t||------------------------------------||");
 
-		System.out.println ("\t||        OAS TERM STRUCTURE         ||");
+		System.out.println ("\t||    ANCHOR DATES QUOTES RECOVERY    ||");
 
-		System.out.println ("\t||-----------------------------------||");
+		System.out.println ("\t||------------------------------------||");
 
-		System.out.println ("\t||  L -> R:                          ||");
-
-		System.out.println ("\t||      - Maturity Time              ||");
-
-		System.out.println ("\t||      - Curve Price                ||");
-
-		System.out.println ("\t||      - Market Price               ||");
-
-		System.out.println ("\t||      - Market OAS (bp)            ||");
-
-		System.out.println ("\t||-----------------------------------||");
-
-		for (Double endTime : timeToYieldBasisMap.keySet()) {
-			ProxyBond proxyBond = ProxyBond.Callable (endTime, bondCoupon, callPriceSchedule);
-
-			double basePrice = proxyBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
-
-			kalotayWilliamsFabozzi.applyBasisYield (0.0001 * timeToYieldBasisMap.get (endTime));
-
-			kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-				annualizedForwardYieldVolatility,
-				KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
-			);
-
-			double bumpedPrice =
-				proxyBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
-
-			kalotayWilliamsFabozzi.removeBasisYield();
+		for (double endTime : timeToCalibrationYieldMapInput.keySet()) {
+			JulianDate endDate = spotDate.addYears ((int) endTime);
 
 			System.out.println (
-				"\t||" + FormatUtil.FormatDouble (
-					endTime,
+				"\t|| [" + endDate + "] =>" + FormatUtil.FormatDouble (
+					explicitBootMuniCurve.yld (endDate),
 					2,
-					0,
-					1.
-				) + " =>" + FormatUtil.FormatDouble (
-					basePrice,
 					3,
-					4,
 					100.
-				) + " |" + FormatUtil.FormatDouble (
-					bumpedPrice,
+				) + "% |" + FormatUtil.FormatDouble (
+					timeToCalibrationYieldMapInput.get (endTime),
+					2,
 					3,
-					4,
 					100.
-				) + " |" + FormatUtil.FormatDouble (
-					new ProxyBondPriceFunction (
-						kalotayWilliamsFabozzi,
-						annualizedForwardYieldVolatility,
-						null,
-						proxyBond
-					).yieldBasisForPrice (
-						bumpedPrice
-					),
-					3,
-					1,
-					10000.
-				) + " ||"
+				) + "% ||"
 			);
 		}
 
-		System.out.println ("\t||-----------------------------------||");
+		System.out.println ("\t||------------------------------------||");
+
+		System.out.println();
+
+		JulianDate brokenDate = spotDate.addTenor ("6M");
+
+		JulianDate endBrokenDate = spotDate.addYears (
+			(int) timeToCalibrationYieldMapInput.lastKey().doubleValue()
+		);
+
+		System.out.println ("\t||--------------------------||");
+
+		System.out.println ("\t||   BROKEN DATES YIELDS    ||");
+
+		System.out.println ("\t||--------------------------||");
+
+		while (brokenDate.julian() < endBrokenDate.julian()) {
+			System.out.println (
+				"\t|| [" + brokenDate + "] =>" + FormatUtil.FormatDouble (
+					explicitBootMuniCurve.yld (brokenDate),
+					2,
+					3,
+					100.
+				) + "% ||"
+			);
+
+			brokenDate = brokenDate.addTenor ("6M");
+		}
+
+		System.out.println ("\t||--------------------------||");
+
+		System.out.println();
+
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println ("\t||  MUNI WENGERT JACOBIAN SENSITIVITY GRID");
+
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		double[][] wengertJacobianSensitivityGrid = explicitBootMuniCurve.jackDForwardDManifestMeasure (
+			"",
+			spotDate
+		).sensitivityGrid();
+
+		for (int wengertIndex = 0; wengertIndex < wengertJacobianSensitivityGrid.length; ++wengertIndex) {
+			String dump = "\t||";
+
+			for (int parameterIndex = 0;
+				parameterIndex < wengertJacobianSensitivityGrid[wengertIndex].length;
+				++parameterIndex)
+			{
+				dump += FormatUtil.FormatDouble (
+					wengertJacobianSensitivityGrid[wengertIndex][parameterIndex],
+					2,
+					3,
+					1.
+				) + " |";
+			}
+
+			System.out.println (dump + "|");
+		}
+
+		System.out.println (
+			"\t||-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println();
 
 		EnvManager.TerminateEnv();
 	}

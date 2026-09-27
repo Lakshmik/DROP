@@ -141,6 +141,7 @@ public class FixedPointFinderOutput
 	private boolean _hasRoot = false;
 	private double _root = Double.NaN;
 	private double _rootFindingTime = Double.NaN;
+	private double[] _firstAndSecondDerivative = null;
 	private int _numberOfObjectiveFunctionCalculations = 0;
 	private int _numberOfObjectiveFunctionDerivativesCalculations = 0;
 	private ExecutionInitializationOutput _executionInitializationOutput = null;
@@ -168,12 +169,14 @@ public class FixedPointFinderOutput
 	 * Set the Root
 	 * 
 	 * @param root Root
+	 * @param firstAndSecondDerivative Array of the First and Second Derivatives
 	 * 
 	 * @return TRUE - Successfully set
 	 */
 
 	public boolean setRoot (
-		final double root)
+		final double root,
+		final double[] firstAndSecondDerivative)
 	{
 		_rootFindingTime = (System.nanoTime() - _startTime) * 0.000001;
 
@@ -181,6 +184,7 @@ public class FixedPointFinderOutput
 			return false;
 		}
 
+		_firstAndSecondDerivative = firstAndSecondDerivative;
 		return _hasRoot = true;
 	}
 
@@ -258,7 +262,7 @@ public class FixedPointFinderOutput
 	 * @return Number of Objective Function Calculations needed
 	 */
 
-	public int umberOfObjectiveFunctionCalculations()
+	public int numberOfObjectiveFunctionCalculations()
 	{
 		return _numberOfObjectiveFunctionCalculations;
 	}
@@ -295,6 +299,17 @@ public class FixedPointFinderOutput
 	public ExecutionInitializationOutput executionInitializationOutput()
 	{
 		return _executionInitializationOutput;
+	}
+
+	/**
+	 * Retrieve the Array of the First and Second Derivatives
+	 * 
+	 * @return Array of the First and Second Derivatives
+	 */
+
+	public double[] firstAndSecondDerivative()
+	{
+		return _firstAndSecondDerivative;
 	}
 
 	/**

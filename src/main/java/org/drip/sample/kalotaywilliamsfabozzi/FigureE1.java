@@ -231,9 +231,16 @@ public class FigureE1
 		double bondMaturityTime = 3.;
 		double annualizedForwardVolatility = 0.1;
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi (
-			TimeToCalibrationYieldMap()
-		);
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		TreeMap<Double, Double> timeToCalibrationYieldMap = TimeToCalibrationYieldMap();
+
+		for (double time : timeToCalibrationYieldMap.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMap.get (time)
+			);
+		}
 
 		TreeMap<Double, Double> timeToProjectedBaseForwardYieldMapInput =
 			TimeToProjectedBaseForwardYieldMapInput();

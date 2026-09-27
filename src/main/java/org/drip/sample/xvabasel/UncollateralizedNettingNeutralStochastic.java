@@ -516,7 +516,6 @@ public class UncollateralizedNettingNeutralStochastic
 			AlbaneseAndersen[] albaneseAndersen2Array = new AlbaneseAndersen[stepCount + 1];
 
 			for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
-
 				LatentStateVertexContainer latentStateVertexContainer = new LatentStateVertexContainer();
 
 				latentStateVertexContainer.add (OTCFixFloatLabel.Standard ("USD-3M-10Y"), Double.NaN);

@@ -97,8 +97,8 @@ import org.drip.service.env.EnvManager;
  */
 
 /**
- * <i>AROPnLEnsembleCorrelationAnalysis</i> analysis the Impact of Yield Curve Weiner Increments the
- * 	Simulation of an Ensemble of correlated Path of ARO PnL for the specified Bond. The References are:
+ * <i>AROEnsemblePnL</i> illustrates the Simulation of an Ensemble of correlated Path of ARO PnL for the
+ * 	specified Bond. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -137,7 +137,7 @@ import org.drip.service.env.EnvManager;
  * @author Lakshmi Krishnamurthy
  */
 
-public class AROPnLEnsembleCorrelationAnalysis
+public class AROEnsemblePnL
 {
 
 	private static final MarketYieldTermStructure TaxExemptMarketYieldTermStructure()
@@ -326,107 +326,6 @@ public class AROPnLEnsembleCorrelationAnalysis
 		return new MarketYieldTermStructure (spotTenorValueMap, infiniteHorizonTenorValueMap);
 	}
 
-	private static final void CorrelatedAROEnsemble (
-		final int pathCount,
-		final OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander,
-		final double[] taxExemptTaxableYieldCorrelationArray,
-		final double[] issuerEscrowYieldCorrelationArray,
-		final DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketSettings,
-		final AROPathGenerator aroPathGenerator,
-		final boolean taxExempt)
-		throws Exception
-	{
-		System.out.println (
-			"\t||---------------------------------------------------------------------------------------------------------------|"
-		);
-
-		System.out.println (
-			"\t||  " + (taxExempt ? "TAX EXEMPT" : "TAXABLE")
-		);
-
-		System.out.println (
-			"\t||---------------------------------------------------------------------------------------------------------------|"
-		);
-
-		System.out.println ("\t||  Inputs - L -> R: ");
-
-		System.out.println ("\t||    - Tax-Exempt to Taxable Yield Correlation");
-
-		System.out.println ("\t||    - Issuer to Escrow Yield Correlation");
-
-		System.out.println (
-			"\t||---------------------------------------------------------------------------------------------------------------|"
-		);
-
-		System.out.println ("\t||  Outputs - L -> R: ");
-
-		System.out.println ("\t||    - Issue PnL Average [Minimum -> Maximum]");
-
-		System.out.println ("\t||    - Escrow PnL Average [Minimum -> Maximum]");
-
-		System.out.println ("\t||    - Total PnL Average [Minimum -> Maximum]");
-
-		System.out.println (
-			"\t||---------------------------------------------------------------------------------------------------------------|"
-		);
-
-		for (double taxExemptTaxableYieldCorrelation : taxExemptTaxableYieldCorrelationArray) {
-			for (double issuerEscrowYieldCorrelation : issuerEscrowYieldCorrelationArray) {
-				AROEnsemble aroEnsemble = OrrDeLaNuez2013.Standard (
-					pathCount,
-					ornsteinUhlenbeckDriftWander,
-					new double[][]
-					{
-						{
-							1.,
-							taxExemptTaxableYieldCorrelation,
-							issuerEscrowYieldCorrelation
-						},
-						{
-							taxExemptTaxableYieldCorrelation,
-							1.,
-							issuerEscrowYieldCorrelation
-						},
-						{
-							issuerEscrowYieldCorrelation,
-							issuerEscrowYieldCorrelation,
-							1.
-						},
-					}
-				).aroEnsemble (
-					deGuillaumeRebonatoPogudinMarketSettings,
-					aroPathGenerator,
-					taxExempt
-				);
-
-				UnivariateCentralMeasures issuePnLCentralMeasures = aroEnsemble.issuePnLCentralMeasures();
-
-				UnivariateCentralMeasures escrowPnLCentralMeasures = aroEnsemble.escrowPnLCentralMeasures();
-
-				UnivariateCentralMeasures totalPnLCentralMeasures = aroEnsemble.totalPnLCentralMeasures();
-
-				System.out.println (
-					"\t|| {" +
-					FormatUtil.FormatDouble (taxExemptTaxableYieldCorrelation, 2, 0, 100.) + "% |" +
-				 	FormatUtil.FormatDouble (issuerEscrowYieldCorrelation, 2, 0, 100.) + "%} =>" +
-					FormatUtil.FormatDouble (issuePnLCentralMeasures.average(), 2, 3, 100.) + "% [" +
-					FormatUtil.FormatDouble (issuePnLCentralMeasures.minimum(), 2, 3, 100.) + "% ->" +
-					FormatUtil.FormatDouble (issuePnLCentralMeasures.maximum(), 2, 3, 100.) + "%] |" +
-					FormatUtil.FormatDouble (escrowPnLCentralMeasures.average(), 2, 3, 100.) + "% [" +
-					FormatUtil.FormatDouble (escrowPnLCentralMeasures.minimum(), 2, 3, 100.) + "% ->" +
-					FormatUtil.FormatDouble (escrowPnLCentralMeasures.maximum(), 2, 3, 100.) + "%] |" +
-					FormatUtil.FormatDouble (totalPnLCentralMeasures.average(), 2, 3, 100.) + "% [" +
-					FormatUtil.FormatDouble (totalPnLCentralMeasures.minimum(), 2, 3, 100.) + "% ->" +
-					FormatUtil.FormatDouble (totalPnLCentralMeasures.maximum(), 2, 3, 100.) + "%] |"
-				);
-			}
-		}
-
-		System.out.println (
-			"\t||---------------------------------------------------------------------------------------------------------------|"
-		);
-	}
-
 	/**
 	 * Entry Point
 	 * 
@@ -457,16 +356,6 @@ public class AROPnLEnsembleCorrelationAnalysis
 
 		double refinancingCharge = 0.01;
 
-		double[] taxExemptTaxableYieldCorrelationArray =
-		{
-			0.5,
-			0.7
-		};
-		double[] issuerEscrowYieldCorrelationArray =
-		{
-			0.1,
-			0.2
-		};
 		double embeddedOptionExercisePrice = 1.;
 
 		JulianDate issueBondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
@@ -509,7 +398,7 @@ public class AROPnLEnsembleCorrelationAnalysis
 			null
 		);
 
-		DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketSettings =
+		DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield =
 			new DeGuillaumeRebonatoPogudinMarketSettings (
 				currency,
 				spotDate,
@@ -529,30 +418,97 @@ public class AROPnLEnsembleCorrelationAnalysis
 			)
 		);
 
-		OrnsteinUhlenbeckDriftWander ornsteinUhlenbeckDriftWander =
-			new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime));
-
-		CorrelatedAROEnsemble (
+		OrrDeLaNuez2013 orrDeLaNuez2013 = OrrDeLaNuez2013.Standard (
 			pathCount,
-			ornsteinUhlenbeckDriftWander,
-			taxExemptTaxableYieldCorrelationArray,
-			issuerEscrowYieldCorrelationArray,
-			deGuillaumeRebonatoPogudinMarketSettings,
+			new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
+			null
+		);
+
+		AROEnsemble taxExemptAROEnsemble = orrDeLaNuez2013.aroEnsemble (
+			deGuillaumeRebonatoPogudinMarketYield,
 			aroPathGenerator,
+			null,
 			true
 		);
 
+		UnivariateCentralMeasures issuePnLTaxExempt = taxExemptAROEnsemble.issuePnLCentralMeasures();
+
+		UnivariateCentralMeasures escrowPnLTaxExempt = taxExemptAROEnsemble.escrowPnLCentralMeasures();
+
+		UnivariateCentralMeasures totalPnLTaxExempt = taxExemptAROEnsemble.totalPnLCentralMeasures();
+
+		System.out.println ("\t||------------------------------------------------------------------------|");
+
+		System.out.println ("\t||                       TAX-EXEMPT ARO PATH ENSEMBLE                     |");
+
+		System.out.println ("\t||------------------------------------------------------------------------|");
+
+		System.out.println (
+			"\t|| Tax-Exempt Issue PnL Thin Statistics  =>" +
+				FormatUtil.FormatDouble (issuePnLTaxExempt.average(), 2, 3, 100.) + "% [" +
+				FormatUtil.FormatDouble (issuePnLTaxExempt.minimum(), 2, 3, 100.) + "% ->" +
+				FormatUtil.FormatDouble (issuePnLTaxExempt.maximum(), 2, 3, 100.) + "%] |"
+			);
+
+		System.out.println (
+			"\t|| Tax-Exempt Escrow PnL Thin Statistics =>" +
+				FormatUtil.FormatDouble (escrowPnLTaxExempt.average(), 2, 3, 100.) + "% [" +
+				FormatUtil.FormatDouble (escrowPnLTaxExempt.minimum(), 2, 3, 100.) + "% ->" +
+				FormatUtil.FormatDouble (escrowPnLTaxExempt.maximum(), 2, 3, 100.) + "%] |"
+		);
+
+		System.out.println (
+			"\t|| Tax-Exempt Total PnL Thin Statistics  =>" +
+				FormatUtil.FormatDouble (totalPnLTaxExempt.average(), 2, 3, 100.) + "% [" +
+				FormatUtil.FormatDouble (totalPnLTaxExempt.minimum(), 2, 3, 100.) + "% ->" +
+				FormatUtil.FormatDouble (totalPnLTaxExempt.maximum(), 2, 3, 100.) + "%] |"
+		);
+
+		System.out.println ("\t||------------------------------------------------------------------------|");
+
 		System.out.println();
 
-		CorrelatedAROEnsemble (
-			pathCount,
-			ornsteinUhlenbeckDriftWander,
-			taxExemptTaxableYieldCorrelationArray,
-			issuerEscrowYieldCorrelationArray,
-			deGuillaumeRebonatoPogudinMarketSettings,
+		AROEnsemble taxableAROEnsemble = orrDeLaNuez2013.aroEnsemble (
+			deGuillaumeRebonatoPogudinMarketYield,
 			aroPathGenerator,
+			null,
 			false
 		);
+
+		UnivariateCentralMeasures issuePnLTaxable = taxableAROEnsemble.issuePnLCentralMeasures();
+
+		UnivariateCentralMeasures escrowPnLTaxable = taxableAROEnsemble.escrowPnLCentralMeasures();
+
+		UnivariateCentralMeasures totalPnLTaxable = taxableAROEnsemble.totalPnLCentralMeasures();
+
+		System.out.println ("\t||------------------------------------------------------------------------|");
+
+		System.out.println ("\t||                        TAXABLE ARO PATH ENSEMBLE                       |");
+
+		System.out.println ("\t||------------------------------------------------------------------------|");
+
+		System.out.println (
+			"\t|| Taxable Issue PnL Thin Statistics     =>" +
+				FormatUtil.FormatDouble (issuePnLTaxable.average(), 2, 3, 100.) + "% [" +
+				FormatUtil.FormatDouble (issuePnLTaxable.minimum(), 2, 3, 100.) + "% ->" +
+				FormatUtil.FormatDouble (issuePnLTaxable.maximum(), 2, 3, 100.) + "%] |"
+			);
+
+		System.out.println (
+			"\t|| Taxable Escrow PnL Thin Statistics    =>" +
+				FormatUtil.FormatDouble (escrowPnLTaxable.average(), 2, 3, 100.) + "% [" +
+				FormatUtil.FormatDouble (escrowPnLTaxable.minimum(), 2, 3, 100.) + "% ->" +
+				FormatUtil.FormatDouble (escrowPnLTaxable.maximum(), 2, 3, 100.) + "%] |"
+		);
+
+		System.out.println (
+			"\t|| Taxable Total PnL Thin Statistics     =>" +
+				FormatUtil.FormatDouble (totalPnLTaxable.average(), 2, 3, 100.) + "% [" +
+				FormatUtil.FormatDouble (totalPnLTaxable.minimum(), 2, 3, 100.) + "% ->" +
+				FormatUtil.FormatDouble (totalPnLTaxable.maximum(), 2, 3, 100.) + "%] |"
+		);
+
+		System.out.println ("\t||------------------------------------------------------------------------|");
 
 		EnvManager.TerminateEnv();
 	}

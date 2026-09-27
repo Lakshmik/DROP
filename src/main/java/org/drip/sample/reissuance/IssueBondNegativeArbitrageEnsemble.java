@@ -4,6 +4,7 @@ package org.drip.sample.reissuance;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
@@ -12,14 +13,15 @@ import org.drip.function.r1tor1operator.Flat;
 import org.drip.measure.dynamics.OrnsteinUhlenbeckDriftWander;
 import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
-import org.drip.product.muni.DeGuillaumeRebonatoPogudin;
 import org.drip.product.muni.DeGuillaumeRebonatoPogudinMarketSettings;
+import org.drip.product.muni.EOSBasis;
+import org.drip.product.muni.InceptionMarketSettings;
 import org.drip.product.muni.MarketYieldTermStructure;
-import org.drip.product.refinancing.AROPathEntry;
-import org.drip.product.refinancing.AROPathGenerator;
-import org.drip.product.refinancing.AROSetting;
-import org.drip.service.common.FormatUtil;
+import org.drip.product.muni.RefinancingEnsemble;
+import org.drip.product.muni.RefinancingPathGenerator;
+import org.drip.product.refinancing.OrrDeLaNuez2013;
 import org.drip.service.env.EnvManager;
+import org.drip.state.creator.ScenarioGovvieCurveBuilder;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -98,8 +100,9 @@ import org.drip.service.env.EnvManager;
  */
 
 /**
- * <i>AROPnLPath</i> illustrates the Simulation of a single-correlated Path of ARO PnL for the specified
- *  Bond. The References are:
+ * <i>IssueBondNegativeArbitrageEnsemble</i> illustrates the Simulation of Correlated Ensemble of Tax-exempt
+ *  and Taxable Negative Arbitrage Count across the Dates in an Exercise Period. The Simulated Counts are
+ *  Anchored at the Dated Nodes. The References are:
  *
  *  <br><br>
  *  <ul>
@@ -138,8 +141,79 @@ import org.drip.service.env.EnvManager;
  * @author Lakshmi Krishnamurthy
  */
 
-public class AROPnLPath
+public class IssueBondNegativeArbitrageEnsemble
 {
+
+	private static final List<String> TenorList()
+	{
+		List<String> tenorList = new ArrayList<String>();
+
+		tenorList.add ("3M");
+
+		tenorList.add ("6M");
+
+		tenorList.add ("1Y");
+
+		tenorList.add ("2Y");
+
+		tenorList.add ("3Y");
+
+		tenorList.add ("4Y");
+
+		tenorList.add ("5Y");
+
+		tenorList.add ("7Y");
+
+		tenorList.add ("10Y");
+
+		tenorList.add ("12Y");
+
+		tenorList.add ("15Y");
+
+		tenorList.add ("20Y");
+
+		tenorList.add ("30Y");
+
+		return tenorList;
+	}
+
+	private static final int[] TenorJulianDateArray (
+		final JulianDate initialDate)
+		throws Exception
+	{
+		int i = 0;
+
+		List<String> tenorList = TenorList();
+
+		int[] tenorJulianDateArray = new int[tenorList.size()];
+
+		for (String tenor : tenorList) {
+			tenorJulianDateArray[i++] = initialDate.addTenor (tenor).julian();
+		}
+
+		return tenorJulianDateArray;
+	}
+
+	private static final double[] InitialTaxExemptYieldArray()
+	{
+		double[] initialTaxExemptYieldArray = new double[TenorList().size()];
+
+		int i = 0;
+		initialTaxExemptYieldArray[i++] = 0.00475;
+		initialTaxExemptYieldArray[i++] = 0.00528;
+		initialTaxExemptYieldArray[i++] = 0.00600;
+		initialTaxExemptYieldArray[i++] = 0.00720;
+		initialTaxExemptYieldArray[i++] = 0.00920;
+		initialTaxExemptYieldArray[i++] = 0.00870;
+		initialTaxExemptYieldArray[i++] = 0.01260;
+		initialTaxExemptYieldArray[i++] = 0.01750;
+		initialTaxExemptYieldArray[i++] = 0.02400;
+		initialTaxExemptYieldArray[i++] = 0.02840;
+		initialTaxExemptYieldArray[i++] = 0.03190;
+		initialTaxExemptYieldArray[i++] = 0.03650;
+		initialTaxExemptYieldArray[i++] = 0.04170;
+		return initialTaxExemptYieldArray;
+	}
 
 	private static final MarketYieldTermStructure TaxExemptMarketYieldTermStructure()
 		throws Exception
@@ -201,6 +275,27 @@ public class AROPnLPath
 		infiniteHorizonTenorValueMap.put ("30Y", 0.05409);
 
 		return new MarketYieldTermStructure (spotTenorValueMap, infiniteHorizonTenorValueMap);
+	}
+
+	private static final double[] InitialTaxableYieldArray()
+	{
+		double[] initialTaxableYieldArray = new double[TenorList().size()];
+
+		int i = 0;
+		initialTaxableYieldArray[i++] = 0.00621;
+		initialTaxableYieldArray[i++] = 0.00642;
+		initialTaxableYieldArray[i++] = 0.00692;
+		initialTaxableYieldArray[i++] = 0.00928;
+		initialTaxableYieldArray[i++] = 0.01005;
+		initialTaxableYieldArray[i++] = 0.01035;
+		initialTaxableYieldArray[i++] = 0.01574;
+		initialTaxableYieldArray[i++] = 0.02123;
+		initialTaxableYieldArray[i++] = 0.02851;
+		initialTaxableYieldArray[i++] = 0.03271;
+		initialTaxableYieldArray[i++] = 0.03541;
+		initialTaxableYieldArray[i++] = 0.03822;
+		initialTaxableYieldArray[i++] = 0.04132;
+		return initialTaxableYieldArray;
 	}
 
 	private static final MarketYieldTermStructure TaxableMarketYieldTermStructure()
@@ -327,6 +422,24 @@ public class AROPnLPath
 		return new MarketYieldTermStructure (spotTenorValueMap, infiniteHorizonTenorValueMap);
 	}
 
+	private static final List<JulianDate> SimulationDateArray (
+		final JulianDate simulationStartDate,
+		final int simulationCount)
+		throws Exception
+	{
+		List<JulianDate> simulationDateArray = new ArrayList<JulianDate>();
+
+		JulianDate simulationDate = simulationStartDate;
+
+		simulationDateArray.add (simulationDate);
+
+		for (int simulationIndex = 0; simulationIndex < simulationCount; ++simulationIndex) {
+			simulationDateArray.add (simulationDate = simulationDate.addBusDays (1, "USD"));
+		}
+
+		return simulationDateArray;
+	}
+
 	/**
 	 * Entry Point
 	 * 
@@ -345,63 +458,43 @@ public class AROPnLPath
 		double burstiness = 0.002;
 		double relaxationTime = 50;
 
-		int issueBondFrequency = 2;
-		double issueBondCoupon = 0.05;
-		String issueBondDayCount = "30/360";
+		int bondFrequency = 2;
+		double bondCoupon = 0.05;
+		String bondDayCount = "30/360";
 
-		int escrowBondFrequency = 1;
-		double escrowBondCoupon = 0.;
-		String escrowBondDayCount = "30/360";
-
-		double refinancingCharge = 0.01;
-
-		double embeddedOptionExercisePrice = 1.;
-
-		JulianDate issueBondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
-
-		JulianDate escrowBondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
-
-		JulianDate issueBondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
-
-		JulianDate escrowBondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
+		int pathCount = 10000;
+		int simulationDateCount = 50;
 
 		JulianDate spotDate = DateUtil.Today();
 
-		JulianDate aroExerciseStartDate = spotDate.addYears (1);
+		JulianDate exerciseStartDate = spotDate.addYears (1);
 
-		JulianDate embeddedOptionExerciseDate = aroExerciseStartDate.addTenor ("3M");
+		JulianDate bondMaturityDate = DateUtil.CreateFromYMD (2039, 12, 1);
 
-		BondComponent issueBond = BondBuilder.CreateSimpleFixed (
+		JulianDate bondEffectiveDate = DateUtil.CreateFromYMD (2009, 12, 3);
+
+		BondComponent bond = BondBuilder.CreateSimpleFixed (
 			"CUSIP",
 			currency,
 			"",
-			issueBondCoupon,
-			issueBondFrequency,
-			issueBondDayCount,
-			issueBondEffectiveDate,
-			issueBondMaturityDate,
+			bondCoupon,
+			bondFrequency,
+			bondDayCount,
+			bondEffectiveDate,
+			bondMaturityDate,
 			null,
 			null
 		);
 
-		BondComponent escrowBond = BondBuilder.CreateSimpleFixed (
-			"CUSIP",
-			currency,
-			"",
-			escrowBondCoupon,
-			escrowBondFrequency,
-			escrowBondDayCount,
-			escrowBondEffectiveDate,
-			escrowBondMaturityDate,
-			null,
-			null
-		);
+		List<JulianDate> simulationDateList = SimulationDateArray (exerciseStartDate, simulationDateCount);
 
-		List<JulianDate> simulationDateList = new ArrayList<JulianDate>();
+		JulianDate initialDate = DateUtil.CreateFromYMD (2013, 12, 3);
 
-		simulationDateList.add (aroExerciseStartDate);
+		double[] initialTaxableYieldArray = InitialTaxableYieldArray();
 
-		simulationDateList.add (embeddedOptionExerciseDate);
+		int[] tenorDateJulianArray = TenorJulianDateArray (initialDate);
+
+		double[] initialTaxExemptYieldArray = InitialTaxExemptYieldArray();
 
 		DeGuillaumeRebonatoPogudinMarketSettings deGuillaumeRebonatoPogudinMarketYield =
 			new DeGuillaumeRebonatoPogudinMarketSettings (
@@ -412,115 +505,78 @@ public class AROPnLPath
 				EscrowMarketYieldTermStructure()
 			);
 
-		AROPathEntry aroPathEntry = new AROPathGenerator (
-			issueBond,
-			new AROSetting (
-				aroExerciseStartDate,
-				embeddedOptionExerciseDate,
-				embeddedOptionExercisePrice,
-				escrowBond,
-				refinancingCharge
-			)
-		).generate (
-			DeGuillaumeRebonatoPogudin.Standard (
-				new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
-				deGuillaumeRebonatoPogudinMarketYield,
-				null
-			).evolve (
-				deGuillaumeRebonatoPogudinMarketYield,
-				simulationDateList
+		InceptionMarketSettings inceptionMarketSettings = new InceptionMarketSettings (
+			initialDate,
+			ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
+				"TAX_EXEMPT_" + initialDate,
+				initialDate,
+				"UST",
+				currency,
+				tenorDateJulianArray,
+				initialTaxExemptYieldArray
 			),
-			true
+			ScenarioGovvieCurveBuilder.CubicPolynomialCurve (
+				"TAXABLE_" + initialDate,
+				initialDate,
+				"UST",
+				currency,
+				tenorDateJulianArray,
+				initialTaxableYieldArray
+			)
 		);
 
-		System.out.println ("\t||---------------------------------------------------|");
-
-		System.out.println ("\t||                  ARO PATH ENTRY                   |");
-
-		System.out.println ("\t||---------------------------------------------------|");
-
-		System.out.println (
-			"\t|| Refinancing Issue Price               : " + FormatUtil.FormatDouble (
-				aroPathEntry.refinancingIssuePrice(),
-				3,
-				4,
-				100.
-			) + " |"
+		RefinancingPathGenerator refinancingPathPnLGenerator = new RefinancingPathGenerator (
+			bond,
+			inceptionMarketSettings.dateInceptionMarketSimulatedMeasureMap (
+				bond,
+				null,
+				null,
+				simulationDateList
+			)
 		);
 
-		System.out.println (
-			"\t|| Embedded Option Exercise Issue Price  : " + FormatUtil.FormatDouble (
-				aroPathEntry.embeddedOptionExerciseIssuePrice(),
-				3,
-				4,
-				100.
-			) + " |"
+		RefinancingEnsemble refinancingEnsemble = OrrDeLaNuez2013.Standard (
+			pathCount,
+			new OrnsteinUhlenbeckDriftWander (new Flat (burstiness), new Flat (relaxationTime)),
+			null
+		).refinancingEnsemble (
+			deGuillaumeRebonatoPogudinMarketYield,
+			refinancingPathPnLGenerator,
+			EOSBasis.Standard (bond, bondCoupon),
+			EOSBasis.Standard (bond, bondCoupon),
+			simulationDateList
 		);
 
-		System.out.println (
-			"\t|| Issue Accrual                         : " + FormatUtil.FormatDouble (
-				aroPathEntry.issueAccrual(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		TreeMap<JulianDate, Integer> dateTaxExemptNegativeArbitrageMap =
+			refinancingEnsemble.dateTaxExemptNegativeArbitrageMap();
 
-		System.out.println (
-			"\t|| Issue PnL                             : " + FormatUtil.FormatDouble (
-				aroPathEntry.issuePnL(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		TreeMap<JulianDate, Integer> dateTaxableNegativeArbitrageMap =
+			refinancingEnsemble.dateTaxableNegativeArbitrageMap();
 
-		System.out.println (
-			"\t|| Refinancing Escrow Price              : " + FormatUtil.FormatDouble (
-				aroPathEntry.refinancingEscrowPrice(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		System.out.println ("\t||------------------------------||");
 
-		System.out.println (
-			"\t|| Embedded Option Exercise Escrow Price : " + FormatUtil.FormatDouble (
-				aroPathEntry.embeddedOptionExerciseEscrowPrice(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		System.out.println ("\t||    NEGATIVE ARBITRAGE MAP    ||");
 
-		System.out.println (
-			"\t|| Escrow Accrual                        : " + FormatUtil.FormatDouble (
-				aroPathEntry.escrowAccrual(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		System.out.println ("\t||------------------------------||");
 
-		System.out.println (
-			"\t|| Escrow PnL                            : " + FormatUtil.FormatDouble (
-				aroPathEntry.escrowPnL(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		System.out.println ("\t|| L -> R:                      ||");
 
-		System.out.println (
-			"\t|| Total PnL                             : " + FormatUtil.FormatDouble (
-				aroPathEntry.pnL(),
-				3,
-				4,
-				100.
-			) + " |"
-		);
+		System.out.println ("\t||   - Date                     ||");
 
-		System.out.println ("\t||---------------------------------------------------|");
+		System.out.println ("\t||   - Tax-exempt               ||");
+
+		System.out.println ("\t||   - Taxable                  ||");
+
+		System.out.println ("\t||------------------------------||");
+
+		for (JulianDate date : dateTaxExemptNegativeArbitrageMap.keySet()) {
+			System.out.println (
+				"\t|| " + date + " => " + dateTaxExemptNegativeArbitrageMap.get (date) + " | " +
+					dateTaxableNegativeArbitrageMap.get (date) + " ||"
+			);
+		}
+
+		System.out.println ("\t||------------------------------||");
 
 		EnvManager.TerminateEnv();
 	}

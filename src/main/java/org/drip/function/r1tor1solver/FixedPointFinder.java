@@ -236,7 +236,7 @@ public abstract class FixedPointFinder
 				}
 			}
 
-			fixedPointFinderOutput.setRoot (iteratedVariate.x());
+			fixedPointFinderOutput.setRoot (iteratedVariate.x(), iteratedVariate.firstAndSecondDerivative());
 		} catch (Exception e) {
 			if (_whine) {
 				e.printStackTrace();

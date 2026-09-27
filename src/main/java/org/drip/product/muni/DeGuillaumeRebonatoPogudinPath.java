@@ -528,4 +528,72 @@ public class DeGuillaumeRebonatoPogudinPath
 			taxableGovvieCurveMap (currency) &&
 			escrowGovvieCurveMap (currency);
 	}
+
+	/**
+	 * Retrieve the Map of the Simulation Date to Tax-exempt Negative Arbitrage Indicator at the Target Date
+	 * 
+	 * @param targetDate Target Date
+	 * 
+	 * @return Map of the Simulation Date to Tax-exempt Negative Arbitrage Indicator at the Target Date
+	 */
+
+	public TreeMap<JulianDate, Boolean> dateTaxExemptNegativeArbitrageMap (
+		final JulianDate targetDate)
+	{
+		if (null == targetDate) {
+			return null;
+		}
+
+		TreeMap<JulianDate, Boolean> dateTaxExemptNegativeArbitrageMap = new TreeMap<JulianDate, Boolean>();
+
+		try {
+			for (JulianDate date : _escrowDateTenorYieldRealizationMap.keySet()) {
+				dateTaxExemptNegativeArbitrageMap.put (
+					date,
+					_dateEscrowGovvieCurveMap.get (date).yld (targetDate) <
+						_dateTaxExemptGovvieCurveMap.get (date).yld (targetDate)
+				);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		return dateTaxExemptNegativeArbitrageMap;
+	}
+
+	/**
+	 * Retrieve the Map of the Simulation Date to Taxable Negative Arbitrage Indicator at the Target Date
+	 * 
+	 * @param targetDate Target Date
+	 * 
+	 * @return Map of the Simulation Date to Taxable Negative Arbitrage Indicator at the Target Date
+	 */
+
+	public TreeMap<JulianDate, Boolean> dateTaxableNegativeArbitrageMap (
+		final JulianDate targetDate)
+	{
+		if (null == targetDate) {
+			return null;
+		}
+
+		TreeMap<JulianDate, Boolean> dateTaxableNegativeArbitrageMap = new TreeMap<JulianDate, Boolean>();
+
+		try {
+			for (JulianDate date : _escrowDateTenorYieldRealizationMap.keySet()) {
+				dateTaxableNegativeArbitrageMap.put (
+					date,
+					_dateEscrowGovvieCurveMap.get (date).yld (targetDate) <
+						_dateTaxableGovvieCurveMap.get (date).yld (targetDate)
+				);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		return dateTaxableNegativeArbitrageMap;
+	}
 }

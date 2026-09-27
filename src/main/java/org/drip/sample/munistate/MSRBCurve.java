@@ -1,5 +1,5 @@
 
-package org.drip.sample.kalotaywilliamsfabozzi;
+package org.drip.sample.munistate;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -120,7 +120,7 @@ import org.drip.state.municipal.ZeroVolatilityPeriodState;
  *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
  *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
  *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/kalotaywilliamsfabozzi/README.md">Kalotay, Williams, Fabozzi (1993) Output Reconcilers</a></li>
+ *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/munistate/README.md">Municipal Curve Construction and Jacobian</a></li>
  *  </ul>
  * <br><br>
  *
@@ -217,8 +217,14 @@ public class MSRBCurve
 
 		TreeMap<Double, Double> timeToCalibrationYieldMapInput = TimeToCalibrationYieldMapInput();
 
-		KalotayWilliamsFabozzi kalotayWilliamsFabozzi =
-			new KalotayWilliamsFabozzi (timeToCalibrationYieldMapInput);
+		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
+
+		for (double time : timeToCalibrationYieldMapInput.keySet()) {
+			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
+				time,
+				timeToCalibrationYieldMapInput.get (time)
+			);
+		}
 
 		System.out.println ("\t|----------------------------------------------------------------||");
 
