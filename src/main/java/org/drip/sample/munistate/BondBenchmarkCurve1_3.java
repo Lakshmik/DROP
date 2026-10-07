@@ -7,12 +7,11 @@ import java.util.List;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.optimization.neldermead.DownhillSimplex;
-import org.drip.optimization.neldermead.DownhillSimplexRun;
 import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
 import org.drip.service.env.EnvManager;
 import org.drip.state.govvie.MarketComponent;
-import org.drip.state.govvie.MultiBondCurveCalibrator;
+import org.drip.state.govvie.MultiBondLeastSquaresFunction;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -961,15 +960,24 @@ public class BondBenchmarkCurve1_3
 			)
 		);
 
-		MultiBondCurveCalibrator multiBondCurveCalibrator = new MultiBondCurveCalibrator (
+		System.out.println ("\t||--------------------------------------------------||");
+
+		System.out.println ("\t||         1-3Y BOND BENCHMARK CALIBRATION          ||");
+
+		System.out.println ("\t||--------------------------------------------------||");
+
+		MultiBondLeastSquaresFunction multiBondCurveCalibrator = new MultiBondLeastSquaresFunction (
 			spotDate,
 			"UST",
 			currency,
 			calibrationDateArray,
-			marketComponentList
+			marketComponentList,
+			0
 		);
 
-		System.out.println (multiBondCurveCalibrator);
+		System.out.print (multiBondCurveCalibrator.toString ("\t|| "));
+
+		System.out.println ("\t||--------------------------------------------------||");
 
 		DownhillSimplex downhillSimplex = DownhillSimplex.Standard (
 			multiBondCurveCalibrator,
@@ -978,9 +986,17 @@ public class BondBenchmarkCurve1_3
 			false
 		);
 
-		DownhillSimplexRun run = downhillSimplex.controlRun();
+		System.out.println();
 
-		System.out.println (run);
+		System.out.println (
+			"\t||---------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println ("\t|| " + downhillSimplex.controlRun() + " ||");
+
+		System.out.println (
+			"\t||---------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

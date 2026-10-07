@@ -138,6 +138,14 @@ public class OvernightFixedFloatContainer {
 								org.drip.market.definition.OvernightIndexContainer.IndexFromJurisdiction
 									("CHF"), "ON"), "ON"), 2));
 
+			_mapFundConvention.put ("DKK", new org.drip.market.otc.FixedFloatSwapConvention (new
+				org.drip.market.otc.FixedStreamConvention ("DKK", "Act/360", "DKK", "1Y", "1Y",
+					org.drip.analytics.support.CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC),
+						new org.drip.market.otc.FloatStreamConvention (
+							org.drip.state.identifier.ForwardLabel.Create (
+								org.drip.market.definition.OvernightIndexContainer.IndexFromJurisdiction
+									("DKK"), "ON"), "ON"), 2));
+
 			_mapFundConvention.put ("EUR", new org.drip.market.otc.FixedFloatSwapConvention (new
 				org.drip.market.otc.FixedStreamConvention ("EUR", "Act/360", "EUR", "1Y", "1Y",
 					org.drip.analytics.support.CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC),

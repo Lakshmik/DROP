@@ -118,6 +118,10 @@ import java.util.HashMap;
 public class DownhillSimplexRunDiagnostics
 	extends DownhillSimplexRun
 {
+	private int _expansionCount = Integer.MIN_VALUE;
+	private int _shrinkageCount = Integer.MIN_VALUE;
+	private int _reflectionCount = Integer.MIN_VALUE;
+	private int _contractionCount = Integer.MIN_VALUE;
 	private HashMap<Integer, DownhillSimplexIterationDiagnostics> _downhillSimplexIterationDiagnosticsMap =
 		null;
 
@@ -127,8 +131,57 @@ public class DownhillSimplexRunDiagnostics
 
 	public DownhillSimplexRunDiagnostics()
 	{
+		_expansionCount = 0;
+		_shrinkageCount = 0;
+		_reflectionCount = 0;
+		_contractionCount = 0;
+
 		_downhillSimplexIterationDiagnosticsMap =
 			new HashMap<Integer, DownhillSimplexIterationDiagnostics>();
+	}
+
+	/**
+	 * Retrieve the Count of Reflections
+	 * 
+	 * @return Count of Reflections
+	 */
+
+	public int reflectionCount()
+	{
+		return _reflectionCount;
+	}
+
+	/**
+	 * Retrieve the Count of Expansions
+	 * 
+	 * @return Count of Expansions
+	 */
+
+	public int expansionCount()
+	{
+		return _expansionCount;
+	}
+
+	/**
+	 * Retrieve the Count of Contractions
+	 * 
+	 * @return Count of Contractions
+	 */
+
+	public int contractionCount()
+	{
+		return _contractionCount;
+	}
+
+	/**
+	 * Retrieve the Count of Shrinkages
+	 * 
+	 * @return Count of Shrinkages
+	 */
+
+	public int shrinkageCount()
+	{
+		return _shrinkageCount;
 	}
 
 	/**
@@ -140,6 +193,54 @@ public class DownhillSimplexRunDiagnostics
 	public HashMap<Integer, DownhillSimplexIterationDiagnostics> downhillSimplexIterationDiagnosticsMap()
 	{
 		return _downhillSimplexIterationDiagnosticsMap;
+	}
+
+	/**
+	 * Increment the Number of Reflections
+	 * 
+	 * @return Number of Reflections
+	 */
+
+	public boolean incrementReflectionCount()
+	{
+		++_reflectionCount;
+		return true;
+	}
+
+	/**
+	 * Increment the Number of Expansions
+	 * 
+	 * @return Number of Expansions
+	 */
+
+	public boolean incrementExpansionCount()
+	{
+		++_expansionCount;
+		return true;
+	}
+
+	/**
+	 * Increment the Number of Contractions
+	 * 
+	 * @return Number of Contractions
+	 */
+
+	public boolean incrementContractionCount()
+	{
+		++_contractionCount;
+		return true;
+	}
+
+	/**
+	 * Increment the Number of Shrinkages
+	 * 
+	 * @return Number of Shrinkages
+	 */
+
+	public boolean incrementShrinkageCount()
+	{
+		++_shrinkageCount;
+		return true;
 	}
 
 	/**
@@ -417,6 +518,17 @@ public class DownhillSimplexRunDiagnostics
 	}
 
 	/**
+	 * Retrieve the Iteration Count
+	 * 
+	 * @return Iteration Count
+	 */
+
+	public int iterationCount()
+	{
+		return _downhillSimplexIterationDiagnosticsMap.size();
+	}
+
+	/**
 	 * 'JSON-ize' the State
 	 * 
 	 * @param prefix The JSON Prefix
@@ -429,7 +541,11 @@ public class DownhillSimplexRunDiagnostics
 	{
 		return prefix + "(" +
 			"Optimal Coordinate: " + optimalObjectiveFunctionCoordinate() + "; " +
-			"Diagnostics Entry: " + _downhillSimplexIterationDiagnosticsMap +
+			"Diagnostics Entry: " + _downhillSimplexIterationDiagnosticsMap + "; " +
+			"Reflection Count : " + _reflectionCount + "; " +
+			"Expansion Count : " + _expansionCount + "; " +
+			"Contraction Count: " + _contractionCount + "; " +
+			"Shrinkage Count: " + _shrinkageCount + "; " +
 		")";
 	}
 

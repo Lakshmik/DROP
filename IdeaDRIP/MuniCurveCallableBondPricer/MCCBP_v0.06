@@ -171,7 +171,7 @@
 	- Replication of Historical Yield Correlations: Both within and across Markets
 	- Distribution Tails for the Yields: Low high end and fat low end
 	- Use the above to analyze and evaluate different exercise criteria, and establish refunding criteria
- 6.4) Expected Present Value – EPV – Savings
+ 6.5) Expected Present Value – EPV – Savings
 	- Simulate taxable issuer yield curve, tax-free issuer yield curve, escrow yeld curve
 	- Quarterly Refunding of Candidate Bonds => value of refunding bonds assuming one percent for costs of bond issuance
 	- Negative Arbitrage => Escrow Yield < Refuncing Yield
@@ -182,7 +182,7 @@
 			- Taxable vs. tax-free refunding
 			- Optimal exercise as a function of rate and time
  --------------------------
- 6.5) Analysis and Enhancement: (Cumulative => 12/12)
+ 6.6) Analysis and Enhancement: (Cumulative => 12/12)
 	- Correlated Ornstein-Uhlenbeck Yield Evolution
 	- Ornstein-Uhlenbeck Dynamics Regime Based NPV Savings
 	- NPV Savings at Typical Exercise YTW

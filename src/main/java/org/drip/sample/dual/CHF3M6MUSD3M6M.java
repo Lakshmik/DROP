@@ -17,6 +17,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -94,124 +102,125 @@ import org.drip.state.identifier.ForwardLabel;
 
 /**
  * <i>CHF3M6MUSD3M6M</i> demonstrates the setup and construction of the USD 3M Forward Curve from
- * CHF3M6MUSD3M6M CCBS, CHF 3M, CHF 6M, and USD 6M Quotes.
+ * 	CHF3M6MUSD3M6M CCBS, CHF 3M, CHF 6M, and USD 6M Quotes.
  * 
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/cross/README.md">G7 Standard Cross Currency Swap</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/capfloor/README.md">FRA Standard Cap Floor Valuation</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CHF3M6MUSD3M6M {
-	private static final double _dblFXCHFUSD = 1.1121;
-
-	private static final int[] s_aiUSDOISDepositMaturityDays = new int[] {
+public class CHF3M6MUSD3M6M
+{
+	private static final double FX_CHFUSD = 1.1121;
+	private static final int[] USD_OIS_DEPOSIT_MATURITY_DAYS_ARRAY =
+	{
 		1,
 		2,
 		3
 	};
-
-	private static final int[] s_aiCHFOISDepositMaturityDays = new int[] {
+	private static final int[] CHF_OIS_DEPOSIT_MATURITY_DAYS_ARRAY =
+	{
 		1,
 		2,
 		3
 	};
-
-	private static final double[] s_adblUSDOISDepositQuote = new double[] {
+	private static final double[] USD_OIS_DEPOSIT_QUOTE_ARRAY =
+	{
 		0.0004,	// 1D
 		0.0004,	// 2D
 		0.0004	// 3D
 	};
-
-	private static final double[] s_adblCHFOISDepositQuote = new double[] {
+	private static final double[] CHF_OIS_DEPOSIT_QUOTE_ARRAY =
+	{
 		0.0004,	// 1D
 		0.0004,	// 2D
 		0.0004	// 3D
 	};
-
-	private static final String[] s_astrUSDShortEndOISMaturityTenor = new String[] {
+	private static final String[] USD_SHORT_END_OIS_MATURITY_TENOR_ARRAY =
+	{
 		"1W",
 		"2W",
 		"3W",
 		"1M"
 	};
-
-	private static final String[] s_astrCHFShortEndOISMaturityTenor = new String[] {
+	private static final String[] CHF_SHORT_END_OIS_MATURITY_TENOR_ARRAY =
+	{
 		"1W",
 		"2W",
 		"3W",
 		"1M"
 	};
-
-	private static final double[] s_adblUSDShortEndOISQuote = new double[] {
+	private static final double[] USD_SHORT_END_OIS_MATURITY_QUOTE_ARRAY =
+	{
 		0.00070,    //   1W
 		0.00069,    //   2W
 		0.00078,    //   3W
 		0.00074     //   1M
 	};
-
-	private static final double[] s_adblCHFShortEndOISQuote = new double[] {
+	private static final double[] CHF_SHORT_END_OIS_MATURITY_QUOTE_ARRAY =
+	{
 		0.00070,    //   1W
 		0.00069,    //   2W
 		0.00078,    //   3W
 		0.00074     //   1M
 	};
-
-	private static final String[] s_astrUSDOISFutureTenor = new String[] {
+	private static final String[] USD_OIS_FUTURE_TENOR_ARRAY =
+	{
 		"1M",
 		"1M",
 		"1M",
 		"1M",
 		"1M"
 	};
-
-	private static final String[] s_astrCHFOISFutureTenor = new String[] {
+	private static final String[] CHF_OIS_FUTURE_TENOR_ARRAY =
+	{
 		"1M",
 		"1M",
 		"1M",
 		"1M",
 		"1M"
 	};
-
-	private static final String[] s_astrUSDOISFutureMaturityTenor = new String[] {
+	private static final String[] USD_OIS_FUTURE_MATURITY_TENOR_ARRAY =
+	{
 		"1M",
 		"2M",
 		"3M",
 		"4M",
 		"5M"
 	};
-
-	private static final String[] s_astrCHFOISFutureMaturityTenor = new String[] {
+	private static final String[] CHF_OIS_FUTURE_MATURITY_TENOR_ARRAY =
+	{
 		"1M",
 		"2M",
 		"3M",
 		"4M",
 		"5M"
 	};
-
-	private static final double[] s_adblUSDOISFutureQuote = new double[] {
+	private static final double[] USD_OIS_FUTURE_QUOTE_ARRAY =
+	{
 		 0.00046,    //   1M x 1M
 		 0.00016,    //   2M x 1M
 		-0.00007,    //   3M x 1M
 		-0.00013,    //   4M x 1M
 		-0.00014     //   5M x 1M
 	};
-
-	private static final double[] s_adblCHFOISFutureQuote = new double[] {
+	private static final double[] CHF_OIS_FUTURE_QUOTE_ARRAY =
+	{
 		 0.00046,    //   1M x 1M
 		 0.00016,    //   2M x 1M
 		-0.00007,    //   3M x 1M
 		-0.00013,    //   4M x 1M
 		-0.00014     //   5M x 1M
 	};
-
-	private static final String[] s_astrUSDLongEndOISMaturityTenor = new String[] {
+	private static final String[] USD_LONG_END_OIS_MATURITY_TENOR_ARRAY =
+	{
 		"15M",
 		"18M",
 		"21M",
@@ -231,8 +240,8 @@ public class CHF3M6MUSD3M6M {
 		"25Y",
 		"30Y"
 	};
-
-	private static final String[] s_astrCHFLongEndOISMaturityTenor = new String[] {
+	private static final String[] CHF_LONG_END_OIS_MATURITY_TENOR_ARRAY =
+	{
 		"15M",
 		"18M",
 		"21M",
@@ -252,8 +261,8 @@ public class CHF3M6MUSD3M6M {
 		"25Y",
 		"30Y"
 	};
-
-	private static final double[] s_adblUSDLongEndOISQuote = new double[] {
+	private static final double[] USD_LONG_END_OIS_MATURITY_QUOTE_ARRAY =
+	{
 		0.00002,    //  15M
 		0.00008,    //  18M
 		0.00021,    //  21M
@@ -273,8 +282,8 @@ public class CHF3M6MUSD3M6M {
 		0.02003,    //  25Y
 		0.02038     //  30Y
 	};
-
-	private static final double[] s_adblCHFLongEndOISQuote = new double[] {
+	private static final double[] CHF_LONG_END_OIS_MATURITY_QUOTE_ARRAY =
+	{
 		0.00002,    //  15M
 		0.00008,    //  18M
 		0.00021,    //  21M
@@ -294,8 +303,8 @@ public class CHF3M6MUSD3M6M {
 		0.02003,    //  25Y
 		0.02038     //  30Y
 	};
-
-	private static final String[] s_astrUSD6MDepositTenor = new String[] {
+	private static final String[] USD_6M_DEPOSIT_TENOR_ARRAY =
+	{
 		"1D",
 		"1W",
 		"2W",
@@ -306,8 +315,8 @@ public class CHF3M6MUSD3M6M {
 		"4M",
 		"5M"
 	};
-
-	private static final String[] s_astrCHF6MDepositTenor = new String[] {
+	private static final String[] CHF_6M_DEPOSIT_TENOR_ARRAY =
+	{
 		"1D",
 		"1W",
 		"2W",
@@ -318,8 +327,8 @@ public class CHF3M6MUSD3M6M {
 		"4M",
 		"5M"
 	};
-
-	private static final double[] s_adblUSD6MDepositQuote = new double[] {
+	private static final double[] USD_6M_DEPOSIT_QUOTE_ARRAY =
+	{
 		0.003565,	// 1D
 		0.003858,	// 1W
 		0.003840,	// 2W
@@ -330,8 +339,8 @@ public class CHF3M6MUSD3M6M {
 		0.003342,	// 4M
 		0.003225	// 5M
 	};
-
-	private static final double[] s_adblCHF6MDepositQuote = new double[] {
+	private static final double[] CHF_6M_DEPOSIT_QUOTE_ARRAY =
+	{
 		0.003565,	// 1D
 		0.003858,	// 1W
 		0.003840,	// 2W
@@ -342,8 +351,8 @@ public class CHF3M6MUSD3M6M {
 		0.003342,	// 4M
 		0.003225	// 5M
 	};
-
-	private static final String[] s_astrUSD6MFRATenor = new String[] {
+	private static final String[] USD_6M_FRA_TENOR_ARRAY =
+	{
 		 "0D",
 		 "1M",
 		 "2M",
@@ -364,8 +373,8 @@ public class CHF3M6MUSD3M6M {
 		"17M",
 		"18M"
 	};
-
-	private static final String[] s_astrCHF6MFRATenor = new String[] {
+	private static final String[] CHF_6M_FRA_TENOR_ARRAY =
+	{
 		 "0D",
 		 "1M",
 		 "2M",
@@ -386,8 +395,8 @@ public class CHF3M6MUSD3M6M {
 		"17M",
 		"18M"
 	};
-
-	private static final double[] s_adblUSD6MFRAQuote = new double[] {
+	private static final double[] USD_6M_FRA_QUOTE_ARRAY =
+	{
 		0.003120,	//  0D
 		0.002930,	//  1M
 		0.002720,	//  2M
@@ -408,8 +417,8 @@ public class CHF3M6MUSD3M6M {
 		0.003890,	// 17M
 		0.004090	// 18M
 	};
-
-	private static final double[] s_adblCHF6MFRAQuote = new double[] {
+	private static final double[] CHF_6M_FRA_QUOTE_ARRAY =
+	{
 		0.003120,	//  0D
 		0.002930,	//  1M
 		0.002720,	//  2M
@@ -430,8 +439,8 @@ public class CHF3M6MUSD3M6M {
 		0.003890,	// 17M
 		0.004090	// 18M
 	};
-
-	private static final String[] s_astrUSD6MFixFloatTenor = new String[] {
+	private static final String[] USD_6M_FIX_FLOAT_TENOR_ARRAY =
+	{
 		 "3Y",
 		 "4Y",
 		 "5Y",
@@ -450,8 +459,8 @@ public class CHF3M6MUSD3M6M {
 		"50Y",
 		"60Y"
 	};
-
-	private static final String[] s_astrCHF6MFixFloatTenor = new String[] {
+	private static final String[] CHF_6M_FIX_FLOAT_TENOR_ARRAY =
+	{
 		 "3Y",
 		 "4Y",
 		 "5Y",
@@ -470,8 +479,8 @@ public class CHF3M6MUSD3M6M {
 		"50Y",
 		"60Y"
 	};
-
-	private static final double[] s_adblUSD6MFixFloatQuote = new double[] {
+	private static final double[] USD_6M_FIX_FLOAT_QUOTE_ARRAY =
+	{
 		0.004240,	//  3Y
 		0.005760,	//  4Y			
 		0.007620,	//  5Y
@@ -490,8 +499,8 @@ public class CHF3M6MUSD3M6M {
 		0.024210,	// 50Y
 		0.024630	// 60Y
 	};
-
-	private static final double[] s_adblCHF6MFixFloatQuote = new double[] {
+	private static final double[] CHF_6M_FIX_FLOAT_QUOTE_ARRAY =
+	{
 		0.004240,	//  3Y
 		0.005760,	//  4Y			
 		0.007620,	//  5Y
@@ -510,22 +519,22 @@ public class CHF3M6MUSD3M6M {
 		0.024210,	// 50Y
 		0.024630	// 60Y
 	};
-
-	private static final String[] s_astrUSD3MDepositTenor = new String[] {
+	private static final String[] USD_3M_DEPOSIT_TENOR_ARRAY =
+	{
 		"2W",
 		"3W",
 		"1M",
 		"2M"
 	};
-
-	private static final double[] s_adblUSD3MDepositQuote = new double[] {
+	private static final double[] USD_3M_DEPOSIT_QUOTE_ARRAY =
+	{
 		0.001865,
 		0.001969,
 		0.001951,
 		0.001874
 	};
-
-	private static final String[] s_astrUSD3MFRATenor = new String[] {
+	private static final String[] USD_3M_FRA_TENOR_ARRAY =
+	{
 		 "0D",
 		 "1M",
 		 "3M",
@@ -536,8 +545,8 @@ public class CHF3M6MUSD3M6M {
 		"18M",
 		"21M"
 	};
-
-	private static final double[] s_adblUSD3MFRAQuote = new double[] {
+	private static final double[] USD_3M_FRA_QUOTE_ARRAY =
+	{
 		0.001790,
 		0.001775,
 		0.001274,
@@ -548,8 +557,8 @@ public class CHF3M6MUSD3M6M {
 		0.002556,
 		0.003101
 	};
-
-	private static final String[] s_astrUSD3MFixFloatTenor = new String[] {
+	private static final String[] USD_3M_FIX_FLOAT_TENOR_ARRAY =
+	{
 		 "3Y",
 		 "4Y",
 		 "5Y",
@@ -564,8 +573,8 @@ public class CHF3M6MUSD3M6M {
 		"25Y",
 		"30Y"
 	};
-
-	private static final double[] s_adblUSD3MFixFloatQuote = new double[] {
+	private static final double[] USD_3M_FIX_FLOAT_QUOTE_ARRAY =
+	{
 		0.002850,	//  3Y
 		0.004370,	//  4Y
 		0.006230,	//  5Y
@@ -580,22 +589,22 @@ public class CHF3M6MUSD3M6M {
 		0.021560,	// 25Y
 		0.021860 	// 30Y
 	};
-
-	private static final String[] s_astrUSD3MSyntheticFloatFloatTenor = new String[] {
+	private static final String[] USD_3M_SYNTHETIC_FLOAT_FLOAT_TENOR_ARRAY =
+	{
 		"35Y",
 		"40Y",
 		"50Y",
 		"60Y"
 	};
-
-	private static final double[] s_adblUSD3MSyntheticFloatFloatQuote = new double[] {
+	private static final double[] USD_3M_SYNTHETIC_FLOAT_FLOAT_QUOTE_ARRAY =
+	{
 		0.00065,
 		0.00060,
 		0.00054,
 		0.00050
 	};
-
-	private static final String[] s_astrCCBSTenor = new String[] {
+	private static final String[] CCBS_TENOR_ARRAY =
+	{
 		"1Y",
 		"2Y",
 		"3Y",
@@ -606,8 +615,8 @@ public class CHF3M6MUSD3M6M {
 		"15Y",
 		"20Y"
 	};
-
-	private static final double[] s_adblCCBSQuote = new double[] {
+	private static final double[] CCBS_QUOTE_ARRAY =
+	{
 		-0.0000000, //  1Y
 		-0.0000500, //  2Y
 		-0.0001375, //  3Y
@@ -618,8 +627,8 @@ public class CHF3M6MUSD3M6M {
 		-0.0002750, // 15Y
 		-0.0002250  // 20Y
 	};
-
-	private static final double[] s_adblIRSQuote = new double[] {
+	private static final double[] IRS_QUOTE_ARRAY =
+	{
 		0.00500, //  1Y
 		0.00500, //  2Y
 		0.01375, //  3Y
@@ -634,76 +643,59 @@ public class CHF3M6MUSD3M6M {
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		/*
-		 * Initialize the Credit Analytics Library
-		 */
-
 		EnvManager.InitEnv ("");
 
-		JulianDate dtValue = DateUtil.CreateFromYMD (
-			2012,
-			DateUtil.DECEMBER,
-			11
-		);
+		JulianDate valueDate = DateUtil.CreateFromYMD (2012, DateUtil.DECEMBER, 11);
 
-		String strReferenceCurrency = "USD";
-		String strDerivedCurrency = "CHF";
+		String referenceCurrency = "USD";
+		String derivedCurrency = "CHF";
 
-		SegmentCustomBuilderControl scbcCubic = new SegmentCustomBuilderControl (
+		SegmentCustomBuilderControl cubicSegmentCustomBuilderControl = new SegmentCustomBuilderControl (
 			MultiSegmentSequenceBuilder.BASIS_SPLINE_POLYNOMIAL,
 			new PolynomialFunctionSetParams (4),
-			SegmentInelasticDesignControl.Create (
-				2,
-				2
-			),
-			new ResponseScalingShapeControl (
-				true,
-				new QuadraticRationalShapeControl (0.)
-			),
+			SegmentInelasticDesignControl.Create (2, 2),
+			new ResponseScalingShapeControl (true, new QuadraticRationalShapeControl (0.)),
 			null
 		);
 
-		MergedDiscountForwardCurve dcReference = OvernightIndexCurve.MakeDC (
-			strReferenceCurrency,
-			dtValue,
-			s_aiUSDOISDepositMaturityDays,
-			s_adblUSDOISDepositQuote,
-			s_astrUSDShortEndOISMaturityTenor,
-			s_adblUSDShortEndOISQuote,
-			s_astrUSDOISFutureTenor,
-			s_astrUSDOISFutureMaturityTenor,
-			s_adblUSDOISFutureQuote,
-			s_astrUSDLongEndOISMaturityTenor,
-			s_adblUSDLongEndOISQuote,
-			scbcCubic,
+		MergedDiscountForwardCurve referenceDiscountCurve = OvernightIndexCurve.MakeDC (
+			referenceCurrency,
+			valueDate,
+			USD_OIS_DEPOSIT_MATURITY_DAYS_ARRAY,
+			USD_OIS_DEPOSIT_QUOTE_ARRAY,
+			USD_SHORT_END_OIS_MATURITY_TENOR_ARRAY,
+			USD_SHORT_END_OIS_MATURITY_QUOTE_ARRAY,
+			USD_OIS_FUTURE_TENOR_ARRAY,
+			USD_OIS_FUTURE_MATURITY_TENOR_ARRAY,
+			USD_OIS_FUTURE_QUOTE_ARRAY,
+			USD_LONG_END_OIS_MATURITY_TENOR_ARRAY,
+			USD_LONG_END_OIS_MATURITY_QUOTE_ARRAY,
+			cubicSegmentCustomBuilderControl,
 			null
 		);
 
-		ForwardCurve fc6MReference = IBORCurve.CustomIBORBuilderSample (
-			dcReference,
+		ForwardCurve reference6MForwardCurve = IBORCurve.CustomIBORBuilderSample (
+			referenceDiscountCurve,
 			null,
-			ForwardLabel.Create (
-				strReferenceCurrency,
-				"6M"
-			),
-			scbcCubic,
-			s_astrUSD6MDepositTenor,
-			s_adblUSD6MDepositQuote,
+			ForwardLabel.Create (referenceCurrency, "6M"),
+			cubicSegmentCustomBuilderControl,
+			USD_6M_DEPOSIT_TENOR_ARRAY,
+			USD_6M_DEPOSIT_QUOTE_ARRAY,
 			"ForwardRate",
-			s_astrUSD6MFRATenor,
-			s_adblUSD6MFRAQuote,
+			USD_6M_FRA_TENOR_ARRAY,
+			USD_6M_FRA_QUOTE_ARRAY,
 			"ParForwardRate",
-			s_astrUSD6MFixFloatTenor,
-			s_adblUSD6MFixFloatQuote,
+			USD_6M_FIX_FLOAT_TENOR_ARRAY,
+			USD_6M_FIX_FLOAT_QUOTE_ARRAY,
 			"SwapRate",
 			null,
 			null,
@@ -715,65 +707,59 @@ public class CHF3M6MUSD3M6M {
 			false
 		);
 
-		ForwardCurve fc3MReference = IBORCurve.CustomIBORBuilderSample (
-			dcReference,
-			fc6MReference,
-			ForwardLabel.Create (
-				strReferenceCurrency,
-				"3M"
-			),
-			scbcCubic,
-			s_astrUSD3MDepositTenor,
-			s_adblUSD3MDepositQuote,
+		ForwardCurve reference3MForwardCurve = IBORCurve.CustomIBORBuilderSample (
+			referenceDiscountCurve,
+			reference6MForwardCurve,
+			ForwardLabel.Create (referenceCurrency, "3M"),
+			cubicSegmentCustomBuilderControl,
+			USD_3M_DEPOSIT_TENOR_ARRAY,
+			USD_3M_DEPOSIT_QUOTE_ARRAY,
 			"ForwardRate",
-			s_astrUSD3MFRATenor,
-			s_adblUSD3MFRAQuote,
+			USD_3M_FRA_TENOR_ARRAY,
+			USD_3M_FRA_QUOTE_ARRAY,
 			"ParForwardRate",
-			s_astrUSD3MFixFloatTenor,
-			s_adblUSD3MFixFloatQuote,
+			USD_3M_FIX_FLOAT_TENOR_ARRAY,
+			USD_3M_FIX_FLOAT_QUOTE_ARRAY,
 			"SwapRate",
 			null,
 			null,
 			"DerivedParBasisSpread",
-			s_astrUSD3MSyntheticFloatFloatTenor,
-			s_adblUSD3MSyntheticFloatFloatQuote,
+			USD_3M_SYNTHETIC_FLOAT_FLOAT_TENOR_ARRAY,
+			USD_3M_SYNTHETIC_FLOAT_FLOAT_QUOTE_ARRAY,
 			"DerivedParBasisSpread",
 			"---- VANILLA CUBIC POLYNOMIAL FORWARD CURVE ---",
 			false
 		);
 
-		MergedDiscountForwardCurve dcDerived = OvernightIndexCurve.MakeDC (
-			strDerivedCurrency,
-			dtValue,
-			s_aiCHFOISDepositMaturityDays,
-			s_adblCHFOISDepositQuote,
-			s_astrCHFShortEndOISMaturityTenor,
-			s_adblCHFShortEndOISQuote,
-			s_astrCHFOISFutureTenor,
-			s_astrCHFOISFutureMaturityTenor,
-			s_adblCHFOISFutureQuote,
-			s_astrCHFLongEndOISMaturityTenor,
-			s_adblCHFLongEndOISQuote,
-			scbcCubic,
+		MergedDiscountForwardCurve derivedDiscountCurve = OvernightIndexCurve.MakeDC (
+			derivedCurrency,
+			valueDate,
+			CHF_OIS_DEPOSIT_MATURITY_DAYS_ARRAY,
+			CHF_OIS_DEPOSIT_QUOTE_ARRAY,
+			CHF_SHORT_END_OIS_MATURITY_TENOR_ARRAY,
+			CHF_SHORT_END_OIS_MATURITY_QUOTE_ARRAY,
+			CHF_OIS_FUTURE_TENOR_ARRAY,
+			CHF_OIS_FUTURE_MATURITY_TENOR_ARRAY,
+			CHF_OIS_FUTURE_QUOTE_ARRAY,
+			CHF_LONG_END_OIS_MATURITY_TENOR_ARRAY,
+			CHF_LONG_END_OIS_MATURITY_QUOTE_ARRAY,
+			cubicSegmentCustomBuilderControl,
 			null
 		);
 
-		ForwardCurve fc6MDerived = IBORCurve.CustomIBORBuilderSample (
-			dcDerived,
+		ForwardCurve derived6MForwardCurve = IBORCurve.CustomIBORBuilderSample (
+			derivedDiscountCurve,
 			null,
-			ForwardLabel.Create (
-				strDerivedCurrency,
-				"6M"
-			),
-			scbcCubic,
-			s_astrCHF6MDepositTenor,
-			s_adblCHF6MDepositQuote,
+			ForwardLabel.Create (derivedCurrency, "6M"),
+			cubicSegmentCustomBuilderControl,
+			CHF_6M_DEPOSIT_TENOR_ARRAY,
+			CHF_6M_DEPOSIT_QUOTE_ARRAY,
 			"ForwardRate",
-			s_astrCHF6MFRATenor,
-			s_adblCHF6MFRAQuote,
+			CHF_6M_FRA_TENOR_ARRAY,
+			CHF_6M_FRA_QUOTE_ARRAY,
 			"ParForwardRate",
-			s_astrCHF6MFixFloatTenor,
-			s_adblCHF6MFixFloatQuote,
+			CHF_6M_FIX_FLOAT_TENOR_ARRAY,
+			CHF_6M_FIX_FLOAT_QUOTE_ARRAY,
 			"SwapRate",
 			null,
 			null,
@@ -786,64 +772,64 @@ public class CHF3M6MUSD3M6M {
 		);
 
 		CCBSForwardCurve.ForwardCurveReferenceComponentBasis (
-			strReferenceCurrency,
-			strDerivedCurrency,
-			dtValue,
-			dcReference,
-			fc6MReference,
-			fc3MReference,
-			dcDerived,
-			fc6MDerived,
-			_dblFXCHFUSD,
-			scbcCubic,
-			s_astrCCBSTenor,
-			s_adblCCBSQuote,
+			referenceCurrency,
+			derivedCurrency,
+			valueDate,
+			referenceDiscountCurve,
+			reference6MForwardCurve,
+			reference3MForwardCurve,
+			derivedDiscountCurve,
+			derived6MForwardCurve,
+			FX_CHFUSD,
+			cubicSegmentCustomBuilderControl,
+			CCBS_TENOR_ARRAY,
+			CCBS_QUOTE_ARRAY,
 			true
 		);
 
 		CCBSForwardCurve.ForwardCurveReferenceComponentBasis (
-			strReferenceCurrency,
-			strDerivedCurrency,
-			dtValue,
-			dcReference,
-			fc6MReference,
-			fc3MReference,
-			dcDerived,
-			fc6MDerived,
-			_dblFXCHFUSD,
-			scbcCubic,
-			s_astrCCBSTenor,
-			s_adblCCBSQuote,
+			referenceCurrency,
+			derivedCurrency,
+			valueDate,
+			referenceDiscountCurve,
+			reference6MForwardCurve,
+			reference3MForwardCurve,
+			derivedDiscountCurve,
+			derived6MForwardCurve,
+			FX_CHFUSD,
+			cubicSegmentCustomBuilderControl,
+			CCBS_TENOR_ARRAY,
+			CCBS_QUOTE_ARRAY,
 			false
 		);
 
 		CCBSDiscountCurve.MakeDiscountCurve (
-			strReferenceCurrency,
-			strDerivedCurrency,
-			dtValue,
-			dcReference,
-			fc6MReference,
-			fc3MReference,
-			_dblFXCHFUSD,
-			scbcCubic,
-			s_astrCCBSTenor,
-			s_adblCCBSQuote,
-			s_adblIRSQuote,
+			referenceCurrency,
+			derivedCurrency,
+			valueDate,
+			referenceDiscountCurve,
+			reference6MForwardCurve,
+			reference3MForwardCurve,
+			FX_CHFUSD,
+			cubicSegmentCustomBuilderControl,
+			CCBS_TENOR_ARRAY,
+			CCBS_QUOTE_ARRAY,
+			IRS_QUOTE_ARRAY,
 			true
 		);
 
 		CCBSDiscountCurve.MakeDiscountCurve (
-			strReferenceCurrency,
-			strDerivedCurrency,
-			dtValue,
-			dcReference,
-			fc6MReference,
-			fc3MReference,
-			_dblFXCHFUSD,
-			scbcCubic,
-			s_astrCCBSTenor,
-			s_adblCCBSQuote,
-			s_adblIRSQuote,
+			referenceCurrency,
+			derivedCurrency,
+			valueDate,
+			referenceDiscountCurve,
+			reference6MForwardCurve,
+			reference3MForwardCurve,
+			FX_CHFUSD,
+			cubicSegmentCustomBuilderControl,
+			CCBS_TENOR_ARRAY,
+			CCBS_QUOTE_ARRAY,
+			IRS_QUOTE_ARRAY,
 			false
 		);
 

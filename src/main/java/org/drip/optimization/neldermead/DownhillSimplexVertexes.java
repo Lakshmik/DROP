@@ -193,8 +193,14 @@ public class DownhillSimplexVertexes
 		_centroidVertex = null;
 		_objectiveFunctionMean = 0.;
 
+		double highestValue = _orderedVertexListMap.lastEntry().getKey();
+
 		try {
 			for (double valueKey : _orderedVertexListMap.keySet()) {
+				if (valueKey == highestValue) {
+					continue;
+				}
+
 				for (double[] vertex : _orderedVertexListMap.get (valueKey)) {
 					++vertexCount;
 					_objectiveFunctionMean += valueKey;

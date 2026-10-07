@@ -100,6 +100,7 @@ org.drip.historical.calibration
 org.drip.historical.engine
 org.drip.historical.sensitivity
 org.drip.historical.state
+org.drip.ideadrip.Q3_2026
 org.drip.investing.engine
 org.drip.investing.factors
 org.drip.investing.factorspec

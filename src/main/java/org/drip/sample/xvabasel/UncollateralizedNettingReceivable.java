@@ -322,6 +322,7 @@ public class UncollateralizedNettingReceivable
 				timeToMaturity2,
 				swapNotional2
 			);
+
 			AlbaneseAndersen[] albaneseAndersen1Array = new AlbaneseAndersen[stepCount + 1];
 			AlbaneseAndersen[] albaneseAndersen2Array = new AlbaneseAndersen[stepCount + 1];
 

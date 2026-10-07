@@ -509,6 +509,7 @@ public class UncollateralizedNettingReceivableStochastic
 				numeraireGrid[8],
 				stepCount
 			);
+
 			MarketVertex[] marketVertexArray = new MarketVertex [stepCount + 1];
 			AlbaneseAndersen[] albaneseAndersen1Array = new AlbaneseAndersen[stepCount + 1];
 			AlbaneseAndersen[] albaneseAndersen2Array = new AlbaneseAndersen[stepCount + 1];

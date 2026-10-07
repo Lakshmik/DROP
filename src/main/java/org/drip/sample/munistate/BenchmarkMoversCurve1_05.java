@@ -7,12 +7,12 @@ import java.util.List;
 import org.drip.analytics.date.DateUtil;
 import org.drip.analytics.date.JulianDate;
 import org.drip.optimization.neldermead.DownhillSimplex;
-import org.drip.optimization.neldermead.DownhillSimplexRun;
 import org.drip.product.creator.BondBuilder;
 import org.drip.product.credit.BondComponent;
+import org.drip.sequence.random.BoundedUniform;
 import org.drip.service.env.EnvManager;
 import org.drip.state.govvie.MarketComponent;
-import org.drip.state.govvie.MultiBondCurveCalibrator;
+import org.drip.state.govvie.MultiBondLeastSquaresFunction;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -91,7 +91,7 @@ import org.drip.state.govvie.MultiBondCurveCalibrator;
  */
 
 /**
- * <i>BenchmarkMoversCurve1_3</i> illustrates the Calibration of the 1-3Y Constant Forward Yield Muni Curve
+ * <i>BenchmarkMoversCurve1_05</i> illustrates the Calibration of the 1-5Y Constant Forward Yield Muni Curve
  * 	using the Specified Suite of Municipal Benchmark Bonds. The References are:
  *  
  * 	<br>
@@ -130,7 +130,7 @@ import org.drip.state.govvie.MultiBondCurveCalibrator;
  * @author Lakshmi Krishnamurthy
  */
 
-public class BenchmarkMoversCurve1_3
+public class BenchmarkMoversCurve1_05
 {
 
 	private static final BondComponent FixedCouponBond (
@@ -156,39 +156,30 @@ public class BenchmarkMoversCurve1_3
 
 	private static final void AddVertexList (
 		final List<double[]> vertexList,
-		final double f1,
-		final double f2,
-		final double f3)
+		final BoundedUniform boundedUniform,
+		final int variateCount)
 	{
-		vertexList.add (
-			new double[]
-			{
-				f1,
-				f2,
-				f3
-			}
-		);
+		double[] vertex = new double[variateCount];
+
+		for (int i = 0; i < variateCount; ++i) {
+			vertex[i] = boundedUniform.random();
+		}
+
+		vertexList.add (vertex);
 	}
 
-	private static final List<double[]> VertexList()
+	private static final List<double[]> VertexList (
+		final int variateCount,
+		final int vertexCount)
+		throws Exception
 	{
 		List<double[]> vertexList = new ArrayList<double[]>();
 
-		AddVertexList (vertexList, 0.01, 0.01, 0.01);
+		BoundedUniform boundedUniform = new BoundedUniform (0.01, 0.09);
 
-		AddVertexList (vertexList, 0.01, 0.01, 0.09);
-
-		AddVertexList (vertexList, 0.01, 0.09, 0.01);
-
-		AddVertexList (vertexList, 0.01, 0.09, 0.09);
-
-		AddVertexList (vertexList, 0.09, 0.01, 0.01);
-
-		AddVertexList (vertexList, 0.09, 0.01, 0.09);
-
-		AddVertexList (vertexList, 0.09, 0.09, 0.01);
-
-		AddVertexList (vertexList, 0.09, 0.09, 0.09);
+		for (int i = 0; i < vertexCount; ++i) {
+			AddVertexList (vertexList, boundedUniform, variateCount);
+		}
 
 		return vertexList;
 	}
@@ -207,6 +198,7 @@ public class BenchmarkMoversCurve1_3
 	{
 		EnvManager.InitEnv ("");
 
+		int vertexCount = 10;
 		String currency = "USD";
 
 		JulianDate spotDate = DateUtil.CreateFromYMD (2026, DateUtil.SEPTEMBER, 25);
@@ -215,7 +207,9 @@ public class BenchmarkMoversCurve1_3
 		{
 			spotDate.addTenor ("1Y").julian(),
 			spotDate.addTenor ("2Y").julian(),
-			spotDate.addTenor ("3Y").julian()
+			spotDate.addTenor ("3Y").julian(),
+			spotDate.addTenor ("4Y").julian(),
+			spotDate.addTenor ("5Y").julian()
 		};
 
 		List<MarketComponent> marketComponentList = new ArrayList<MarketComponent>();
@@ -480,26 +474,303 @@ public class BenchmarkMoversCurve1_3
 			)
 		);
 
-		MultiBondCurveCalibrator multiBondCurveCalibrator = new MultiBondCurveCalibrator (
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"21",
+					0.04,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029,  2, 15)
+				),
+				0.99308,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"22",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029,  8,  1)
+				),
+				1.02160,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"23",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031, 12,  1)
+				),
+				1.02393,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"24",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2030,  7, 15)
+				),
+				1.01789,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"25",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029, 10, 15)
+				),
+				1.03519,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"26",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031,  6, 15)
+				),
+				1.02508,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"27",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2030,  2, 15)
+				),
+				1.02500,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"28",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031, 12,  1)
+				),
+				1.04367,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"29",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031,  9, 15)
+				),
+				1.03830,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"30",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031, 12,  1)
+				),
+				1.04428,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"31",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029,  2, 15)
+				),
+				1.03139,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"32",
+					0.04,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031,  2, 15)
+				),
+				1.00930,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"33",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031,  2, 15)
+				),
+				1.02911,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"34",
+					0.04,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029,  3,  1)
+				),
+				1.00997,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"35",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029, 12,  1)
+				),
+				1.03406,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"36",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031,  8, 15)
+				),
+				1.04846,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"37",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2031,  8,  1)
+				),
+				1.02660,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"38",
+					0.04,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2029, 11,  1)
+				),
+				1.02299,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"39",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2030,  2, 15)
+				),
+				1.02717,
+				1.
+			)
+		);
+
+		marketComponentList.add (
+			new MarketComponent (
+				FixedCouponBond (
+					"40",
+					0.05,
+					DateUtil.CreateFromYMD (2025,  2,  2),
+					DateUtil.CreateFromYMD (2030, 11, 15)
+				),
+				1.01733,
+				1.
+			)
+		);
+
+		MultiBondLeastSquaresFunction multiBondCurveCalibrator = new MultiBondLeastSquaresFunction (
 			spotDate,
 			"UST",
 			currency,
 			calibrationDateArray,
-			marketComponentList
+			marketComponentList,
+			0
 		);
 
-		System.out.println (multiBondCurveCalibrator);
+		System.out.println ("\t||--------------------------------------------------||");
+
+		System.out.println ("\t||        1-5Y BENCHMARK MOVERS CALIBRATION         ||");
+
+		System.out.println ("\t||--------------------------------------------------||");
+
+		System.out.print (multiBondCurveCalibrator.toString ("\t|| "));
+
+		System.out.println ("\t||--------------------------------------------------||");
 
 		DownhillSimplex downhillSimplex = DownhillSimplex.Standard (
 			multiBondCurveCalibrator,
-			VertexList(),
-			true,
+			VertexList (calibrationDateArray.length, vertexCount),
+			false,
 			false
 		);
 
-		DownhillSimplexRun run = downhillSimplex.controlRun();
+		System.out.println();
 
-		System.out.println (run);
+		System.out.println (
+			"\t||---------------------------------------------------------------------------------------------------------||"
+		);
+
+		System.out.println ("\t|| " + downhillSimplex.controlRun() + " ||");
+
+		System.out.println (
+			"\t||---------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

@@ -527,7 +527,7 @@ public class CAD3M6MUSD3M6M
 		"1M",
 		"2M"
 	};
-	private static final double[] s_adblUSD3MDepositQuote =
+	private static final double[] USD_3M_DEPOSIT_QUOTE_ARRAY =
 	{
 		0.001865,
 		0.001969,
@@ -754,7 +754,7 @@ public class CAD3M6MUSD3M6M
 			ForwardLabel.Create (referenceCurrency, "3M"),
 			cubicSegmentCustomBuilderControl,
 			USD_3M_DEPOSIT_TENOR_ARRAY,
-			s_adblUSD3MDepositQuote,
+			USD_3M_DEPOSIT_QUOTE_ARRAY,
 			"ForwardRate",
 			USD_3M_FRA_TENOR_ARRAY,
 			USD_3M_FRA_QUOTE_ARRAY,

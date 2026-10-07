@@ -358,6 +358,7 @@ public class DownhillSimplex
 			double[] centroidVertex = vertexes.centroidVertex();
 
 			double centroidValue = Double.NaN;
+			double reflectedValue = Double.NaN;
 
 			try {
 				centroidValue = _objectiveFunction.evaluate (centroidVertex);
@@ -396,8 +397,6 @@ public class DownhillSimplex
 			if (null == (reflectedVertex = reflectedVertex (highestValueVertex, centroidVertex))) {
 				return null;
 			}
-
-			double reflectedValue = Double.NaN;
 
 			try {
 				reflectedValue = _objectiveFunction.evaluate (reflectedVertex);
@@ -458,6 +457,14 @@ public class DownhillSimplex
 				if (!vertexes.swapNodes (highestValue, reflectedValue, reflectedVertex)) {
 					return null;
 				}
+
+				if (run instanceof DownhillSimplexRunDiagnostics) {
+					try {
+						((DownhillSimplexRunDiagnostics) run).incrementReflectionCount();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			} else if (reflectedValue < lowestValue) {
 				double[] expandedVertex = expandedVertex (reflectedVertex, centroidVertex);
 
@@ -490,9 +497,25 @@ public class DownhillSimplex
 					if (!vertexes.swapNodes (highestValue, expandedValue, expandedVertex)) {
 						return null;
 					}
+
+					if (run instanceof DownhillSimplexRunDiagnostics) {
+						try {
+							((DownhillSimplexRunDiagnostics) run).incrementExpansionCount();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 				} else {
 					if (!vertexes.swapNodes (highestValue, reflectedValue, reflectedVertex)) {
 						return null;
+					}
+
+					if (run instanceof DownhillSimplexRunDiagnostics) {
+						try {
+							((DownhillSimplexRunDiagnostics) run).incrementReflectionCount();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			} else {
@@ -528,9 +551,25 @@ public class DownhillSimplex
 						if (!vertexes.swapNodes (highestValue, contractedValue, contractedVertex)) {
 							return null;
 						}
+
+						if (run instanceof DownhillSimplexRunDiagnostics) {
+							try {
+								((DownhillSimplexRunDiagnostics) run).incrementContractionCount();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
 					} else {
 						if (null == (vertexes = shrinkVertexes (lowestValueVertex))) {
 							return null;
+						}
+
+						if (run instanceof DownhillSimplexRunDiagnostics) {
+							try {
+								((DownhillSimplexRunDiagnostics) run).incrementShrinkageCount();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				} else {
@@ -565,9 +604,25 @@ public class DownhillSimplex
 						if (!vertexes.swapNodes (highestValue, contractedValue, contractedVertex)) {
 							return null;
 						}
+
+						if (run instanceof DownhillSimplexRunDiagnostics) {
+							try {
+								((DownhillSimplexRunDiagnostics) run).incrementContractionCount();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
 					} else {
 						if (null == (vertexes = shrinkVertexes (lowestValueVertex))) {
 							return null;
+						}
+
+						if (run instanceof DownhillSimplexRunDiagnostics) {
+							try {
+								((DownhillSimplexRunDiagnostics) run).incrementShrinkageCount();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}

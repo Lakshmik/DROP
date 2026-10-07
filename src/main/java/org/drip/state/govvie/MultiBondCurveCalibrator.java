@@ -1,15 +1,12 @@
 
 package org.drip.state.govvie;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.drip.analytics.date.JulianDate;
-import org.drip.function.definition.RdToR1;
 import org.drip.numerical.common.NumberUtil;
-import org.drip.param.market.CurveSurfaceQuoteContainer;
-import org.drip.param.valuation.ValuationParams;
-import org.drip.product.credit.BondComponent;
-import org.drip.state.nonlinear.FlatForwardGovvieCurve;
+import org.drip.optimization.neldermead.DownhillSimplex;
+import org.drip.sequence.random.BoundedUniform;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -88,8 +85,8 @@ import org.drip.state.nonlinear.FlatForwardGovvieCurve;
  */
 
 /**
- * <i>MultiBondCurveCalibrator</i> calibrates the Govvie Curve from the Set of Bond Quotes using the Nelder
- * 	Mead Scheme. The References are:
+ * <i>MultiBondCurveCalibrator</i> implements the Multi-bond Least-squares Govvie Curve Calibration using a
+ * 	Set of Bond Quotes through the Nelder-Mead Scheme. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -128,176 +125,172 @@ import org.drip.state.nonlinear.FlatForwardGovvieCurve;
  */
 
 public class MultiBondCurveCalibrator
-	extends RdToR1
 {
-	private String _code = "";
-	private String _currency = "";
-	private JulianDate _epochDate = null;
-	private int[] _calibrationDateArray = null;
-	private ValuationParams _valuationParams = null;
-	private List<MarketComponent> _marketComponentList = null;
+	private boolean _diagnosticsOn = false;
+	private boolean _incorporateCentroid = false;
+	private int _vertexCount = Integer.MIN_VALUE;
+	private double _lowerSearchBound = Double.NaN;
+	private double _upperSearchBound = Double.NaN;
+	private MultiBondLeastSquaresFunction _multiBondLeastSquaresFunction = null;
+
+	private List<double[]> vertexList()
+	{
+		BoundedUniform boundedUniform = null;
+
+		List<double[]> vertexList = new ArrayList<double[]>();
+
+		int variateDimension = _multiBondLeastSquaresFunction.dimension();
+
+		try {
+			boundedUniform = new BoundedUniform (_lowerSearchBound, _upperSearchBound);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		for (int vertexIndex = 0; vertexIndex < _vertexCount; ++vertexIndex) {
+			double[] vertex = new double[variateDimension];
+
+			for (int variateIndex = 0; variateIndex < variateDimension; ++variateIndex) {
+				vertex[variateIndex] = boundedUniform.random();
+			}
+
+			vertexList.add (vertex);
+		}
+
+		return vertexList;
+	}
 
 	/**
 	 * <i>MultiBondCurveCalibrator</i> Constructor
 	 * 
-	 * @param epochDate Epoch Date
-	 * @param code Code
-	 * @param currency Currency
-	 * @param calibrationDateArray Array of Calibration Dates
-	 * @param marketComponentList List of <i>MarketComponent</i> Instances
+	 * @param multiBondLeastSquaresFunction Multi-Bond Least Squares Error Function
+	 * @param vertexCount Number of Vertexes in the Simplex
+	 * @param lowerSearchBound Lower Search Bound
+	 * @param upperSearchBound Upper Search Bound
+	 * @param incorporateCentroid TRUE - Centroid is a Candidate for the Vertex List
+	 * @param diagnosticsOn TRUE - Diagnostics has been Turned On
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public MultiBondCurveCalibrator (
-		final JulianDate epochDate,
-		final String code,
-		final String currency,
-		final int[] calibrationDateArray,
-		final List<MarketComponent> marketComponentList)
+		final MultiBondLeastSquaresFunction multiBondLeastSquaresFunction,
+		final int vertexCount,
+		final double lowerSearchBound,
+		final double upperSearchBound,
+		final boolean incorporateCentroid,
+		final boolean diagnosticsOn)
 		throws Exception
 	{
-		super (null);
-
-		if (null == (_epochDate = epochDate) ||
-			null == (_code = code) || _code.isEmpty() ||
-			null == (_currency = currency) || _currency.isEmpty() ||
-			null == (_calibrationDateArray = calibrationDateArray) || 0 == _calibrationDateArray.length ||
-			null == (_marketComponentList = marketComponentList) ||
-				_marketComponentList.size() <= _calibrationDateArray.length)
+		if (null == (_multiBondLeastSquaresFunction = multiBondLeastSquaresFunction) ||
+			!NumberUtil.IsValid (_lowerSearchBound = lowerSearchBound) ||
+			!NumberUtil.IsValid (_upperSearchBound = upperSearchBound) ||
+				_upperSearchBound <= _lowerSearchBound)
 		{
 			throw new Exception ("MultiBondCurveCalibrator Constructor => Invalid Inputs");
 		}
 
-		_valuationParams = ValuationParams.Spot (_epochDate.julian());
+		int dimension = _multiBondLeastSquaresFunction.dimension();
 
-		for (MarketComponent marketComponent : marketComponentList) {
-			if (null == marketComponent) {
-				throw new Exception ("MultiBondCurveCalibrator Constructor => Invalid Inputs");
-			}
-		}
-	}
-
-	/**
-	 * Retrieve the Epoch Date
-	 * 
-	 * @return Epoch Date
-	 */
-
-	public JulianDate epochDate()
-	{
-		return _epochDate;
-	}
-
-	/**
-	 * Retrieve the Code
-	 * 
-	 * @return Code
-	 */
-
-	public String code()
-	{
-		return _code;
-	}
-
-	/**
-	 * Retrieve the Currency
-	 * 
-	 * @return Currency
-	 */
-
-	public String currency()
-	{
-		return _currency;
-	}
-
-	/**
-	 * Retrieve the Array of Calibration Dates
-	 * 
-	 * @return Array of Calibration Dates
-	 */
-
-	public int[] calibrationDateArray()
-	{
-		return _calibrationDateArray;
-	}
-	/**
-	 * Return the List of Calibration Bonds and their Prices
-	 * 
-	 * @return List of Calibration Bonds and their Prices
-	 */
-
-	public List<MarketComponent> marketComponentList()
-	{
-		return _marketComponentList;
-	}
-
-	/**
-	 * Retrieve the Dimension of the Input Variate
-	 * 
-	 * @return The Dimension of the Input Variate
-	 */
-
-	@Override public int dimension()
-	{
-		return _calibrationDateArray.length;
-	}
-
-	/**
-	 * Evaluate for the given Array of Forward Yields
-	 * 
-	 * @param forwardYieldArray Array of Forward Yields
-	 *  
-	 * @return The Calculated Value
-	 * 
-	 * @throws Exception Thrown if the Evaluation cannot be done
-	 */
-
-	public double evaluate (
-		final double[] forwardYieldArray)
-		throws Exception
-	{
-		if (null == forwardYieldArray ||
-			!NumberUtil.IsValid (forwardYieldArray) ||
-			forwardYieldArray.length != _calibrationDateArray.length)
+		if ((_vertexCount = vertexCount) < dimension || Math.log (_vertexCount) > Math.log (2.) * dimension)
 		{
-			throw new Exception ("MultiBondCurveCalibrator::evaluate => Invalid Inputs");
+			throw new Exception ("MultiBondCurveCalibrator Constructor => Invalid Inputs");
 		}
 
-		int epochDateJulian = _epochDate.julian();
+		_incorporateCentroid = incorporateCentroid;
+		_diagnosticsOn = diagnosticsOn;
+	}
 
-		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
+	/**
+	 * Retrieve the Multi-Bond Least Squares Error Function
+	 * 
+	 * @return Multi-Bond Least Squares Error Function
+	 */
 
-		curveSurfaceQuoteContainer.setGovvieState (
-			new FlatForwardGovvieCurve (
-				epochDateJulian,
-				_code,
-				_currency,
-				_calibrationDateArray,
-				forwardYieldArray
-			)
+	public MultiBondLeastSquaresFunction multiBondLeastSquaresFunction()
+	{
+		return _multiBondLeastSquaresFunction;
+	}
+
+	/**
+	 * Retrieve the Number of Vertexes in the Simplex
+	 * 
+	 * @return Number of Vertexes in the Simplex
+	 */
+
+	public int vertexCount()
+	{
+		return _vertexCount;
+	}
+
+	/**
+	 * Retrieve the Lower Search Bound
+	 * 
+	 * @return Lower Search Bound
+	 */
+
+	public double lowerSearchBound()
+	{
+		return _lowerSearchBound;
+	}
+
+	/**
+	 * Retrieve the Upper Search Bound
+	 * 
+	 * @return Upper Search Bound
+	 */
+
+	public double upperSearchBound()
+	{
+		return _upperSearchBound;
+	}
+
+	/**
+	 * Indicate if Centroid is a Candidate for the Vertex List
+	 * 
+	 * @return TRUE - Centroid is a Candidate for the Vertex List
+	 */
+
+	public boolean incorporateCentroid()
+	{
+		return _incorporateCentroid;
+	}
+
+	/**
+	 * Indicate if Diagnostics has been Turned On
+	 * 
+	 * @return TRUE - Diagnostics has been Turned On
+	 */
+
+	public boolean diagnosticsOn()
+	{
+		return _diagnosticsOn;
+	}
+
+	/**
+	 * Calibrate and Generate an Instance of <i>MultiBondCurveCalibrationRun</i>
+	 * 
+	 * @return Instance of <i>MultiBondCurveCalibrationRun</i>
+	 */
+
+	public MultiBondCurveCalibrationRun calibrate()
+	{
+		DownhillSimplex downhillSimplex = DownhillSimplex.Standard (
+			_multiBondLeastSquaresFunction,
+			vertexList(),
+			_incorporateCentroid,
+			_diagnosticsOn
 		);
 
-		double leastSquaresPriceDifferencesSum = 0.;
-
-		for (MarketComponent marketComponent : _marketComponentList) {
-			BondComponent bond = marketComponent.bond();
-
-			double priceDifference = bond.priceFromGSpread (
-				_valuationParams,
-				curveSurfaceQuoteContainer,
-				null,
-				0.
-			) - bond.accrued (
-				epochDateJulian,
-				null
-			) - marketComponent.cleanPrice();
-
-			leastSquaresPriceDifferencesSum +=
-				marketComponent.weight() * (priceDifference * priceDifference);
-		}
-
-		return leastSquaresPriceDifferencesSum;
+		return null == downhillSimplex ? null : MultiBondCurveCalibrationRun.Standard (
+			downhillSimplex.controlRun(),
+			_multiBondLeastSquaresFunction.epochDate().julian(),
+			_multiBondLeastSquaresFunction.code(),
+			_multiBondLeastSquaresFunction.currency(),
+			_multiBondLeastSquaresFunction.calibrationDateArray()
+		);
 	}
 
 	/**
@@ -311,20 +304,10 @@ public class MultiBondCurveCalibrator
 	public String toString (
 		final String prefix)
 	{
-		String dump = prefix + "Multi-Bond Curve Calibrator: {" + _epochDate + ", " + _currency + ", " +
-			_code + "} {Pillar Dates: ";
-
-		for (int calibrationDate : _calibrationDateArray) {
-			dump += new JulianDate (calibrationDate) + ", ";
-		}
-
-		dump += "};\n" + prefix + "Calibration Components:";
-
-		for (MarketComponent marketComponent : _marketComponentList) {
-			dump += marketComponent.toString ("\n" + prefix + "\t");
-		}
-
-		return dump + "\n";
+		return prefix + "Multi-Bond Curve Calibrator => " + _multiBondLeastSquaresFunction + prefix +
+			" {Vertex Count => " + _vertexCount + " | Lower Search Bound => " + _lowerSearchBound +
+			" | Upper Search Bound => " + _upperSearchBound + " | Incorporate Centroid => " +
+			_incorporateCentroid + "}";
 	}
 
 	/**

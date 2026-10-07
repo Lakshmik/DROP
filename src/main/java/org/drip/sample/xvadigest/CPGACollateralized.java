@@ -25,6 +25,14 @@ import org.drip.xva.vertex.AlbaneseAndersen;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -125,271 +133,319 @@ import org.drip.xva.vertex.AlbaneseAndersen;
  *  	</li>
  *  </ul>
  *
- *  <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/PortfolioCore.md">Portfolio Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/XVAAnalyticsLibrary.md">XVA Analytics Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/xvadigest/README.md">Basel XVA Accounting Metrics Digest</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/xvadigest/README.md">Basel XVA Accounting Metrics Digest</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CPGACollateralized {
+public class CPGACollateralized
+{
 
 	private static final double[] ATMSwapRateOffsetRealization (
-		final DiffusionEvolver deATMSwapRateOffset,
-		final double dblATMSwapRateOffsetInitial,
-		final double dblTime,
-		final double dblTimeWidth,
-		final int iNumStep)
+		final DiffusionEvolver atmSwapRateOffsetDiffusionEvolver,
+		final double initialATMSwapRateOffset,
+		final double time,
+		final double timeWidth,
+		final int stepCount)
 		throws Exception
 	{
-		double[] adblATMSwapRateOffset = new double[iNumStep + 1];
-		adblATMSwapRateOffset[0] = dblATMSwapRateOffsetInitial;
-		double[] adblTimeWidth = new double[iNumStep];
+		double[] atmSwapRateOffsetArray = new double[stepCount + 1];
+		atmSwapRateOffsetArray[0] = initialATMSwapRateOffset;
+		double[] timeWidthArray = new double[stepCount];
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblTimeWidth[i] = dblTimeWidth;
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			timeWidthArray[stepIndex] = timeWidth;
+		}
 
-		JumpDiffusionEdge[] aJDE = deATMSwapRateOffset.incrementSequence (
-			new JumpDiffusionVertex (
-				dblTime,
-				dblATMSwapRateOffsetInitial,
-				0.,
-				false
-			),
-			JumpDiffusionEdgeUnit.Diffusion (
-				adblTimeWidth,
-				RandomSequenceGenerator.Gaussian (iNumStep)
-			),
-			dblTimeWidth
+		JumpDiffusionEdge[] jumpDiffusionEdgeArray = atmSwapRateOffsetDiffusionEvolver.incrementSequence (
+			new JumpDiffusionVertex (time, initialATMSwapRateOffset, 0., false),
+			JumpDiffusionEdgeUnit.Diffusion (timeWidthArray, RandomSequenceGenerator.Gaussian (stepCount)),
+			timeWidth
 		);
 
-		for (int j = 1; j <= iNumStep; ++j)
-			adblATMSwapRateOffset[j] = aJDE[j - 1].finish();
+		for (int stepIndex = 1; stepIndex <= stepCount; ++stepIndex) {
+			atmSwapRateOffsetArray[stepIndex] = jumpDiffusionEdgeArray[stepIndex - 1].finish();
+		}
 
-		return adblATMSwapRateOffset;
+		return atmSwapRateOffsetArray;
 	}
 
 	private static final double[] SwapPortfolioValueRealization (
-		final DiffusionEvolver deATMSwapRate,
-		final double dblATMSwapRateStart,
-		final int iNumStep,
-		final double dblTime,
-		final double dblTimeWidth,
-		final int iNumSwap)
+		final DiffusionEvolver atmSwapRateDiffusionEvolver,
+		final double initialATMSwapRate,
+		final int stepCount,
+		final double time,
+		final double timeWidth,
+		final int swapCount)
 		throws Exception
 	{
-		double[] adblSwapPortfolioValueRealization = new double[iNumStep + 1];
+		double[] swapPortfolioValueRealizationArray = new double[stepCount + 1];
 
-		for (int i = 0; i < iNumStep; ++i)
-			adblSwapPortfolioValueRealization[i] = 0.;
-
-		for (int i = 0; i < iNumSwap; ++i) {
-			double[] adblATMSwapRateOffsetRealization = ATMSwapRateOffsetRealization (
-				deATMSwapRate,
-				dblATMSwapRateStart,
-				dblTime,
-				dblTimeWidth,
-				iNumStep
-			);
-
-			for (int j = 0; j <= iNumStep; ++j)
-				adblSwapPortfolioValueRealization[j] += dblTimeWidth * (iNumStep - j) * adblATMSwapRateOffsetRealization[j];
+		for (int stepIndex = 0; stepIndex < stepCount; ++stepIndex) {
+			swapPortfolioValueRealizationArray[stepIndex] = 0.;
 		}
 
-		return adblSwapPortfolioValueRealization;
+		for (int swapIndex = 0; swapIndex < swapCount; ++swapIndex) {
+			double[] atmSwapRateOffsetArrayRealization = ATMSwapRateOffsetRealization (
+				atmSwapRateDiffusionEvolver,
+				initialATMSwapRate,
+				time,
+				timeWidth,
+				stepCount
+			);
+
+			for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
+				swapPortfolioValueRealizationArray[stepIndex] +=
+					timeWidth * (stepCount - stepIndex) * atmSwapRateOffsetArrayRealization[stepIndex];
+			}
+		}
+
+		return swapPortfolioValueRealizationArray;
 	}
 
 	private static final double[][] SwapPortfolioValueRealization (
-		final DiffusionEvolver deATMSwapRate,
-		final double dblSwapPortfolioValueStart,
-		final int iNumStep,
-		final double dblTime,
-		final double dblTimeWidth,
-		final int iNumSwap,
-		final int iNumSimulation)
+		final DiffusionEvolver atmSwapRateDiffusionEvolver,
+		final double initalSwapPortfolioValue,
+		final int stepCount,
+		final double time,
+		final double timeWidth,
+		final int swapCount,
+		final int simulationCount)
 		throws Exception
 	{
-		double[][] aadblSwapPortfolioValueRealization = new double[iNumSimulation][];
+		double[][] swapPortfolioValueRealizationArray = new double[simulationCount][];
 
-		for (int i = 0; i < iNumSimulation; ++i)
-			aadblSwapPortfolioValueRealization[i] = SwapPortfolioValueRealization (
-				deATMSwapRate,
-				dblSwapPortfolioValueStart,
-				iNumStep,
-				dblTime,
-				dblTimeWidth,
-				iNumSwap
+		for (int simulationIndex = 0; simulationIndex < simulationCount; ++simulationIndex) {
+			swapPortfolioValueRealizationArray[simulationIndex] = SwapPortfolioValueRealization (
+				atmSwapRateDiffusionEvolver,
+				initalSwapPortfolioValue,
+				stepCount,
+				time,
+				timeWidth,
+				swapCount
 			);
+		}
 
-		return aadblSwapPortfolioValueRealization;
+		return swapPortfolioValueRealizationArray;
 	}
 
-	private static final void UDTDump (
-		final String strHeader,
-		final JulianDate[] adtVertexNode,
-		final UnivariateCentralMeasures[] aUDT)
-		throws Exception
-	{
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-
-		System.out.println (strHeader);
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-
-		String strDump = "\t|       DATE      =>" ;
-
-		for (int i = 0; i < adtVertexNode.length; ++i)
-			strDump = strDump + " " + adtVertexNode[i] + "  |";
-
-		System.out.println (strDump);
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-
-		 strDump = "\t|     AVERAGE     =>";
-
-		for (int j = 0; j < aUDT.length; ++j)
-			strDump = strDump + "   " + FormatUtil.FormatDouble (aUDT[j].average(), 2, 4, 1.) + "   |";
-
-		System.out.println (strDump);
-
-		strDump = "\t|     MAXIMUM     =>";
-
-		for (int j = 0; j < aUDT.length; ++j)
-			strDump = strDump + "   " + FormatUtil.FormatDouble (aUDT[j].maximum(), 2, 4, 1.) + "   |";
-
-		System.out.println (strDump);
-
-		strDump = "\t|     MINIMUM     =>";
-
-		for (int j = 0; j < aUDT.length; ++j)
-			strDump = strDump + "   " + FormatUtil.FormatDouble (aUDT[j].minimum(), 2, 4, 1.) + "   |";
-
-		System.out.println (strDump);
-
-		strDump = "\t|      ERROR      =>";
-
-		for (int j = 0; j < aUDT.length; ++j)
-			strDump = strDump + "   " + FormatUtil.FormatDouble (aUDT[j].error(), 2, 4, 1.) + "   |";
-
-		System.out.println (strDump);
-
-		System.out.println ("\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-	}
-
-	private static final void UDTDump (
-		final String strHeader,
-		final UnivariateCentralMeasures udt)
+	private static final void univariateCentralMeasuresDump (
+		final String header,
+		final JulianDate[] vertexNodeArray,
+		final UnivariateCentralMeasures[] univariateCentralMeasuresArray)
 		throws Exception
 	{
 		System.out.println (
-			strHeader +
-			FormatUtil.FormatDouble (udt.average(), 3, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (udt.maximum(), 3, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (udt.minimum(), 3, 2, 100.) + "% | " +
-			FormatUtil.FormatDouble (udt.error(), 3, 2, 100.) + "% ||"
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|"
+		);
+
+		System.out.println (header);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|"
+		);
+
+		String dump = "\t|       DATE      =>" ;
+
+		for (int nodeIndex = 0; nodeIndex < vertexNodeArray.length; ++nodeIndex) {
+			dump = dump + " " + vertexNodeArray[nodeIndex] + "  |";
+		}
+
+		System.out.println (dump);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|"
+		);
+
+		dump = "\t|     AVERAGE     =>";
+
+		for (int univariateCentralMeasuresIndex = 0;
+			univariateCentralMeasuresIndex < univariateCentralMeasuresArray.length;
+			++univariateCentralMeasuresIndex)
+		{
+			dump = dump + "   " + FormatUtil.FormatDouble (
+				univariateCentralMeasuresArray[univariateCentralMeasuresIndex].average(),
+				2,
+				4,
+				1.
+			) + "   |";
+		}
+
+		System.out.println (dump);
+
+		dump = "\t|     MAXIMUM     =>";
+
+		for (int univariateCentralMeasuresIndex = 0;
+			univariateCentralMeasuresIndex < univariateCentralMeasuresArray.length;
+			++univariateCentralMeasuresIndex)
+		{
+			dump = dump + "   " + FormatUtil.FormatDouble (
+				univariateCentralMeasuresArray[univariateCentralMeasuresIndex].maximum(),
+				2,
+				4,
+				1.
+			) + "   |";
+		}
+
+		System.out.println (dump);
+
+		dump = "\t|     MINIMUM     =>";
+
+		for (int univariateCentralMeasuresIndex = 0;
+			univariateCentralMeasuresIndex < univariateCentralMeasuresArray.length;
+			++univariateCentralMeasuresIndex)
+		{
+			dump = dump + "   " + FormatUtil.FormatDouble (
+				univariateCentralMeasuresArray[univariateCentralMeasuresIndex].minimum(),
+				2,
+				4,
+				1.
+			) + "   |";
+		}
+
+		System.out.println (dump);
+
+		dump = "\t|      ERROR      =>";
+
+		for (int univariateCentralMeasuresIndex = 0;
+			univariateCentralMeasuresIndex < univariateCentralMeasuresArray.length;
+			++univariateCentralMeasuresIndex)
+		{
+			dump = dump + "   " + FormatUtil.FormatDouble (
+				univariateCentralMeasuresArray[univariateCentralMeasuresIndex].error(),
+				2,
+				4,
+				1.
+			) + "   |";
+		}
+
+		System.out.println (dump);
+
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|"
+		);
+	}
+
+	private static final void univariateCentralMeasuresDump (
+		final String header,
+		final UnivariateCentralMeasures univariateCentralMeasures)
+		throws Exception
+	{
+		System.out.println (
+			header +
+			FormatUtil.FormatDouble (univariateCentralMeasures.average(), 3, 2, 100.) + "% | " +
+			FormatUtil.FormatDouble (univariateCentralMeasures.maximum(), 3, 2, 100.) + "% | " +
+			FormatUtil.FormatDouble (univariateCentralMeasures.minimum(), 3, 2, 100.) + "% | " +
+			FormatUtil.FormatDouble (univariateCentralMeasures.error(), 3, 2, 100.) + "% ||"
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		int iNumStep = 10;
-		int iNumSwap = 10;
-		double dblTime = 5.;
-		int iNumPath = 10000;
-		double dblATMSwapRateStart = 0.;
-		double dblATMSwapRateDrift = 0.0;
-		double dblATMSwapRateVolatility = 0.25;
-		double dblOvernightNumeraireDrift = 0.004;
-		double dblCSADrift = 0.01;
-		double dblBankHazardRate = 0.015;
-		double dblBankRecoveryRate = 0.40;
-		double dblCounterPartyHazardRate = 0.030;
-		double dblCounterPartyRecoveryRate = 0.30;
-		double dblBankThreshold = -0.1;
-		double dblCounterPartyThreshold = 0.1;
+		int stepCount = 10;
+		int swapCount = 10;
+		int pathCount = 10000;
 
-		JulianDate dtSpot = DateUtil.Today();
+		double time = 5.;
 
-		double dblTimeWidth = dblTime / iNumStep;
-		MarketVertex[] aMV = new MarketVertex[iNumStep + 1];
-		JulianDate[] adtVertex = new JulianDate[iNumStep + 1];
-		double dblBankFundingSpread = dblBankHazardRate / (1. - dblBankRecoveryRate);
-		MonoPathExposureAdjustment[] aMPEA = new MonoPathExposureAdjustment[iNumPath];
-		double dblCounterPartyFundingSpread = dblCounterPartyHazardRate / (1. - dblCounterPartyRecoveryRate);
+		double initialATMSwapRate = 0.;
+
+		double atmSwapRateDrift = 0.;
+		double atmSwapRateVolatility = 0.25;
+
+		double overnightNumeraireDrift = 0.004;
+
+		double csaDrift = 0.01;
+
+		double bankThreshold = -0.1;
+		double bankHazardRate = 0.015;
+		double bankRecoveryRate = 0.40;
+
+		double counterPartyThreshold = 0.1;
+		double counterPartyHazardRate = 0.030;
+		double counterPartyRecoveryRate = 0.30;
+
+		JulianDate spotDate = DateUtil.Today();
+
+		double timeWidth = time / stepCount;
+		JulianDate[] vertexDateArray = new JulianDate[stepCount + 1];
+		MarketVertex[] marketVertexArray = new MarketVertex[stepCount + 1];
+		double bankFundingSpread = bankHazardRate / (1. - bankRecoveryRate);
+		double counterPartyFundingSpread = counterPartyHazardRate / (1. - counterPartyRecoveryRate);
+		MonoPathExposureAdjustment[] monoPathExposureAdjustmentArray =
+			new MonoPathExposureAdjustment[pathCount];
 
 		PositionGroupSpecification positionGroupSpecification = PositionGroupSpecification.FixedThreshold (
 			"FIXEDTHRESHOLD",
-			dblCounterPartyThreshold,
-			dblBankThreshold,
+			counterPartyThreshold,
+			bankThreshold,
 			PositionReplicationScheme.ALBANESE_ANDERSEN_VERTEX,
 			BrokenDateScheme.LINEAR_TIME,
 			0.,
 			CloseOutScheme.ISDA_92
 		);
 
-		double[][] aadblSwapPortfolioValueRealization = SwapPortfolioValueRealization (
+		double[][] swapPortfolioValueRealizationArray = SwapPortfolioValueRealization (
 			new DiffusionEvolver (
-				DiffusionEvaluatorLinear.Standard (
-					dblATMSwapRateDrift,
-					dblATMSwapRateVolatility
-				)
+				DiffusionEvaluatorLinear.Standard (atmSwapRateDrift, atmSwapRateVolatility)
 			),
-			dblATMSwapRateStart,
-			iNumStep,
-			dblTime,
-			dblTimeWidth,
-			iNumSwap,
-			iNumPath
+			initialATMSwapRate,
+			stepCount,
+			time,
+			timeWidth,
+			swapCount,
+			pathCount
 		);
 
-		for (int i = 0; i <= iNumStep; ++i)
-		{
+		for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
 			LatentStateVertexContainer latentStateVertexContainer = new LatentStateVertexContainer();
 
-			latentStateVertexContainer.add (
-				OTCFixFloatLabel.Standard ("USD-3M-10Y"),
-				Double.NaN
-			);
+			latentStateVertexContainer.add (OTCFixFloatLabel.Standard ("USD-3M-10Y"), Double.NaN);
 
-			aMV[i] = MarketVertex.Nodal (
-				adtVertex[i] = dtSpot.addMonths (6 * i),
-				dblOvernightNumeraireDrift,
-				Math.exp (-0.5 * dblOvernightNumeraireDrift * (iNumStep - i)),
-				dblCSADrift,
-				Math.exp (-0.5 * dblCSADrift * (iNumStep - i)),
+			marketVertexArray[stepIndex] = MarketVertex.Nodal (
+				vertexDateArray[stepIndex] = spotDate.addMonths (6 * stepIndex),
+				overnightNumeraireDrift,
+				Math.exp (-0.5 * overnightNumeraireDrift * (stepCount - stepIndex)),
+				csaDrift,
+				Math.exp (-0.5 * csaDrift * (stepCount - stepIndex)),
 				new MarketVertexEntity (
-					Math.exp (-0.5 * dblBankHazardRate * i),
-					dblBankHazardRate,
-					dblBankRecoveryRate,
-					dblBankFundingSpread,
-					Math.exp (-0.5 * dblBankHazardRate * (1. - dblBankRecoveryRate) * (iNumStep - i)),
+					Math.exp (-0.5 * bankHazardRate * stepIndex),
+					bankHazardRate,
+					bankRecoveryRate,
+					bankFundingSpread,
+					Math.exp (-0.5 * bankHazardRate * (1. - bankRecoveryRate) * (stepCount - stepIndex)),
 					Double.NaN,
 					Double.NaN,
 					Double.NaN
 				),
 				new MarketVertexEntity (
-					Math.exp (-0.5 * dblCounterPartyHazardRate * i),
-					dblCounterPartyHazardRate,
-					dblCounterPartyRecoveryRate,
-					dblCounterPartyFundingSpread,
-					Math.exp (-0.5 * dblCounterPartyHazardRate * (1. - dblCounterPartyRecoveryRate) * (iNumStep - i)),
+					Math.exp (-0.5 * counterPartyHazardRate * stepIndex),
+					counterPartyHazardRate,
+					counterPartyRecoveryRate,
+					counterPartyFundingSpread,
+					Math.exp (
+						-0.5 * counterPartyHazardRate * (1. - counterPartyRecoveryRate) *
+							(stepCount - stepIndex)
+					),
 					Double.NaN,
 					Double.NaN,
 					Double.NaN
@@ -398,118 +454,108 @@ public class CPGACollateralized {
 			);
 		}
 
-		MarketPath mp = MarketPath.FromMarketVertexArray (aMV);
+		MarketPath marketPath = MarketPath.FromMarketVertexArray (marketVertexArray);
 
-		for (int i = 0; i < iNumPath; ++i) {
-			JulianDate dtStart = dtSpot;
-			double dblValueStart = dblTime * dblATMSwapRateStart;
-			AlbaneseAndersen[] aHGVR = new AlbaneseAndersen[iNumStep + 1];
+		for (int pathIndex = 0; pathIndex < pathCount; ++pathIndex) {
+			JulianDate startDate = spotDate;
+			double valueStart = time * initialATMSwapRate;
+			AlbaneseAndersen[] albaneseAndersenArray = new AlbaneseAndersen[stepCount + 1];
 
-			for (int j = 0; j <= iNumStep; ++j) {
-				JulianDate dtEnd = adtVertex[j];
-				double dblCollateralBalance = 0.;
-				double dblValueEnd = aadblSwapPortfolioValueRealization[i][j];
-
-				if (0 != j) {
-					CollateralAmountEstimator hae = new CollateralAmountEstimator (
+			for (int stepIndex = 0; stepIndex <= stepCount; ++stepIndex) {
+				albaneseAndersenArray[stepIndex] = new AlbaneseAndersen (
+					vertexDateArray[stepIndex],
+					swapPortfolioValueRealizationArray[pathIndex][stepIndex],
+					0.,
+					0 == stepIndex ? 0. : new CollateralAmountEstimator (
 						positionGroupSpecification,
 						new BrokenDateInterpolatorLinearT (
-							dtStart.julian(),
-							dtEnd.julian(),
-							dblValueStart,
-							dblValueEnd
+							startDate.julian(),
+							vertexDateArray[stepIndex].julian(),
+							valueStart,
+							swapPortfolioValueRealizationArray[pathIndex][stepIndex]
 						),
 						Double.NaN
-					);
-
-					dblCollateralBalance = hae.postingRequirement (dtEnd);
-				}
-
-				aHGVR[j] = new AlbaneseAndersen (
-					adtVertex[j],
-					aadblSwapPortfolioValueRealization[i][j],
-					0.,
-					dblCollateralBalance
+					).postingRequirement (
+						vertexDateArray[stepIndex]
+					)
 				);
 
-				dtStart = dtEnd;
-				dblValueStart = dblValueEnd;
+				startDate = vertexDateArray[stepIndex];
+				valueStart = swapPortfolioValueRealizationArray[pathIndex][stepIndex];
 			}
 
-			CollateralGroupPath[] aHGP = new CollateralGroupPath[] {
-				new CollateralGroupPath (
-					aHGVR,
-					mp
-				)
+			CollateralGroupPath[] collateralGroupPathArray =
+			{
+				new CollateralGroupPath (albaneseAndersenArray, marketPath)
 			};
 
-			aMPEA[i] = new MonoPathExposureAdjustment (
-				new AlbaneseAndersenFundingGroupPath[] {
+			monoPathExposureAdjustmentArray[pathIndex] = new MonoPathExposureAdjustment (
+				new AlbaneseAndersenFundingGroupPath[]
+				{
 					new AlbaneseAndersenFundingGroupPath (
-						new AlbaneseAndersenNettingGroupPath[] {
-							new AlbaneseAndersenNettingGroupPath (
-								aHGP,
-								mp
-							)
+						new AlbaneseAndersenNettingGroupPath[]
+						{
+							new AlbaneseAndersenNettingGroupPath (collateralGroupPathArray, marketPath)
 						},
-						mp
+						marketPath
 					)
 				}
 			);
 		}
 
-		ExposureAdjustmentAggregator eaa = new ExposureAdjustmentAggregator (aMPEA);
+		ExposureAdjustmentAggregator exposureAdjustmentAggregator =
+			new ExposureAdjustmentAggregator (monoPathExposureAdjustmentArray);
 
-		ExposureAdjustmentDigest ead = eaa.digest();
+		ExposureAdjustmentDigest exposureAdjustmentDigest = exposureAdjustmentAggregator.digest();
 
 		System.out.println();
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                                COLLATERALIZED EXPOSURE                                                                                |",
-			eaa.vertexDates(),
-			ead.collateralizedExposure()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.collateralizedExposure()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                               UNCOLLATERALIZED EXPOSURE                                                                               |",
-			eaa.vertexDates(),
-			ead.uncollateralizedExposure()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.uncollateralizedExposure()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                                COLLATERALIZED EXPOSURE PV                                                                             |",
-			eaa.vertexDates(),
-			ead.collateralizedExposurePV()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.collateralizedExposurePV()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                               UNCOLLATERALIZED EXPOSURE PV                                                                            |",
-			eaa.vertexDates(),
-			ead.uncollateralizedExposurePV()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.uncollateralizedExposurePV()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                            COLLATERALIZED POSITIVE EXPOSURE PV                                                                        |",
-			eaa.vertexDates(),
-			ead.collateralizedPositiveExposure()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.collateralizedPositiveExposure()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                           UNCOLLATERALIZED POSITIVE EXPOSURE PV                                                                       |",
-			eaa.vertexDates(),
-			ead.uncollateralizedPositiveExposure()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.uncollateralizedPositiveExposure()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                            COLLATERALIZED NEGATIVE EXPOSURE PV                                                                        |",
-			eaa.vertexDates(),
-			ead.collateralizedNegativeExposure()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.collateralizedNegativeExposure()
 		);
 
-		UDTDump (
+		univariateCentralMeasuresDump (
 			"\t|                                                                           UNCOLLATERALIZED NEGATIVE EXPOSURE PV                                                                       |",
-			eaa.vertexDates(),
-			ead.uncollateralizedNegativeExposure()
+			exposureAdjustmentAggregator.vertexDates(),
+			exposureAdjustmentDigest.uncollateralizedNegativeExposure()
 		);
 
 		System.out.println();
@@ -532,62 +578,29 @@ public class CPGACollateralized {
 
 		System.out.println ("\t||-----------------------------------------------------||");
 
-		UDTDump (
-			"\t||  UCVA  => ",
-			ead.ucva()
-		);
+		univariateCentralMeasuresDump ("\t||  UCVA  => ", exposureAdjustmentDigest.ucva());
 
-		UDTDump (
-			"\t|| FTDCVA => ",
-			ead.ftdcva()
-		);
+		univariateCentralMeasuresDump ("\t|| FTDCVA => ", exposureAdjustmentDigest.ftdcva());
 
-		UDTDump (
-			"\t||   CVA  => ",
-			ead.cva()
-		);
+		univariateCentralMeasuresDump ("\t||   CVA  => ", exposureAdjustmentDigest.cva());
 
-		UDTDump (
-			"\t||  CVACL => ",
-			ead.cvacl()
-		);
+		univariateCentralMeasuresDump ("\t||  CVACL => ", exposureAdjustmentDigest.cvacl());
 
-		UDTDump (
-			"\t||   DVA  => ",
-			ead.dva()
-		);
+		univariateCentralMeasuresDump ("\t||   DVA  => ", exposureAdjustmentDigest.dva());
 
-		UDTDump (
-			"\t||   FVA  => ",
-			ead.fva()
-		);
+		univariateCentralMeasuresDump ("\t||   FVA  => ", exposureAdjustmentDigest.fva());
 
-		UDTDump (
-			"\t||   FDA  => ",
-			ead.fda()
-		);
+		univariateCentralMeasuresDump ("\t||   FDA  => ", exposureAdjustmentDigest.fda());
 
-		UDTDump (
-			"\t||   FCA  => ",
-			ead.fca()
-		);
+		univariateCentralMeasuresDump ("\t||   FCA  => ", exposureAdjustmentDigest.fca());
 
-		UDTDump (
-			"\t||   FBA  => ",
-			ead.fba()
-		);
+		univariateCentralMeasuresDump ("\t||   FBA  => ", exposureAdjustmentDigest.fba());
 
-		UDTDump (
-			"\t||  SFVA  => ",
-			ead.sfva()
-		);
+		univariateCentralMeasuresDump ("\t||  SFVA  => ", exposureAdjustmentDigest.sfva());
 
 		System.out.println ("\t||-----------------------------------------------------||");
 
-		UDTDump (
-			"\t||  Total => ",
-			ead.totalVA()
-		);
+		univariateCentralMeasuresDump ("\t||  Total => ", exposureAdjustmentDigest.totalVA());
 
 		System.out.println ("\t||-----------------------------------------------------||");
 
