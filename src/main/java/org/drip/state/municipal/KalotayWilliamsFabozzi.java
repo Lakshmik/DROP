@@ -560,4 +560,80 @@ public class KalotayWilliamsFabozzi
 
 		return applyProjectedBaseForwardYield (timeToProjectedBaseForwardYieldMap);
 	}
+
+	/**
+	 * Retrieve the List of <i>KalotayWilliamsFabozziPeriodState</i> Instances at the Specified Time Node
+	 * 
+	 * @param bespokeTime Bespoke Time Node
+	 * 
+	 * @return List of <i>KalotayWilliamsFabozziPeriodState</i> Instances
+	 */
+
+	public List<KalotayWilliamsFabozziPeriodState> bespokePeriodStateList (
+		final double bespokeTime)
+	{
+		if (!NumberUtil.IsValid (bespokeTime) || 0. >= bespokeTime ||
+			_timeToProjectedPeriodStateMap.isEmpty())
+		{
+			return null;
+		}
+
+		double segmentStartTime = 0.;
+		double segmentEndTime = Double.NaN;
+
+		for (double endTime : _timeToProjectedPeriodStateMap.keySet()) {
+			if (endTime > bespokeTime) {
+				segmentEndTime = endTime;
+				break;
+			}
+
+			if (endTime == bespokeTime) {
+				return _timeToProjectedPeriodStateMap.get (endTime);
+			}
+
+			segmentStartTime = endTime;
+		}
+
+		if (Double.isNaN (segmentEndTime)) {
+			return null;
+		}
+
+		double timeShift = segmentEndTime - bespokeTime;
+
+		double frontalDiscountFactorAdjustment =
+			1. + _timeToZeroVolatilityPeriodStateMap.firstEntry().getValue().cumulativeMarketYield() *
+				(segmentStartTime - bespokeTime);
+
+		List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+			new ArrayList<KalotayWilliamsFabozziPeriodState>();
+
+		for (KalotayWilliamsFabozziPeriodState kalotayWilliamsFabozziPeriodState :
+			_timeToProjectedPeriodStateMap.get (segmentEndTime))
+		{
+			KalotayWilliamsFabozziPeriod period = kalotayWilliamsFabozziPeriodState.period();
+
+			double startTime = period.startTime() - timeShift;
+
+			try {
+				kalotayWilliamsFabozziPeriodStateList.add (
+					new KalotayWilliamsFabozziPeriodState (
+						new KalotayWilliamsFabozziPeriod (
+							0. > startTime ? 0. : startTime,
+							period.endTime() - timeShift
+						),
+						kalotayWilliamsFabozziPeriodState.forwardYield(),
+						kalotayWilliamsFabozziPeriodState.forwardDiscountFactor(),
+						kalotayWilliamsFabozziPeriodState.cumulativeEndDiscountFactor() *
+							frontalDiscountFactorAdjustment
+					)
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+
+				return null;
+			}
+		}
+
+		return kalotayWilliamsFabozziPeriodStateList;
+	}
 }

@@ -152,7 +152,8 @@ public class MultiBondCurveCalibrationRun
 					code,
 					currency,
 					calibrationDateArray,
-					downhillSimplexRun.optimalObjectiveFunctionCoordinate().vertex()
+					downhillSimplexRun.optimalObjectiveFunctionCoordinate().vertex(),
+					true
 				)
 			);
 		} catch (Exception e) {

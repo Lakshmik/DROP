@@ -1,6 +1,8 @@
 
 package org.drip.state.municipal;
 
+import java.util.TreeMap;
+
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -80,8 +82,9 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>ProxyBondSensitivity</i> contains the Duration and the Convexity of a Bond using the Kalotay, Williams,
- *  and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
+ * <i>BondPriceFunction</i> implements the Full Bond Evaluation Pricing Function to be used in the Kalotay,
+ * 	Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References
+ *  are:
  *  
  * 	<br>
  *  <ul>
@@ -119,147 +122,83 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ProxyBondSensitivity
+public class BondPriceFunction
 {
-	private double _duration = Double.NaN;
-	private double _convexity = Double.NaN;
-	private double _yieldBasis = Double.NaN;
-	private double _marketPrice = Double.NaN;
-	private double _theoreticalPrice = Double.NaN;
+	private BondEvaluator _evaluator = null;
+	private double _annualizedForwardYieldVolatility = Double.NaN;
+	private KalotayWilliamsFabozzi _kalotayWilliamsFabozzi = null;
+	private TreeMap<Double, Double> _timeToProjectedBaseForwardYieldMap = null;
 
 	/**
-	 * Construct the <i>ProxyBondSensitivity</i> Instance from the Market and the Yield Bump Up/Down Prices
+	 * <i>BondPriceFunction</i> Constructor
 	 * 
-	 * @param theoreticalPrice Theoretical Price
-	 * @param marketPrice Market Price
-	 * @param yieldBasis Yield Basis
-	 * @param bumpUpMarketPrice Yield Bumped Up Market Price
-	 * @param bumpDownMarketPrice Yield Bumped Down Market Price
-	 * @param yieldBump Yield Bump
-	 * 
-	 * @return <i>ProxyBondSensitivity</i> Instance
-	 */
-
-	public static final ProxyBondSensitivity FromBaseUpDown (
-		final double theoreticalPrice,
-		final double marketPrice,
-		final double yieldBasis,
-		final double bumpUpMarketPrice,
-		final double bumpDownMarketPrice,
-		final double yieldBump)
-	{
-		if (!NumberUtil.IsValid (marketPrice) ||
-			!NumberUtil.IsValid (bumpUpMarketPrice) ||
-			!NumberUtil.IsValid (bumpDownMarketPrice) ||
-			!NumberUtil.IsValid (yieldBump) || 0. == yieldBump)
-		{
-			return null;
-		}
-
-		double yieldBumpReciprocal = 1. / yieldBump;
-
-		try {
-			return NumberUtil.IsValid (marketPrice) &&
-				NumberUtil.IsValid (bumpUpMarketPrice) &&
-				NumberUtil.IsValid (bumpDownMarketPrice) &&
-				NumberUtil.IsValid (yieldBump) && 0. != yieldBump ?
-				new ProxyBondSensitivity (
-					theoreticalPrice,
-					marketPrice,
-					yieldBasis,
-					0.5 * (bumpDownMarketPrice - bumpUpMarketPrice) * yieldBumpReciprocal,
-					(bumpDownMarketPrice + bumpUpMarketPrice - 2. * marketPrice) * yieldBumpReciprocal *
-						yieldBumpReciprocal
-				) : null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * <i>ProxyBondSensitivity</i> Constructor
-	 * 
-	 * @param theoreticalPrice Theoretical Price
-	 * @param marketPrice Market Price
-	 * @param yieldBasis Yield Basis
-	 * @param duration Duration
-	 * @param convexity Convexity
+	 * @param kalotayWilliamsFabozzi <i>KalotayWilliamsFabozzi</i> Model Implementation
+	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
+	 * @param timeToProjectedBaseForwardYieldMap Projected Base Forward Yield Time Map
+	 * @param evaluator Underlying Calibration  Bond
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public ProxyBondSensitivity (
-		final double theoreticalPrice,
-		final double marketPrice,
-		final double yieldBasis,
-		final double duration,
-		final double convexity)
+	public BondPriceFunction (
+		final BondEvaluator evaluator,
+		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
+		final double annualizedForwardYieldVolatility,
+		final TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap)
 		throws Exception
 	{
-		if (!NumberUtil.IsValid (_theoreticalPrice = theoreticalPrice) || 0. > _theoreticalPrice ||
-			!NumberUtil.IsValid (_marketPrice = marketPrice) || 0. > _marketPrice ||
-			!NumberUtil.IsValid (_yieldBasis = yieldBasis) ||
-			!NumberUtil.IsValid (_duration = duration) ||
-			!NumberUtil.IsValid (_convexity = convexity))
+		if (null == (_kalotayWilliamsFabozzi = kalotayWilliamsFabozzi) ||
+			!NumberUtil.IsValid (_annualizedForwardYieldVolatility = annualizedForwardYieldVolatility) ||
+				0. > _annualizedForwardYieldVolatility ||
+			null == (_evaluator = evaluator))
 		{
-			throw new Exception ("ProxyBondSensitivity Constructor => Invalid Inputs");
+			throw new Exception ("BondPriceFunction Constructor => Invalid Inputs");
 		}
+
+		_timeToProjectedBaseForwardYieldMap = timeToProjectedBaseForwardYieldMap;
 	}
 
 	/**
-	 * Retrieve the Theoretical Price
+	 * Retrieve the Underlying Calibration Bond Evaluator
 	 * 
-	 * @return Theoretical Price
+	 * @return Underlying Calibration Bond Evaluator
 	 */
 
-	public double theoreticalPrice()
+	public BondEvaluator evaluator()
 	{
-		return _theoreticalPrice;
+		return _evaluator;
 	}
 
 	/**
-	 * Retrieve the Market Price
+	 * Retrieve the Underlying <i>KalotayWilliamsFabozzi</i> Model Implementation
 	 * 
-	 * @return Market Price
+	 * @return Underlying <i>KalotayWilliamsFabozzi</i> Model Implementation
 	 */
 
-	public double marketPrice()
+	public KalotayWilliamsFabozzi kalotayWilliamsFabozzi()
 	{
-		return _marketPrice;
+		return _kalotayWilliamsFabozzi;
 	}
 
 	/**
-	 * Retrieve the Yield Basis
+	 * Retrieve the Annualized Forward Yield Volatility
 	 * 
-	 * @return Yield Basis
+	 * @return Annualized Forward Yield Volatility
 	 */
 
-	public double yieldBasis()
+	public double annualizedForwardYieldVolatility()
 	{
-		return _yieldBasis;
+		return _annualizedForwardYieldVolatility;
 	}
 
 	/**
-	 * Retrieve the Duration
+	 * Retrieve the Projected Base Forward Yield Time Map
 	 * 
-	 * @return Duration
+	 * @return Projected Base Forward Yield Time Map
 	 */
 
-	public double duration()
+	public TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap()
 	{
-		return _duration;
-	}
-
-	/**
-	 * Retrieve the Convexity
-	 * 
-	 * @return Convexity
-	 */
-
-	public double convexity()
-	{
-		return _convexity;
+		return _timeToProjectedBaseForwardYieldMap;
 	}
 }

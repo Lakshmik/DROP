@@ -491,7 +491,8 @@ public class BenchmarkMoversCurve1_03
 			currency,
 			calibrationDateArray,
 			marketComponentList,
-			0
+			0,
+			false
 		);
 
 		System.out.print (multiBondCurveCalibrator.toString ("\t|| "));

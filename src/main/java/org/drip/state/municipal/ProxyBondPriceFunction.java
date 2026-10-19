@@ -4,6 +4,7 @@ package org.drip.state.municipal;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.drip.analytics.date.JulianDate;
 import org.drip.function.definition.R1ToR1;
 import org.drip.function.r1tor1solver.FixedPointFinderBracketing;
 import org.drip.function.r1tor1solver.FixedPointFinderBrent;
@@ -130,7 +131,7 @@ import org.drip.numerical.common.NumberUtil;
 
 public class ProxyBondPriceFunction
 {
-	private ProxyBond _underlying = null;
+	private ProxyBondEvaluator _underlying = null;
 	private double _annualizedForwardYieldVolatility = Double.NaN;
 	private KalotayWilliamsFabozzi _kalotayWilliamsFabozzi = null;
 	private TreeMap<Double, Double> _timeToProjectedBaseForwardYieldMap = null;
@@ -155,6 +156,7 @@ public class ProxyBondPriceFunction
 		}
 
 		TreeMap<Double, List<Double>> projectedBondValueListMap = _underlying.valueTree (
+			null,
 			_kalotayWilliamsFabozzi
 		);
 
@@ -168,19 +170,19 @@ public class ProxyBondPriceFunction
 	/**
 	 * <i>ProxyBondPriceFunction</i> Constructor
 	 * 
+	 * @param underlying Underlying Calibration Proxy Bond
 	 * @param kalotayWilliamsFabozzi <i>KalotayWilliamsFabozzi</i> Model Implementation
 	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
 	 * @param timeToProjectedBaseForwardYieldMap Projected Base Forward Yield Time Map
-	 * @param underlying Underlying Calibration Proxy Bond
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ProxyBondPriceFunction (
+		final ProxyBondEvaluator underlying,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
 		final double annualizedForwardYieldVolatility,
-		final TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap,
-		final ProxyBond underlying)
+		final TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap)
 		throws Exception
 	{
 		if (null == (_kalotayWilliamsFabozzi = kalotayWilliamsFabozzi) ||
@@ -233,7 +235,7 @@ public class ProxyBondPriceFunction
 	 * @return Underlying Calibration Proxy Bond
 	 */
 
-	public ProxyBond underlying()
+	public ProxyBondEvaluator underlying()
 	{
 		return _underlying;
 	}
@@ -241,6 +243,7 @@ public class ProxyBondPriceFunction
 	/**
 	 * Evaluate the Price for the given Yield Basis
 	 * 
+	 * @param spotDate Spot Date
 	 * @param yieldBasis Yield Basis
 	 *  
 	 * @return Returns the calculated Price
@@ -249,6 +252,7 @@ public class ProxyBondPriceFunction
 	 */
 
 	public double priceFromYieldBasis (
+		final JulianDate spotDate,
 		final double yieldBasis)
 		throws Exception
 	{
@@ -265,6 +269,7 @@ public class ProxyBondPriceFunction
 		}
 
 		TreeMap<Double, List<Double>> projectedBondValueListMap = _underlying.valueTree (
+			spotDate,
 			_kalotayWilliamsFabozzi
 		);
 
@@ -320,12 +325,14 @@ public class ProxyBondPriceFunction
 	/**
 	 * Retrieve the Yield Basis <i>CalibrateAndSensitivity</i> Instance given the Price
 	 * 
+	 * @param spotDate Spot Date
 	 * @param price Price
 	 * 
 	 * @return Yield Basis <i>CalibrateAndSensitivity</i> Instance
 	 */
 
 	public CalibrateAndSensitivity yieldBasisForPrice (
+		final JulianDate spotDate,
 		final double price)
 	{
 		try {
@@ -337,7 +344,7 @@ public class ProxyBondPriceFunction
 						final double yieldBasis)
 						throws Exception
 					{
-						return priceFromYieldBasis (yieldBasis);
+						return priceFromYieldBasis (spotDate, yieldBasis);
 					}
 				},
 				null,

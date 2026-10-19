@@ -310,7 +310,8 @@ public class PathVertexForwardRealization {
 						dtEvent,
 						astrTenor
 					),
-					aadblPathForwardYield[iTimeVertex]
+					aadblPathForwardYield[iTimeVertex],
+					true
 				);
 
 				for (int iDimension = 0; iDimension < iNumDimension; ++iDimension)

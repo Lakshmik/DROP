@@ -163,7 +163,8 @@ public class PathVertexGovvie extends PathVertexRd
 							treasuryCode,
 							currency,
 							tenorDateArray,
-							forwardPathRdVertexRealization[pathIndex][timeVertexIndex]
+							forwardPathRdVertexRealization[pathIndex][timeVertexIndex],
+							true
 						))) {
 						return null;
 					}

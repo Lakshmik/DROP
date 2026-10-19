@@ -239,9 +239,11 @@ public class FixedPointFinderBracketing
 				(objectiveFunctionValue - _objectiveFunctionValueGoal)
 		))
 		{
-			if (!_iteratedBracket.setLeftObjectiveFunctionValue (objectiveFunctionValue) ||
-				!_iteratedBracket.setVariateLeft (variate))
-			{
+			boolean setOFAndVariate =
+				_iteratedBracket.setLeftObjectiveFunctionValue (objectiveFunctionValue) &&
+				_iteratedBracket.setVariateLeft (variate);
+
+			if (!setOFAndVariate) {
 				return false;
 			}
 
@@ -252,9 +254,11 @@ public class FixedPointFinderBracketing
 				(objectiveFunctionValue - _objectiveFunctionValueGoal)
 		))
 		{
-			if (!_iteratedBracket.setRightObjectiveFunctionValue (objectiveFunctionValue) ||
-				!_iteratedBracket.setVariateRight (variate))
-			{
+			boolean setOFAndVariate =
+				_iteratedBracket.setRightObjectiveFunctionValue (objectiveFunctionValue) &&
+				_iteratedBracket.setVariateRight (variate);
+
+			if (!setOFAndVariate) {
 				return false;
 			}
 
@@ -271,9 +275,10 @@ public class FixedPointFinderBracketing
 				fixedPointFinderOutput
 			);
 
-			return iteratedVariate.setX (variate) &&
-				iteratedVariate.setObjectiveFunctionValue (_objectiveFunction.evaluate (variate)) &&
-				fixedPointFinderOutput.incrementObjectiveFunctionCalculations();
+			return iteratedVariate.setVariateAndObjectiveFunction (
+				variate,
+				_objectiveFunction.evaluate (variate)
+			) && fixedPointFinderOutput.incrementObjectiveFunctionCalculations();
 		} catch (Exception e) {
 			if (_whine) e.printStackTrace();
 		}

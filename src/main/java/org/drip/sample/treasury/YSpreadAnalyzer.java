@@ -314,7 +314,8 @@ public class YSpreadAnalyzer
 			code,
 			bondArray[0].currency(),
 			dateArray,
-			forwardYieldArray
+			forwardYieldArray,
+			true
 		);
 
 		return NonlinearCurveBuilder.YieldCurve (

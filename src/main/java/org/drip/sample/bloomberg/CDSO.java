@@ -24,6 +24,14 @@ import org.drip.state.identifier.*;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -100,55 +108,60 @@ import org.drip.state.identifier.*;
 /**
  * <i>CDSO</i> contains the sample demonstrating the replication of Bloomberg's CDSO functionality.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/bloomberg/README.md">Bloomberg CDSO CDSW SWPM YAS</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/bloomberg/README.md">Bloomberg CDSO CDSW SWPM YAS</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CDSO {
+public class CDSO
+{
 
 	private static final MergedDiscountForwardCurve MarketFundingCurve (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final double dblBump)
+		final JulianDate spotDate,
+		final String currency,
+		final double bump)
 	{
 		return LatentMarketStateBuilder.SmoothFundingCurve (
-			dtSpot,
-			strCurrency,
-			new String[] {
+			spotDate,
+			currency,
+			new String[]
+			{
 				"02D",
 				"07D",
 				"14D",
 				"30D",
 				"60D"
 			},
-			new double[] {
-				0.0017 + dblBump,	//  2D
-				0.0017 + dblBump,	//  7D
-				0.0018 + dblBump,	// 14D
-				0.0020 + dblBump,	// 30D
-				0.0023 + dblBump	// 60D
+			new double[]
+			{
+				0.0017 + bump,	//  2D
+				0.0017 + bump,	//  7D
+				0.0018 + bump,	// 14D
+				0.0020 + bump,	// 30D
+				0.0023 + bump	// 60D
 			},
 			"ForwardRate",
-			new double[] {
-				0.0027 + dblBump,
-				0.0032 + dblBump,
-				0.0041 + dblBump,
-				0.0054 + dblBump,
-				0.0077 + dblBump,
-				0.0104 + dblBump,
-				0.0134 + dblBump,
-				0.0160 + dblBump
+			new double[]
+			{
+				0.0027 + bump,
+				0.0032 + bump,
+				0.0041 + bump,
+				0.0054 + bump,
+				0.0077 + bump,
+				0.0104 + bump,
+				0.0134 + bump,
+				0.0160 + bump
 			},
 			"ForwardRate",
-			new String[] {
+			new String[]
+			{
 				"04Y",
 				"05Y",
 				"06Y",
@@ -165,37 +178,39 @@ public class CDSO {
 				"40Y",
 				"50Y"
 			},
-			new double[] {
-				0.0166 + dblBump,	//  4Y
-				0.0206 + dblBump,	//  5Y
-				0.0241 + dblBump,	//  6Y
-				0.0269 + dblBump,	//  7Y
-				0.0292 + dblBump,	//  8Y
-				0.0311 + dblBump,	//  9Y
-				0.0326 + dblBump,	// 10Y
-				0.0340 + dblBump,	// 11Y
-				0.0351 + dblBump,	// 12Y
-				0.0375 + dblBump,	// 15Y
-				0.0393 + dblBump,	// 20Y
-				0.0402 + dblBump,	// 25Y
-				0.0407 + dblBump,	// 30Y
-				0.0409 + dblBump,	// 40Y
-				0.0409 + dblBump	// 50Y
+			new double[]
+			{
+				0.0166 + bump,	//  4Y
+				0.0206 + bump,	//  5Y
+				0.0241 + bump,	//  6Y
+				0.0269 + bump,	//  7Y
+				0.0292 + bump,	//  8Y
+				0.0311 + bump,	//  9Y
+				0.0326 + bump,	// 10Y
+				0.0340 + bump,	// 11Y
+				0.0351 + bump,	// 12Y
+				0.0375 + bump,	// 15Y
+				0.0393 + bump,	// 20Y
+				0.0402 + bump,	// 25Y
+				0.0407 + bump,	// 30Y
+				0.0409 + bump,	// 40Y
+				0.0409 + bump	// 50Y
 			},
 			"SwapRate"
 		);
 	}
 
 	private static final CreditCurve MarketCreditCurve (
-		final JulianDate dtSpot,
-		final String strCreditCurve,
-		final String strManifestMeasure,
-		final MergedDiscountForwardCurve dcFunding,
-		final double dblBump,
-		final boolean bDisplay)
+		final JulianDate spotDate,
+		final String creditCurveName,
+		final String manifestMeasure,
+		final MergedDiscountForwardCurve fundingCurve,
+		final double bump,
+		final boolean display)
 		throws Exception
 	{
-		String[] astrCDSMaturityTenor = new String[] {
+		String[] cdsMaturityTenorArray =
+		{
 			"06M",
 			"01Y",
 			"02Y",
@@ -205,37 +220,39 @@ public class CDSO {
 			"07Y",
 			"10Y"
 		};
-
-		double[] adblCDSParSpread = new double[] {
-			100. + dblBump,	//  6M
-			100. + dblBump,	//  1Y
-			100. + dblBump,	//  2Y
-			100. + dblBump,	//  3Y
-			100. + dblBump,	//  4Y
-			100. + dblBump,	//  5Y
-			100. + dblBump,	//  7Y
-			100. + dblBump	// 10Y
+		double[] cdsParSpreadArray =
+		{
+			100. + bump,	//  6M
+			100. + bump,	//  1Y
+			100. + bump,	//  2Y
+			100. + bump,	//  3Y
+			100. + bump,	//  4Y
+			100. + bump,	//  5Y
+			100. + bump,	//  7Y
+			100. + bump	// 10Y
 		};
 
-		CreditCurve cc = LatentMarketStateBuilder.CreditCurve (
-			dtSpot,
-			strCreditCurve,
-			astrCDSMaturityTenor,
-			adblCDSParSpread,
-			adblCDSParSpread,
-			strManifestMeasure,
-			dcFunding
+		CreditCurve creditCurve = LatentMarketStateBuilder.CreditCurve (
+			spotDate,
+			creditCurveName,
+			cdsMaturityTenorArray,
+			cdsParSpreadArray,
+			cdsParSpreadArray,
+			manifestMeasure,
+			fundingCurve
 		);
 
-		if (!bDisplay) return cc;
+		if (!display) {
+			return creditCurve;
+		}
 
 		CreditPricerParams pricerParams = CreditPricerParams.Standard();
 
-		CurveSurfaceQuoteContainer csqc = new CurveSurfaceQuoteContainer();
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		csqc.setFundingState (dcFunding);
+		curveSurfaceQuoteContainer.setFundingState (fundingCurve);
 
-		csqc.setCreditState (cc);
+		curveSurfaceQuoteContainer.setCreditState (creditCurve);
 
 		System.out.println ("\n\t|---------------||");
 
@@ -243,103 +260,91 @@ public class CDSO {
 
 		System.out.println ("\t|---------------||");
 
-		for (int i = 0; i < adblCDSParSpread.length; ++i)
+		for (int cdsIndex = 0; cdsIndex < cdsParSpreadArray.length; ++cdsIndex) {
 			System.out.println (
-				"\t| " + astrCDSMaturityTenor[i] + " |" +
-				FormatUtil.FormatDouble (
+				"\t| " + cdsMaturityTenorArray[cdsIndex] + " |" + FormatUtil.FormatDouble (
 					CDSBuilder.CreateSNAC (
-						dtSpot,
-						astrCDSMaturityTenor[i],
+						spotDate,
+						cdsMaturityTenorArray[cdsIndex],
 						0.1,
-						strCreditCurve
+						creditCurveName
 					).measureValue (
-						ValuationParams.Spot (dtSpot.julian()),
+						ValuationParams.Spot (spotDate.julian()),
 						pricerParams,
-						csqc,
+						curveSurfaceQuoteContainer,
 						null,
-						strManifestMeasure
+						manifestMeasure
 					),
-				3, 3, 1.) + " ||"
+					3,
+					3,
+					1.
+				) + " ||"
 			);
+		}
 
 		System.out.println ("\t|---------------||");
 
-		return cc;
+		return creditCurve;
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		JulianDate dtSpot = DateUtil.CreateFromYMD (
-			2016,
-			DateUtil.FEBRUARY,
-			2
-		);
+		JulianDate spotDate = DateUtil.CreateFromYMD (2016, DateUtil.FEBRUARY, 2);
 
-		JulianDate dtCashPay = DateUtil.CreateFromYMD (
-			2016,
-			DateUtil.FEBRUARY,
-			5
-		);
+		JulianDate cashPayDate = DateUtil.CreateFromYMD (2016, DateUtil.FEBRUARY, 5);
 
-		String strCurrency = "USD";
-		String strCreditCurve = "DB";
-		String strCDSForwardTenor = "5Y";
-		double dblCDSForwardCoupon = 0.1;
-		double dblFairPremiumVolatility = 0.3;
-		String strManifestMeasure = "FairPremium";
-		double dblNotional = 10000000.;
-		double dblCreditBump = 10.;
-		double dblFundingBump = .0001;
+		double creditBump = 10.;
+		String currency = "USD";
+		double fundingBump = .0001;
+		double notional = 10000000.;
+		double cdsForwardCoupon = 0.1;
+		String cdsForwardTenor = "5Y";
+		String creditCurveName = "DB";
+		double fairPremiumVolatility = 0.3;
+		String manifestMeasure = "FairPremium";
 
-		MergedDiscountForwardCurve dcFunding = MarketFundingCurve (
-			dtSpot,
-			strCurrency,
-			0.
-		);
+		MergedDiscountForwardCurve fundingCurve = MarketFundingCurve (spotDate, currency, 0.);
 
-		CreditCurve cc = MarketCreditCurve (
-			dtSpot,
-			strCreditCurve,
-			strManifestMeasure,
-			dcFunding,
+		CreditCurve creditCurve = MarketCreditCurve (
+			spotDate,
+			creditCurveName,
+			manifestMeasure,
+			fundingCurve,
 			0.,
 			true
 		);
 
 		CreditPricerParams pricerParams = CreditPricerParams.Standard();
 
-		CurveSurfaceQuoteContainer csqc = new CurveSurfaceQuoteContainer();
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = new CurveSurfaceQuoteContainer();
 
-		csqc.setFundingState (dcFunding);
+		curveSurfaceQuoteContainer.setFundingState (fundingCurve);
 
-		csqc.setCreditState (cc);
+		curveSurfaceQuoteContainer.setCreditState (creditCurve);
 
-		JulianDate dtEffective = DateUtil.CreateFromYMD (
+		JulianDate effectiveDate = DateUtil.CreateFromYMD (
 			2016,
 			DateUtil.MARCH,
 			20
 		);
 
 		CreditDefaultSwap cdsForward = CDSBuilder.CreateSNAC (
-			dtEffective,
-			strCDSForwardTenor,
-			dblCDSForwardCoupon,
-			strCreditCurve
+			effectiveDate,
+			cdsForwardTenor,
+			cdsForwardCoupon,
+			creditCurveName
 		);
 
 		System.out.println ("\n\t|-------------------------------------|");
@@ -352,7 +357,7 @@ public class CDSO {
 
 		System.out.println ("\t|  Maturity Date     : " + cdsForward.maturityDate());
 
-		System.out.println ("\t|  Notional          : " + FormatUtil.FormatDouble (dblNotional, 1, 0, 1.));
+		System.out.println ("\t|  Notional          : " + FormatUtil.FormatDouble (notional, 1, 0, 1.));
 
 		System.out.println ("\t|  Payment Frequency : " + cdsForward.freq());
 
@@ -360,36 +365,32 @@ public class CDSO {
 
 		System.out.println ("\t|-------------------------------------|\n");
 
-		csqc.setCustomVolatility (
+		curveSurfaceQuoteContainer.setCustomVolatility (
 			ScenarioDeterministicVolatilityBuilder.FlatForward (
-				dtSpot.julian(),
-				VolatilityLabel.Standard (CustomLabel.Standard (cdsForward.name() + "_" + strManifestMeasure)),
-				strCurrency,
-				dblFairPremiumVolatility
+				spotDate.julian(),
+				VolatilityLabel.Standard (CustomLabel.Standard (cdsForward.name() + "_" + manifestMeasure)),
+				currency,
+				fairPremiumVolatility
 			)
 		);
 
-		ValuationParams valParams = new ValuationParams (
-			dtSpot,
-			dtCashPay,
-			strCurrency
-		);
+		ValuationParams valuationParams = new ValuationParams (spotDate, cashPayDate, currency);
 
-		Map<String, Double> mapCDSForwardOutput = cdsForward.value (
-			valParams,
+		double strike = cdsForward.value (
+			valuationParams,
 			pricerParams,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
+		).get (
+			manifestMeasure
 		);
-
-		double dblStrike = mapCDSForwardOutput.get (strManifestMeasure);
 
 		CDSEuropeanOption cdsOptionPayer = new CDSEuropeanOption (
 			cdsForward.name() + "::PAYER_OPT",
 			cdsForward,
-			strManifestMeasure,
+			manifestMeasure,
 			false,
-			dblStrike,
+			strike,
 			null,
 			new BlackScholesAlgorithm(),
 			null
@@ -407,100 +408,103 @@ public class CDSO {
 
 		System.out.println ("\t| Knock Out?       " + true);
 
-		System.out.println ("\t| Strike         : " + FormatUtil.FormatDouble (dblStrike, 1, 0, 1.));
+		System.out.println ("\t| Strike         : " + FormatUtil.FormatDouble (strike, 1, 0, 1.));
 
-		System.out.println ("\t| Start Date     : " + dtSpot);
+		System.out.println ("\t| Start Date     : " + spotDate);
 
-		System.out.println ("\t| Cash Pay Date  : " + dtCashPay);
+		System.out.println ("\t| Cash Pay Date  : " + cashPayDate);
 
 		System.out.println ("\t| Exercise Date  : " + cdsOptionPayer.exerciseDate());
 
 		System.out.println ("\t|-------------------------------------|\n");
 
-		Map<String, Double> mapPayerOptionOutput = cdsOptionPayer.value (
-			valParams,
+		Map<String, Double> payerOptionMeasureMap = cdsOptionPayer.value (
+			valuationParams,
 			null,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		double dblOptionPriceBase = mapPayerOptionOutput.get ("Price") / cdsForward.initialNotional();
+		double optionPriceBase = payerOptionMeasureMap.get ("Price") / cdsForward.initialNotional();
 
-		CreditCurve ccBumpUp = MarketCreditCurve (
-			dtSpot,
-			strCreditCurve,
-			strManifestMeasure,
-			dcFunding,
-			dblCreditBump,
+		CreditCurve creditCurveBumpUp = MarketCreditCurve (
+			spotDate,
+			creditCurveName,
+			manifestMeasure,
+			fundingCurve,
+			creditBump,
 			false
 		);
 
-		CreditCurve ccBumpDown = MarketCreditCurve (
-			dtSpot,
-			strCreditCurve,
-			strManifestMeasure,
-			dcFunding,
-			-dblCreditBump,
+		CreditCurve creditCurveBumpDown = MarketCreditCurve (
+			spotDate,
+			creditCurveName,
+			manifestMeasure,
+			fundingCurve,
+			-creditBump,
 			false
 		);
 
-		csqc.setCreditState (ccBumpUp);
+		curveSurfaceQuoteContainer.setCreditState (creditCurveBumpUp);
 
-		Map<String, Double> mapPayerOptionOutputCreditBumpUp = cdsOptionPayer.value (
-			valParams,
+		Map<String, Double> payerOptionMeasureMapCreditBumpUp = cdsOptionPayer.value (
+			valuationParams,
 			null,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		double dblOptionPriceCreditBumpUp = mapPayerOptionOutputCreditBumpUp.get ("Price") / cdsForward.initialNotional();
+		double optionPriceCreditBumpUp =
+			payerOptionMeasureMapCreditBumpUp.get ("Price") / cdsForward.initialNotional();
 
-		csqc.setCreditState (ccBumpDown);
+		curveSurfaceQuoteContainer.setCreditState (creditCurveBumpDown);
 
-		Map<String, Double> mapPayerOptionOutputCreditBumpDown = cdsOptionPayer.value (
-			valParams,
+		Map<String, Double> payerOptionMeasureMapCreditBumpDown = cdsOptionPayer.value (
+			valuationParams,
 			null,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		double dblOptionPriceCreditBumpDown = mapPayerOptionOutputCreditBumpDown.get ("Price") / cdsForward.initialNotional();
+		double optionPriceCreditBumpDown =
+			payerOptionMeasureMapCreditBumpDown.get ("Price") / cdsForward.initialNotional();
 
-		MergedDiscountForwardCurve dcFundingBumpUp = MarketFundingCurve (
-			dtSpot,
-			strCurrency,
-			dblFundingBump
+		MergedDiscountForwardCurve fundingCurveBumpUp = MarketFundingCurve (spotDate,
+			currency,
+			fundingBump
 		);
 
-		csqc.setFundingState (dcFundingBumpUp);
+		curveSurfaceQuoteContainer.setFundingState (fundingCurveBumpUp);
 
-		csqc.setCreditState (cc);
+		curveSurfaceQuoteContainer.setCreditState (creditCurve);
 
-		Map<String, Double> mapPayerOptionOutputFundingBumpUp = cdsOptionPayer.value (
-			valParams,
+		Map<String, Double> payerOptionMeasureMapFundingBumpUp = cdsOptionPayer.value (
+			valuationParams,
 			null,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		double dblOptionPriceFundingBumpUp = mapPayerOptionOutputFundingBumpUp.get ("Price") / cdsForward.initialNotional();
+		double optionPriceFundingBumpUp =
+			payerOptionMeasureMapFundingBumpUp.get ("Price") / cdsForward.initialNotional();
 
-		MergedDiscountForwardCurve dcFundingBumpDown = MarketFundingCurve (
-			dtSpot,
-			strCurrency,
-			-dblFundingBump
+		MergedDiscountForwardCurve fundingCurveBumpDown = MarketFundingCurve (
+			spotDate,
+			currency,
+			-fundingBump
 		);
 
-		csqc.setFundingState (dcFundingBumpDown);
+		curveSurfaceQuoteContainer.setFundingState (fundingCurveBumpDown);
 
-		Map<String, Double> mapPayerOptionOutputFundingBumpDown = cdsOptionPayer.value (
-			valParams,
+		Map<String, Double> payerOptionMeasureMapFundingBumpDown = cdsOptionPayer.value (
+			valuationParams,
 			null,
-			csqc,
+			curveSurfaceQuoteContainer,
 			null
 		);
 
-		double dblOptionPriceFundingBumpDown = mapPayerOptionOutputFundingBumpDown.get ("Price") / cdsForward.initialNotional();
+		double optionPriceFundingBumpDown =
+			payerOptionMeasureMapFundingBumpDown.get ("Price") / cdsForward.initialNotional();
 
 		System.out.println ("\n\t|-----------------------------------------------|");
 
@@ -508,35 +512,109 @@ public class CDSO {
 
 		System.out.println ("\t|-----------------------------------------------|");
 
-		System.out.println ("\t| Valuation Date          : " + dtSpot);
+		System.out.println ("\t| Valuation Date          : " + spotDate);
 
-		System.out.println ("\t| Fair Premium Volatility : " + FormatUtil.FormatDouble (dblFairPremiumVolatility, 1, 3, 100.) + "%");
+		System.out.println (
+			"\t| Fair Premium Volatility : " + FormatUtil.FormatDouble (fairPremiumVolatility, 1, 3, 100.) +
+				"%"
+		);
 
-		System.out.println ("\t| Option Premium          : " + FormatUtil.FormatDouble (dblOptionPriceBase, 1, 5, 100.) + "%");
+		System.out.println (
+			"\t| Option Premium          : " + FormatUtil.FormatDouble (optionPriceBase, 1, 5, 100.) + "%"
+		);
 
-		System.out.println ("\t| Option MTM              : " + FormatUtil.FormatDouble (dblOptionPriceBase * dblNotional, 1, 2, 1.));
+		System.out.println (
+			"\t| Option MTM              : " + FormatUtil.FormatDouble (optionPriceBase * notional, 1, 2, 1.)
+		);
 
-		System.out.println ("\t| Credit Spread Delta 01  : " + FormatUtil.FormatDouble (0.5 * (dblOptionPriceCreditBumpUp - dblOptionPriceCreditBumpDown) * dblNotional / dblCreditBump, 1, 2, 1.));
+		System.out.println (
+			"\t| Credit Spread Delta 01  : " + FormatUtil.FormatDouble (
+				0.5 * (optionPriceCreditBumpUp - optionPriceCreditBumpDown) * notional / creditBump,
+				1,
+				2,
+				1.
+			)
+		);
 
-		System.out.println ("\t| Credit Spread Gamma 01  : " + FormatUtil.FormatDouble (0.5 * (dblOptionPriceCreditBumpUp + dblOptionPriceCreditBumpDown - 2. * dblOptionPriceBase) * dblNotional / (dblCreditBump * dblCreditBump), 1, 2, 1.));
+		System.out.println (
+			"\t| Credit Spread Gamma 01  : " + FormatUtil.FormatDouble (
+				0.5 * (optionPriceCreditBumpUp + optionPriceCreditBumpDown - 2. * optionPriceBase) * notional
+					/ (creditBump * creditBump),
+				1,
+				2,
+				1.
+			)
+		);
 
-		System.out.println ("\t| Funding Spread Delta 01 : " + FormatUtil.FormatDouble (0.5 * (dblOptionPriceFundingBumpUp - dblOptionPriceFundingBumpDown) * dblNotional / (10000. * dblFundingBump), 1, 2, 1.));
+		System.out.println (
+			"\t| Funding Spread Delta 01 : " + FormatUtil.FormatDouble (
+				0.5 * (optionPriceFundingBumpUp - optionPriceFundingBumpDown) * notional /
+					(10000. * fundingBump),
+				1,
+				2,
+				1.
+			)
+		);
 
-		System.out.println ("\t| Funding Spread Gamma 01 : " + FormatUtil.FormatDouble (0.5 * (dblOptionPriceFundingBumpUp + dblOptionPriceFundingBumpDown - 2. * dblOptionPriceBase) * dblNotional / (10000. * 10000. * dblFundingBump * dblFundingBump), 1, 2, 1.));
+		System.out.println (
+			"\t| Funding Spread Gamma 01 : " + FormatUtil.FormatDouble (
+				0.5 * (
+					optionPriceFundingBumpUp + optionPriceFundingBumpDown - 2. * optionPriceBase
+				) * notional / (
+					10000. * 10000. * fundingBump * fundingBump
+				),
+				1,
+				2,
+				1.
+			)
+		);
 
-		System.out.println ("\t| ATM Forward             : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("ATMManifestMeasure"), 1, 0, 1.));
+		System.out.println (
+			"\t| ATM Forward             : " + FormatUtil.FormatDouble (
+				payerOptionMeasureMap.get ("ATMManifestMeasure"),
+				1,
+				0,
+				1.
+			)
+		);
 
-		System.out.println ("\t| FPG Delta               : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("FPGDelta"), 1, 4, 1.));
+		System.out.println (
+			"\t| FPG Delta               : " +
+				FormatUtil.FormatDouble (payerOptionMeasureMap.get ("FPGDelta"), 1, 4, 1.)
+		);
 
-		System.out.println ("\t| FPG Gamma               : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("FPGGamma"), 1, 4, 1.));
+		System.out.println (
+			"\t| FPG Gamma               : " +
+				FormatUtil.FormatDouble (payerOptionMeasureMap.get ("FPGGamma"), 1, 4, 1.)
+		);
 
-		System.out.println ("\t| FPG Vega                : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("FPGVega"), 1, 2, 1.));
+		System.out.println (
+			"\t| FPG Vega                : " +
+				FormatUtil.FormatDouble (payerOptionMeasureMap.get ("FPGVega"), 1, 2, 1.)
+		);
 
-		System.out.println ("\t| FPG Theta               : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("FPGTheta"), 1, 2, 1.));
+		System.out.println (
+			"\t| FPG Theta               : " +
+				FormatUtil.FormatDouble (payerOptionMeasureMap.get ("FPGTheta"), 1, 2, 1.)
+		);
 
-		System.out.println ("\t| Vega (1%)               : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("Vega") / cdsForward.initialNotional() * dblNotional * 0.01, 1, 2, 1.));
+		System.out.println (
+			"\t| Vega (1%)               : " + FormatUtil.FormatDouble (
+				payerOptionMeasureMap.get ("Vega") / cdsForward.initialNotional() * notional * 0.01,
+				1,
+				2,
+				1.
+			)
+		);
 
-		System.out.println ("\t| Theta                   : " + FormatUtil.FormatDouble (mapPayerOptionOutput.get ("Theta") / cdsForward.initialNotional() * dblNotional / 365.25, 1, 2, 1.));
+		System.out.println (
+			"\t| Theta                   : " + FormatUtil.FormatDouble (
+				payerOptionMeasureMap.get ("Theta") / cdsForward.initialNotional() * notional / 365.25,
+				1,
+				2,
+				1.
+			)
+		);
 
 		System.out.println ("\t|-----------------------------------------------|\n");
 

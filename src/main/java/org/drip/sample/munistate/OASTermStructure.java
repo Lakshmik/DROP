@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.ProxyBond;
+import org.drip.state.municipal.ProxyBondEvaluator;
 import org.drip.state.municipal.ProxyBondPriceFunction;
 
 /*
@@ -320,9 +320,13 @@ public class OASTermStructure
 		System.out.println ("\t||-----------------------------------||");
 
 		for (Double endTime : timeToYieldBasisMap.keySet()) {
-			ProxyBond proxyBond = ProxyBond.Callable (endTime, bondCoupon, callPriceSchedule);
+			ProxyBondEvaluator proxyBond =
+				ProxyBondEvaluator.Callable (endTime, bondCoupon, callPriceSchedule);
 
-			double basePrice = proxyBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+			double basePrice = proxyBond.valueTree (
+				null,
+				kalotayWilliamsFabozzi
+			).firstEntry().getValue().get (0);
 
 			kalotayWilliamsFabozzi.applyBasisYield (0.0001 * timeToYieldBasisMap.get (endTime));
 
@@ -332,7 +336,7 @@ public class OASTermStructure
 			);
 
 			double bumpedPrice =
-				proxyBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+				proxyBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
 
 			kalotayWilliamsFabozzi.removeBasisYield();
 
@@ -354,11 +358,12 @@ public class OASTermStructure
 					100.
 				) + " |" + FormatUtil.FormatDouble (
 					new ProxyBondPriceFunction (
+						proxyBond,
 						kalotayWilliamsFabozzi,
 						annualizedForwardYieldVolatility,
-						null,
-						proxyBond
+						null
 					).yieldBasisForPrice (
+						null,
 						bumpedPrice
 					).calibratedState(),
 					3,

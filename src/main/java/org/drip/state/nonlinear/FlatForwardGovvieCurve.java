@@ -113,6 +113,7 @@ import org.drip.state.govvie.ExplicitBootGovvieCurve;
 public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 {
 	private int[] _dateArray = null;
+	private boolean _compoundingOn = false;
 	private double[] _forwardYieldArray = null;
 
 	private double yearFraction (
@@ -133,6 +134,7 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 	 * @param currency Currency
 	 * @param dateArray Array of Dates
 	 * @param forwardYieldArray Array of Forward Yields
+	 * @param compoundingOn TRUE - Discounting is based on Compounding
 	 * 
 	 * @throws Exception Thrown if the curve cannot be created
 	 */
@@ -142,7 +144,8 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 		final String treasuryCode,
 		final String currency,
 		final int[] dateArray,
-		final double[] forwardYieldArray)
+		final double[] forwardYieldArray,
+		final boolean compoundingOn)
 		throws Exception
 	{
 		super (epochDate, treasuryCode, currency);
@@ -151,11 +154,45 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 			throw new Exception ("FlatForwardGovvieCurve Constructor => Invalid Inputs!");
 		}
 
+		_compoundingOn = compoundingOn;
 		int nodeCount = _dateArray.length;
 
 		if (0 == nodeCount || nodeCount != _forwardYieldArray.length) {
 			throw new Exception ("FlatForwardGovvieCurve Constructor => Invalid Inputs!");
 		}
+	}
+
+	/**
+	 * Retrieve the Array of Dates
+	 * 
+	 * @return Array of Dates
+	 */
+
+	public int[] dateArray()
+	{
+		return _dateArray;
+	}
+
+	/**
+	 * Retrieve the Array of Forward Yields
+	 * 
+	 * @return Array of Forward Yields
+	 */
+
+	public double[] forwardYieldArray()
+	{
+		return _forwardYieldArray;
+	}
+
+	/**
+	 * Indicate if Discounting is based on Compounding
+	 * 
+	 * @return TRUE - Discounting is based on Compounding
+	 */
+
+	public boolean compoundingOn()
+	{
+		return _compoundingOn;
 	}
 
 	/**
@@ -194,9 +231,20 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 		ActActDCParams actActDCParams = ActActDCParams.FromFrequency (frequency);
 
 		while (i < dateArrayCount && (int) date >= (int) _dateArray[i]) {
-			discountFactor *= Math.pow (
-				1. + ((_forwardYieldArray[i] + yieldSpread) / frequency),
-				-1. * yearFraction (startDate, _dateArray[i], actActDCParams, dayCount) * frequency
+			discountFactor *= (
+				_compoundingOn ? Math.pow (
+					1. + ((_forwardYieldArray[i] + yieldSpread) / frequency),
+					-1. * yearFraction (startDate, _dateArray[i], actActDCParams, dayCount) * frequency
+				) : 1. / (
+					1. + (
+						_forwardYieldArray[i] * yearFraction (
+							startDate,
+							_dateArray[i],
+							actActDCParams,
+							dayCount
+						)
+					)
+				)
 			);
 
 			startDate = _dateArray[i++];
@@ -206,8 +254,67 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 			i = dateArrayCount - 1;
 		}
 
-		return discountFactor * Math.pow (1. + ((_forwardYieldArray[i] + yieldSpread) / frequency),
-			-1. * yearFraction (startDate, date, actActDCParams, dayCount) * frequency);
+		return discountFactor * (
+			_compoundingOn ? Math.pow (
+				1. + ((_forwardYieldArray[i] + yieldSpread) / frequency),
+				-1. * yearFraction (startDate, date, actActDCParams, dayCount) * frequency
+			) : 1. / (
+				1. + (_forwardYieldArray[i] * yearFraction (startDate, date, actActDCParams, dayCount))
+			)
+		);
+	}
+
+	/**
+	 * Retrieve the Manifest Measure Jacobian of the Forward Rate to the given date
+	 * 
+	 * @return The Manifest Measure Jacobian of the Forward Rate to the given date
+	 */
+
+	public WengertJacobian jackDForwardDManifestMeasure()
+	{
+		int segmentCount = _dateArray.length;
+		WengertJacobian wengertJacobian = null;
+
+		try {
+			wengertJacobian = new WengertJacobian (segmentCount, segmentCount);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		int epochDateJulian = epoch().julian();
+
+		for (int segmentIndex = 0; segmentIndex < segmentCount; ++segmentIndex) {
+			try {
+				double annuityRatio = (0 == segmentIndex ? 1. : 1. + yld (_dateArray[segmentIndex - 1])) /
+					(1. + yld (_dateArray[segmentIndex]));
+
+				if (0 != segmentIndex) {
+					wengertJacobian.accumulatePartialFirstDerivative (
+						segmentIndex,
+						segmentIndex - 1,
+						-1. * (segmentIndex - 1) * Math.pow (
+							annuityRatio,
+							((double) (_dateArray[segmentIndex - 1] - epochDateJulian)) / 365.25
+						)
+					);
+				}
+
+				wengertJacobian.accumulatePartialFirstDerivative (
+					segmentIndex,
+					segmentIndex,
+					segmentIndex * Math.pow (
+						annuityRatio,
+						((double) (_dateArray[segmentIndex] - epochDateJulian)) / 365.25
+					)
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return wengertJacobian;
 	}
 
 	@Override public double df (
@@ -315,10 +422,81 @@ public class FlatForwardGovvieCurve extends ExplicitBootGovvieCurve
 		return true;
 	}
 
+	/**
+	 * Retrieve the Manifest Measure Jacobian of the Forward Rate to the given date
+	 * 
+	 * @param manifestMeasure Manifest Measure
+	 * @param date Date
+	 * 
+	 * @return The Manifest Measure Jacobian of the Forward Rate to the given date
+	 */
+
 	@Override public WengertJacobian jackDForwardDManifestMeasure (
 		final String manifestMeasure,
 		final int date)
 	{
-		return null;
+		int epochDateJulian = epoch().julian();
+
+		if (date < epochDateJulian) {
+			return null;
+		}
+
+		WengertJacobian jackDForwardDManifestMeasure = jackDForwardDManifestMeasure();
+
+		if (null == jackDForwardDManifestMeasure) {
+			return null;
+		}
+
+		int enclosingSegmentIndex = 0;
+		WengertJacobian wengertJacobian = null;
+
+		try {
+			wengertJacobian = new WengertJacobian (1, _dateArray.length);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		if (date >= _dateArray[_dateArray.length - 1]) {
+			enclosingSegmentIndex = _dateArray.length - 1;
+		} else {
+			for (int segmentIndex = 0; segmentIndex < _dateArray.length; ++segmentIndex) {
+				if (date <= _dateArray[segmentIndex]) {
+					enclosingSegmentIndex = segmentIndex;
+					break;
+				}
+			}
+		}
+
+		double t = (date - _dateArray[enclosingSegmentIndex]) / 365.25;
+		double forwardDiscountFactor = 1. / (1. + _forwardYieldArray[enclosingSegmentIndex] * t);
+
+		if (0 != enclosingSegmentIndex) {
+			wengertJacobian.accumulatePartialFirstDerivative (
+				0,
+				enclosingSegmentIndex - 1,
+				forwardDiscountFactor * (
+					(enclosingSegmentIndex - 1) * Math.pow (
+						1. + _forwardYieldArray[enclosingSegmentIndex - 1],
+						enclosingSegmentIndex - 1
+					) - t * jackDForwardDManifestMeasure.firstDerivative (
+						enclosingSegmentIndex,
+						enclosingSegmentIndex - 1
+					)
+				)
+			);
+		}
+
+		wengertJacobian.accumulatePartialFirstDerivative (
+			0,
+			enclosingSegmentIndex,
+			-1. * forwardDiscountFactor * t * jackDForwardDManifestMeasure.firstDerivative (
+				enclosingSegmentIndex,
+				enclosingSegmentIndex
+			)
+		);
+
+		return wengertJacobian;
 	}
 }

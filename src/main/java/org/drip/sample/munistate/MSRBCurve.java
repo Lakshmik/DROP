@@ -8,7 +8,7 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
-import org.drip.state.municipal.ProxyBond;
+import org.drip.state.municipal.ProxyBondEvaluator;
 import org.drip.state.municipal.ZeroVolatilityPeriodState;
 
 /*
@@ -366,10 +366,10 @@ public class MSRBCurve
 		callPriceSchedule.put (callTimeNode, 1.);
 
 		for (double endTime : timeToCalibrationYieldMapInput.descendingKeySet()) {
-			ProxyBond proxyBulletBond = ProxyBond.Bullet (endTime, bondCoupon);
+			ProxyBondEvaluator proxyBulletBond = ProxyBondEvaluator.Bullet (endTime, bondCoupon);
 
-			ProxyBond proxyCallableBond = endTime <= callTimeNode ?
-				proxyBulletBond : ProxyBond.Callable (endTime, bondCoupon, callPriceSchedule);
+			ProxyBondEvaluator proxyCallableBond = endTime <= callTimeNode ?
+				proxyBulletBond : ProxyBondEvaluator.Callable (endTime, bondCoupon, callPriceSchedule);
 
 			System.out.println (
 				"\t| Maturity Time => " + FormatUtil.FormatDouble (
@@ -379,13 +379,16 @@ public class MSRBCurve
 					1.,
 					false
 				) + " | " + FormatUtil.FormatDouble (
-					proxyBulletBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0),
+					proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0),
 					3,
 					3,
 					100.,
 					false
 				) + " | " + FormatUtil.FormatDouble (
-					proxyCallableBond.valueTree (kalotayWilliamsFabozzi).firstEntry().getValue().get (0),
+					proxyCallableBond.valueTree (
+						null,
+						kalotayWilliamsFabozzi
+					).firstEntry().getValue().get (0),
 					3,
 					3,
 					100.,
@@ -411,12 +414,12 @@ public class MSRBCurve
 
 			System.out.println ("\t|----------------------------------------------------------------------");
 
-			ProxyBond proxyBond = maturityTime <= callTimeNode ?
-				ProxyBond.Bullet (maturityTime, bondCoupon) :
-				ProxyBond.Callable (maturityTime, bondCoupon, callPriceSchedule);
+			ProxyBondEvaluator proxyBond = maturityTime <= callTimeNode ?
+				ProxyBondEvaluator.Bullet (maturityTime, bondCoupon) :
+				ProxyBondEvaluator.Callable (maturityTime, bondCoupon, callPriceSchedule);
 
 			TreeMap<Double, List<Double>> projectedBondValueListMap =
-				proxyBond.valueTree (kalotayWilliamsFabozzi);
+				proxyBond.valueTree (null, kalotayWilliamsFabozzi);
 
 			for (double periodStartTime : projectedBondValueListMap.descendingKeySet()) {
 				String dump = "\t|" + FormatUtil.FormatDouble (periodStartTime, 2, 0, 1.) + " => ";

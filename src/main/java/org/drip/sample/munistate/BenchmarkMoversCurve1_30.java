@@ -2327,7 +2327,8 @@ public class BenchmarkMoversCurve1_30
 			currency,
 			calibrationDateArray,
 			marketComponentList,
-			0
+			0,
+			false
 		);
 
 		System.out.println ("\t||--------------------------------------------------||");

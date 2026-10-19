@@ -10,7 +10,7 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
-import org.drip.state.municipal.ProxyBond;
+import org.drip.state.municipal.ProxyBondEvaluator;
 import org.drip.state.municipal.ProxyBondPriceFunction;
 
 /*
@@ -233,7 +233,7 @@ public class FigureE2
 		double annualizedForwardVolatility = 0.1;
 		double projectedBulletBaseForwardYieldReconciler = 0.0453;
 
-		ProxyBond proxyBulletBond = ProxyBond.Bullet (bondMaturityTime, bondCoupon);
+		ProxyBondEvaluator proxyBulletBond = ProxyBondEvaluator.Bullet (bondMaturityTime, bondCoupon);
 
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
 
@@ -250,10 +250,10 @@ public class FigureE2
 			TimeToProjectedBaseForwardYieldMapInput();
 
 		double calibratedBulletBaseYield = new ProxyBondPriceFunction (
+			proxyBulletBond,
 			kalotayWilliamsFabozzi,
 			annualizedForwardVolatility,
-			timeToProjectedBaseForwardYieldMap,
-			proxyBulletBond
+			timeToProjectedBaseForwardYieldMap
 		).baseYieldForPrice (
 			calibrationEndTime,
 			calibrationPrice
@@ -348,7 +348,7 @@ public class FigureE2
 			TimeToProjectedBulletBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedBulletBondValueListMap =
-			proxyBulletBond.valueTree (kalotayWilliamsFabozzi);
+			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi);
 
 		System.out.println ("\t|-------------------------------------------------||");
 

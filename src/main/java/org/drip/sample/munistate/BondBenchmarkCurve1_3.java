@@ -972,7 +972,8 @@ public class BondBenchmarkCurve1_3
 			currency,
 			calibrationDateArray,
 			marketComponentList,
-			0
+			0,
+			false
 		);
 
 		System.out.print (multiBondCurveCalibrator.toString ("\t|| "));

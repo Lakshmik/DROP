@@ -236,7 +236,7 @@ public class CPGACollateralized
 		return swapPortfolioValueRealizationArray;
 	}
 
-	private static final void univariateCentralMeasuresDump (
+	private static final void UnivariateCentralMeasuresDump (
 		final String header,
 		final JulianDate[] vertexNodeArray,
 		final UnivariateCentralMeasures[] univariateCentralMeasuresArray)
@@ -333,7 +333,7 @@ public class CPGACollateralized
 		);
 	}
 
-	private static final void univariateCentralMeasuresDump (
+	private static final void UnivariateCentralMeasuresDump (
 		final String header,
 		final UnivariateCentralMeasures univariateCentralMeasures)
 		throws Exception
@@ -510,49 +510,49 @@ public class CPGACollateralized
 
 		System.out.println();
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                                COLLATERALIZED EXPOSURE                                                                                |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.collateralizedExposure()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                               UNCOLLATERALIZED EXPOSURE                                                                               |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.uncollateralizedExposure()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                                COLLATERALIZED EXPOSURE PV                                                                             |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.collateralizedExposurePV()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                               UNCOLLATERALIZED EXPOSURE PV                                                                            |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.uncollateralizedExposurePV()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                            COLLATERALIZED POSITIVE EXPOSURE PV                                                                        |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.collateralizedPositiveExposure()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                           UNCOLLATERALIZED POSITIVE EXPOSURE PV                                                                       |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.uncollateralizedPositiveExposure()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                            COLLATERALIZED NEGATIVE EXPOSURE PV                                                                        |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.collateralizedNegativeExposure()
 		);
 
-		univariateCentralMeasuresDump (
+		UnivariateCentralMeasuresDump (
 			"\t|                                                                           UNCOLLATERALIZED NEGATIVE EXPOSURE PV                                                                       |",
 			exposureAdjustmentAggregator.vertexDates(),
 			exposureAdjustmentDigest.uncollateralizedNegativeExposure()
@@ -578,29 +578,29 @@ public class CPGACollateralized
 
 		System.out.println ("\t||-----------------------------------------------------||");
 
-		univariateCentralMeasuresDump ("\t||  UCVA  => ", exposureAdjustmentDigest.ucva());
+		UnivariateCentralMeasuresDump ("\t||  UCVA  => ", exposureAdjustmentDigest.ucva());
 
-		univariateCentralMeasuresDump ("\t|| FTDCVA => ", exposureAdjustmentDigest.ftdcva());
+		UnivariateCentralMeasuresDump ("\t|| FTDCVA => ", exposureAdjustmentDigest.ftdcva());
 
-		univariateCentralMeasuresDump ("\t||   CVA  => ", exposureAdjustmentDigest.cva());
+		UnivariateCentralMeasuresDump ("\t||   CVA  => ", exposureAdjustmentDigest.cva());
 
-		univariateCentralMeasuresDump ("\t||  CVACL => ", exposureAdjustmentDigest.cvacl());
+		UnivariateCentralMeasuresDump ("\t||  CVACL => ", exposureAdjustmentDigest.cvacl());
 
-		univariateCentralMeasuresDump ("\t||   DVA  => ", exposureAdjustmentDigest.dva());
+		UnivariateCentralMeasuresDump ("\t||   DVA  => ", exposureAdjustmentDigest.dva());
 
-		univariateCentralMeasuresDump ("\t||   FVA  => ", exposureAdjustmentDigest.fva());
+		UnivariateCentralMeasuresDump ("\t||   FVA  => ", exposureAdjustmentDigest.fva());
 
-		univariateCentralMeasuresDump ("\t||   FDA  => ", exposureAdjustmentDigest.fda());
+		UnivariateCentralMeasuresDump ("\t||   FDA  => ", exposureAdjustmentDigest.fda());
 
-		univariateCentralMeasuresDump ("\t||   FCA  => ", exposureAdjustmentDigest.fca());
+		UnivariateCentralMeasuresDump ("\t||   FCA  => ", exposureAdjustmentDigest.fca());
 
-		univariateCentralMeasuresDump ("\t||   FBA  => ", exposureAdjustmentDigest.fba());
+		UnivariateCentralMeasuresDump ("\t||   FBA  => ", exposureAdjustmentDigest.fba());
 
-		univariateCentralMeasuresDump ("\t||  SFVA  => ", exposureAdjustmentDigest.sfva());
+		UnivariateCentralMeasuresDump ("\t||  SFVA  => ", exposureAdjustmentDigest.sfva());
 
 		System.out.println ("\t||-----------------------------------------------------||");
 
-		univariateCentralMeasuresDump ("\t||  Total => ", exposureAdjustmentDigest.totalVA());
+		UnivariateCentralMeasuresDump ("\t||  Total => ", exposureAdjustmentDigest.totalVA());
 
 		System.out.println ("\t||-----------------------------------------------------||");
 

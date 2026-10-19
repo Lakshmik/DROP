@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
 
 /*
@@ -84,8 +85,8 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>ProxyBond</i> implements a Bond Proxy to be used in the Kalotay, Williams, and Fabozzi (1993)
- *  Tree-based Model for valuing bonds with Embedded Options. The References are:
+ * <i>ProxyBondEvaluator</i> implements the Bond Proxy Evaluator to be used in the Kalotay, Williams, and
+ *  Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -123,7 +124,7 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ProxyBond
+public class ProxyBondEvaluator
 {
 	private static final double SENSITIVITY_BUMP = 0.0001;
 
@@ -133,20 +134,20 @@ public class ProxyBond
 	private TreeMap<Double, Double> _callPriceSchedule = null;
 
 	/**
-	 * Construct a Bullet Instance of <i>ProxyBond</i>
+	 * Construct a Bullet Instance of <i>ProxyBondEvaluator</i>
 	 * 
 	 * @param maturityTime Bond Maturity Time
 	 * @param coupon Bond Coupon
 	 * 
-	 * @return Bullet Instance of <i>ProxyBond</i>
+	 * @return Bullet Instance of <i>ProxyBondEvaluator</i>
 	 */
 
-	public static final ProxyBond Bullet (
+	public static final ProxyBondEvaluator Bullet (
 		final double maturityTime,
 		final double coupon)
 	{
 		try {
-			return new ProxyBond (maturityTime, coupon, null, null);
+			return new ProxyBondEvaluator (maturityTime, coupon, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -155,22 +156,22 @@ public class ProxyBond
 	}
 
 	/**
-	 * Construct a Callable Instance of <i>ProxyBond</i>
+	 * Construct a Callable Instance of <i>ProxyBondEvaluator</i>
 	 * 
 	 * @param maturityTime Bond Maturity Time
 	 * @param coupon Bond Coupon
 	 * @param callPriceSchedule Call Price Schedule
 	 * 
-	 * @return Callable Instance of <i>ProxyBond</i>
+	 * @return Callable Instance of <i>ProxyBondEvaluator</i>
 	 */
 
-	public static final ProxyBond Callable (
+	public static final ProxyBondEvaluator Callable (
 		final double maturityTime,
 		final double coupon,
 		final TreeMap<Double, Double> callPriceSchedule)
 	{
 		try {
-			return new ProxyBond (maturityTime, coupon, callPriceSchedule, null);
+			return new ProxyBondEvaluator (maturityTime, coupon, callPriceSchedule, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -179,22 +180,22 @@ public class ProxyBond
 	}
 
 	/**
-	 * Construct a Puttable Instance of <i>ProxyBond</i>
+	 * Construct a Puttable Instance of <i>ProxyBondEvaluator</i>
 	 * 
 	 * @param maturityTime Bond Maturity Time
 	 * @param coupon Bond Coupon
 	 * @param putPriceSchedule Put Price Schedule
 	 * 
-	 * @return Puttable Instance of <i>ProxyBond</i>
+	 * @return Puttable Instance of <i>ProxyBondEvaluator</i>
 	 */
 
-	public static final ProxyBond Puttable (
+	public static final ProxyBondEvaluator Puttable (
 		final double maturityTime,
 		final double coupon,
 		final TreeMap<Double, Double> putPriceSchedule)
 	{
 		try {
-			return new ProxyBond (maturityTime, coupon, null, putPriceSchedule);
+			return new ProxyBondEvaluator (maturityTime, coupon, null, putPriceSchedule);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -202,8 +203,31 @@ public class ProxyBond
 		return null;
 	}
 
+	private double priceFromYieldBasis (
+		final JulianDate spotDate,
+		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
+		final double annualizedForwardYieldVolatility,
+		final double yieldBasis)
+		throws Exception
+	{
+		kalotayWilliamsFabozzi.applyBasisYield (yieldBasis);
+
+		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+			annualizedForwardYieldVolatility,
+			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+		);
+
+		TreeMap<Double, List<Double>> bumpUpValueTree = valueTree (spotDate, kalotayWilliamsFabozzi);
+
+		if (null == bumpUpValueTree) {
+			throw new Exception ("ProxyBond::priceFromYieldBasis => Cannot calculate Price");
+		}
+
+		return bumpUpValueTree.firstEntry().getValue().get (0);
+	}
+
 	/**
-	 * <i>ProxyBond</i> Constructor
+	 * <i>ProxyBondEvaluator</i> Constructor
 	 * 
 	 * @param maturityTime Bond Maturity Time
 	 * @param coupon Bond Coupon
@@ -213,7 +237,7 @@ public class ProxyBond
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public ProxyBond (
+	public ProxyBondEvaluator (
 		final double maturityTime,
 		final double coupon,
 		final TreeMap<Double, Double> callPriceSchedule,
@@ -223,7 +247,7 @@ public class ProxyBond
 		if (!NumberUtil.IsValid (_maturityTime = maturityTime) || 0. >= _maturityTime ||
 			!NumberUtil.IsValid (_coupon = coupon) || 0. > _coupon)
 		{
-			throw new Exception ("ProxyBond Constructor => Invalid Inputs");
+			throw new Exception ("ProxyBondEvaluator Constructor => Invalid Inputs");
 		}
 
 		_callPriceSchedule = callPriceSchedule;
@@ -274,37 +298,17 @@ public class ProxyBond
 		return _putPriceSchedule;
 	}
 
-	private double priceFromYieldBasis (
-		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
-		final double annualizedForwardYieldVolatility,
-		final double yieldBasis)
-		throws Exception
-	{
-		kalotayWilliamsFabozzi.applyBasisYield (yieldBasis);
-
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
-		);
-
-		TreeMap<Double, List<Double>> bumpUpValueTree = valueTree (kalotayWilliamsFabozzi);
-
-		if (null == bumpUpValueTree) {
-			throw new Exception ("ProxyBond::priceFromYieldBasis => Cannot calculate Price");
-		}
-
-		return bumpUpValueTree.firstEntry().getValue().get (0);
-	}
-
 	/**
 	 * Construct the Bond Value Tree using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
+	 * @param spotDate Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
 	 * @return Bond Value Tree
 	 */
 
 	public TreeMap<Double, List<Double>> valueTree (
+		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
 		if (null == kalotayWilliamsFabozzi) {
@@ -364,6 +368,7 @@ public class ProxyBond
 	/**
 	 * Generate the Secular Bond Sensitivity Measures from the Yield Basis
 	 * 
+	 * @param spotDate Spot Date
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
 	 * @param yieldBasis Yield Basis
@@ -371,7 +376,8 @@ public class ProxyBond
 	 * @return Secular Bond Sensitivity Measures from the Yield Basis
 	 */
 
-	public ProxyBondSensitivity secularMeasuresFromYieldBasis (
+	public BondSensitivity secularMeasuresFromYieldBasis (
+		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
 		final double annualizedForwardYieldVolatility,
 		final double yieldBasis)
@@ -383,23 +389,26 @@ public class ProxyBond
 			return null;
 		}
 
-		TreeMap<Double, List<Double>> theoreticalValueTree = valueTree (kalotayWilliamsFabozzi);
+		TreeMap<Double, List<Double>> theoreticalValueTree = valueTree (spotDate, kalotayWilliamsFabozzi);
 
 		try {
-			return null == theoreticalValueTree ? null : ProxyBondSensitivity.FromBaseUpDown (
+			return null == theoreticalValueTree ? null : BondSensitivity.FromBaseUpDown (
 				theoreticalValueTree.firstEntry().getValue().get (0),
 				priceFromYieldBasis (
+					spotDate,
 					kalotayWilliamsFabozzi,
 					annualizedForwardYieldVolatility,
 					yieldBasis
 				),
 				yieldBasis,
 				priceFromYieldBasis (
+					spotDate,
 					kalotayWilliamsFabozzi,
 					annualizedForwardYieldVolatility,
 					yieldBasis + SENSITIVITY_BUMP
 				),
 				priceFromYieldBasis (
+					spotDate,
 					kalotayWilliamsFabozzi,
 					annualizedForwardYieldVolatility,
 					yieldBasis - SENSITIVITY_BUMP

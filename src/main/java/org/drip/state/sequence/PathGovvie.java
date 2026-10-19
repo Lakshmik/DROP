@@ -196,7 +196,8 @@ public class PathGovvie extends PathRd
 						treasuryCode,
 						currency,
 						tenorDateArray,
-						pathSequenceGrid[pathIndex]
+						pathSequenceGrid[pathIndex],
+						true
 					)
 				)) {
 					return null;

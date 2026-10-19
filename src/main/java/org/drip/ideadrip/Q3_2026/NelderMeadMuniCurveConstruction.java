@@ -2249,12 +2249,13 @@ public class NelderMeadMuniCurveConstruction
 			)
 		);
 
-		return MultiBondLeastSquaresFunction.TenorScaleDownNone (
+		return MultiBondLeastSquaresFunction.TenorScaleDownWAL (
 			spotDate,
 			"UST",
 			"USD",
 			calibrationDateArray,
-			marketComponentList
+			marketComponentList,
+			false
 		);
 	}
 
@@ -2272,7 +2273,7 @@ public class NelderMeadMuniCurveConstruction
 	{
 		EnvManager.InitEnv ("");
 
-		int vertexCount = 120;
+		int vertexCount = 80;
 		int simulationCount = 20;
 		double lowerSearchBound =  0.01;
 		double upperSearchBound =  0.09;

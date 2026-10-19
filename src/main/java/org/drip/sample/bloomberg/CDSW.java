@@ -28,6 +28,14 @@ import org.drip.state.identifier.ForwardLabel;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,468 +116,439 @@ import org.drip.state.identifier.ForwardLabel;
 /**
  * <i>CDSW</i> contains the sample demonstrating the replication of Bloomberg's CDSW functionality.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/bloomberg/README.md">Bloomberg CDSO CDSW SWPM YAS</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/bloomberg/README.md">Bloomberg CDSO CDSW SWPM YAS</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class CDSW {
-	private static final java.lang.String FIELD_SEPARATOR = "   ";
+public class CDSW
+{
+	private static final String FIELD_SEPARATOR = "   ";
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Sample demonstrating building of rates curve from cash/future/swaps
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static MergedDiscountForwardCurve BuildRatesCurveFromInstruments (
-		final JulianDate dtStart,
-		final String[] astrCashTenor,
-		final double[] adblCashRate,
-		final String[] astrIRSTenor,
-		final double[] adblIRSRate,
-		final double dblBump,
-		final String strCurrency)
+		final JulianDate startDate,
+		final String[] cashTenorArray,
+		final double[] cashRateArray,
+		final String[] irsTenorArray,
+		final double[] irsRateArray,
+		final double bump,
+		final String currency)
 		throws Exception
 	{
-		int iNumDCInstruments = astrCashTenor.length + adblIRSRate.length;
-		int aiDate[] = new int[iNumDCInstruments];
-		double adblRate[] = new double[iNumDCInstruments];
-		String astrCalibMeasure[] = new String[iNumDCInstruments];
-		double adblCompCalibValue[] = new double[iNumDCInstruments];
-		CalibratableComponent aCompCalib[] = new CalibratableComponent[iNumDCInstruments];
+		int instrumentCount = cashTenorArray.length + irsRateArray.length;
+		int[] dateArray = new int[instrumentCount];
+		double[] rateArray = new double[instrumentCount];
+		String[] calibrationMeasureArray = new String[instrumentCount];
+		double[] calibratableComponentValueArray = new double[instrumentCount];
+		CalibratableComponent[] calibratableComponentArray = new CalibratableComponent[instrumentCount];
 
-		// Cash Calibration
+		JulianDate effectiveCashDate = startDate.addBusDays (1, currency);
 
-		JulianDate dtCashEffective = dtStart.addBusDays (
-			1,
-			strCurrency
-		);
+		for (int cashIndex = 0; cashIndex < cashTenorArray.length; ++cashIndex) {
+			rateArray[cashIndex] = Double.NaN;
+			calibrationMeasureArray[cashIndex] = "Rate";
+			calibratableComponentValueArray[cashIndex] = cashRateArray[cashIndex] + bump;
 
-		for (int i = 0; i < astrCashTenor.length; ++i) {
-			astrCalibMeasure[i] = "Rate";
-			adblRate[i] = java.lang.Double.NaN;
-			adblCompCalibValue[i] = adblCashRate[i] + dblBump;
-
-			aCompCalib[i] = SingleStreamComponentBuilder.Deposit (
-				dtCashEffective,
-				new JulianDate (aiDate[i] = dtCashEffective.addTenor (astrCashTenor[i]).julian()),
+			calibratableComponentArray[cashIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveCashDate,
+				new JulianDate (
+					dateArray[cashIndex] = effectiveCashDate.addTenor (cashTenorArray[cashIndex]).julian()
+				),
 				ForwardLabel.Create (
-					strCurrency,
-					astrCashTenor[i]
+					currency,
+					cashTenorArray[cashIndex]
 				)
 			);
 		}
 
-		// IRS Calibration
+		JulianDate effectiveIRSDate = startDate.addBusDays (2, currency);
 
-		JulianDate dtIRSEffective = dtStart.addBusDays (2, strCurrency);
+		for (int irsIndex = 0; irsIndex < irsTenorArray.length; ++irsIndex) {
+			rateArray[irsIndex + cashTenorArray.length] = Double.NaN;
+			calibrationMeasureArray[irsIndex + cashTenorArray.length] = "Rate";
+			calibratableComponentValueArray[irsIndex + cashTenorArray.length] =
+				irsRateArray[irsIndex] + bump;
 
-		for (int i = 0; i < astrIRSTenor.length; ++i) {
-			astrCalibMeasure[i + astrCashTenor.length] = "Rate";
-			adblRate[i + astrCashTenor.length] = java.lang.Double.NaN;
-			adblCompCalibValue[i + astrCashTenor.length] = adblIRSRate[i] + dblBump;
+			dateArray[irsIndex + cashTenorArray.length] =
+				effectiveIRSDate.addTenor (irsTenorArray[irsIndex]).julian();
 
-			aiDate[i + astrCashTenor.length] = dtIRSEffective.addTenor (astrIRSTenor[i]).julian();
-
-			aCompCalib[i + astrCashTenor.length] = OTCIRS (
-				dtIRSEffective,
-				strCurrency,
-				astrIRSTenor[i],
+			calibratableComponentArray[irsIndex + cashTenorArray.length] = OTCIRS (
+				effectiveIRSDate,
+				currency,
+				irsTenorArray[irsIndex],
 				0.
 			);
 		}
 
-		/*
-		 * Build the IR curve from the components, their calibration measures, and their calibration quotes.
-		 */
-
 		return ScenarioDiscountCurveBuilder.NonlinearBuild (
-			dtStart,
-			strCurrency,
-			aCompCalib,
-			adblCompCalibValue,
-			astrCalibMeasure,
+			startDate,
+			currency,
+			calibratableComponentArray,
+			calibratableComponentValueArray,
+			calibrationMeasureArray,
 			null
 		);
 	}
 
-	/*
-	 * Sample demonstrating creation of credit curve from CDS instruments
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static CreditCurve CreateCreditCurveFromCDS (
-		final JulianDate dtStart,
-		final double[] adblQuote,
-		final String[] astrTenor,
-		final String strMeasure,
-		final MergedDiscountForwardCurve dc,
-		final double dblRecovery,
-		final String strCCName,
-		final double dblStrike,
-		final double dblBump)
+		final JulianDate startDate,
+		final double[] quoteArray,
+		final String[] tenorArray,
+		final String measure,
+		final MergedDiscountForwardCurve discountCurve,
+		final double recoveryRate,
+		final String creditCurveName,
+		final double strike,
+		final double bump)
 		throws Exception
 	{
-		String[] astrCalibMeasure = new String[adblQuote.length];
-		CreditDefaultSwap[] aCDS = new CreditDefaultSwap[adblQuote.length];
+		String[] calibrationMeasureArray = new String[quoteArray.length];
+		CreditDefaultSwap[] creditDefaultSwapArray = new CreditDefaultSwap[quoteArray.length];
 
-		for (int i = 0; i < astrTenor.length; ++i) {
-			aCDS[i] = CDSBuilder.CreateSNAC (
-				dtStart,
-				astrTenor[i],
-				dblStrike,
-				strCCName
+		for (int tenorIndex = 0; tenorIndex < tenorArray.length; ++tenorIndex) {
+			creditDefaultSwapArray[tenorIndex] = CDSBuilder.CreateSNAC (
+				startDate,
+				tenorArray[tenorIndex],
+				strike,
+				creditCurveName
 			);
 
-			astrCalibMeasure[i] = strMeasure;
-			adblQuote[i] += dblBump;
+			calibrationMeasureArray[tenorIndex] = measure;
+			quoteArray[tenorIndex] += bump;
 		}
 
-		/*
-		 * Build the credit curve from the CDS instruments and the fair premium
-		 */
-
 		return ScenarioCreditCurveBuilder.Custom (
-			strCCName,
-			dtStart,
-			aCDS,
-			dc,
-			adblQuote,
-			astrCalibMeasure,
-			dblRecovery,
-			"QuotedSpread".equals (strMeasure)
+			creditCurveName,
+			startDate,
+			creditDefaultSwapArray,
+			discountCurve,
+			quoteArray,
+			calibrationMeasureArray,
+			recoveryRate,
+			"QuotedSpread".equals (measure)
 		);
 	}
 
-	/*
-	 * Sample demonstrating display of survival probability at the calibration instrument maturities
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final void DisplayInstrumentMaturitySurvival (
-		final CreditCurve cc)
-		throws java.lang.Exception
+		final CreditCurve creditCurve)
+		throws Exception
 	{
-		CalibratableComponent[] aCDS = cc.calibComp();
+		CalibratableComponent[] creditDefaultSwapArray = creditCurve.calibComp();
 
-		for (int i = 0; i < aCDS.length; ++i)
+		for (int cdsIndex = 0; cdsIndex < creditDefaultSwapArray.length; ++cdsIndex) {
 			System.out.println (
-				aCDS[i].maturityDate() + " | " +
-				cc.manifestMeasure (aCDS[i].primaryCode()) + " | " +
-				FormatUtil.FormatDouble (1. - cc.survival (aCDS[i].maturityDate()), 1, 3, 1.));
+				creditDefaultSwapArray[cdsIndex].maturityDate() + " | " + creditCurve.manifestMeasure (
+					creditDefaultSwapArray[cdsIndex].primaryCode()
+				) + " | " + FormatUtil.FormatDouble (
+					1. - creditCurve.survival (creditDefaultSwapArray[cdsIndex].maturityDate()),
+					1,
+					3,
+					1.
+				)
+			);
+		}
 	}
-
-	/*
-	 * Sample demonstrating the creation of a CDS
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static CreditDefaultSwap CreateCDS (
-		final JulianDate dtStart,
-		final String strTenor,
-		final double dblCoupon,
-		final String strCCName)
+		final JulianDate startDate,
+		final String tenor,
+		final double coupon,
+		final String creditCurveName)
 	{
-		return CDSBuilder.CreateSNAC (dtStart, strTenor, dblCoupon, strCCName);
+		return CDSBuilder.CreateSNAC (startDate, tenor, coupon, creditCurveName);
 	}
-
-	/*
-	 * Sample demonstrating the generation of the full set of CDSW measure
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
-		JulianDate dtCurve = DateUtil.CreateFromYMD (
-			2018,
-			DateUtil.JANUARY,
-			5
-		);
+		JulianDate curveDate = DateUtil.CreateFromYMD (2018, DateUtil.JANUARY, 5);
 
-		JulianDate dtValue = dtCurve.addDays (1);
+		JulianDate valueDate = curveDate.addDays (1);
 
-		JulianDate dtSettle = dtValue.addBusDays (
-			3,
-			"USD"
-		);
+		JulianDate settleDate = valueDate.addBusDays (3, "USD");
 
-		/*
-		 * Model the USD ISDA Standard Curve
-		 */
+		double recoveryRate = 0.4;
+		double notional = -10.e+06;
+		String[] cashTenorArray =
+		{
+			"1M",
+			"2M",
+			"3M",
+			"6M",
+			"12M"
+		};
+		double[] cashRateArray =
+		{
+			0.001864,
+			0.002289,
+			0.002638,
+			0.003965,
+			0.006759
+		};
+		String[] irsTenorArray =
+		{
+			 "2Y",
+			 "3Y",
+			 "4Y",
+			 "5Y",
+			 "6Y",
+			 "7Y",
+			 "8Y",
+			 "9Y",
+			"10Y",
+			"12Y",
+			"15Y",
+			"20Y",
+			"25Y",
+			"30Y"
+		};
+		double[] irsRateArray =
+		{
+			0.004750,
+			0.007700,
+			0.011600,
+			0.015425,
+			0.018900,
+			0.021760,
+			0.024105,
+			0.026095,
+			0.027750,
+			0.030400,
+			0.032890,
+			0.034855,
+			0.035805,
+			0.036345
+		};
+		String[] cdsTenorArray =
+		{
+			 "6M",
+			 "1Y",
+			 "2Y",
+			 "3Y",
+			 "4Y",
+			 "5Y",
+			 "7Y",
+			"10Y"
+		};
+		double[] cdsParSpreadArray =
+		{
+			 60.,
+			 68.,
+			 88.,
+			102.,
+			121.,
+			138.,
+			168.,
+			188.
+		};
 
-		double dblRecovery = 0.4;
-		double dblNotional = -10.e+06;
-		String[] astrCashTenor = new String[] {   "1M",     "2M",     "3M",     "6M",    "12M"};
-		double[] adblCashRate = new double[] {0.001864, 0.002289, 0.002638, 0.003965, 0.006759};
-		String[] astrIRSTenor = new String[] {   "2Y",     "3Y",     "4Y",     "5Y",     "6Y",     "7Y",
-				"8Y",     "9Y",    "10Y",    "12Y",    "15Y",    "20Y",    "25Y",    "30Y"};
-		double[] adblIRSRate = new double[] {0.004750, 0.007700, 0.011600, 0.015425, 0.018900, 0.021760,
-			0.024105, 0.026095, 0.027750, 0.030400, 0.032890, 0.034855, 0.035805, 0.036345};
-
-		/*
-		 * Build the USD ISDA Standard Curve
-		 */
-
-		MergedDiscountForwardCurve dc = BuildRatesCurveFromInstruments (
-			dtCurve,
-			astrCashTenor,
-			adblCashRate,
-			astrIRSTenor,
-			adblIRSRate,
+		MergedDiscountForwardCurve discountCount = BuildRatesCurveFromInstruments (
+			curveDate,
+			cashTenorArray,
+			cashRateArray,
+			irsTenorArray,
+			irsRateArray,
 			0.,
 			"USD"
 		);
 
-		/*
-		 * Build the CDS Instrument Quotes
-		 */
-
-		String[] astrCDSTenor = new String[] {
-			"6M", "1Y", "2Y", "3Y", "4Y", "5Y", "7Y", "10Y"
-		};
-		double[] adblCDSParSpread = new double[] {
-			60., 68., 88., 102., 121., 138., 168., 188.
-		};
-
-		/*
-		 * Build the Base Credit Curve
-		 */
-
-		CreditCurve cc = CreateCreditCurveFromCDS (
-			dtValue,
-			adblCDSParSpread,
-			astrCDSTenor,
+		CreditCurve creditCurve = CreateCreditCurveFromCDS (
+			valueDate,
+			cdsParSpreadArray,
+			cdsTenorArray,
 			"FairPremium",
-			dc,
-			dblRecovery,
+			discountCount,
+			recoveryRate,
 			"MS",
 			0.01,
 			0.
 		);
 
-		/*
-		 * Display Survival Probability to the instrument maturities
-		 */
+		DisplayInstrumentMaturitySurvival (creditCurve);
 
-		DisplayInstrumentMaturitySurvival (cc);
+		CreditDefaultSwap cds = CreateCDS (valueDate, "6Y", 0.05, "MS");
 
-		/*
-		 * Create the CDS to price. Contract Maturity is 6Y. Traded Spread Input is 0.05 (500 bp).
-		 */
-
-		CreditDefaultSwap cds = CreateCDS (
-			dtValue,
-			"6Y",
-			0.05,
-			"MS"
-		);
-
-		ValuationParams valParams = new ValuationParams (
-			dtValue,
-			dtSettle,
-			"USD"
-		);
+		ValuationParams valuationParams = new ValuationParams (valueDate, settleDate, "USD");
 
 		CreditPricerParams pricerParams = CreditPricerParams.Standard();
 
-		System.out.println ("\n---- Valuation Details ----");
+		System.out.println ("\n\t||---- Valuation Details ----");
 
-		System.out.println ("Trade Date   : " + dtCurve);
+		System.out.println ("\t|| Trade Date   : " + curveDate);
 
-		System.out.println ("Cash Settle  : " + dtSettle);
+		System.out.println ("\t|| Cash Settle  : " + settleDate);
 
-		System.out.println ("\n---- CDS Details ----");
+		System.out.println ("\n\t||---- CDS Details ----");
 
-		System.out.println ("Effective    : " + cds.effectiveDate());
+		System.out.println ("\t|| Effective    : " + cds.effectiveDate());
 
-		System.out.println ("Maturity     : " + cds.maturityDate());
+		System.out.println ("\t|| Maturity     : " + cds.maturityDate());
 
-		/*
-		 * Generate the base CDS Measures
-		 */
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer =
+			MarketParamsBuilder.Credit (discountCount, creditCurve);
 
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Credit (
-			dc,
-			cc
+		CaseInsensitiveTreeMap<Double> mapBaseMeasures =
+			cds.value (valuationParams, pricerParams, curveSurfaceQuoteContainer, null);
+
+		double accrued = mapBaseMeasures.get ("Accrued") * 100. * notional;
+
+		double baseDirtyPV = mapBaseMeasures.get ("DirtyPV");
+
+		double principal = mapBaseMeasures.get ("Upfront") * 0.01 * notional;
+
+		System.out.println ("\n\t||---- Base CDS Measures ----");
+
+		System.out.println (
+			"\t|| Price        : " + FormatUtil.FormatDouble (mapBaseMeasures.get ("Price"), 1, 2, 1.)
 		);
 
-		CaseInsensitiveTreeMap<Double> mapBaseMeasures = cds.value (
-			valParams,
-			pricerParams,
-			mktParams,
-			null
+		System.out.println ("\t|| Principal    : " + FormatUtil.FormatDouble (principal, 1, 0, 1.));
+
+		System.out.println ("\t|| Accrued      : " + FormatUtil.FormatDouble (accrued, 1, 0, 1.));
+
+		System.out.println (
+			"\t|| Accrual Days : " + FormatUtil.FormatDouble (mapBaseMeasures.get ("AccrualDays"), 1, 0, 1.)
 		);
 
-		double dblAccrued = mapBaseMeasures.get ("Accrued") * 100. * dblNotional;
-
-		double dblBaseDirtyPV = mapBaseMeasures.get ("DirtyPV");
-
-		double dblPrincipal = mapBaseMeasures.get ("Upfront") * 0.01 * dblNotional;
-
-		System.out.println ("\n---- Base CDS Measures ----");
-
-		System.out.println ("Price        : " + FormatUtil.FormatDouble (mapBaseMeasures.get ("Price"), 1, 2, 1.));
-
-		System.out.println ("Principal    : " + FormatUtil.FormatDouble (dblPrincipal, 1, 0, 1.));
-
-		System.out.println ("Accrued      : " + FormatUtil.FormatDouble (dblAccrued, 1, 0, 1.));
-
-		System.out.println ("Accrual Days : " + FormatUtil.FormatDouble (mapBaseMeasures.get ("AccrualDays"), 1, 0, 1.));
-
-		System.out.println ("Cash Amount  : " + FormatUtil.FormatDouble (dblAccrued + dblPrincipal, 1, 0, 1.));
-
-		System.out.println ("Repl Spread  : " + FormatUtil.FormatDouble (mapBaseMeasures.get ("FairPremium"), 1, 4, 1.));
-
-		/*
-		 * Build the Bumped 01 Credit Curve
-		 */
-
-		CreditCurve cc01Bump = CreateCreditCurveFromCDS (
-			dtValue,
-			adblCDSParSpread,
-			astrCDSTenor,
-			"FairPremium",
-			dc,
-			dblRecovery,
-			"MS",
-			0.01,
-			1.
+		System.out.println (
+			"\t|| Cash Amount  : " + FormatUtil.FormatDouble (accrued + principal, 1, 0, 1.)
 		);
 
-		/*
-		 * Generate the 1 bp flat Credit Curve bumped  Measures
-		 */
-
-		CaseInsensitiveTreeMap<Double> mapCreditFlat01Measures = cds.value (
-			valParams,
-			pricerParams,
-			MarketParamsBuilder.Credit (
-				dc,
-				cc01Bump
-			),
-			null
+		System.out.println (
+			"\t|| Repl Spread  : " + FormatUtil.FormatDouble (mapBaseMeasures.get ("FairPremium"), 1, 4, 1.)
 		);
 
-		double dblCreditFlat01DirtyPV = mapCreditFlat01Measures.get ("DirtyPV");
-
-		System.out.println ("CS01         : " + FormatUtil.FormatDouble (dblCreditFlat01DirtyPV - dblBaseDirtyPV, 1, 0, 0.01 * dblNotional));
-
-		/*
-		 * Build the Bumped 01 Rates Curve
-		 */
-
-		MergedDiscountForwardCurve dc01Bump = BuildRatesCurveFromInstruments (
-			dtCurve,
-			astrCashTenor,
-			adblCashRate,
-			astrIRSTenor,
-			adblIRSRate,
-			0.0001,
-			"USD"
+		System.out.println (
+			"\t|| CS01         : " + FormatUtil.FormatDouble (
+				cds.value (
+					valuationParams,
+					pricerParams,
+					MarketParamsBuilder.Credit (
+						discountCount,
+						CreateCreditCurveFromCDS (
+							valueDate,
+							cdsParSpreadArray,
+							cdsTenorArray,
+							"FairPremium",
+							discountCount,
+							recoveryRate,
+							"MS",
+							0.01,
+							1.
+						)
+					),
+					null
+				).get (
+					"DirtyPV"
+				) - baseDirtyPV,
+				1,
+				0,
+				0.01 * notional
+			)
 		);
 
-		/*
-		 * Generate the 1 bp flat Rates Curve bumped  Measures
-		 */
-
-		CaseInsensitiveTreeMap<Double> mapRatesFlat01Measures = cds.value (
-			valParams,
-			pricerParams,
-			MarketParamsBuilder.Credit (
-				dc01Bump,
-				cc
-			),
-			null
+		System.out.println (
+			"\t|| IR01         : " + FormatUtil.FormatDouble (
+				cds.value (
+					valuationParams,
+					pricerParams,
+					MarketParamsBuilder.Credit (
+						BuildRatesCurveFromInstruments (
+							curveDate,
+							cashTenorArray,
+							cashRateArray,
+							irsTenorArray,
+							irsRateArray,
+							0.0001,
+							"USD"
+						),
+						creditCurve
+					),
+					null
+				).get (
+					"DirtyPV"
+				) - baseDirtyPV,
+				1,
+				0,
+				0.01 * notional
+			)
 		);
 
-		double dblRatesFlat01DirtyPV = mapRatesFlat01Measures.get ("DirtyPV");
+		System.out.println ("\n\t||---- CDS Coupon Flows ----");
 
-		System.out.println ("IR01         : " + FormatUtil.FormatDouble (dblRatesFlat01DirtyPV - dblBaseDirtyPV, 1, 0, 0.01 * dblNotional));
+		for (CompositePeriod compositePeriod : cds.couponPeriods()) {
+			int payDateJulian = compositePeriod.payDate();
 
-		/*
-		 * Generates and displays the coupon period details for the bonds
-		 */
+			double couponDCF = compositePeriod.couponDCF();
 
-		System.out.println ("\n---- CDS Coupon Flows ----");
-
-		for (CompositePeriod p : cds.couponPeriods())
 			System.out.println (
-				DateUtil.YYYYMMDD (p.startDate()) + FIELD_SEPARATOR +
-				DateUtil.YYYYMMDD (p.endDate()) + FIELD_SEPARATOR +
-				DateUtil.YYYYMMDD (p.payDate()) + FIELD_SEPARATOR +
-				FormatUtil.FormatDouble (p.couponDCF(), 1, 3, 1.) + FIELD_SEPARATOR +
-				FormatUtil.FormatDouble (p.couponDCF(), 1, 2, 0.01 * dblNotional) + FIELD_SEPARATOR +
-				FormatUtil.FormatDouble (dc.df (p.payDate()), 1, 4, 1.) + FIELD_SEPARATOR +
-				FormatUtil.FormatDouble (cc.survival (p.payDate()), 1, 4, 1.)
+				"\t|| " + DateUtil.YYYYMMDD (compositePeriod.startDate()) + FIELD_SEPARATOR +
+					DateUtil.YYYYMMDD (compositePeriod.endDate()) + FIELD_SEPARATOR +
+					DateUtil.YYYYMMDD (payDateJulian) + FIELD_SEPARATOR +
+					FormatUtil.FormatDouble (couponDCF, 1, 3, 1.) + FIELD_SEPARATOR +
+					FormatUtil.FormatDouble (couponDCF, 1, 2, 0.01 * notional) + FIELD_SEPARATOR +
+					FormatUtil.FormatDouble (discountCount.df (payDateJulian), 1, 4, 1.) + FIELD_SEPARATOR +
+					FormatUtil.FormatDouble (creditCurve.survival (payDateJulian), 1, 4, 1.)
 			);
+		}
 
-		/*
-		 * Generate the Quoted Spread Based CDS Measures
-		 */
-
-		CaseInsensitiveTreeMap<Double> mapQSMeasures = cds.valueFromQuotedSpread (
-			valParams,
+		CaseInsensitiveTreeMap<Double> quotedSpreadMeasureMap = cds.valueFromQuotedSpread (
+			valuationParams,
 			pricerParams,
-			mktParams,
+			curveSurfaceQuoteContainer,
 			null,
 			0.05,
 			208.
 		);
 
-		System.out.println ("\n---- Quoted Spread CDS Measures ----");
+		System.out.println ("\n\t||---- Quoted Spread CDS Measures ----");
 
-		System.out.println ("QS Price     : " + FormatUtil.FormatDouble (mapQSMeasures.get ("Price"), 1, 2, 1.));
+		System.out.println (
+			"\t|| QS Price     : " + FormatUtil.FormatDouble (quotedSpreadMeasureMap.get ("Price"), 1, 2, 1.)
+		);
 
-		System.out.println ("QS Repl Spd  : " + FormatUtil.FormatDouble (mapQSMeasures.get ("FairPremium"), 1, 4, 1.));
+		System.out.println (
+			"\t|| QS Repl Spd  : " +
+				FormatUtil.FormatDouble (quotedSpreadMeasureMap.get ("FairPremium"), 1, 4, 1.)
+		);
 
 		EnvManager.TerminateEnv();
 	}

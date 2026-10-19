@@ -6,8 +6,8 @@ import java.util.TreeMap;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.ProxyBond;
-import org.drip.state.municipal.ProxyBondSensitivity;
+import org.drip.state.municipal.ProxyBondEvaluator;
+import org.drip.state.municipal.BondSensitivity;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -322,9 +322,14 @@ public class MuniBondSensitivityMeasures
 		System.out.println ("\t||----------------------------------------------------||");
 
 		for (Double endTime : timeToYieldBasisMap.keySet()) {
-			ProxyBond proxyBond = ProxyBond.Callable (endTime, bondCoupon, callPriceSchedule);
+			ProxyBondEvaluator proxyBond = ProxyBondEvaluator.Callable (
+				endTime,
+				bondCoupon,
+				callPriceSchedule
+			);
 
-			ProxyBondSensitivity proxyBondSensitivity = proxyBond.secularMeasuresFromYieldBasis (
+			BondSensitivity proxyBondSensitivity = proxyBond.secularMeasuresFromYieldBasis (
+				null,
 				kalotayWilliamsFabozzi,
 				annualizedForwardYieldVolatility,
 				0.0001 * timeToYieldBasisMap.get (endTime)

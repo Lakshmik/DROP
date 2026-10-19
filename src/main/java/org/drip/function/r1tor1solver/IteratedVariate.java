@@ -171,26 +171,6 @@ public class IteratedVariate
 	}
 
 	/**
-	 * Set the Variate
-	 * 
-	 * @param x Variate
-	 * 
-	 * @return TRUE - Variate set successfully
-	 */
-
-	public boolean setX (
-		final double x)
-	{
-		if (!NumberUtil.IsValid (x)) {
-			return false;
-		}
-
-		ITERATED_X_LIST.add (_x = x);
-
-		return true;
-	}
-
-	/**
 	 * Retrieve the Objective Function Value
 	 * 
 	 * @return The Objective Function Value
@@ -202,19 +182,23 @@ public class IteratedVariate
 	}
 
 	/**
-	 * Set the Objective Function Value
+	 * Set the Variate and the Objective Function Values
 	 * 
+	 * @param x Variate
 	 * @param objectiveFunctionValue Objective Function Value
 	 * 
-	 * @return TRUE - Objective Function Value set successfully
+	 * @return TRUE - Variate and Objective Function Values set successfully
 	 */
 
-	public boolean setObjectiveFunctionValue (
+	public boolean setVariateAndObjectiveFunction (
+		final double x,
 		final double objectiveFunctionValue)
 	{
-		if (!NumberUtil.IsValid (objectiveFunctionValue)) {
+		if (!NumberUtil.IsValid (x) || !NumberUtil.IsValid (objectiveFunctionValue)) {
 			return false;
 		}
+
+		ITERATED_X_LIST.add (_x = x);
 
 		ITERATED_OBJECTIVE_FUNCTION_VALUE_LIST.add (_objectiveFunctionValue = objectiveFunctionValue);
 

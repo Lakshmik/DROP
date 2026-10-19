@@ -10,7 +10,7 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
-import org.drip.state.municipal.ProxyBond;
+import org.drip.state.municipal.ProxyBondEvaluator;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -294,7 +294,7 @@ public class FigureG
 		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
 			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
 
-		ProxyBond proxyBulletBond = ProxyBond.Bullet (bondMaturityTime, bondCoupon);
+		ProxyBondEvaluator proxyBulletBond = ProxyBondEvaluator.Bullet (bondMaturityTime, bondCoupon);
 
 		System.out.println ("\t|------------------------------------------------------||");
 
@@ -346,7 +346,7 @@ public class FigureG
 			TimeToProjectedBulletBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedBulletBondValueListMap =
-			proxyBulletBond.valueTree (kalotayWilliamsFabozzi);
+			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi);
 
 		System.out.println ("\t|------------------------------------------------------||");
 
@@ -391,13 +391,13 @@ public class FigureG
 
 		System.out.println ("\t|------------------------------------------------------||\n");
 
-		ProxyBond proxyCallableBond = ProxyBond.Callable (bondMaturityTime, bondCoupon, callPriceSchedule);
+		ProxyBondEvaluator proxyCallableBond = ProxyBondEvaluator.Callable (bondMaturityTime, bondCoupon, callPriceSchedule);
 
 		Map<Double, List<Double>> timeToProjectedCallableBondValueListMapReconciler =
 			TimeToProjectedCallableBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedCallableBondValueListMap =
-			proxyCallableBond.valueTree (kalotayWilliamsFabozzi);
+			proxyCallableBond.valueTree (null, kalotayWilliamsFabozzi);
 
 		System.out.println ("\t|------------------------------------------------------||");
 

@@ -207,7 +207,8 @@ public class BootstrappedGovvieCurve
 			code,
 			currency,
 			dateArray,
-			forwardYieldArray
+			forwardYieldArray,
+			true
 		);
 
 		NonlinearCurveBuilder.YieldCurve (

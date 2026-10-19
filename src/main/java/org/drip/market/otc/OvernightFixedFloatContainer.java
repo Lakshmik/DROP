@@ -186,6 +186,14 @@ public class OvernightFixedFloatContainer {
 								(org.drip.market.definition.OvernightIndexContainer.IndexFromJurisdiction
 									("NZD"), "ON"), "ON"), 1));
 
+			_mapFundConvention.put ("PLN", new org.drip.market.otc.FixedFloatSwapConvention (new
+				org.drip.market.otc.FixedStreamConvention ("PLN", "Act/360", "PLN", "1Y", "1Y",
+					org.drip.analytics.support.CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC),
+						new org.drip.market.otc.FloatStreamConvention (
+							org.drip.state.identifier.ForwardLabel.Create (
+								org.drip.market.definition.OvernightIndexContainer.IndexFromJurisdiction
+									("PLN"), "ON"), "ON"), 2));
+
 			_mapFundConvention.put ("SEK", new org.drip.market.otc.FixedFloatSwapConvention (new
 				org.drip.market.otc.FixedStreamConvention ("SEK", "Act/360", "SEK", "1Y", "1Y",
 					org.drip.analytics.support.CompositePeriodBuilder.ACCRUAL_COMPOUNDING_RULE_GEOMETRIC),

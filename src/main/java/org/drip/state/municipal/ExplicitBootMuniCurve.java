@@ -172,7 +172,7 @@ public class ExplicitBootMuniCurve
 	 * @return <i>KalotayWilliamsFabozzi</i> Grid Instance
 	 */
 
-	public KalotayWilliamsFabozzi _kalotayWilliamsFabozzi()
+	public KalotayWilliamsFabozzi kalotayWilliamsFabozzi()
 	{
 		return _kalotayWilliamsFabozzi;
 	}

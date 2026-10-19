@@ -163,9 +163,10 @@ public class FixedPointFinderNewton
 			double nextVariate = variate -
 				variateObjectiveFunctionValueSlope (variate) * iteratedVariate.objectiveFunctionValue();
 
-			return iteratedVariate.setX (nextVariate) &&
-				iteratedVariate.setObjectiveFunctionValue (_objectiveFunction.evaluate (nextVariate)) &&
-				fixedPointFinderOutput.incrementNumberOfObjectiveFunctionDerivativesCalculations() &&
+			return iteratedVariate.setVariateAndObjectiveFunction (
+				nextVariate,
+				_objectiveFunction.evaluate (variate)
+			) && fixedPointFinderOutput.incrementNumberOfObjectiveFunctionDerivativesCalculations() &&
 				fixedPointFinderOutput.incrementObjectiveFunctionCalculations();
 		} catch (Exception e) {
 			e.printStackTrace();

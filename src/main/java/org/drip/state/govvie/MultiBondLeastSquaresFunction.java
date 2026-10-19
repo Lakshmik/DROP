@@ -153,6 +153,7 @@ public class MultiBondLeastSquaresFunction
 	private String _currency = "";
 	private int _tenorScaleDown = 0;
 	private JulianDate _epochDate = null;
+	private boolean _compoundingOn = false;
 	private int[] _calibrationDateArray = null;
 	private ValuationParams _valuationParams = null;
 	private List<MarketComponent> _marketComponentList = null;
@@ -165,6 +166,7 @@ public class MultiBondLeastSquaresFunction
 	 * @param currency Currency
 	 * @param calibrationDateArray Array of Calibration Dates
 	 * @param marketComponentList List of <i>MarketComponent</i> Instances
+	 * @param compoundingOn TRUE - Discounting is based on Compounding
 	 * 
 	 * @return <i>TENOR_SCALE_DOWN_NONE</i> Instance of <i>MultiBondLeastSquaresFunction</i>
 	 */
@@ -174,7 +176,8 @@ public class MultiBondLeastSquaresFunction
 		final String code,
 		final String currency,
 		final int[] calibrationDateArray,
-		final List<MarketComponent> marketComponentList)
+		final List<MarketComponent> marketComponentList,
+		final boolean compoundingOn)
 	{
 		try {
 			return new MultiBondLeastSquaresFunction (
@@ -183,7 +186,8 @@ public class MultiBondLeastSquaresFunction
 				currency,
 				calibrationDateArray,
 				marketComponentList,
-				TENOR_SCALE_DOWN_NONE
+				TENOR_SCALE_DOWN_NONE,
+				compoundingOn
 			);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -200,6 +204,7 @@ public class MultiBondLeastSquaresFunction
 	 * @param currency Currency
 	 * @param calibrationDateArray Array of Calibration Dates
 	 * @param marketComponentList List of <i>MarketComponent</i> Instances
+	 * @param compoundingOn TRUE - Discounting is based on Compounding
 	 * 
 	 * @return <i>TENOR_SCALE_DOWN_MATURITY</i> Instance of <i>MultiBondLeastSquaresFunction</i>
 	 */
@@ -209,7 +214,8 @@ public class MultiBondLeastSquaresFunction
 		final String code,
 		final String currency,
 		final int[] calibrationDateArray,
-		final List<MarketComponent> marketComponentList)
+		final List<MarketComponent> marketComponentList,
+		final boolean compoundingOn)
 	{
 		try {
 			return new MultiBondLeastSquaresFunction (
@@ -218,7 +224,8 @@ public class MultiBondLeastSquaresFunction
 				currency,
 				calibrationDateArray,
 				marketComponentList,
-				TENOR_SCALE_DOWN_MATURITY
+				TENOR_SCALE_DOWN_MATURITY,
+				compoundingOn
 			);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -235,6 +242,7 @@ public class MultiBondLeastSquaresFunction
 	 * @param currency Currency
 	 * @param calibrationDateArray Array of Calibration Dates
 	 * @param marketComponentList List of <i>MarketComponent</i> Instances
+	 * @param compoundingOn TRUE - Discounting is based on Compounding
 	 * 
 	 * @return <i>TENOR_SCALE_DOWN_WAL</i> Instance of <i>MultiBondLeastSquaresFunction</i>
 	 */
@@ -244,7 +252,8 @@ public class MultiBondLeastSquaresFunction
 		final String code,
 		final String currency,
 		final int[] calibrationDateArray,
-		final List<MarketComponent> marketComponentList)
+		final List<MarketComponent> marketComponentList,
+		final boolean compoundingOn)
 	{
 		try {
 			return new MultiBondLeastSquaresFunction (
@@ -253,7 +262,8 @@ public class MultiBondLeastSquaresFunction
 				currency,
 				calibrationDateArray,
 				marketComponentList,
-				TENOR_SCALE_DOWN_WAL
+				TENOR_SCALE_DOWN_WAL,
+				compoundingOn
 			);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -271,6 +281,7 @@ public class MultiBondLeastSquaresFunction
 	 * @param calibrationDateArray Array of Calibration Dates
 	 * @param marketComponentList List of <i>MarketComponent</i> Instances
 	 * @param tenorScaleDown Tenor Scale Down Setting
+	 * @param compoundingOn TRUE - Discounting is based on Compounding
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
@@ -281,7 +292,8 @@ public class MultiBondLeastSquaresFunction
 		final String currency,
 		final int[] calibrationDateArray,
 		final List<MarketComponent> marketComponentList,
-		final int tenorScaleDown)
+		final int tenorScaleDown,
+		final boolean compoundingOn)
 		throws Exception
 	{
 		super (null);
@@ -302,6 +314,7 @@ public class MultiBondLeastSquaresFunction
 			}
 		}
 
+		_compoundingOn = compoundingOn;
 		_tenorScaleDown = tenorScaleDown;
 
 		_valuationParams = ValuationParams.Spot (_epochDate.julian());
@@ -374,6 +387,17 @@ public class MultiBondLeastSquaresFunction
 	}
 
 	/**
+	 * Indicate if Discounting is based on Compounding
+	 * 
+	 * @return TRUE - Discounting is based on Compounding
+	 */
+
+	public boolean compoundingOn()
+	{
+		return _compoundingOn;
+	}
+
+	/**
 	 * Retrieve the Dimension of the Input Variate
 	 * 
 	 * @return The Dimension of the Input Variate
@@ -415,7 +439,8 @@ public class MultiBondLeastSquaresFunction
 				_code,
 				_currency,
 				_calibrationDateArray,
-				forwardYieldArray
+				forwardYieldArray,
+				_compoundingOn
 			)
 		);
 
