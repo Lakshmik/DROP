@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -90,74 +98,88 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>IntegerRandomSequenceBound</i> demonstrates the Computation of the Probabilistic Bounds for a Sample
  * 	Random Integer Sequence.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class IntegerRandomSequenceBound {
+public class IntegerRandomSequenceBound
+{
 
 	private static final void IntegerBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			IntegerSequenceAgnosticMetrics ssamDist = (IntegerSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
+		for (int sampleSize : sampleSizeArray) {
+			IntegerSequenceAgnosticMetrics integerSequenceAgnosticMetrics =
+				(IntegerSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
+
+			System.out.println (
+				"\t| " + FormatUtil.FormatDouble (
+					sampleSize,
+					3,
+					0,
+					1.
+				) + " => " + FormatUtil.FormatDouble (
+					integerSequenceAgnosticMetrics.probGreaterThanZeroUpperBound(),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					integerSequenceAgnosticMetrics.probEqualToZeroUpperBound(),
+					1,
+					9,
+					1.
+				) + " | "
 			);
-
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 3, 0, 1) + " => ";
-
-			strDump +=
-				FormatUtil.FormatDouble (ssamDist.probGreaterThanZeroUpperBound(), 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (ssamDist.probEqualToZeroUpperBound(), 1, 9, 1.) + " | ";
-
-			System.out.println (strDump);
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		BoundedUniformInteger buiSequence = new BoundedUniformInteger (
-			0,
-			100
-		);
+		BoundedUniformInteger boundedUniformIntegerSequence = new BoundedUniformInteger (0, 100);
 
-		I1ContinuousUniform buiDistribution = new I1ContinuousUniform (
-			0,
-			100
-		);
+		I1ContinuousUniform i1ContinuousUniformDistribution = new I1ContinuousUniform (0, 100);
 
-		int[] aiSampleSize = new int[] {
-			10, 20, 50, 100, 250
+		int[] sampleSizeArray =
+		{
+			10,
+			20,
+			50,
+			100,
+			250
 		};
 
 		System.out.println();
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		System.out.println ("\t| Generating Integer Random Sequence Metrics");
 
@@ -169,35 +191,43 @@ public class IntegerRandomSequenceBound {
 
 		System.out.println ("\t| \t\tUpper Probability Bound for X = 0");
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		System.out.println ("\t| Generating Metrics off of Underlying Distribution");
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
-
-		IntegerBounds (
-			buiSequence,
-			buiDistribution,
-			aiSampleSize
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
 		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		IntegerBounds (
+			boundedUniformIntegerSequence,
+			i1ContinuousUniformDistribution,
+			sampleSizeArray
+		);
+
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		System.out.println ("\t| Generating Metrics off of Empirical Distribution");
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
-
-		IntegerBounds (
-			buiSequence,
-			null,
-			aiSampleSize
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
 		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		IntegerBounds (boundedUniformIntegerSequence, null, sampleSizeArray);
+
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		EnvManager.TerminateEnv();
 	}

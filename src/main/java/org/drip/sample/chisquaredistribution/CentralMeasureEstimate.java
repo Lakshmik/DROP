@@ -15,6 +15,14 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -113,14 +121,15 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  * 				https://www.itl.nist.gov/div898/handbook/eda/section3/eda3666.htm
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -138,10 +147,7 @@ public class CentralMeasureEstimate
 				final double t)
 				throws Exception
 			{
-				return new LowerEulerIntegral (
-					null,
-					t
-				).evaluate (s);
+				return new LowerEulerIntegral (null, t).evaluate (s);
 			}
 		};
 	}
@@ -163,7 +169,6 @@ public class CentralMeasureEstimate
 		int digammaTermCount = 1000;
 		int[] dofArray =
 		{
-			 // 1,
 			 2,
 			 3,
 			 4,
@@ -196,63 +201,122 @@ public class CentralMeasureEstimate
 
 		R1ToR1 digammaEstimator = CumulativeSeriesEstimator.AbramowitzStegun2007 (digammaTermCount);
 
-		System.out.println ("\t|----------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|             CENTRAL CHI-SQUARED DISTRIBUTION MEASURES ESTIMATE             ||");
+		System.out.println (
+			"\t|             CENTRAL CHI-SQUARED DISTRIBUTION MEASURES ESTIMATE             ||"
+		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                             ||");
+		System.out.println (
+			"\t|        L -> R:                                                             ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom                                        ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom                                        ||"
+		);
 
-		System.out.println ("\t|                - Mean                                                      ||");
+		System.out.println (
+			"\t|                - Mean                                                      ||"
+		);
 
-		System.out.println ("\t|                - Median                                                    ||");
+		System.out.println (
+			"\t|                - Median                                                    ||"
+		);
 
-		System.out.println ("\t|                - Mode                                                      ||");
+		System.out.println (
+			"\t|                - Mode                                                      ||"
+		);
 
-		System.out.println ("\t|                - Variance                                                  ||");
+		System.out.println (
+			"\t|                - Variance                                                  ||"
+		);
 
-		System.out.println ("\t|                - Skewness                                                  ||");
+		System.out.println (
+			"\t|                - Skewness                                                  ||"
+		);
 
-		System.out.println ("\t|                - Excess Kurtosis                                           ||");
+		System.out.println (
+			"\t|                - Excess Kurtosis                                           ||"
+		);
 
-		System.out.println ("\t|                - Differential Entropy                                      ||");
+		System.out.println (
+			"\t|                - Differential Entropy                                      ||"
+		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------||"
+			);
 
-		for (int dof : dofArray)
-		{
-			R1Central r1UnivariateCentral = new R1Central (
+		for (int dof : dofArray) {
+			R1Central r1CentralChisquared = new R1Central (
 				dof,
 				gammaEstimator,
 				digammaEstimator,
 				lowerIncompleteGammaEstimator
 			);
 
-			String display = "\t| [" + FormatUtil.FormatDouble (dof, 2, 0, 1., false) + "] =>";
-
-			display = display + " " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.mean(), 2, 2, 1., false
-			) + " | " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.median(), 2, 6, 1., false
-			) + " | " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.mode(), 2, 2, 1., false
-			) + " | " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.variance(), 2, 2, 1., false
-			) + " | " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.skewness(), 1, 6, 1., false
-			) + " | " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.excessKurtosis(), 1, 6, 1., false
-			) + " | " + FormatUtil.FormatDouble (
-				r1UnivariateCentral.differentialEntropy(), 1, 6, 1., false
-			) + " |";
-
-			System.out.println (display + "|");
+			System.out.println (
+				"\t| [" + FormatUtil.FormatDouble (
+					dof,
+					2,
+					0,
+					1.,
+					false
+				) + "] =>" + " " + FormatUtil.FormatDouble (
+					r1CentralChisquared.mean(),
+					2,
+					2,
+					1.,
+					false
+				) + " | " + FormatUtil.FormatDouble (
+					r1CentralChisquared.median(),
+					2,
+					6,
+					1.,
+					false
+				) + " | " + FormatUtil.FormatDouble (
+					r1CentralChisquared.mode(),
+					2,
+					2,
+					1.,
+					false
+				) + " | " + FormatUtil.FormatDouble (
+					r1CentralChisquared.variance(),
+					2,
+					2,
+					1.,
+					false
+				) + " | " + FormatUtil.FormatDouble (
+					r1CentralChisquared.skewness(),
+					1,
+					6,
+					1.,
+					false
+				) + " | " + FormatUtil.FormatDouble (
+					r1CentralChisquared.excessKurtosis(),
+					1,
+					6,
+					1.,
+					false
+				) + " | " + FormatUtil.FormatDouble (
+					r1CentralChisquared.differentialEntropy(),
+					1,
+					6,
+					1.,
+					false
+				) + " ||"
+			);
 		}
 
-		System.out.println ("\t|----------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

@@ -1,11 +1,23 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.r1tor1operator.Convolution;
+import org.drip.function.r1tor1operator.NaturalLogSeriesElement;
+import org.drip.function.r1tor1operator.Reflection;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,46 +96,45 @@ package org.drip.function.r1tor1;
 
 /**
  * <i>BernsteinPolynomial</i> provides the evaluation of the BernsteinPolynomial and its derivatives for a
- * specified variate.
+ *  specified variate. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>BernsteinPolynomial</i> Constructor</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BernsteinPolynomial extends org.drip.function.r1tor1operator.Convolution {
+public class BernsteinPolynomial
+	extends Convolution
+{
 
 	/**
-	 * Construct a BernsteinPolynomial instance
+	 * Construct a <i>BernsteinPolynomial</i> instance
 	 * 
-	 * @param iBaseExponent Base Exponent
-	 * @param iComplementExponent Complement Exponent
+	 * @param baseExponent Base Exponent
+	 * @param complementExponent Complement Exponent
 	 * 
-	 * @throws java.lang.Exception Thrown if the inputs are invalid
+	 * @throws Exception Thrown if the inputs are invalid
 	 */
 
 	public BernsteinPolynomial (
-		final int iBaseExponent,
-		final int iComplementExponent)
-		throws java.lang.Exception
+		final int baseExponent,
+		final int complementExponent)
+		throws Exception
 	{
-		super (new org.drip.function.r1tor1operator.NaturalLogSeriesElement (iBaseExponent), new
-			org.drip.function.r1tor1operator.Reflection (new org.drip.function.r1tor1operator.NaturalLogSeriesElement
-				(iComplementExponent)));
+		super (
+			new NaturalLogSeriesElement (baseExponent),
+			new Reflection (new NaturalLogSeriesElement (complementExponent))
+		);
 	}
-
-	/* public static final void main (
-		final java.lang.String[] astrArgs)
-		throws java.lang.Exception
-	{
-		BernsteinPolynomial bp = new BernsteinPolynomial (3, 3);
-
-		System.out.println ("BPDeriv[0.25] = " + bp.derivative (0.25, 1));
-	} */
 }

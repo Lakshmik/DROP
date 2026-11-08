@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,248 +99,270 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>UnitRandomSequenceBound</i> demonstrates the Computation of the Probabilistic Bounds for a Sample
  * 	Random Sequence.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class UnitRandomSequenceBound {
+public class UnitRandomSequenceBound
+{
 
 	private static final void Head (
 		final String strHeader)
 	{
 		System.out.println();
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		System.out.println (strHeader);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
-		System.out.println ("\t| SIZE ||               <-               TOLERANCES               ->               |");
+		System.out.println (
+			"\t| SIZE ||               <-               TOLERANCES               ->               |"
+		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 	}
 
 	private static final void ChernoffBinomialBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			UnitSequenceAgnosticMetrics ssamDist = (UnitSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			UnitSequenceAgnosticMetrics unitSequenceAgnosticMetrics =
+				(UnitSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 3, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 3, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.chernoffBinomialUpperBound (dblTolerance), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					unitSequenceAgnosticMetrics.chernoffBinomialUpperBound (tolerance),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	private static final void PoissonChernoffBinomialBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			UnitSequenceAgnosticMetrics ssamDist = (UnitSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
+		for (int sampleSize : sampleSizeArray) {
+			UnitSequenceAgnosticMetrics unitSequenceAgnosticMetrics =
+				(UnitSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+				sampleSize,
+				r1ContinuousDistribution
 			);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 3, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 3, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.chernoffPoissonUpperBound (dblTolerance), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					unitSequenceAgnosticMetrics.chernoffPoissonUpperBound (tolerance),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	private static final void KarpHagerupRubUpperBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			UnitSequenceAgnosticMetrics ssamDist = (UnitSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			UnitSequenceAgnosticMetrics unitSequenceAgnosticMetrics =
+				(UnitSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 3, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 3, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.karpHagerupRubBounds (dblTolerance).upper(), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					unitSequenceAgnosticMetrics.karpHagerupRubBounds (tolerance).upper(),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	private static final void KarpHagerupRubLowerBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			UnitSequenceAgnosticMetrics ssamDist = (UnitSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			UnitSequenceAgnosticMetrics unitSequenceAgnosticMetrics =
+				(UnitSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 3, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 3, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.karpHagerupRubBounds (dblTolerance).lower(), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					unitSequenceAgnosticMetrics.karpHagerupRubBounds (tolerance).lower(),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		BoundedUniform uniformRandom = new BoundedUniform (
-			0.,
-			1.
-		);
+		BoundedUniform boundedUniform = new BoundedUniform (0., 1.);
 
-		R1ContinuousUniform uniformDistribution = new R1ContinuousUniform (
-			0.,
-			1.
-		);
+		R1ContinuousUniform r1ContinuousUniform = new R1ContinuousUniform (0., 1.);
 
-		int[] aiSampleSize = new int[] {
-			10, 20, 50, 100, 250
+		int[] sampleSizeArray =
+		{
+			10,
+			20,
+			50,
+			100,
+			250
 		};
 
-		double[] adblTolerance = new double[] {
-			0.01, 0.03, 0.05, 0.07, 0.10
+		double[] toleranceArray =
+		{
+			0.01,
+			0.03,
+			0.05,
+			0.07,
+			0.10
 		};
 
 		Head ("\t|        CHERNOFF-BINOMIAL BOUNDS    -     METRICS FROM UNDERLYING GENERATOR       |");
 
-		ChernoffBinomialBounds (
-			uniformRandom,
-			uniformDistribution,
-			aiSampleSize,
-			adblTolerance
-		);
+		ChernoffBinomialBounds (boundedUniform, r1ContinuousUniform, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|      CHERNOFF-BINOMIAL BOUNDS    -     METRICS FROM EMPIRICAL DISTRIBUTION       |");
 
-		ChernoffBinomialBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		ChernoffBinomialBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|       POISSON CHERNOFF-BINOMIAL BOUNDS  -   METRICS FROM UNDERLYING GENERATOR    |");
 
-		PoissonChernoffBinomialBounds (
-			uniformRandom,
-			uniformDistribution,
-			aiSampleSize,
-			adblTolerance
-		);
+		PoissonChernoffBinomialBounds (boundedUniform, r1ContinuousUniform, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|       POISSON CHERNOFF-BINOMIAL BOUNDS  -  METRICS FROM EMPIRICAL DISTRIBUTION   |");
 
-		PoissonChernoffBinomialBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		PoissonChernoffBinomialBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		aiSampleSize = new int[] {
-			100, 200, 300, 500, 999
+		sampleSizeArray = new int[]
+		{
+			100,
+			200,
+			300,
+			500,
+			999
 		};
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|         KARP-HAGERUP-RUB UPPER BOUNDS  -   METRICS FROM UNDERLYING GENERATOR     |");
 
-		KarpHagerupRubUpperBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		KarpHagerupRubUpperBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|        KARP-HAGERUP-RUB UPPER BOUNDS  -   METRICS FROM EMPIRICAL DISTRIBUTION    |");
 
-		KarpHagerupRubUpperBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		KarpHagerupRubUpperBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|         KARP-HAGERUP-RUB LOWER BOUNDS  -   METRICS FROM UNDERLYING GENERATOR     |");
 
-		KarpHagerupRubLowerBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		KarpHagerupRubLowerBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|        KARP-HAGERUP-RUB LOWER BOUNDS  -   METRICS FROM EMPIRICAL DISTRIBUTION    |");
 
-		KarpHagerupRubLowerBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		KarpHagerupRubLowerBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		EnvManager.TerminateEnv();
 	}

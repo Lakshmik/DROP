@@ -1,9 +1,18 @@
 
-package org.drip.state.municipal;
+package org.drip.state.eostree;
 
+import java.util.List;
 import java.util.TreeMap;
 
+import org.drip.analytics.date.JulianDate;
+import org.drip.function.definition.R1ToR1;
+import org.drip.function.r1tor1solver.FixedPointFinderBracketing;
+import org.drip.function.r1tor1solver.FixedPointFinderBrent;
+import org.drip.function.r1tor1solver.FixedPointFinderOutput;
+import org.drip.function.r1tor1solver.VariateIteratorPrimitive;
 import org.drip.numerical.common.NumberUtil;
+import org.drip.state.municipal.CalibrateAndSensitivity;
+import org.drip.state.municipal.KalotayWilliamsFabozzi;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -82,9 +91,8 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>BondPriceFunction</i> implements the Full Bond Evaluation Pricing Function to be used in the Kalotay,
- * 	Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References
- *  are:
+ * <i>BondPriceFunction</i> calibrates the specified Base Bond Yield used in the Kalotay, Williams, and
+ *  Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -115,7 +123,7 @@ import org.drip.numerical.common.NumberUtil;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/README.md">Latent State Inference and Creation Utilities</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/municipal/README.md">Municipal Latent State Curve Estimator</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/eostree/README.md">EOS Bond Tree Based Valuation</a></td></tr>
  *  </table>
  *	<br>
  *
@@ -129,13 +137,44 @@ public class BondPriceFunction
 	private KalotayWilliamsFabozzi _kalotayWilliamsFabozzi = null;
 	private TreeMap<Double, Double> _timeToProjectedBaseForwardYieldMap = null;
 
+	private double priceFromBaseForwardYield (
+		final double calibrationEndTime,
+		final double projectedBaseForwardYield)
+		throws Exception
+	{
+		if (null == _timeToProjectedBaseForwardYieldMap) {
+			_timeToProjectedBaseForwardYieldMap = new TreeMap<Double, Double>();
+		}
+
+		_timeToProjectedBaseForwardYieldMap.put (calibrationEndTime, projectedBaseForwardYield);
+
+		if (!_kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+			_annualizedForwardYieldVolatility,
+			_timeToProjectedBaseForwardYieldMap
+		))
+		{
+			throw new Exception ("BondPriceFunction::priceFromBaseForwardYield => Invalid Inputs");
+		}
+
+		TreeMap<Double, List<Double>> projectedBondValueListMap = _evaluator.valueTree (
+			null,
+			_kalotayWilliamsFabozzi
+		);
+
+		if (null == projectedBondValueListMap) {
+			throw new Exception ("BondPriceFunction::priceFromBaseForwardYield => Invalid Inputs");
+		}
+
+		return projectedBondValueListMap.firstEntry().getValue().get (0);
+	}
+
 	/**
 	 * <i>BondPriceFunction</i> Constructor
 	 * 
+	 * @param evaluator Bond Evaluator
 	 * @param kalotayWilliamsFabozzi <i>KalotayWilliamsFabozzi</i> Model Implementation
 	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
 	 * @param timeToProjectedBaseForwardYieldMap Projected Base Forward Yield Time Map
-	 * @param evaluator Underlying Calibration  Bond
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
@@ -156,17 +195,6 @@ public class BondPriceFunction
 		}
 
 		_timeToProjectedBaseForwardYieldMap = timeToProjectedBaseForwardYieldMap;
-	}
-
-	/**
-	 * Retrieve the Underlying Calibration Bond Evaluator
-	 * 
-	 * @return Underlying Calibration Bond Evaluator
-	 */
-
-	public BondEvaluator evaluator()
-	{
-		return _evaluator;
 	}
 
 	/**
@@ -200,5 +228,137 @@ public class BondPriceFunction
 	public TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap()
 	{
 		return _timeToProjectedBaseForwardYieldMap;
+	}
+
+	/**
+	 * Retrieve the Bond Evaluator
+	 * 
+	 * @return Bond Evaluator
+	 */
+
+	public BondEvaluator evaluator()
+	{
+		return _evaluator;
+	}
+
+	/**
+	 * Evaluate the Price for the given Yield Basis
+	 * 
+	 * @param spotDate Spot Date
+	 * @param yieldBasis Yield Basis
+	 *  
+	 * @return Returns the calculated Price
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
+	public double priceFromYieldBasis (
+		final JulianDate spotDate,
+		final double yieldBasis)
+		throws Exception
+	{
+		if (!_kalotayWilliamsFabozzi.applyBasisYield (yieldBasis)) {
+			throw new Exception ("BondPriceFunction::priceFromYieldBasis => Invalid Inputs");
+		}
+
+		if (!_kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+			_annualizedForwardYieldVolatility,
+			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+		))
+		{
+			throw new Exception ("BondPriceFunction::priceFromYieldBasis => Invalid Inputs");
+		}
+
+		TreeMap<Double, List<Double>> projectedBondValueListMap = _evaluator.valueTree (
+			spotDate,
+			_kalotayWilliamsFabozzi
+		);
+
+		if (null == projectedBondValueListMap) {
+			throw new Exception ("BondPriceFunction::priceFromYieldBasis => Invalid Inputs");
+		}
+
+		return projectedBondValueListMap.firstEntry().getValue().get (0);
+	}
+
+	/**
+	 * Retrieve the Base Yield <i>CalibrateAndSensitivity</i> Instance given the Price
+	 * 
+	 * @param spotTime The Spot Time
+	 * @param calibrationEndTime The Calibration End Time
+	 * @param price Price
+	 * 
+	 * @return Base Yield <i>CalibrateAndSensitivity</i> Instance
+	 */
+
+	public CalibrateAndSensitivity baseYieldForPrice (
+		final double spotTime,
+		final double calibrationEndTime,
+		final double price)
+	{
+		try {
+			return !NumberUtil.IsValid (calibrationEndTime) || 0. >= calibrationEndTime ||
+				_evaluator.maturityTime (spotTime) < calibrationEndTime ?
+					null : CalibrateAndSensitivity.Standard (
+					new FixedPointFinderBrent (
+						price,
+						new R1ToR1 (null)
+						{
+							@Override public double evaluate (
+								final double projectedBaseForwardYield)
+								throws Exception
+							{
+								return priceFromBaseForwardYield (
+									calibrationEndTime,
+									projectedBaseForwardYield
+								);
+							}
+						},
+						true
+					).findRoot()
+				);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Retrieve the Yield Basis <i>CalibrateAndSensitivity</i> Instance given the Price
+	 * 
+	 * @param spotDate Spot Date
+	 * @param price Price
+	 * 
+	 * @return Yield Basis <i>CalibrateAndSensitivity</i> Instance
+	 */
+
+	public CalibrateAndSensitivity yieldBasisForPrice (
+		final JulianDate spotDate,
+		final double price)
+	{
+		try {
+			FixedPointFinderOutput fixedPointFinderOutput = new FixedPointFinderBracketing (
+				price,
+				new R1ToR1 (null)
+				{
+					@Override public double evaluate (
+						final double yieldBasis)
+						throws Exception
+					{
+						return priceFromYieldBasis (spotDate, yieldBasis);
+					}
+				},
+				null,
+				VariateIteratorPrimitive.BISECTION,
+				true
+			).findRoot();
+
+			return CalibrateAndSensitivity.Standard (fixedPointFinderOutput);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 }

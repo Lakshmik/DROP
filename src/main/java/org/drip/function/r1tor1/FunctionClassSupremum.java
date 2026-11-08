@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,55 +92,67 @@ package org.drip.function.r1tor1;
 
 /**
  * <i>FunctionClassSupremum</i> implements the Univariate Function that corresponds to the Supremum among the
- * specified Class of Functions.
+ *  specified Class of Functions. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>FunctionClassSupremum</i> Constructor</li>
+ * 		<li>Retrieve the Class of Functions</li>
+ * 		<li>Retrieve the Supremum Function corresponding to the specified Variate</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class FunctionClassSupremum extends org.drip.function.definition.R1ToR1 {
-	class IndexSupremum {
-		int _iIndex = -1;
-		double _dblSupremum = java.lang.Double.NaN;
+public class FunctionClassSupremum
+	extends R1ToR1
+{
+	class IndexSupremum
+	{
+		int _index = -1;
+		double _supremum = Double.NaN;
 
 		IndexSupremum (
-			final int iIndex,
-			final double dblSupremum)
+			final int index,
+			final double supremum)
 		{
-			_iIndex = iIndex;
-			_dblSupremum = dblSupremum;
+			_index = index;
+			_supremum = supremum;
 		}
 	};
 
-	private org.drip.function.definition.R1ToR1[] _aAUClass = null;
+	private R1ToR1[] _r1ToR1Array = null;
 
 	private IndexSupremum supremum (
-		final double dblVariate)
+		final double variate)
 	{
-		int iIndex = 0;
-		int iNumFunction = _aAUClass.length;
+		int supremumIndex = 0;
 
 		try {
-			double dblSupremum = _aAUClass[0].evaluate (dblVariate);
+			double supremum = _r1ToR1Array[0].evaluate (variate);
 
-			for (int i = 1; i < iNumFunction; ++i) {
-				double dblValue = _aAUClass[i].evaluate (dblVariate);
+			for (int functionIndex = 1; functionIndex < _r1ToR1Array.length; ++functionIndex) {
+				double value = _r1ToR1Array[functionIndex].evaluate (variate);
 
-				if (dblValue > dblSupremum) {
-					iIndex = i;
-					dblSupremum = dblValue;
+				if (value > supremum) {
+					supremumIndex = functionIndex;
+					supremum = value;
 				}
 			}
 
-			return new IndexSupremum (iIndex, dblSupremum);
-		} catch (java.lang.Exception e) {
+			return new IndexSupremum (supremumIndex, supremum);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -138,21 +160,22 @@ public class FunctionClassSupremum extends org.drip.function.definition.R1ToR1 {
 	}
 
 	/**
-	 * FunctionClassSupremum Cnstructor
+	 * <i>FunctionClassSupremum</i> Constructor
 	 * 
-	 * @param aAUClass Array of Functions in the Class
+	 * @param r1ToR1Array Array of Functions in the Class
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public FunctionClassSupremum (
-		final org.drip.function.definition.R1ToR1[] aAUClass)
-		throws java.lang.Exception
+		final R1ToR1[] r1ToR1Array)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_aAUClass = aAUClass) || 0 == _aAUClass.length)
-			throw new java.lang.Exception ("FunctionClassSupremum ctr => Invalid Inputs");
+		if (null == (_r1ToR1Array = r1ToR1Array) || 0 == _r1ToR1Array.length) {
+			throw new Exception ("FunctionClassSupremum Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -161,60 +184,97 @@ public class FunctionClassSupremum extends org.drip.function.definition.R1ToR1 {
 	 * @return The Class of Functions
 	 */
 
-	public org.drip.function.definition.R1ToR1[] functionClass()
+	public R1ToR1[] r1ToR1Array()
 	{
-		return _aAUClass;
+		return _r1ToR1Array;
 	}
 
 	/**
 	 * Retrieve the Supremum Function corresponding to the specified Variate
 	 * 
-	 * @param dblVariate The Variate
+	 * @param variate The Variate
 	 * 
 	 * @return The Supremum Function corresponding to the specified Variate
 	 */
 
-	public org.drip.function.definition.R1ToR1 supremumFunction (
-		final double dblVariate)
+	public R1ToR1 supremumFunction (
+		final double variate)
 	{
-		IndexSupremum is = supremum (dblVariate);
+		IndexSupremum indexSupremum = supremum (variate);
 
-		return null == is ? null : _aAUClass[is._iIndex];
+		return null == indexSupremum ? null : _r1ToR1Array[indexSupremum._index];
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		IndexSupremum is = supremum (dblVariate);
+		IndexSupremum indexSupremum = supremum (variate);
 
-		if (null == is) throw new java.lang.Exception ("FunctionClassSupremum::evaluate => Invalid Inputs");
+		if (null == indexSupremum) {
+			throw new Exception ("FunctionClassSupremum::evaluate => Invalid Inputs");
+		}
 
-		return is._dblSupremum;
+		return indexSupremum._supremum;
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		IndexSupremum is = supremum (dblVariate);
+		IndexSupremum indexSupremum = supremum (variate);
 
-		if (null == is)
-			throw new java.lang.Exception ("FunctionClassSupremum::derivative => Invalid Inputs");
+		if (null == indexSupremum) {
+			throw new Exception ("FunctionClassSupremum::derivative => Invalid Inputs");
+		}
 
-		return _aAUClass[is._iIndex].derivative (dblVariate, iOrder);
+		return _r1ToR1Array[indexSupremum._index].derivative (variate, order);
 	}
 
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
 	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
+		final double begin,
+		final double end)
+		throws Exception
 	{
-		IndexSupremum is = supremum (0.5 * (dblBegin + dblEnd));
+		IndexSupremum indexSupremum = supremum (0.5 * (begin + end));
 
-		if (null == is) throw new java.lang.Exception ("FunctionClassSupremum::integrate => Invalid Inputs");
+		if (null == indexSupremum) {
+			throw new Exception ("FunctionClassSupremum::integrate => Invalid Inputs");
+		}
 
-		return _aAUClass[is._iIndex].integrate (dblBegin, dblEnd);
+		return _r1ToR1Array[indexSupremum._index].integrate (begin, end);
 	}
 }

@@ -473,6 +473,7 @@ org.drip.state.credit
 org.drip.state.csa
 org.drip.state.curve
 org.drip.state.discount
+org.drip.state.eostree
 org.drip.state.estimator
 org.drip.state.forward
 org.drip.state.fx

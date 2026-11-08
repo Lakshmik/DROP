@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,20 +95,34 @@ package org.drip.function.r1tor1;
 
 /**
  * <i>HyperbolicTension</i> provides the evaluation of the Hyperbolic Tension Function and its derivatives
- * for a specified variate.
+ * 	for a specified variate. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li>Hyperbolic Tension Function Type - sinh</li>
+ * 		<li>Hyperbolic Tension Function Type - cosh</li>
+ * 		<li><i>HyperbolicTension</i> Constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
+ * 		<li>Retrieve the hyperbolic Function Type</li>
+ * 		<li>Retrieve the Tension Parameter</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class HyperbolicTension extends org.drip.function.definition.R1ToR1 {
+public class HyperbolicTension
+	extends R1ToR1
+{
 
 	/**
 	 * Hyperbolic Tension Function Type - sinh
@@ -111,83 +136,118 @@ public class HyperbolicTension extends org.drip.function.definition.R1ToR1 {
 
 	public static final int COSH = 2;
 
-	private int _iType = -1;
-	private double _dblTension = java.lang.Double.NaN;
+	private int _type = -1;
+	private double _tension = Double.NaN;
 
 	/**
-	 * HyperbolicTension constructor
+	 * <i>HyperbolicTension</i> Constructor
 	 * 
-	 * @param iType Type of the HyperbolicTension Function - SINH/COSH/TANH
-	 * @param dblTension Tension of the HyperbolicTension Function
+	 * @param type Type of the HyperbolicTension Function - SINH/COSH/TANH
+	 * @param tension Tension of the HyperbolicTension Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the input is invalid
+	 * @throws Exception Thrown if the input is invalid
 	 */
 
 	public HyperbolicTension (
-		final int iType,
-		final double dblTension)
-		throws java.lang.Exception
+		final int type,
+		final double tension)
+		throws Exception
 	{
 		super (null);
 
-		if ((SINH != (_iType = iType) && COSH != _iType) || !org.drip.numerical.common.NumberUtil.IsValid
-			(_dblTension = dblTension))
-			throw new java.lang.Exception ("HyperbolicTension ctr: Invalid Inputs");
-	}
-
-	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("HyperbolicTension::evaluate => Invalid Inputs");
-
-		return SINH == _iType ? java.lang.Math.sinh (_dblTension * dblVariate) : java.lang.Math.cosh
-			(_dblTension * dblVariate);
-	}
-
-	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 > iOrder)
-			throw new java.lang.Exception ("HyperbolicTension::derivative => Invalid Inputs");
-
-		double dblDerivFactor = 1.;
-
-		for (int i = 0; i < iOrder; ++i)
-			dblDerivFactor *= _dblTension;
-
-		return (SINH == _iType) ? dblDerivFactor * (1 == iOrder % 2 ? java.lang.Math.cosh (_dblTension *
-			dblVariate) : java.lang.Math.sinh (_dblTension * dblVariate)) : dblDerivFactor * (1 == iOrder % 2
-				? java.lang.Math.sinh (_dblTension * dblVariate) : java.lang.Math.cosh (_dblTension *
-					dblVariate));
-	}
-
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("HyperbolicTension::integrate => Invalid Inputs");
-
-		return SINH == _iType ? (java.lang.Math.cosh (_dblTension * dblEnd) - java.lang.Math.cosh
-			(_dblTension * dblBegin)) / _dblTension : (java.lang.Math.sinh (_dblTension * dblEnd) -
-				java.lang.Math.sinh (_dblTension * dblBegin)) / _dblTension;
+		if ((SINH != (_type = type) && COSH != _type) || !NumberUtil.IsValid (_tension = tension)) {
+			throw new Exception ("HyperbolicTension Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
-	 * Retrieve the hyperbolic function type
+	 * Evaluate for the given variate
 	 * 
-	 * @return Hyperbolic function type
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
+	@Override public double evaluate (
+		final double variate)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("HyperbolicTension::evaluate => Invalid Inputs");
+		}
+
+		return SINH == _type ? Math.sinh (_tension * variate) : Math.cosh (_tension * variate);
+	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
+
+	@Override public double derivative (
+		final double variate,
+		final int order)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (variate) || 0 > order) {
+			throw new Exception ("HyperbolicTension::derivative => Invalid Inputs");
+		}
+
+		double derivativeFactor = 1.;
+
+		for (int orderIndex = 0; orderIndex < order; ++orderIndex) {
+			derivativeFactor *= _tension;
+		}
+
+		return SINH == _type ? derivativeFactor * (
+			1 == order % 2 ? Math.cosh (_tension * variate) : Math.sinh (_tension * variate)
+		) : derivativeFactor * (
+			1 == order % 2 ? Math.sinh (_tension * variate) : Math.cosh (_tension * variate)
+		);
+	}
+
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("HyperbolicTension::integrate => Invalid Inputs");
+		}
+
+		return SINH == _type ?
+			(Math.cosh (_tension * end) - Math.cosh (_tension * begin)) / _tension :
+			(Math.sinh (_tension * end) - Math.sinh (_tension * begin)) / _tension;
+	}
+
+	/**
+	 * Retrieve the hyperbolic Function Type
+	 * 
+	 * @return Hyperbolic Function Type
 	 */
 
 	public int getType()
 	{
-		return _iType;
+		return _type;
 	}
 
 	/**
@@ -198,25 +258,6 @@ public class HyperbolicTension extends org.drip.function.definition.R1ToR1 {
 
 	public double getTension()
 	{
-		return _dblTension;
+		return _tension;
 	}
-
-	/* public static final void main (
-		final java.lang.String[] astrArgs)
-		throws java.lang.Exception
-	{
-		HyperbolicTension e = new HyperbolicTension (SINH, 2.);
-
-		System.out.println ("E[0.0] = " + e.evaluate (0.0));
-
-		System.out.println ("E[0.5] = " + e.evaluate (0.5));
-
-		System.out.println ("E[1.0] = " + e.evaluate (1.0));
-
-		System.out.println ("EDeriv[0.0] = " + e.derivative (0.0, 2));
-
-		System.out.println ("EDeriv[0.5] = " + e.derivative (0.5, 2));
-
-		System.out.println ("EDeriv[1.0] = " + e.derivative (1.0, 2));
-	} */
 }

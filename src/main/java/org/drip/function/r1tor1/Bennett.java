@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,40 +93,59 @@ package org.drip.function.r1tor1;
 
 /**
  * <i>Bennett</i> is implementation of the Bennett's Function used in the Estimation of the Bennett's
- * Concentration Inequality.
+ * 	Concentration Inequality. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>Bennett</i> Constructor</li>
+ * 		<li>Evaluate for the given variate</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class Bennett extends org.drip.function.definition.R1ToR1 {
+public class Bennett
+	extends R1ToR1
+{
 
 	/**
-	 * Bennett constructor
+	 * <i>Bennett</i> Constructor
 	 * 
-	 * @throws java.lang.Exception Thrown if Bennett cannot be instantiated
+	 * @throws Exception Thrown if Bennett cannot be instantiated
 	 */
 
 	public Bennett()
-		throws java.lang.Exception
+		throws Exception
 	{
 		super (null);
 	}
 
-	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || dblVariate < 0.)
-			throw new java.lang.Exception ("Bennett::evaluate => Invalid Inputs");
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return (1. + dblVariate) * java.lang.Math.log (1. + dblVariate) - dblVariate;
+	@Override public double evaluate (
+		final double variate)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (variate) || variate < 0.) {
+			throw new Exception ("Bennett::evaluate => Invalid Inputs");
+		}
+
+		return (1. + variate) * Math.log (1. + variate) - variate;
 	}
 }

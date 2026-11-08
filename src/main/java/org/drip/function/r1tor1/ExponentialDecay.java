@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,80 +93,128 @@ package org.drip.function.r1tor1;
  */
 
 /**
- * <i>ExponentialDecay</i> implements the scaled exponential decay Univariate Function.
+ * <i>ExponentialDecay</i> implements the scaled exponential decay Univariate Function. It exposes the
+ * 	following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>ExponentialDecay</i> Constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
+ * 		<li>Retrieve the Epoch</li>
+ * 		<li>Retrieve the Hazard</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class ExponentialDecay extends org.drip.function.definition.R1ToR1 {
-	private double _dblEpoch = java.lang.Double.NaN;
-	private double _dblHazard = java.lang.Double.NaN;
+public class ExponentialDecay
+	extends R1ToR1
+{
+	private double _epoch = Double.NaN;
+	private double _hazard = Double.NaN;
 
 	/**
-	 * ExponentialDecay constructor
+	 * <i>ExponentialDecay</i> Constructor
 	 * 
-	 * @param dblEpoch The Starting Epoch
-	 * @param dblHazard The Exponential Decay Hazard Rate
+	 * @param epoch The Starting Epoch
+	 * @param hazard The Exponential Decay Hazard Rate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public ExponentialDecay (
-		final double dblEpoch,
-		final double dblHazard)
-		throws java.lang.Exception
+		final double epoch,
+		final double hazard)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblEpoch = dblEpoch) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblHazard = dblHazard))
-			throw new java.lang.Exception ("ExponentialDecay ctr => Invalid Inputs");
+		if (!NumberUtil.IsValid (_epoch = epoch) || !NumberUtil.IsValid (_hazard = hazard)) {
+			throw new Exception ("ExponentialDecay Constructor => Invalid Inputs");
+		}
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("ExponentialDecay::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("ExponentialDecay::evaluate => Invalid Inputs");
+		}
 
-		return java.lang.Math.exp (-1. * _dblHazard * (dblVariate - _dblEpoch));
+		return Math.exp (-1. * _hazard * (variate - _epoch));
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 >= iOrder)
-			throw new java.lang.Exception ("ExponentialDecay::derivative => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate) || 0 >= order) {
+			throw new Exception ("ExponentialDecay::derivative => Invalid Inputs");
+		}
 
-		double dblDerivativeFactor = 1;
+		double derivativeFactor = 1;
 
-		for (int i = 0; i < iOrder; ++i)
-			dblDerivativeFactor *= (-1. * _dblHazard);
+		for (int orderIndex = 0; orderIndex < order; ++orderIndex) {
+			derivativeFactor *= (-1. * _hazard);
+		}
 
-		return dblDerivativeFactor * evaluate (dblVariate);
+		return derivativeFactor * evaluate (variate);
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("ExponentialDecay::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return (evaluate (dblEnd) - evaluate (dblBegin)) / (-1. * _dblHazard);
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("ExponentialDecay::integrate => Invalid Inputs");
+		}
+
+		return (evaluate (end) - evaluate (begin)) / (-1. * _hazard);
 	}
 
 	/**
@@ -166,7 +225,7 @@ public class ExponentialDecay extends org.drip.function.definition.R1ToR1 {
 
 	public double epoch()
 	{
-		return _dblEpoch;
+		return _epoch;
 	}
 
 	/**
@@ -177,6 +236,6 @@ public class ExponentialDecay extends org.drip.function.definition.R1ToR1 {
 
 	public double hazard()
 	{
-		return _dblHazard;
+		return _hazard;
 	}
 }

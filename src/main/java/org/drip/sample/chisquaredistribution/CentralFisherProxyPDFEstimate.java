@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,14 +116,15 @@ import org.drip.service.env.EnvManager;
  * 				https://www.itl.nist.gov/div898/handbook/eda/section3/eda3666.htm
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -154,7 +163,6 @@ public class CentralFisherProxyPDFEstimate
 		};
 		int[] dofArray =
 		{
-			 // 1,
 			 2,
 			 3,
 			 4,
@@ -180,105 +188,159 @@ public class CentralFisherProxyPDFEstimate
 			 0.55,
 		};
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                             PROBABILITY DENSITY FUNCTION ESTIMATE                                            ||");
+		System.out.println (
+			"\t|                                             PROBABILITY DENSITY FUNCTION ESTIMATE                                            ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom                                                                                          ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom                                                                                          ||"
+		);
 
-		System.out.println ("\t|                - Values for different t                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different t                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int dof : dofArray)
-		{
-			R1CentralFisherProxy r1UnivariateFisherProxy = new R1CentralFisherProxy (dof);
+		for (int dof : dofArray) {
+			R1CentralFisherProxy r1CentralChisquaredFisherProxy = new R1CentralFisherProxy (dof);
 
 			String display = "\t| [" + FormatUtil.FormatDouble (dof, 1, 0, 1., false) + "] =>";
 
-			for (double t : tArray)
-			{
+			for (double t : tArray) {
 				display = display + " " + FormatUtil.FormatDouble (
-					r1UnivariateFisherProxy.density (t), 1, 5, 1., false
+					r1CentralChisquaredFisherProxy.density (t),
+					1,
+					5,
+					1.,
+					false
 				) + " |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                           CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                          ||");
+		System.out.println (
+			"\t|                                           CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                          ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom                                                                                          ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom                                                                                          ||"
+		);
 
-		System.out.println ("\t|                - Values for different t                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different t                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int dof : dofArray)
-		{
-			R1CentralFisherProxy r1UnivariateFisherProxy = new R1CentralFisherProxy (dof);
+		for (int dof : dofArray) {
+			R1CentralFisherProxy r1CentralChisquaredFisherProxy = new R1CentralFisherProxy (dof);
 
 			String display = "\t| [" + FormatUtil.FormatDouble (dof, 1, 0, 1., false) + "] =>";
 
-			for (double t : tArray)
-			{
+			for (double t : tArray) {
 				display = display + " " + FormatUtil.FormatDouble (
-					r1UnivariateFisherProxy.cumulative (t), 1, 5, 1., false
+					r1CentralChisquaredFisherProxy.cumulative (t),
+					1,
+					5,
+					1.,
+					false
 				) + " |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                       INVERSE CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                      ||");
+		System.out.println (
+			"\t|                                       INVERSE CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom                                                                                          ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom                                                                                          ||"
+		);
 
-		System.out.println ("\t|                - Values for different p                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different p                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int dof : dofArray)
-		{
+		for (int dof : dofArray) {
 			R1CentralFisherProxy r1UnivariateFisherProxy = new R1CentralFisherProxy (dof);
 
 			String display = "\t| [" + FormatUtil.FormatDouble (dof, 1, 0, 1., false) + "] =>";
 
-			for (double p : pValueArray)
-			{
+			for (double p : pValueArray) {
 				display = display + " " + FormatUtil.FormatDouble (
-					r1UnivariateFisherProxy.invCumulative (p), 1, 5, 1., false
+					r1UnivariateFisherProxy.invCumulative (p),
+					1,
+					5,
+					1.,
+					false
 				) + " |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

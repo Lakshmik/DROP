@@ -602,7 +602,7 @@ public class KalotayWilliamsFabozzi
 
 		double frontalDiscountFactorAdjustment =
 			1. + _timeToZeroVolatilityPeriodStateMap.firstEntry().getValue().cumulativeMarketYield() *
-				(segmentStartTime - bespokeTime);
+				(bespokeTime - segmentStartTime);
 
 		List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
 			new ArrayList<KalotayWilliamsFabozziPeriodState>();

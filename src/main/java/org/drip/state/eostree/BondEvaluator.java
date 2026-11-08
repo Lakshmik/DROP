@@ -1,12 +1,13 @@
 
-package org.drip.state.municipal;
+package org.drip.state.eostree;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
 import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
+import org.drip.state.municipal.BondSensitivity;
+import org.drip.state.municipal.KalotayWilliamsFabozzi;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -85,8 +86,8 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>ProxyBondEvaluator</i> implements the Bond Proxy Evaluator to be used in the Kalotay, Williams, and
- *  Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
+ * <i>BondEvaluator</i> exports the Bond Evaluator Functionality to be used in the Kalotay, Williams, and
+ * 	Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -117,93 +118,18 @@ import org.drip.numerical.common.NumberUtil;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/README.md">Latent State Inference and Creation Utilities</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/municipal/README.md">Municipal Latent State Curve Estimator</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/eostree/README.md">EOS Bond Tree Based Valuation</a></td></tr>
  *  </table>
  *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ProxyBondEvaluator
+public abstract class BondEvaluator
 {
 	private static final double SENSITIVITY_BUMP = 0.0001;
 
-	private double _coupon = Double.NaN;
-	private double _maturityTime = Double.NaN;
-	private TreeMap<Double, Double> _putPriceSchedule = null;
-	private TreeMap<Double, Double> _callPriceSchedule = null;
-
-	/**
-	 * Construct a Bullet Instance of <i>ProxyBondEvaluator</i>
-	 * 
-	 * @param maturityTime Bond Maturity Time
-	 * @param coupon Bond Coupon
-	 * 
-	 * @return Bullet Instance of <i>ProxyBondEvaluator</i>
-	 */
-
-	public static final ProxyBondEvaluator Bullet (
-		final double maturityTime,
-		final double coupon)
-	{
-		try {
-			return new ProxyBondEvaluator (maturityTime, coupon, null, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Construct a Callable Instance of <i>ProxyBondEvaluator</i>
-	 * 
-	 * @param maturityTime Bond Maturity Time
-	 * @param coupon Bond Coupon
-	 * @param callPriceSchedule Call Price Schedule
-	 * 
-	 * @return Callable Instance of <i>ProxyBondEvaluator</i>
-	 */
-
-	public static final ProxyBondEvaluator Callable (
-		final double maturityTime,
-		final double coupon,
-		final TreeMap<Double, Double> callPriceSchedule)
-	{
-		try {
-			return new ProxyBondEvaluator (maturityTime, coupon, callPriceSchedule, null);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	/**
-	 * Construct a Puttable Instance of <i>ProxyBondEvaluator</i>
-	 * 
-	 * @param maturityTime Bond Maturity Time
-	 * @param coupon Bond Coupon
-	 * @param putPriceSchedule Put Price Schedule
-	 * 
-	 * @return Puttable Instance of <i>ProxyBondEvaluator</i>
-	 */
-
-	public static final ProxyBondEvaluator Puttable (
-		final double maturityTime,
-		final double coupon,
-		final TreeMap<Double, Double> putPriceSchedule)
-	{
-		try {
-			return new ProxyBondEvaluator (maturityTime, coupon, null, putPriceSchedule);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	private double priceFromYieldBasis (
+	protected double priceFromYieldBasis (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
 		final double annualizedForwardYieldVolatility,
@@ -220,82 +146,10 @@ public class ProxyBondEvaluator
 		TreeMap<Double, List<Double>> bumpUpValueTree = valueTree (spotDate, kalotayWilliamsFabozzi);
 
 		if (null == bumpUpValueTree) {
-			throw new Exception ("ProxyBond::priceFromYieldBasis => Cannot calculate Price");
+			throw new Exception ("BondEvaluator::priceFromYieldBasis => Cannot calculate Price");
 		}
 
 		return bumpUpValueTree.firstEntry().getValue().get (0);
-	}
-
-	/**
-	 * <i>ProxyBondEvaluator</i> Constructor
-	 * 
-	 * @param maturityTime Bond Maturity Time
-	 * @param coupon Bond Coupon
-	 * @param callPriceSchedule Call Price Schedule
-	 * @param putPriceSchedule Put Price Schedule
-	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
-	 */
-
-	public ProxyBondEvaluator (
-		final double maturityTime,
-		final double coupon,
-		final TreeMap<Double, Double> callPriceSchedule,
-		final TreeMap<Double, Double> putPriceSchedule)
-		throws Exception
-	{
-		if (!NumberUtil.IsValid (_maturityTime = maturityTime) || 0. >= _maturityTime ||
-			!NumberUtil.IsValid (_coupon = coupon) || 0. > _coupon)
-		{
-			throw new Exception ("ProxyBondEvaluator Constructor => Invalid Inputs");
-		}
-
-		_callPriceSchedule = callPriceSchedule;
-		_putPriceSchedule = putPriceSchedule;
-	}
-
-	/**
-	 * Retrieve the Bond Maturity Time
-	 * 
-	 * @return Bond Maturity Time
-	 */
-
-	public double maturityTime()
-	{
-		return _maturityTime;
-	}
-
-	/**
-	 * Retrieve the Bond Coupon
-	 * 
-	 * @return Bond Coupon
-	 */
-
-	public double coupon()
-	{
-		return _coupon;
-	}
-
-	/**
-	 * Retrieve the Bond Call Price Schedule
-	 * 
-	 * @return Bond Call Price Schedule
-	 */
-
-	public TreeMap<Double, Double> callPriceSchedule()
-	{
-		return _callPriceSchedule;
-	}
-
-	/**
-	 * Retrieve the Bond Put Price Schedule
-	 * 
-	 * @return Bond Put Price Schedule
-	 */
-
-	public TreeMap<Double, Double> putPriceSchedule()
-	{
-		return _putPriceSchedule;
 	}
 
 	/**
@@ -307,63 +161,24 @@ public class ProxyBondEvaluator
 	 * @return Bond Value Tree
 	 */
 
-	public TreeMap<Double, List<Double>> valueTree (
+	public abstract TreeMap<Double, List<Double>> valueTree (
 		final JulianDate spotDate,
-		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
-	{
-		if (null == kalotayWilliamsFabozzi) {
-			return null;
-		}
+		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi
+	);
 
-		double endTimePayoff = 1. + _coupon;
-		List<Double> aboveProjectedBondValueList = null;
+	/**
+	 * Retrieve the Bond Maturity Time
+	 * 
+	 * @param spotTime Spot Time
+	 * 
+	 * @return Bond Maturity Time
+	 * 
+	 * @throws Thrown if the Maturity Time cannot be calculated
+	 */
 
-		TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
-
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
-
-		for (double endTime : timeToProjectedPeriodStateMap.descendingKeySet()) {
-			if (endTime > _maturityTime) {
-				continue;
-			}
-
-			List<Double> projectedBondValueList = new ArrayList<Double>();
-
-			List<KalotayWilliamsFabozziPeriodState> projectedPeriodStateList =
-				timeToProjectedPeriodStateMap.get (endTime);
-
-			double startTime = projectedPeriodStateList.get (0).period().startTime();
-
-			for (int projectionIndex = 0;
-				projectionIndex < projectedPeriodStateList.size();
-				++projectionIndex)
-			{
-				double aboveNodeBondPriceAverage = null == aboveProjectedBondValueList ?
-					endTimePayoff : _coupon + 0.5 * (
-						aboveProjectedBondValueList.get (projectionIndex) +
-							aboveProjectedBondValueList.get (projectionIndex + 1)
-					);
-
-				double discountedPrice = aboveNodeBondPriceAverage *
-					projectedPeriodStateList.get (projectionIndex).forwardDiscountFactor();
-
-				if (null != _callPriceSchedule && _callPriceSchedule.containsKey (startTime)) {
-					discountedPrice = Math.min (discountedPrice, _callPriceSchedule.get (startTime));
-				}
-
-				if (null != _putPriceSchedule && _putPriceSchedule.containsKey (startTime)) {
-					discountedPrice = Math.max (discountedPrice, _putPriceSchedule.get (startTime));
-				}
-
-				projectedBondValueList.add (discountedPrice);
-			}
-
-			valueTree.put (startTime, aboveProjectedBondValueList = projectedBondValueList);
-		}
-
-		return valueTree;
-	}
+	public abstract double maturityTime (
+		final double spotTime
+	) throws Exception;
 
 	/**
 	 * Generate the Secular Bond Sensitivity Measures from the Yield Basis

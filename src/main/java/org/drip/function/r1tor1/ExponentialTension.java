@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,88 +95,135 @@ package org.drip.function.r1tor1;
 
 /**
  * <i>ExponentialTension</i> provides the evaluation of the Exponential Tension Function and its derivatives
- * for a specified variate.
+ * 	for a specified variate. It exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>ExponentialTension</i> Constructor</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
+ * 		<li>Is the base natural?</li>
+ * 		<li>Retrieve the Base</li>
+ * 		<li>Retrieve the Tension Parameter</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ExponentialTension extends org.drip.function.definition.R1ToR1 {
-	private boolean _bIsBaseNatural = false;
-	private double _dblBase = java.lang.Double.NaN;
-	private double _dblTension = java.lang.Double.NaN;
+public class ExponentialTension
+	extends R1ToR1
+{
+	private double _base = Double.NaN;
+	private double _tension = Double.NaN;
+	private boolean _isBaseNatural = false;
 
 	/**
-	 * ExponentialTension constructor
+	 * <i>ExponentialTension</i> Constructor
 	 * 
-	 * @param dblBase Base of the ExponentialTension Function
-	 * @param dblTension Tension of the ExponentialTension Function
+	 * @param base Base of the ExponentialTension Function
+	 * @param tension Tension of the ExponentialTension Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the input is invalid
+	 * @throws Exception Thrown if the input is invalid
 	 */
 
 	public ExponentialTension (
-		final double dblBase,
-		final double dblTension)
-		throws java.lang.Exception
+		final double base,
+		final double tension)
+		throws Exception
 	{
 		super (null);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_dblBase = dblBase) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_dblTension = dblTension))
-			throw new java.lang.Exception ("ExponentialTension ctr: Invalid Inputs");
+		if (!NumberUtil.IsValid (_base = base) || !NumberUtil.IsValid (_tension = tension)) {
+			throw new Exception ("ExponentialTension Constructor => Invalid Inputs");
+		}
 
-		_bIsBaseNatural = _dblBase == java.lang.Math.E;
+		_isBaseNatural = _base == Math.E;
 	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
 	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+		final double variate)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate))
-			throw new java.lang.Exception ("ExponentialTension::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate)) {
+			throw new Exception ("ExponentialTension::evaluate => Invalid Inputs");
+		}
 
-		return _bIsBaseNatural ? java.lang.Math.exp (_dblTension * dblVariate) : java.lang.Math.pow
-			(_dblBase, _dblTension * dblVariate);
+		return _isBaseNatural ? Math.exp (_tension * variate) : Math.pow (_base, _tension * variate);
 	}
+
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
 
 	@Override public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 > iOrder)
-			throw new java.lang.Exception ("ExponentialTension::derivative => Invalid Inputs");
+		if (!NumberUtil.IsValid (variate) || 0 > order) {
+			throw new Exception ("ExponentialTension::derivative => Invalid Inputs");
+		}
 
-		double dblDerivFactor = 1.;
+		double derivativeFactor = 1.;
 
-		for (int i = 0; i < iOrder; ++i)
-			dblDerivFactor *= _dblTension;
+		for (int orderIndex = 0; orderIndex < order; ++orderIndex) {
+			derivativeFactor *= _tension;
+		}
 
-		return _bIsBaseNatural ? dblDerivFactor * java.lang.Math.exp (_dblTension * dblVariate) :
-			dblDerivFactor * java.lang.Math.exp (_dblTension * dblVariate);
+		return _isBaseNatural ? derivativeFactor * Math.exp (_tension * variate) :
+			derivativeFactor * Math.exp (_tension * variate);
 	}
 
-	@Override public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
-	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblBegin) || !org.drip.numerical.common.NumberUtil.IsValid
-			(dblEnd))
-			throw new java.lang.Exception ("ExponentialTension::integrate => Invalid Inputs");
+	/**
+	 * Integrate over the given range
+	 * 
+	 * @param begin Range Begin 
+	 * @param end Range End 
+	 *  
+	 * @return The Integrated Value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
 
-		return _bIsBaseNatural ? (java.lang.Math.exp (_dblTension * dblEnd) - java.lang.Math.exp (_dblTension
-			* dblBegin)) / _dblTension : (java.lang.Math.pow (_dblBase, _dblTension * dblEnd) -
-				java.lang.Math.pow (_dblBase, _dblTension * dblBegin)) / (_dblTension * java.lang.Math.log
-					(_dblBase));
+	@Override public double integrate (
+		final double begin,
+		final double end)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (begin) || !NumberUtil.IsValid (end)) {
+			throw new Exception ("ExponentialTension::integrate => Invalid Inputs");
+		}
+
+		return _isBaseNatural ?
+			(Math.exp (_tension * end) - Math.exp (_tension * begin)) / _tension :
+			(Math.pow (_base, _tension * end) - Math.pow (_base, _tension * begin)) /
+				(_tension * Math.log (_base));
 	}
 
 	/**
@@ -176,7 +234,7 @@ public class ExponentialTension extends org.drip.function.definition.R1ToR1 {
 
 	public boolean isBaseNatural()
 	{
-		return _bIsBaseNatural;
+		return _isBaseNatural;
 	}
 
 	/**
@@ -187,7 +245,7 @@ public class ExponentialTension extends org.drip.function.definition.R1ToR1 {
 
 	public double getBase()
 	{
-		return _dblBase;
+		return _base;
 	}
 
 	/**
@@ -198,25 +256,6 @@ public class ExponentialTension extends org.drip.function.definition.R1ToR1 {
 
 	public double getTension()
 	{
-		return _dblTension;
+		return _tension;
 	}
-
-	/* public static final void main (
-		final java.lang.String[] astrArgs)
-		throws java.lang.Exception
-	{
-		ExponentialTension e = new ExponentialTension (java.lang.Math.E, 2.);
-
-		System.out.println ("E[0.0] = " + e.evaluate (0.0));
-
-		System.out.println ("E[0.5] = " + e.evaluate (0.5));
-
-		System.out.println ("E[1.0] = " + e.evaluate (1.0));
-
-		System.out.println ("EDeriv[0.0] = " + e.derivative (0.0, 2));
-
-		System.out.println ("EDeriv[0.5] = " + e.derivative (0.5, 2));
-
-		System.out.println ("EDeriv[1.0] = " + e.derivative (1.0, 2));
-	} */
 }

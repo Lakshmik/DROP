@@ -18511,4 +18511,18 @@ public class BondComponent extends org.drip.product.definition.Bond implements
 				"->" + org.drip.analytics.date.DateUtil.YYYYMMDD (period.endDate()) + "    " +
 					period.accrualDCF (period.endDate()));
 	}
+
+	/**
+	 * Retrieve the Period Instance enveloping the specified Date
+	 * 
+	 * @param dateJulian The Date
+	 * 
+	 * @return The Period Instance enveloping the specified Date
+	 */
+
+	@Override public org.drip.analytics.cashflow.CompositePeriod containingPeriod (
+		final int dateJulian)
+	{
+		return _stream.containingPeriod (dateJulian);
+	}
 }

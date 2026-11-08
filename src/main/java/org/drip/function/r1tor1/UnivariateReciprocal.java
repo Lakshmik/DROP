@@ -1,11 +1,21 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,43 +92,76 @@ package org.drip.function.r1tor1;
  */
 
 /**
- * <i>UnivariateReciprocal</i> provides the evaluation 1/f(x) instead of f(x) for a given f.
+ * <i>UnivariateReciprocal</i> provides the evaluation 1/f(x) instead of f(x) for a given f. It exposes the
+ * 	following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1operator/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Operator Functions</a></li>
+ * 		<li><i>UnivariateReciprocal</i> Constructor</li>
+ * 		<li>Retrieve the Base Function</li>
+ * 		<li>Evaluate for the given variate</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class UnivariateReciprocal extends org.drip.function.definition.R1ToR1 {
-	private org.drip.function.definition.R1ToR1 _au = null;
+public class UnivariateReciprocal
+	extends R1ToR1
+{
+	private R1ToR1 _baseFunction = null;
 
 	/**
-	 * UnivariateReciprocal constructor
+	 * <i>UnivariateReciprocal</i> Constructor
 	 * 
-	 * @param au Univariate Function
+	 * @param baseFunction Base Function
 	 * 
-	 * @throws java.lang.Exception Thrown if the input is invalid
+	 * @throws Exception Thrown if the input is invalid
 	 */
 
 	public UnivariateReciprocal (
-		final org.drip.function.definition.R1ToR1 au)
-		throws java.lang.Exception
+		final R1ToR1 baseFunction)
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_au = au)) throw new java.lang.Exception ("UnivariateReciprocal ctr: Invalid Inputs");
+		if (null == (_baseFunction = baseFunction)) {
+			throw new Exception ("UnivariateReciprocal Constructor => Invalid Inputs");
+		}
 	}
 
-	@Override public double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception
+	/**
+	 * Retrieve the Base Function
+	 * 
+	 * @return Base Function
+	 */
+
+	public R1ToR1 baseFunction()
 	{
-		return 1. / _au.evaluate (dblVariate);
+		return _baseFunction;
+	}
+
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param variate Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
+	@Override public double evaluate (
+		final double variate)
+		throws Exception
+	{
+		return 1. / _baseFunction.evaluate (variate);
 	}
 }

@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,220 +99,242 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>SingleRandomSequenceBound</i> demonstrates the Computation of the Probabilistic Bounds for a Sample
  * 	Random Sequence.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class SingleRandomSequenceBound {
+public class SingleRandomSequenceBound
+{
 
 	private static final void MarkovBound (
-		final SingleSequenceAgnosticMetrics sm,
-		final double dblLevel,
-		final R1ToR1 au)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics,
+		final double level,
+		final R1ToR1 function)
 		throws Exception
 	{
 		System.out.println (
-			(null == au ? "\tMarkov Base Bound        [" :  "\tMarkov Function Bound    [") +
-			FormatUtil.FormatDouble (dblLevel, 1, 2, 1.) + "] : " +
-			FormatUtil.FormatDouble (sm.markovUpperProbabilityBound (dblLevel, au), 1, 4, 1.) + " |" +
-			FormatUtil.FormatDouble (1. - dblLevel, 1, 4, 1.)
+			(null == function ? "\tMarkov Base Bound        [" :  "\tMarkov Function Bound    [") +
+			FormatUtil.FormatDouble (
+				level,
+				1,
+				2,
+				1.
+			) + "] : " + FormatUtil.FormatDouble (
+				singleSequenceAgnosticMetrics.markovUpperProbabilityBound (level, function),
+				1,
+				4,
+				1.
+			) + " |" + FormatUtil.FormatDouble (
+				1. - level,
+				1,
+				4,
+				1.
+			)
 		);
 	}
 
 	private static final void ChebyshevBound (
-		final SingleSequenceAgnosticMetrics sm,
-		final double dblLevel)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics,
+		final double level)
 		throws Exception
 	{
+		PivotedDepartureBounds chebyshevBound = singleSequenceAgnosticMetrics.chebyshevBound (level);
+
 		System.out.println (
-			"\tChebyshev Bound          [" +
-			FormatUtil.FormatDouble (dblLevel, 1, 2, 1.) + "] : " +
-			FormatUtil.FormatDouble (sm.chebyshevBound (dblLevel).lower(), 1, 4, 1.) + " |" +
-			FormatUtil.FormatDouble (sm.chebyshevBound (dblLevel).upper(), 1, 4, 1.) + " |" +
-			FormatUtil.FormatDouble (1. - 2. * dblLevel, 1, 4, 1.)
+			"\tChebyshev Bound          [" + FormatUtil.FormatDouble (level, 1, 2, 1.) + "] : " +
+			FormatUtil.FormatDouble (chebyshevBound.lower(), 1, 4, 1.) + " |" +
+			FormatUtil.FormatDouble (chebyshevBound.upper(), 1, 4, 1.) + " |" +
+			FormatUtil.FormatDouble (1. - 2. * level, 1, 4, 1.)
 		);
 	}
 
 	private static final void ChebyshevCantelliBound (
-		final SingleSequenceAgnosticMetrics sm,
-		final double dblLevel)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics,
+		final double level)
 		throws Exception
 	{
 		System.out.println (
-			"\tChebyshev Cantelli Bound [" +
-			FormatUtil.FormatDouble (dblLevel, 1, 2, 1.) + "] : " +
-			"        |" +
-			FormatUtil.FormatDouble (sm.chebyshevCantelliBound (dblLevel).upper(), 1, 4, 1.) + " |" +
-			FormatUtil.FormatDouble (1. - dblLevel, 1, 4, 1.)
+			"\tChebyshev Cantelli Bound [" + FormatUtil.FormatDouble (
+				level,
+				1,
+				2,
+				1.
+			) + "] : " + "        |" + FormatUtil.FormatDouble (
+				singleSequenceAgnosticMetrics.chebyshevCantelliBound (level).upper(),
+				1,
+				4,
+				1.
+			) + " |" + FormatUtil.FormatDouble (
+				1. - level,
+				1,
+				4,
+				1.
+			)
 		);
 	}
 
 	private static final void CentralMomentBound (
-		final SingleSequenceAgnosticMetrics sm,
-		final double dblLevel,
-		final int iMoment)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics,
+		final double level,
+		final int moment)
 		throws Exception
 	{
+		PivotedDepartureBounds centralMomentBound =
+			singleSequenceAgnosticMetrics.centralMomentBound (level, moment);
+
 		System.out.println (
-			"\tMoment #" + iMoment + " Bound          [" +
-			FormatUtil.FormatDouble (dblLevel, 1, 2, 1.) + "] : " +
-			FormatUtil.FormatDouble (sm.centralMomentBound (dblLevel, iMoment).lower(), 1, 4, 1.) + " |" +
-			FormatUtil.FormatDouble (sm.centralMomentBound (dblLevel, iMoment).upper(), 1, 4, 1.) + " |" +
-			FormatUtil.FormatDouble (1. - 2. * dblLevel, 1, 4, 1.)
+			"\t|| Moment #" + moment + " Bound          [" + FormatUtil.FormatDouble (level, 1, 2, 1.) +
+			"] : " + FormatUtil.FormatDouble (centralMomentBound.lower(), 1, 4, 1.) + " |" +
+			FormatUtil.FormatDouble (centralMomentBound.upper(), 1, 4, 1.) + " |" +
+			FormatUtil.FormatDouble (1. - 2. * level, 1, 4, 1.)
 		);
 	}
 
 	private static final void MarkovBound (
-		final SingleSequenceAgnosticMetrics sm,
-		final R1ToR1 au)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics,
+		final R1ToR1 function)
 		throws Exception
 	{
-		MarkovBound (sm, 0.20, au);
+		MarkovBound (singleSequenceAgnosticMetrics, 0.20, function);
 
-		MarkovBound (sm, 0.40, au);
+		MarkovBound (singleSequenceAgnosticMetrics, 0.40, function);
 
-		MarkovBound (sm, 0.59, au);
+		MarkovBound (singleSequenceAgnosticMetrics, 0.59, function);
 
-		MarkovBound (sm, 0.79, au);
+		MarkovBound (singleSequenceAgnosticMetrics, 0.79, function);
 
-		MarkovBound (sm, 0.99, au);
+		MarkovBound (singleSequenceAgnosticMetrics, 0.99, function);
 	}
 
 	private static final void ChebyshevBound (
-		final SingleSequenceAgnosticMetrics sm)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics)
 		throws Exception
 	{
-		ChebyshevBound (sm, 0.20);
+		ChebyshevBound (singleSequenceAgnosticMetrics, 0.20);
 
-		ChebyshevBound (sm, 0.25);
+		ChebyshevBound (singleSequenceAgnosticMetrics, 0.25);
 
-		ChebyshevBound (sm, 0.30);
+		ChebyshevBound (singleSequenceAgnosticMetrics, 0.30);
 
-		ChebyshevBound (sm, 0.35);
+		ChebyshevBound (singleSequenceAgnosticMetrics, 0.35);
 
-		ChebyshevBound (sm, 0.40);
+		ChebyshevBound (singleSequenceAgnosticMetrics, 0.40);
 	}
 
 	private static final void ChebyshevCantelliBound (
-		final SingleSequenceAgnosticMetrics sm)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics)
 		throws Exception
 	{
-		ChebyshevCantelliBound (sm, 0.20);
+		ChebyshevCantelliBound (singleSequenceAgnosticMetrics, 0.20);
 
-		ChebyshevCantelliBound (sm, 0.25);
+		ChebyshevCantelliBound (singleSequenceAgnosticMetrics, 0.25);
 
-		ChebyshevCantelliBound (sm, 0.30);
+		ChebyshevCantelliBound (singleSequenceAgnosticMetrics, 0.30);
 
-		ChebyshevCantelliBound (sm, 0.35);
+		ChebyshevCantelliBound (singleSequenceAgnosticMetrics, 0.35);
 
-		ChebyshevCantelliBound (sm, 0.40);
+		ChebyshevCantelliBound (singleSequenceAgnosticMetrics, 0.40);
 	}
 
 	private static final void CentralMomentBound (
-		final SingleSequenceAgnosticMetrics sm,
-		final int iMoment)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics,
+		final int moment)
 		throws Exception
 	{
-		CentralMomentBound (sm, 0.20, iMoment);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 0.20, moment);
 
-		CentralMomentBound (sm, 0.25, iMoment);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 0.25, moment);
 
-		CentralMomentBound (sm, 0.30, iMoment);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 0.30, moment);
 
-		CentralMomentBound (sm, 0.35, iMoment);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 0.35, moment);
 
-		CentralMomentBound (sm, 0.40, iMoment);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 0.40, moment);
 	}
 
 	private static final void SequenceGenerationRun (
-		final SingleSequenceAgnosticMetrics sm)
+		final SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics)
 		throws Exception
 	{
-		System.out.println ("\tExpectation                      : " + FormatUtil.FormatDouble (sm.empiricalExpectation(), 1, 4, 1.));
+		System.out.println (
+			"\t|| Expectation                      : " +
+				FormatUtil.FormatDouble (singleSequenceAgnosticMetrics.empiricalExpectation(), 1, 4, 1.)
+		);
 
-		System.out.println ("\tVariance                         : " + FormatUtil.FormatDouble (sm.empiricalVariance(), 1, 4, 1.));
+		System.out.println (
+			"\t|| Variance                         : " +
+				FormatUtil.FormatDouble (singleSequenceAgnosticMetrics.empiricalVariance(), 1, 4, 1.)
+		);
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		MarkovBound (sm, new ExponentialTension (Math.E, 0.1));
+		MarkovBound (singleSequenceAgnosticMetrics, new ExponentialTension (Math.E, 0.1));
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		MarkovBound (sm, new ExponentialTension (Math.E, 1.0));
+		MarkovBound (singleSequenceAgnosticMetrics, new ExponentialTension (Math.E, 1.0));
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		MarkovBound (sm, new ExponentialTension (Math.E, 5.0));
+		MarkovBound (singleSequenceAgnosticMetrics, new ExponentialTension (Math.E, 5.0));
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		MarkovBound (sm, null);
+		MarkovBound (singleSequenceAgnosticMetrics, null);
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		ChebyshevBound (sm);
+		ChebyshevBound (singleSequenceAgnosticMetrics);
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		ChebyshevCantelliBound (sm);
+		ChebyshevCantelliBound (singleSequenceAgnosticMetrics);
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		CentralMomentBound (sm, 3);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 3);
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		CentralMomentBound (sm, 4);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 4);
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||---------------------------------------------------");
 
-		CentralMomentBound (sm, 5);
+		CentralMomentBound (singleSequenceAgnosticMetrics, 5);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		/* System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||--------------------------------------------------|");
 
-		System.out.println ("\t|              BOUNDED GAUSSIAN RUN               |");
+		System.out.println ("\t||              BOUNDED UNIFORM RUN                 |");
 
-		System.out.println ("\t---------------------------------------------------");
-
-		SequenceGenerationRun (new BoundedGaussian (0.5, 1., 0., 1.).sequence (50000, null));
-
-		System.out.println ("\t---------------------------------------------------");
-
-		System.out.println(); */
-
-		System.out.println ("\t---------------------------------------------------");
-
-		System.out.println ("\t|              BOUNDED UNIFORM RUN                |");
-
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||--------------------------------------------------|");
 
 		SequenceGenerationRun (new BoundedUniform (0., 1.).sequence (50000, null));
 
-		System.out.println ("\t---------------------------------------------------");
+		System.out.println ("\t||--------------------------------------------------|");
 
 		EnvManager.TerminateEnv();
 	}

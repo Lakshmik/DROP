@@ -35,6 +35,14 @@ import org.drip.state.govvie.GovvieCurve;
 import org.drip.state.identifier.ForwardLabel;
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -114,461 +122,573 @@ import org.drip.state.identifier.ForwardLabel;
 /**
  * <i>YAS</i> contains the sample demonstrating the replication of Bloomberg's YAS functionality.
  *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ProductCore.md">Product Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/bloomberg/README.md">Bloomberg CDSO CDSW SWPM YAS</a></li>
- *  </ul>
- * <br><br>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/bloomberg/README.md">Bloomberg CDSO CDSW SWPM YAS</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class YAS {
+public class YAS
+{
 	private static final String FIELD_SEPARATOR = "    ";
 
 	private static final FixFloatComponent OTCIRS (
-		final JulianDate dtSpot,
-		final String strCurrency,
-		final String strMaturityTenor,
-		final double dblCoupon)
+		final JulianDate spotDate,
+		final String currency,
+		final String maturityTenor,
+		final double coupon)
 	{
-		FixedFloatSwapConvention ffConv = IBORFixedFloatContainer.ConventionFromJurisdiction (
-			strCurrency,
+		return IBORFixedFloatContainer.ConventionFromJurisdiction (
+			currency,
 			"ALL",
-			strMaturityTenor,
+			maturityTenor,
 			"MAIN"
-		);
-
-		return ffConv.createFixFloatComponent (
-			dtSpot,
-			strMaturityTenor,
-			dblCoupon,
+		).createFixFloatComponent (
+			spotDate,
+			maturityTenor,
+			coupon,
 			0.,
 			1.
 		);
 	}
 
-	/*
-	 * Sample demonstrating building of rates curve from cash/future/swaps
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static MergedDiscountForwardCurve BuildRatesCurveFromInstruments (
-		final JulianDate dtStart,
-		final String[] astrCashTenor,
-		final double[] adblCashRate,
-		final String[] astrIRSTenor,
-		final double[] adblIRSRate,
-		final double dblBump,
-		final String strCurrency)
+		final JulianDate startDate,
+		final String[] cashTenorArray,
+		final double[] cashRateArray,
+		final String[] irsTenorArray,
+		final double[] irsRateArray,
+		final double bump,
+		final String currency)
 		throws Exception
 	{
-		int iNumDCInstruments = astrCashTenor.length + adblIRSRate.length;
-		int aiDate[] = new int[iNumDCInstruments];
-		double adblRate[] = new double[iNumDCInstruments];
-		String astrCalibMeasure[] = new String[iNumDCInstruments];
-		double adblCompCalibValue[] = new double[iNumDCInstruments];
-		CalibratableComponent aCompCalib[] = new CalibratableComponent[iNumDCInstruments];
+		int instrumentCount = cashTenorArray.length + irsRateArray.length;
+		int dateArray[] = new int[instrumentCount];
+		double rateArray[] = new double[instrumentCount];
+		double calibrationValueArray[] = new double[instrumentCount];
+		String calibrationMeasureArray[] = new String[instrumentCount];
+		CalibratableComponent calibratableComponentArray[] = new CalibratableComponent[instrumentCount];
 
-		// Cash Calibration
+		JulianDate effectiveCashDate = startDate.addBusDays (1, currency);
 
-		JulianDate dtCashEffective = dtStart.addBusDays (
-			1,
-			strCurrency
-		);
+		for (int cashIndex = 0; cashIndex < cashTenorArray.length; ++cashIndex) {
+			rateArray[cashIndex] = Double.NaN;
+			calibrationMeasureArray[cashIndex] = "Rate";
+			calibrationValueArray[cashIndex] = cashRateArray[cashIndex] + bump;
 
-		for (int i = 0; i < astrCashTenor.length; ++i) {
-			astrCalibMeasure[i] = "Rate";
-			adblRate[i] = java.lang.Double.NaN;
-			adblCompCalibValue[i] = adblCashRate[i] + dblBump;
-
-			aCompCalib[i] = SingleStreamComponentBuilder.Deposit (
-				dtCashEffective,
-				new JulianDate (aiDate[i] = dtCashEffective.addTenor (astrCashTenor[i]).julian()),
+			calibratableComponentArray[cashIndex] = SingleStreamComponentBuilder.Deposit (
+				effectiveCashDate,
+				new JulianDate (
+					dateArray[cashIndex] = effectiveCashDate.addTenor (cashTenorArray[cashIndex]).julian()
+				),
 				ForwardLabel.Create (
-					strCurrency,
-					astrCashTenor[i]
+					currency,
+					cashTenorArray[cashIndex]
 				)
 			);
 		}
 
-		// IRS Calibration
+		JulianDate effectiveIRSDate = startDate.addBusDays (2, currency);
 
-		JulianDate dtIRSEffective = dtStart.addBusDays (2, strCurrency);
+		for (int irsIndex = 0; irsIndex < irsTenorArray.length; ++irsIndex) {
+			rateArray[irsIndex + cashTenorArray.length] = Double.NaN;
+			calibrationMeasureArray[irsIndex + cashTenorArray.length] = "SwapRate";
+			calibrationValueArray[irsIndex + cashTenorArray.length] = irsRateArray[irsIndex] + bump;
 
-		for (int i = 0; i < astrIRSTenor.length; ++i) {
-			astrCalibMeasure[i + astrCashTenor.length] = "SwapRate";
-			adblRate[i + astrCashTenor.length] = java.lang.Double.NaN;
-			adblCompCalibValue[i + astrCashTenor.length] = adblIRSRate[i] + dblBump;
+			dateArray[irsIndex + cashTenorArray.length] =
+				effectiveIRSDate.addTenor (irsTenorArray[irsIndex]).julian();
 
-			aiDate[i + astrCashTenor.length] = dtIRSEffective.addTenor (astrIRSTenor[i]).julian();
-
-			aCompCalib[i + astrCashTenor.length] = OTCIRS (
-				dtIRSEffective,
-				strCurrency,
-				astrIRSTenor[i],
+			calibratableComponentArray[irsIndex + cashTenorArray.length] = OTCIRS (
+				effectiveIRSDate,
+				currency,
+				irsTenorArray[irsIndex],
 				0.
 			);
 		}
 
-		/*
-		 * Build the IR curve from the components, their calibration measures, and their calibration quotes.
-		 */
-
 		return ScenarioDiscountCurveBuilder.NonlinearBuild (
-			dtStart,
-			strCurrency,
-			aCompCalib,
-			adblCompCalibValue,
-			astrCalibMeasure,
+			startDate,
+			currency,
+			calibratableComponentArray,
+			calibrationValueArray,
+			calibrationMeasureArray,
 			null
 		);
 	}
 
-	/*
-	 * Sample demonstrating creation of simple fixed coupon treasury bond
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final TreasuryComponent Treasury (
-		final String strName,
-		final double dblCoupon,
-		final JulianDate dt,
-		final String strTenor)
+		final String name,
+		final double coupon,
+		final JulianDate date,
+		final String tenor)
 		throws Exception
 	{
-		return TreasuryBuilder.FromCode (
-			"UST",
-			dt,
-			dt.addTenor (strTenor),
-			dblCoupon
-		);
+		return TreasuryBuilder.FromCode ("UST", date, date.addTenor (tenor), coupon);
 	}
-
-	/*
-	 * Sample demonstrating creation of a set of the on-the-run treasury bonds
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final TreasuryComponent[] OTRTreasurySet (
-		final JulianDate dt,
-		final String[] astrTenor,
-		final double[] adblCoupon)
+		final JulianDate date,
+		final String[] tenorArray,
+		final double[] couponArray)
 		throws Exception
 	{
-		TreasuryComponent aTreasury[] = new TreasuryComponent[astrTenor.length];
+		TreasuryComponent[] treasuryArray = new TreasuryComponent[tenorArray.length];
 
-		for (int i = 0; i < astrTenor.length; ++i)
-			aTreasury[i] = Treasury (
-				"TSY" + astrTenor[i] + "ON",
-				adblCoupon[i],
-				dt,
-				astrTenor[i]
+		for (int tenorIndex = 0; tenorIndex < tenorArray.length; ++tenorIndex) {
+			treasuryArray[tenorIndex] = Treasury (
+				"TSY" + tenorArray[tenorIndex] + "ON",
+				couponArray[tenorIndex],
+				date,
+				tenorArray[tenorIndex]
 			);
+		}
 
-		return aTreasury;
+		return treasuryArray;
 	}
 
-	/*
-	 * Sample demonstrating building of the treasury discount curve based off the on-the run instruments and their yields
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final GovvieCurve BuildOnTheRunGovvieCurve (
-		final JulianDate dt,
-		final TreasuryComponent[] aTreasury,
-		final double[] adblYield)
+		final JulianDate date,
+		final TreasuryComponent[] treasuryArray,
+		final double[] yieldArray)
 		throws Exception
 	{
 		return ScenarioGovvieCurveBuilder.CubicPolyShapePreserver (
 			"UST",
 			"UST",
-			aTreasury[0].currency(),
-			dt.julian(),
-			aTreasury,
-			adblYield,
+			treasuryArray[0].currency(),
+			date.julian(),
+			treasuryArray,
+			yieldArray,
 			"Yield"
 		);
 	}
 
-	/*
-	 * Sample demonstrating creation of treasury quotes map
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
-
 	private static final CaseInsensitiveTreeMap<ProductQuote> MakeTSYQuotes (
-		final String[] astrTSYTenor,
-		final double[] adblTSYYield)
+		final String[] treasuryTenorArray,
+		final double[] treasuryYieldArray)
 		throws Exception
 	{
-		CaseInsensitiveTreeMap<ProductQuote> mTSYQuotes = new CaseInsensitiveTreeMap<ProductQuote>();
+		CaseInsensitiveTreeMap<ProductQuote> treasuryQuoteMap = new CaseInsensitiveTreeMap<ProductQuote>();
 
-		for (int i = 0; i < astrTSYTenor.length; ++i) {
-			ProductMultiMeasure cmmq = new ProductMultiMeasure();
+		for (int treasuryIndex = 0; treasuryIndex < treasuryTenorArray.length; ++treasuryIndex) {
+			ProductMultiMeasure productMultiMeasureQuote = new ProductMultiMeasure();
 
-			cmmq.addQuote (
+			productMultiMeasureQuote.addQuote (
 				"Yield",
-				new MultiSided (
-					"mid",
-					adblTSYYield[i],
-					Double.NaN
-				),
+				new MultiSided ("mid", treasuryYieldArray[treasuryIndex], Double.NaN),
 				true
 			);
 
-			mTSYQuotes.put (
-				astrTSYTenor[i] + "ON",
-				cmmq
-			);
+			treasuryQuoteMap.put (treasuryTenorArray[treasuryIndex] + "ON", productMultiMeasureQuote);
 		}
 
-		return mTSYQuotes;
+		return treasuryQuoteMap;
 	}
-
-	/*
-	 * Sample demonstrating generation of all the YAS measures
-	 * 
-	 *  	USE WITH CARE: This sample ignores errors and does not handle exceptions.
-	 */
 
 	private static final void BondPricerSample()
 		throws Exception
 	{
-		JulianDate dtCurve = DateUtil.Today();
+		JulianDate curveDate = DateUtil.CreateFromYMD (2013, 4, 21);
 
-		JulianDate dtSettle = dtCurve.addBusDays (
-			3,
-			"USD"
-		);
+		JulianDate settleDate = curveDate.addBusDays (3, "USD");
 
-		double dblNotional = 1000000.;
-		String[] astrCashTenor = new String[] {"3M"};
-		double[] adblCashRate = new double[] {0.00276};
-		String[] astrIRSTenor = new String[] {   "1Y",    "2Y",    "3Y",    "4Y",    "5Y",    "6Y",    "7Y",
-			   "8Y",    "9Y",   "10Y",   "11Y",   "12Y",   "15Y",   "20Y",   "25Y",   "30Y",   "40Y",   "50Y"};
-		double[] adblIRSRate = new double[]  {0.00367, 0.00533, 0.00843, 0.01238, 0.01609, 0.01926, 0.02191,
-			0.02406, 0.02588, 0.02741, 0.02870, 0.02982, 0.03208, 0.03372, 0.03445, 0.03484, 0.03501, 0.03484};
-		String[] astrTSYTenor = new String[] {
-			"1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "30Y"
+		double price = 0.97828;
+		double notional = 1000000.;
+		String[] cashTenorArray =
+		{
+			"3M"
 		};
-		final double[] adblTSYCoupon = new double[] {
-			0.0000, 0.00375, 0.00500, 0.0100, 0.01375, 0.01375, 0.02875
+		double[] cashRateArray =
+		{
+			0.00276
 		};
-		double[] adblTSYYield = new double[] {
-			0.00160, 0.00397, 0.00696, 0.01421, 0.01955, 0.02529, 0.03568
+		String[] irsTenorArray =
+		{
+			 "1Y",
+			 "2Y",
+			 "3Y",
+			 "4Y",
+			 "5Y",
+			 "6Y",
+			 "7Y",
+			 "8Y",
+			 "9Y",
+			"10Y",
+			"11Y",
+			"12Y",
+			"15Y",
+			"20Y",
+			"25Y",
+			"30Y",
+			"40Y",
+			"50Y"
 		};
-
-		MergedDiscountForwardCurve dc = BuildRatesCurveFromInstruments (
-			dtCurve,
-			astrCashTenor,
-			adblCashRate,
-			astrIRSTenor,
-			adblIRSRate,
-			0.,
-			"USD"
-		);
-
-		TreasuryComponent[] aTSYBond = OTRTreasurySet (
-			dtCurve,
-			astrTSYTenor,
-			adblTSYCoupon
-		);
-
-		/*
-		 * Create the on-the-run treasury discount curve
-		 */
-
-		GovvieCurve gc = BuildOnTheRunGovvieCurve (
-			dtCurve,
-			aTSYBond,
-			adblTSYYield
-		);
-
-		BondComponent bond = BondBuilder.CreateSimpleFixed (	// Simple Fixed Rate Bond
-			"TEST",			// Name
-			"USD",			// Currency
-			"",				// Empty Credit Curve
-			0.054,			// Bond Coupon
-			2, 				// Frequency
-			"30/360",		// Day Count
-			DateUtil.CreateFromYMD (
-				2011,
-				4,
-				21
-			), // Effective
-			DateUtil.CreateFromYMD (
-				2021,
-				4,
-				15
-			),	// Maturity
-			null,		// Principal Schedule
-			null
-		);
-
-		int[] aiDate = new int[] {
+		double[] irsRateArray =
+		{
+			0.00367,
+			0.00533,
+			0.00843,
+			0.01238,
+			0.01609,
+			0.01926,
+			0.02191,
+			0.02406,
+			0.02588,
+			0.02741,
+			0.02870,
+			0.02982,
+			0.03208,
+			0.03372,
+			0.03445,
+			0.03484,
+			0.03501,
+			0.03484
+		};
+		String[] treasuryTenorArray =
+		{
+			 "1Y",
+			 "2Y",
+			 "3Y",
+			 "5Y",
+			 "7Y",
+			"10Y",
+			"30Y"
+		};
+		final double[] treasuryCouponArray =
+		{
+			0.00000,
+			0.00375,
+			0.00500,
+			0.01000,
+			0.01375,
+			0.01375,
+			0.02875
+		};
+		double[] treasuryYieldArray =
+		{
+			0.00160,
+			0.00397,
+			0.00696,
+			0.01421,
+			0.01955,
+			0.02529,
+			0.03568
+		};
+		int[] exerciseDateArray =
+		{
 			DateUtil.CreateFromYMD (2016, 3, 1).julian(),
 			DateUtil.CreateFromYMD (2017, 3, 1).julian(),
 			DateUtil.CreateFromYMD (2018, 3, 1).julian(),
 			DateUtil.CreateFromYMD (2019, 3, 1).julian(),
 			DateUtil.CreateFromYMD (2020, 3, 1).julian()
 		};
-
-		double[] adblFactor = new double[] {
-			1.045, 1.03, 1.015, 1., 1.
+		double[] factorArray =
+		{
+			1.045,
+			1.030,
+			1.015,
+			1.000,
+			1.000
 		};
 
-		EmbeddedOptionSchedule eos = new EmbeddedOptionSchedule (
-			aiDate,
-			adblFactor,
-			false,
-			30,
-			false,
-			Double.NaN,
-			"",
-			Double.NaN
+		MergedDiscountForwardCurve discountCurve = BuildRatesCurveFromInstruments (
+			curveDate,
+			cashTenorArray,
+			cashRateArray,
+			irsTenorArray,
+			irsRateArray,
+			0.,
+			"USD"
 		);
 
-		bond.setEmbeddedCallSchedule (eos);
+		BondComponent bond = BondBuilder.CreateSimpleFixed (
+			"TEST",									// Name
+			"USD",									// Currency
+			"",										// Empty Credit Curve
+			0.054,									// Bond Coupon
+			2, 										// Frequency
+			"30/360",								// Day Count
+			DateUtil.CreateFromYMD (2011, 4, 21), 	// Effective
+			DateUtil.CreateFromYMD (2021, 4, 15),	// Maturity
+			null,									// Principal Schedule
+			null
+		);
 
-		CurveSurfaceQuoteContainer mktParams = MarketParamsBuilder.Create (
-			dc,
-			gc,
+		bond.setEmbeddedCallSchedule (
+			new EmbeddedOptionSchedule (
+				exerciseDateArray,
+				factorArray,
+				false,
+				30,
+				false,
+				Double.NaN,
+				"",
+				Double.NaN
+			)
+		);
+
+		CurveSurfaceQuoteContainer curveSurfaceQuoteContainer = MarketParamsBuilder.Create (
+			discountCurve,
+			BuildOnTheRunGovvieCurve (
+				curveDate,
+				OTRTreasurySet (curveDate, treasuryTenorArray, treasuryCouponArray),
+				treasuryYieldArray
+			),
 			null,
 			null,
 			null, 
 			MakeTSYQuotes (
-				astrTSYTenor,
-				adblTSYYield
+				treasuryTenorArray,
+				treasuryYieldArray
 			),
 			null
 		);
 
-		System.out.println ("\n---- Valuation Details ----");
-
-		System.out.println ("Trade Date   : " + dtCurve);
-
-		System.out.println ("Cash Settle  : " + dtSettle);
-
-		System.out.println ("\n--------");
-
-		ValuationParams valParams = ValuationParams.Spot (
-			dtSettle,
+		ValuationParams valuationParams = ValuationParams.Spot (
+			settleDate,
 			0,
 			"",
 			Convention.DATE_ROLL_ACTUAL
 		);
 
-		double dblPrice = 0.97828;
+		WorkoutInfo workoutInfo =
+			bond.exerciseYieldFromPrice (valuationParams, curveSurfaceQuoteContainer, null, price);
 
-		double dblAccrued = bond.accrued (
-			valParams.valueDate(),
-			mktParams
+		double accrued = bond.accrued (valuationParams.valueDate(), curveSurfaceQuoteContainer);
+
+		double workoutFactor = workoutInfo.factor();
+
+		int workoutDate = workoutInfo.date();
+
+		double yield01 = bond.yield01FromPrice (
+			valuationParams,
+			curveSurfaceQuoteContainer,
+			null,
+			workoutDate,
+			workoutFactor,
+			price
 		);
 
-		WorkoutInfo wi = bond.exerciseYieldFromPrice (valParams, mktParams, null, dblPrice);
+		System.out.println ("\n\t||---- Valuation Details ----");
 
-		double dblTSYSpread = bond.tsySpreadFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\t|| Trade Date   : " + curveDate);
 
-		double dblGSpread = bond.gSpreadFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\t|| Cash Settle  : " + settleDate);
 
-		double dblISpread = bond.iSpreadFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\n\t||--------");
 
-		double dblZSpread = bond.zSpreadFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\t|| Price          : " + FormatUtil.FormatDouble (price, 1, 3, 100.));
 
-		double dblASW = bond.aswFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println (
+			"\t|| Yield          : " + FormatUtil.FormatDouble (workoutInfo.yield(), 1, 3, 100.)
+		);
 
-		double dblOAS = bond.oasFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\t|| Workout Date   : " + new JulianDate (workoutDate));
 
-		double dblModDur = bond.modifiedDurationFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\t|| Workout Factor : " + FormatUtil.FormatDouble (workoutFactor, 1, 2, 100.));
 
-		double dblMacDur = bond.macaulayDurationFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println ("\n\t||--SPREAD AND YIELD CALCULATIONS--\n");
 
-		double dblYield01 = bond.yield01FromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println (
+			"\t|| TSY Spread : " + FormatUtil.FormatDouble (
+				bond.tsySpreadFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				0,
+				10000.
+			)
+		);
 
-		double dblConvexity = bond.convexityFromPrice (valParams, mktParams, null, wi.date(), wi.factor(), dblPrice);
+		System.out.println (
+			"\t|| G Spread   : " + FormatUtil.FormatDouble (
+				bond.gSpreadFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				0,
+				10000.
+			)
+		);
 
-		System.out.println ("Price          : " + FormatUtil.FormatDouble (dblPrice, 1, 3, 100.));
+		System.out.println (
+			"\t|| I Spread   : " + FormatUtil.FormatDouble (
+				bond.iSpreadFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				0,
+				10000.
+			)
+		);
 
-		System.out.println ("Yield          : " + FormatUtil.FormatDouble (wi.yield(), 1, 3, 100.));
+		System.out.println (
+			"\t|| Z Spread   : " + FormatUtil.FormatDouble (
+				bond.zSpreadFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				0,
+				10000.
+			)
+		);
 
-		System.out.println ("Workout Date   : " + new JulianDate (wi.date()));
+		System.out.println (
+			"\t|| ASW        : " + FormatUtil.FormatDouble (
+				bond.aswFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				0,
+				10000.
+			)
+		);
 
-		System.out.println ("Workout Factor : " + FormatUtil.FormatDouble (wi.factor(), 1, 2, 100.));
+		System.out.println (
+			"\t|| OAS        : " + FormatUtil.FormatDouble (
+				bond.oasFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				0,
+				10000.
+			)
+		);
 
-		System.out.println ("\n--SPREAD AND YIELD CALCULATIONS--\n");
+		System.out.println ("\nt||--RISK--\n");
 
-		System.out.println ("TSY Spread : " + FormatUtil.FormatDouble (dblTSYSpread, 1, 0, 10000.));
+		System.out.println (
+			"\t|| Modified Duration : " + FormatUtil.FormatDouble (
+				bond.modifiedDurationFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				2,
+				10000.
+			)
+		);
 
-		System.out.println ("G Spread   : " + FormatUtil.FormatDouble (dblGSpread, 1, 0, 10000.));
+		System.out.println (
+			"\t|| Macaulay Duration : " + FormatUtil.FormatDouble (
+				bond.macaulayDurationFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				2,
+				1.
+			)
+		);
 
-		System.out.println ("I Spread   : " + FormatUtil.FormatDouble (dblISpread, 1, 0, 10000.));
+		System.out.println (
+			"\t|| Risk              : " + FormatUtil.FormatDouble (yield01 * 10000., 1, 2, 1.)
+		);
 
-		System.out.println ("Z Spread   : " + FormatUtil.FormatDouble (dblZSpread, 1, 0, 10000.));
+		System.out.println (
+			"\t|| Convexity         : " + FormatUtil.FormatDouble (
+				bond.convexityFromPrice (
+					valuationParams,
+					curveSurfaceQuoteContainer,
+					null,
+					workoutDate,
+					workoutFactor,
+					price
+				),
+				1,
+				2,
+				1000000.
+			)
+		);
 
-		System.out.println ("ASW        : " + FormatUtil.FormatDouble (dblASW, 1, 0, 10000.));
+		System.out.println (
+			"\t|| DV01              : " + FormatUtil.FormatDouble (yield01 * notional, 1, 0, 1.)
+		);
 
-		System.out.println ("OAS        : " + FormatUtil.FormatDouble (dblOAS, 1, 0, 10000.));
+		System.out.println ("\n\t|| --INVOICE--\n");
 
-		System.out.println ("\n--RISK--\n");
+		System.out.println ("\t|| Face      : " + FormatUtil.FormatDouble (notional, 1, 0, 1.));
 
-		System.out.println ("Modified Duration : " + FormatUtil.FormatDouble (dblModDur, 1, 2, 10000.));
+		System.out.println ("\t|| Principal : " + FormatUtil.FormatDouble (price * notional, 1, 2, 1.));
 
-		System.out.println ("Macaulay Duration : " + FormatUtil.FormatDouble (dblMacDur, 1, 2, 1.));
+		System.out.println ("\t|| Accrued   : " + FormatUtil.FormatDouble (accrued * notional, 1, 2, 1.));
 
-		System.out.println ("Risk              : " + FormatUtil.FormatDouble (dblYield01 * 10000., 1, 2, 1.));
+		System.out.println (
+			"\t|| Total     : " + FormatUtil.FormatDouble ((price + accrued) * notional, 1, 2, 1.)
+		);
 
-		System.out.println ("Convexity         : " + FormatUtil.FormatDouble (dblConvexity, 1, 2, 1000000.));
+		System.out.println ("\n\t|| Cashflow\n--------");
 
-		System.out.println ("DV01              : " + FormatUtil.FormatDouble (dblYield01 * dblNotional, 1, 0, 1.));
+		for (CompositePeriod period : bond.couponPeriods()) {
+			int payDate = period.payDate();
 
-		System.out.println ("\n--INVOICE--\n");
-
-		System.out.println ("Face      : " + FormatUtil.FormatDouble (dblNotional, 1, 0, 1.));
-
-		System.out.println ("Principal : " + FormatUtil.FormatDouble (dblPrice * dblNotional, 1, 2, 1.));
-
-		System.out.println ("Accrued   : " + FormatUtil.FormatDouble (dblAccrued * dblNotional, 1, 2, 1.));
-
-		System.out.println ("Total     : " + FormatUtil.FormatDouble ((dblPrice + dblAccrued) * dblNotional, 1, 2, 1.));
-
-		System.out.println ("\nCashflow\n--------");
-
-		for (CompositePeriod p : bond.couponPeriods())
 			System.out.println (
-				DateUtil.YYYYMMDD (p.startDate()) + FIELD_SEPARATOR +
-				DateUtil.YYYYMMDD (p.endDate()) + FIELD_SEPARATOR +
-				DateUtil.YYYYMMDD (p.payDate()) + FIELD_SEPARATOR +
-				FormatUtil.FormatDouble (p.couponDCF(), 1, 4, 1.) + FIELD_SEPARATOR +
-				FormatUtil.FormatDouble (dc.df (p.payDate()), 1, 4, 1.) + FIELD_SEPARATOR
+				DateUtil.YYYYMMDD (period.startDate()) + FIELD_SEPARATOR +
+				DateUtil.YYYYMMDD (period.endDate()) + FIELD_SEPARATOR +
+				DateUtil.YYYYMMDD (payDate) + FIELD_SEPARATOR +
+				FormatUtil.FormatDouble (period.couponDCF(), 1, 4, 1.) + FIELD_SEPARATOR +
+				FormatUtil.FormatDouble (discountCurve.df (payDate), 1, 4, 1.) + FIELD_SEPARATOR
 			);
+		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String astrArgs[])
+		final String[] argumentArray)
 		throws Exception
 	{
-		// String strConfig = "c:\\Lakshmi\\BondAnal\\Config.xml";
-
-		EnvManager.InitEnv (
-			"",
-			true
-		);
+		EnvManager.InitEnv ("", true);
 
 		BondPricerSample();
 

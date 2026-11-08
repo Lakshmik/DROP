@@ -15,6 +15,14 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -113,14 +121,15 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  * 				https://www.itl.nist.gov/div898/handbook/eda/section3/eda3666.htm
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -138,10 +147,7 @@ public class CentralExponentialCDFComparison
 				final double t)
 				throws Exception
 			{
-				return new LowerEulerIntegral (
-					null,
-					t
-				).evaluate (s);
+				return new LowerEulerIntegral (null, t).evaluate (s);
 			}
 		};
 	}
@@ -219,14 +225,26 @@ public class CentralExponentialCDFComparison
 
 		System.out.println ("\t|-----------------------------------||");
 
-		for (double t : tArray)
-		{
+		for (double t : tArray) {
 			System.out.println (
-				"\t| [" + FormatUtil.FormatDouble (t, 2, 1, 1., false) + "] => " +
-				FormatUtil.FormatDouble (
-					r1UnivariateScaledExponential.cumulative (t), 1, 8, 1., false
+				"\t| [" + FormatUtil.FormatDouble (
+					t,
+					2,
+					1,
+					1.,
+					false
+				) + "] => " + FormatUtil.FormatDouble (
+					r1UnivariateScaledExponential.cumulative (t),
+					1,
+					8,
+					1.,
+					false
 				) + " | " + FormatUtil.FormatDouble (
-					1. - Math.exp (-0.5 * t), 1, 8, 1., false
+					1. - Math.exp (-0.5 * t),
+					1,
+					8,
+					1.,
+					false
 				) + " ||"
 			);
 		}

@@ -5,9 +5,9 @@ import java.util.TreeMap;
 
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
+import org.drip.state.eostree.ProxyBondEvaluator;
+import org.drip.state.eostree.BondPriceFunction;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.ProxyBondEvaluator;
-import org.drip.state.municipal.ProxyBondPriceFunction;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -315,7 +315,7 @@ public class YieldSpreadCalibration
 
 		System.out.println ("\t||---------------------------------------------------------------||");
 
-		double calibratedBulletYieldBasis = new ProxyBondPriceFunction (
+		double calibratedBulletYieldBasis = new BondPriceFunction (
 			proxyBulletBond,
 			kalotayWilliamsFabozzi,
 			annualizedForwardYieldVolatility,
@@ -330,7 +330,7 @@ public class YieldSpreadCalibration
 				FormatUtil.FormatDouble (calibratedBulletYieldBasis, 2, 0, 10000.)
 		);
 
-		double calibratedCallableYieldBasis = new ProxyBondPriceFunction (
+		double calibratedCallableYieldBasis = new BondPriceFunction (
 			proxyCallableBond,
 			kalotayWilliamsFabozzi,
 			annualizedForwardYieldVolatility,

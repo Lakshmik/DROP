@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,69 +99,85 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>PoissonRandomSequenceBound</i> demonstrates the Computation of the Probabilistic Bounds for a Sample
  * 	Random Poisson Sequence.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PoissonRandomSequenceBound {
+public class PoissonRandomSequenceBound
+{
 
 	private static final void Head (
-		final String strHeader)
+		final String header)
 	{
 		System.out.println();
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
-		System.out.println (strHeader);
+		System.out.println (header);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
-		System.out.println ("\t| SIZE ||               <-               TOLERANCES               ->               |");
+		System.out.println (
+			"\t| SIZE ||               <-               TOLERANCES               ->               |"
+		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 	}
 
 	private static final void ChernoffStirlingBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			PoissonSequenceAgnosticMetrics ssamDist = (PoissonSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			PoissonSequenceAgnosticMetrics poissonSequenceAgnosticMetrics =
+				(PoissonSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 3, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 3, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.chernoffStirlingUpperBound (dblTolerance), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					poissonSequenceAgnosticMetrics.chernoffStirlingUpperBound (tolerance),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
@@ -162,35 +186,38 @@ public class PoissonRandomSequenceBound {
 
 		PoissonDistribution poissonDistribution = new PoissonDistribution (10.);
 
-		int[] aiSampleSize = new int[] {
-			10, 20, 50, 100, 250
+		int[] sampleSizeArray =
+		{
+			10,
+			20,
+			50,
+			100,
+			250
 		};
-
-		double[] adblTolerance = new double[] {
-			5., 10., 15., 20., 25.
+		double[] toleranceArray =
+		{
+			5.,
+			10.,
+			15.,
+			20.,
+			25.
 		};
 
 		Head ("\t|        CHERNOFF-STIRLING BOUNDS    -     METRICS FROM UNDERLYING GENERATOR       |");
 
-		ChernoffStirlingBounds (
-			poissonRandom,
-			poissonDistribution,
-			aiSampleSize,
-			adblTolerance
-		);
+		ChernoffStirlingBounds (poissonRandom, poissonDistribution, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|      CHERNOFF-STIRLING BOUNDS    -     METRICS FROM EMPIRICAL DISTRIBUTION       |");
 
-		ChernoffStirlingBounds (
-			poissonRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		ChernoffStirlingBounds (poissonRandom, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------|"
+		);
 
 		EnvManager.TerminateEnv();
 	}

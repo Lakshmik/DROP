@@ -15,6 +15,14 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -113,14 +121,15 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  * 				https://www.itl.nist.gov/div898/handbook/eda/section3/eda3666.htm
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -138,10 +147,7 @@ public class CentralChernoffBounds
 				final double t)
 				throws Exception
 			{
-				return new LowerEulerIntegral (
-					null,
-					t
-				).evaluate (s);
+				return new LowerEulerIntegral (null, t).evaluate (s);
 			}
 		};
 	}
@@ -176,7 +182,6 @@ public class CentralChernoffBounds
 		};
 		int[] dofArray =
 		{
-			 // 1,
 			 2,
 			 3,
 			 4,
@@ -193,23 +198,36 @@ public class CentralChernoffBounds
 
 		R1ToR1 digammaEstimator = CumulativeSeriesEstimator.AbramowitzStegun2007 (digammaTermCount);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                           CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                          ||");
+		System.out.println (
+			"\t|                                           CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                          ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom                                                                                          ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom                                                                                          ||"
+		);
 
-		System.out.println ("\t|                - Values for different t                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different t                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int dof : dofArray)
-		{
-			R1Central r1Univariate = new R1Central (
+		for (int dof : dofArray) {
+			R1Central r1Central = new R1Central (
 				dof,
 				gammaEstimator,
 				digammaEstimator,
@@ -218,37 +236,55 @@ public class CentralChernoffBounds
 
 			String display = "\t| [" + FormatUtil.FormatDouble (dof, 1, 0, 1., false) + "] =>";
 
-			for (double z : zArray)
-			{
+			for (double z : zArray) {
 				display = display + " " + FormatUtil.FormatDouble (
-					r1Univariate.cumulative (z * dof), 1, 5, 1., false
+					r1Central.cumulative (z * dof),
+					1,
+					5,
+					1.,
+					false
 				) + " |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                        CUMULATIVE DISTRIBUTION CHERNOFF BOUND ESTIMATE                                       ||");
+		System.out.println (
+			"\t|                                        CUMULATIVE DISTRIBUTION CHERNOFF BOUND ESTIMATE                                       ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom                                                                                          ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom                                                                                          ||"
+		);
 
-		System.out.println ("\t|                - Values for different t                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different t                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int dof : dofArray)
-		{
-			R1Central r1Univariate = new R1Central (
+		for (int dof : dofArray) {
+			R1Central r1CentralChiSquared = new R1Central (
 				dof,
 				gammaEstimator,
 				digammaEstimator,
@@ -257,17 +293,22 @@ public class CentralChernoffBounds
 
 			String display = "\t| [" + FormatUtil.FormatDouble (dof, 1, 0, 1., false) + "] =>";
 
-			for (double z : zArray)
-			{
+			for (double z : zArray) {
 				display = display + " " + FormatUtil.FormatDouble (
-					r1Univariate.chernoffBound (z * dof), 1, 5, 1., false
+					r1CentralChiSquared.chernoffBound (z * dof),
+					1,
+					5,
+					1.,
+					false
 				) + " |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 

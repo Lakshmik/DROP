@@ -11,7 +11,7 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics/FixedIncomeAnalytics_v7.97.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics/FixedIncomeAnalytics_v7.98.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -275,6 +275,16 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
  * AAA Municipal Curve
 	* Overview
 	* Constituent Selection
+	* References
+ * Refundings and Redemption Provisions
+	* Introduction
+	* What is a Refunding
+	* What is the Purpose of a Municipal Bond Refunding?
+	* Types of Refundings
+	* Defeasance
+	* Types of Defeasances
+	* Escrow Fund and Investments
+	* Yield Limitations and Rebate
 	* References
  * The Right and the Wrong Models for Evaluating Callable Municipal Bonds
 	* Abstract

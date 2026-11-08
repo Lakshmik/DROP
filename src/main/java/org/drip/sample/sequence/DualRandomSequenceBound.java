@@ -12,6 +12,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -89,66 +97,70 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>DualRandomSequenceBound</i> demonstrates the Computation of the Probabilistic Bounds for a Joint
  * 	Realizations of a Sample Random Sequence.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class DualRandomSequenceBound {
+public class DualRandomSequenceBound
+{
 
 	private static final void CauchySchwartzBound (
-		final double dblLeft1,
-		final double dblRight1,
-		final double dblLeft2,
-		final double dblRight2)
+		final double left1,
+		final double right1,
+		final double left2,
+		final double right2)
 		throws Exception
 	{
-		SingleSequenceAgnosticMetrics ssam1 = new BoundedUniform (
-			dblLeft1,
-			dblRight1
-		).sequence (
-			50000,
-			null
+		SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics1 =
+			new BoundedUniform (left1, right1).sequence (50000, null);
+
+		SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics2 =
+			new BoundedUniform (left2, right2).sequence (50000, null);
+
+		DualSequenceAgnosticMetrics dualSequenceAgnosticMetrics = new DualSequenceAgnosticMetrics (
+			singleSequenceAgnosticMetrics1,
+			singleSequenceAgnosticMetrics2
 		);
 
-		SingleSequenceAgnosticMetrics ssam2 = new BoundedUniform (
-			dblLeft2,
-			dblRight2
-		).sequence (
-			50000,
-			null
-		);
-
-		DualSequenceAgnosticMetrics dsam = new DualSequenceAgnosticMetrics (
-			ssam1,
-			ssam2
-		);
-
-		System.out.println ("\t| " +
-			FormatUtil.FormatDouble (ssam1.empiricalExpectation(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (ssam2.empiricalExpectation(), 1, 4, 1.) + " | " +
-			FormatUtil.FormatDouble (dsam.cauchySchwarzAbsoluteBound(), 1, 4, 1.) + " |"
+		System.out.println (
+			"\t| " + FormatUtil.FormatDouble (
+				singleSequenceAgnosticMetrics1.empiricalExpectation(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				singleSequenceAgnosticMetrics2.empiricalExpectation(),
+				1,
+				4,
+				1.
+			) + " | " + FormatUtil.FormatDouble (
+				dualSequenceAgnosticMetrics.cauchySchwarzAbsoluteBound(),
+				1,
+				4,
+				1.
+			) + " |"
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");

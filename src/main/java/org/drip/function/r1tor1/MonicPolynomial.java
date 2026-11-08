@@ -1,11 +1,22 @@
 
 package org.drip.function.r1tor1;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -77,42 +88,49 @@ package org.drip.function.r1tor1;
  */
 
 /**
- * <i>MonicPolynomial</i> implements the Multi-root R<sup>1</sup> to R<sup>1</sup> Monic Polynomial.
+ * <i>MonicPolynomial</i> implements the Multi-root R<sup>1</sup> to R<sup>1</sup> Monic Polynomial. It
+ * 	exposes the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></li>
+ * 		<li><i>MonicPolynomial</i> constructor</li>
+ * 		<li>Retrieve the Array of Roots</li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Compute the Log Product over [a, a + 1, ..., b] of the Monic Polynomial</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/r1tor1/README.md">Built-in R<sup>1</sup> To R<sup>1</sup> Functions</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
-public class MonicPolynomial extends org.drip.function.definition.R1ToR1
+public class MonicPolynomial
+	extends R1ToR1
 {
 	private double[] _rootArray = null;
 
 	/**
-	 * MonicPolynomial constructor
+	 * <i>MonicPolynomial</i> constructor
 	 * 
 	 * @param rootArray The Array of Roots
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
 	public MonicPolynomial (
 		final double[] rootArray)
-		throws java.lang.Exception
+		throws Exception
 	{
 		super (null);
 
-		if (null == (_rootArray = rootArray) ||
-			0 == _rootArray.length ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_rootArray))
-		{
-			throw new java.lang.Exception ("MonicPolynomial Constructor => Invalid Inputs");
+		if (null == (_rootArray = rootArray) || 0 == _rootArray.length || !NumberUtil.IsValid (_rootArray)) {
+			throw new Exception ("MonicPolynomial Constructor => Invalid Inputs");
 		}
 	}
 
@@ -127,13 +145,22 @@ public class MonicPolynomial extends org.drip.function.definition.R1ToR1
 		return _rootArray;
 	}
 
+	/**
+	 * Evaluate for the given variate
+	 * 
+	 * @param x Variate
+	 *  
+	 * @return Returns the calculated value
+	 * 
+	 * @throws Exception Thrown if evaluation cannot be done
+	 */
+
 	@Override public double evaluate (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (x))
-		{
-			throw new java.lang.Exception ("MonicPolynomial::evaluate => Invalid Inputs");
+		if (!NumberUtil.IsValid (x)) {
+			throw new Exception ("MonicPolynomial::evaluate => Invalid Inputs");
 		}
 
 		return 0.;
@@ -148,27 +175,23 @@ public class MonicPolynomial extends org.drip.function.definition.R1ToR1
 	 * 
 	 * @return The Log Product over [a, a + 1, ..., b] of the Monic Polynomial
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double logGammaProduct (
 		final int a,
 		final int b,
-		final org.drip.function.definition.R1ToR1 logGammaEstimator)
-		throws java.lang.Exception
+		final R1ToR1 logGammaEstimator)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (a) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (b) ||
-			null == logGammaEstimator)
-		{
-			throw new java.lang.Exception ("MonicPolynomial::logGammaProduct => Invalid Inputs");
+		if (!NumberUtil.IsValid (a) || !NumberUtil.IsValid (b) || null == logGammaEstimator) {
+			throw new Exception ("MonicPolynomial::logGammaProduct => Invalid Inputs");
 		}
 
 		double logGammaProduct = 0.;
 
-		for (double root : _rootArray)
-		{
-			logGammaProduct = logGammaProduct +
+		for (double root : _rootArray) {
+			logGammaProduct += logGammaProduct +
 				logGammaEstimator.evaluate (b - root + 1) -
 				logGammaEstimator.evaluate (a - root);
 		}

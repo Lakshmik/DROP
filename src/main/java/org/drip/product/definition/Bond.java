@@ -22524,4 +22524,16 @@ public abstract class Bond extends CreditComponent {
 
 	public abstract void showPeriods()
 		throws java.lang.Exception;
+
+	/**
+	 * Retrieve the Period Instance enveloping the specified Date
+	 * 
+	 * @param dateJulian The Date
+	 * 
+	 * @return The Period Instance enveloping the specified Date
+	 */
+
+	public abstract org.drip.analytics.cashflow.CompositePeriod containingPeriod (
+		final int dateJulian
+	);
 }

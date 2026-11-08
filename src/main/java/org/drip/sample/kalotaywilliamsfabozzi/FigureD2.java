@@ -8,10 +8,10 @@ import java.util.TreeMap;
 
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
+import org.drip.state.eostree.ProxyBondEvaluator;
+import org.drip.state.eostree.BondPriceFunction;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
-import org.drip.state.municipal.ProxyBondEvaluator;
-import org.drip.state.municipal.ProxyBondPriceFunction;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -217,12 +217,13 @@ public class FigureD2
 
 		TreeMap<Double, Double> projectedBaseForwardYieldMap = new TreeMap<Double, Double>();
 
-		double calibratedBaseBulletYield = new ProxyBondPriceFunction (
+		double calibratedBaseBulletYield = new BondPriceFunction (
 			proxyBulletBond,
 			kalotayWilliamsFabozzi,
 			annualizedForwardVolatility,
 			projectedBaseForwardYieldMap
 		).baseYieldForPrice (
+			0.,
 			calibrationEndTime,
 			calibrationPrice
 		).calibratedState();

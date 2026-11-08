@@ -14,6 +14,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -91,253 +99,298 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>IIDSequenceSumBound</i> demonstrates the Computation of the Different Probabilistic Bounds for Sums of
  * 	i.i.d. Random Sequences.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/StatisticalLearningLibrary.md">Statistical Learning</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/sequence/README.md">IID Dual Poisson Sequence Bound</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class IIDSequenceSumBound {
+public class IIDSequenceSumBound
+{
 
 	private static final void Head (
-		final String strHeader)
+		final String header)
 	{
 		System.out.println();
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
-		System.out.println (strHeader);
+		System.out.println (header);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
-		System.out.println ("\t|   SAMPLE  ||               <-               TOLERANCES               ->               |");
+		System.out.println (
+			"\t|   SAMPLE  ||               <-               TOLERANCES               ->               |"
+		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 	}
 
 	private static final void WeakLawBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			SingleSequenceAgnosticMetrics ssamDist = iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			SingleSequenceAgnosticMetrics singleSequenceAgnosticMetrics =
+				univariateSequenceGenerator.sequence (sampleSize, r1ContinuousDistribution);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 8, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 8, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.weakLawAverageBounds (dblTolerance).upper(), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					singleSequenceAgnosticMetrics.weakLawAverageBounds (tolerance).upper(),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	private static final void ChernoffHoeffdingBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final double dblSupport,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final double support,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			BoundedSequenceAgnosticMetrics ssamDist = (BoundedSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			BoundedSequenceAgnosticMetrics boundedSequenceAgnosticMetrics =
+				(BoundedSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 8, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 8, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.chernoffHoeffdingAverageBounds (dblTolerance).upper(), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					boundedSequenceAgnosticMetrics.chernoffHoeffdingAverageBounds (tolerance).upper(),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	private static final void BennettBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final double dblSupport,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final double support,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			BoundedSequenceAgnosticMetrics ssamDist = (BoundedSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			BoundedSequenceAgnosticMetrics singleSequenceAgnosticMetrics =
+				(BoundedSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 8, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 8, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.bennettAverageBounds (dblTolerance).upper(), 1, 9, 1.) + " | ";
+			for (double dblTolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					singleSequenceAgnosticMetrics.bennettAverageBounds (dblTolerance).upper(),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	private static final void BernsteinBounds (
-		final UnivariateSequenceGenerator iidsg,
-		final R1Continuous dist,
-		final double dblSupport,
-		final int[] aiSampleSize,
-		final double[] adblTolerance)
+		final UnivariateSequenceGenerator univariateSequenceGenerator,
+		final R1Continuous r1ContinuousDistribution,
+		final double support,
+		final int[] sampleSizeArray,
+		final double[] toleranceArray)
 		throws Exception
 	{
-		for (int iSampleSize : aiSampleSize) {
-			BoundedSequenceAgnosticMetrics ssamDist = (BoundedSequenceAgnosticMetrics) iidsg.sequence (
-				iSampleSize,
-				dist
-			);
+		for (int sampleSize : sampleSizeArray) {
+			BoundedSequenceAgnosticMetrics singleSequenceAgnosticMetrics =
+				(BoundedSequenceAgnosticMetrics) univariateSequenceGenerator.sequence (
+					sampleSize,
+					r1ContinuousDistribution
+				);
 
-			String strDump = "\t| " + FormatUtil.FormatDouble (iSampleSize, 8, 0, 1) + " => ";
+			String dump = "\t| " + FormatUtil.FormatDouble (sampleSize, 8, 0, 1) + " => ";
 
-			for (double dblTolerance : adblTolerance)
-				strDump += FormatUtil.FormatDouble (ssamDist.bernsteinAverageBounds (dblTolerance).upper(), 1, 9, 1.) + " | ";
+			for (double tolerance : toleranceArray) {
+				dump += FormatUtil.FormatDouble (
+					singleSequenceAgnosticMetrics.bernsteinAverageBounds (tolerance).upper(),
+					1,
+					9,
+					1.
+				) + " | ";
+			}
 
-			System.out.println (strDump);
+			System.out.println (dump);
 		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param args Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static void main (
-		final String[] args)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		BoundedUniform uniformRandom = new BoundedUniform (
-			0.,
-			1.
-		);
+		BoundedUniform boundedUniform = new BoundedUniform (0., 1.);
 
-		R1ContinuousUniform uniformDistribution = new R1ContinuousUniform (
-			0.,
-			1.
-		);
+		R1ContinuousUniform r1ContinuousUniform = new R1ContinuousUniform (0., 1.);
 
-		int[] aiSampleSize = new int[] {
-			50, 500, 5000, 50000, 500000, 5000000, 50000000
+		int[] sampleSizeArray =
+		{
+			50,
+			500,
+			5000,
+			50000,
+			500000,
+			5000000,
+			50000000
 		};
-
-		double[] adblTolerance = new double[] {
-			0.01, 0.03, 0.05, 0.07, 0.10
+		double[] toleranceArray =
+		{
+			0.01,
+			0.03,
+			0.05,
+			0.07,
+			0.10
 		};
 
 		Head ("\t|         WEAK LAW OF LARGE NUMBERS     -      METRICS FROM UNDERLYING GENERATOR        |");
 
-		WeakLawBounds (
-			uniformRandom,
-			uniformDistribution,
-			aiSampleSize,
-			adblTolerance
-		);
+		WeakLawBounds (boundedUniform, r1ContinuousUniform, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|        WEAK LAW OF LARGE NUMBERS      -     METRICS FROM EMPIRICAL DISTRIBUTION       |");
 
-		WeakLawBounds (
-			uniformRandom,
-			null,
-			aiSampleSize,
-			adblTolerance
-		);
+		WeakLawBounds (boundedUniform, null, sampleSizeArray, toleranceArray);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|         CHERNOFF-HOEFFDING BOUNDS      -     METRICS FROM UNDERLYING GENERATOR        |");
 
 		ChernoffHoeffdingBounds (
-			uniformRandom,
-			uniformDistribution,
-			uniformRandom.upperBound() - uniformRandom.lowerBound(),
-			aiSampleSize,
-			adblTolerance
+			boundedUniform,
+			r1ContinuousUniform,
+			boundedUniform.upperBound() - boundedUniform.lowerBound(),
+			sampleSizeArray,
+			toleranceArray
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|         CHERNOFF-HOEFFDING BOUNDS      -     METRICS FROM EMPIRICAL DISTRIBUTION      |");
 
 		ChernoffHoeffdingBounds (
-			uniformRandom,
+			boundedUniform,
 			null,
-			uniformRandom.upperBound() - uniformRandom.lowerBound(),
-			aiSampleSize,
-			adblTolerance
+			boundedUniform.upperBound() - boundedUniform.lowerBound(),
+			sampleSizeArray,
+			toleranceArray
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|              BENNETT BOUNDS      -      METRICS FROM UNDERLYING GENERATOR             |");
 
 		BennettBounds (
-			uniformRandom,
-			uniformDistribution,
-			uniformRandom.upperBound() - uniformRandom.lowerBound(),
-			aiSampleSize,
-			adblTolerance
+			boundedUniform,
+			r1ContinuousUniform,
+			boundedUniform.upperBound() - boundedUniform.lowerBound(),
+			sampleSizeArray,
+			toleranceArray
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|              BENNETT BOUNDS      -      METRICS FROM EMPIRICAL DISTRIBUTION           |");
 
 		BennettBounds (
-			uniformRandom,
+			boundedUniform,
 			null,
-			uniformRandom.upperBound() - uniformRandom.lowerBound(),
-			aiSampleSize,
-			adblTolerance
+			boundedUniform.upperBound() - boundedUniform.lowerBound(),
+			sampleSizeArray,
+			toleranceArray
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|             BERNSTEIN BOUNDS      -      METRICS FROM UNDERLYING GENERATOR            |");
 
 		BernsteinBounds (
-			uniformRandom,
-			uniformDistribution,
-			uniformRandom.upperBound() - uniformRandom.lowerBound(),
-			aiSampleSize,
-			adblTolerance
+			boundedUniform,
+			r1ContinuousUniform,
+			boundedUniform.upperBound() - boundedUniform.lowerBound(),
+			sampleSizeArray,
+			toleranceArray
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		Head ("\t|            BERNSTEIN BOUNDS      -      METRICS FROM EMPIRICAL DISTRIBUTION           |");
 
 		BernsteinBounds (
-			uniformRandom,
-			uniformDistribution,
-			uniformRandom.upperBound() - uniformRandom.lowerBound(),
-			aiSampleSize,
-			adblTolerance
+			boundedUniform,
+			r1ContinuousUniform,
+			boundedUniform.upperBound() - boundedUniform.lowerBound(),
+			sampleSizeArray,
+			toleranceArray
 		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------------------|");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------------------|"
+		);
 
 		EnvManager.TerminateEnv();
 	}

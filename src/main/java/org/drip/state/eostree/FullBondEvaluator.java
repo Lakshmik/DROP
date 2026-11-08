@@ -1,5 +1,5 @@
 
-package org.drip.state.municipal;
+package org.drip.state.eostree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,11 @@ import java.util.TreeMap;
 
 import org.drip.analytics.cashflow.CompositePeriod;
 import org.drip.analytics.date.JulianDate;
+import org.drip.numerical.common.NumberUtil;
 import org.drip.product.credit.BondComponent;
 import org.drip.product.params.EmbeddedOptionSchedule;
+import org.drip.state.municipal.KalotayWilliamsFabozzi;
+import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -87,8 +90,8 @@ import org.drip.product.params.EmbeddedOptionSchedule;
  */
 
 /**
- * <i>BondEvaluator</i> implements the DRIP Proxy Evaluator to be used in the Kalotay, Williams, and Fabozzi
- * 	(1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
+ * <i>FullBondEvaluator</i> implements the DRIP Bond Evaluator to be used in the Kalotay, Williams, and
+ * 	Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -119,31 +122,32 @@ import org.drip.product.params.EmbeddedOptionSchedule;
  *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ProductCore.md">Product Core Module</a></td></tr>
  *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FixedIncomeAnalyticsLibrary.md">Fixed Income Analytics</a></td></tr>
  *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/README.md">Latent State Inference and Creation Utilities</a></td></tr>
- *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/municipal/README.md">Municipal Latent State Curve Estimator</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/state/eostree/README.md">EOS Bond Tree Based Valuation</a></td></tr>
  *  </table>
  *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class BondEvaluator
+public class FullBondEvaluator
+	extends BondEvaluator
 {
 	private BondComponent _underlying = null;
 
 	/**
-	 * <i>BondEvaluator</i> Constructor
+	 * <i>FullBondEvaluator</i> Constructor
 	 * 
 	 * @param underlying Underlying Calibration Bond
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public BondEvaluator (
+	public FullBondEvaluator (
 		final BondComponent underlying)
 		throws Exception
 	{
 		if (null == (_underlying = underlying)) {
-			throw new Exception ("BondEvaluator Constructor => Invalid Inputs");
+			throw new Exception ("FullBondEvaluator Constructor => Invalid Inputs");
 		}
 	}
 
@@ -261,52 +265,100 @@ public class BondEvaluator
 	}
 
 	/**
-	 * Evaluate the EOS Value Tree
+	 * Roll the List of <i>SegmentCouponMeasures</i> Instances Backwards
 	 * 
 	 * @param spotDate Spot Date
-	 * @param maturityDate Maturity Date
-	 * @param embeddedOptionSchedule Bond Embedded Option Schedule
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
-	 * @param dateCashflowPVMap Date to Cash Flow PV Map
 	 * 
-	 * @return EOS Value Tree
+	 * @return List of <i>SegmentCouponMeasures</i> Instances Backwards
 	 */
 
-	public TreeMap<Double, List<Double>> eosValueTree (
+	public List<SegmentCouponMeasures> rollBackwards (
 		final JulianDate spotDate,
-		final JulianDate maturityDate,
-		final EmbeddedOptionSchedule embeddedOptionSchedule,
-		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
-		final TreeMap<JulianDate, Double> dateCashflowPVMap)
+		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
-		if (null == spotDate ||
-			null == embeddedOptionSchedule ||
-			null == kalotayWilliamsFabozzi ||
-			null == dateCashflowPVMap)
-		{
+		EventPillarTimeComposite couponExerciseComposite = EventPillarTimeComposite.Standard (
+			spotDate,
+			_underlying,
+			kalotayWilliamsFabozzi
+		);
+
+		if (null == couponExerciseComposite) {
 			return null;
 		}
 
-		int spotDateJulian = spotDate.julian();
+		boolean isPut = _underlying.putable();
 
-		TreeMap<Double, Double> exerciseFactorMap = new TreeMap<Double, Double>();
+		double rightTime = Double.NaN;
+		SegmentCouponMeasures previousSegmentCouponMeasures = null;
 
-		int[] exerciseDateArray = embeddedOptionSchedule.exerciseDates (spotDateJulian);
+		double couponRate = _underlying.couponSetting().couponRate();
 
-		TreeMap<Double, List<Double>> eosValueTree = new TreeMap<Double, List<Double>>();
+		List<SegmentCouponMeasures> segmentCouponMeasuresList = new ArrayList<SegmentCouponMeasures>();
 
-		double[] exerciseFactorArray = embeddedOptionSchedule.exerciseFactors (spotDateJulian);
+		TreeMap<Double, Double> exerciseTimeToPriceMap = couponExerciseComposite.exerciseTimeToPriceMap();
 
-		for (int exerciseDateIndex = 0; exerciseDateIndex < exerciseDateArray.length; ++exerciseDateIndex) {
-			double exerciseTime =
-				((double) (exerciseDateArray[exerciseDateIndex] - spotDateJulian)) / 365.25;
+		double maturityTime = ((double) (_underlying.maturityDate().julian() - spotDate.julian())) / 365.25;
 
-			eosValueTree.put (exerciseTime, new ArrayList<Double>());
+		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToPeriodStateListMap =
+			couponExerciseComposite.timeToPeriodStateListMap();
 
-			exerciseFactorMap.put (exerciseTime, exerciseFactorArray[exerciseDateIndex]);
+		for (double endTime : timeToPeriodStateListMap.descendingKeySet()) {
+			if (maturityTime < endTime) {
+				rightTime = endTime;
+				continue;
+			}
+
+			if (null == previousSegmentCouponMeasures) {
+				segmentCouponMeasuresList.add (
+					previousSegmentCouponMeasures = SegmentCouponMeasures.Terminal (
+						endTime,
+						rightTime,
+						couponRate * (rightTime - endTime),
+						timeToPeriodStateListMap.get (endTime),
+						isPut,
+						exerciseTimeToPriceMap
+					)
+				);
+			} else {
+				segmentCouponMeasuresList.add (
+					previousSegmentCouponMeasures = SegmentCouponMeasures.Preceding (
+						endTime,
+						rightTime,
+						couponRate * (rightTime - endTime),
+						timeToPeriodStateListMap.get (endTime),
+						previousSegmentCouponMeasures,
+						isPut,
+						exerciseTimeToPriceMap
+					)
+				);
+			}
+
+			rightTime = endTime;
 		}
 
-		return eosValueTree;
+		return segmentCouponMeasuresList;
+	}
+
+	/**
+	 * Retrieve the Bond Maturity Time from Spot
+	 * 
+	 * @param spotTime Spot Time
+	 * 
+	 * @return Bond Maturity Time from Spot
+	 * 
+	 * @throws Thrown if the Maturity Time cannot be calculated
+	 */
+
+	@Override public double maturityTime (
+		final double spotTime)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (spotTime)) {
+			throw new Exception ("FullBondEvaluator::maturityTime => Invalid Inputs");
+		}
+
+		return ((double) _underlying.maturityDate().julian()) / 365.25 - spotTime;
 	}
 
 	/**
@@ -318,7 +370,7 @@ public class BondEvaluator
 	 * @return Bond Value Tree
 	 */
 
-	public TreeMap<Double, List<Double>> valueTree (
+	@Override public TreeMap<Double, List<Double>> valueTree (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
@@ -350,17 +402,36 @@ public class BondEvaluator
 			return valueTree;
 		}
 
-		double cashFlowPV = 0.;
+		List<SegmentCouponMeasures> segmentCouponMeasuresList =
+			rollBackwards (spotDate, kalotayWilliamsFabozzi);
 
-		for (double periodCashFlowPV : dateCashflowPVMap.values()) {
-			cashFlowPV += periodCashFlowPV;
+		if (null == segmentCouponMeasuresList || segmentCouponMeasuresList.isEmpty()) {
+			return null;
+		}
+
+		TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
+
+		for (SegmentCouponMeasures segmentCouponMeasures : segmentCouponMeasuresList) {
+			List<Double> forwardLeftPVList = new ArrayList<Double>();
+
+			for (double forwardLeftPV : segmentCouponMeasures.forwardLeftPVArray()) {
+				forwardLeftPVList.add (forwardLeftPV);
+			}
+
+			valueTree.put (segmentCouponMeasures.confine().leftTime(), forwardLeftPVList);
 		}
 
 		List<Double> cashFlowList = new ArrayList<Double>();
 
-		cashFlowList.add (cashFlowPV + dateCashflowPVMap.lastEntry().getValue());
+		SegmentCouponMeasures leadingSegmentCouponMeasures =
+			segmentCouponMeasuresList.get (segmentCouponMeasuresList.size() - 1);
 
-		TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
+		cashFlowList.add (
+			leadingSegmentCouponMeasures.forwardLeftPVArray()[0] / (
+				1. + leadingSegmentCouponMeasures.forwardYieldArray()[0] *
+					leadingSegmentCouponMeasures.confine().leftTime()
+			)
+		);
 
 		valueTree.put (0., cashFlowList);
 
