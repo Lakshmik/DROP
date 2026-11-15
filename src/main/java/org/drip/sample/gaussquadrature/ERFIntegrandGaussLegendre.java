@@ -15,6 +15,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -112,13 +120,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/numerical/gaussquadrature/README.md">R<sup>1</sup> Gauss-Legendre Gauss-Lobatto Quadratures</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/gaussquadrature/README.md">R<sup>1</sup> Gauss-Legendre Gauss-Lobatto Quadratures</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -140,80 +149,104 @@ public class ERFIntegrandGaussLegendre
 	{
 		EnvManager.InitEnv ("");
 
-		R1ToR1 erfIntegrand = new ErrorFunction (
-			null,
-			null
-		).integrand();
+		R1ToR1 erfIntegrand = new ErrorFunction (null, null).integrand();
 
 		Map<Double, BuiltInEntry> builtInTable = BuiltInEntry.Table();
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                   Gauss Legendre erf Estimate                                    ||");
+		System.out.println (
+			"\t|                                   Gauss Legendre erf Estimate                                    ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                   ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                   ||"
+		);
 
-		System.out.println ("\t|                - x                                                                               ||");
+		System.out.println (
+			"\t|                - x                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Built-in Estimate                                                               ||");
+		System.out.println (
+			"\t|                - Built-in Estimate                                                               ||"
+		);
 
-		System.out.println ("\t|                - 5P Estimate                                                                     ||");
+		System.out.println (
+			"\t|                - 5P Estimate                                                                     ||"
+		);
 
-		System.out.println ("\t|                - 4P Estimate                                                                     ||");
+		System.out.println (
+			"\t|                - 4P Estimate                                                                     ||"
+		);
 
-		System.out.println ("\t|                - 3P Estimate                                                                     ||");
+		System.out.println (
+			"\t|                - 3P Estimate                                                                     ||"
+		);
 
-		System.out.println ("\t|                - 2P Estimate                                                                     ||");
+		System.out.println (
+			"\t|                - 2P Estimate                                                                     ||"
+		);
 
-		System.out.println ("\t|                - 1P Estimate                                                                     ||");
+		System.out.println (
+			"\t|                - 1P Estimate                                                                     ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------||"
+		);
 
-		for (Map.Entry<Double, BuiltInEntry> builtInTableEntry : builtInTable.entrySet())
-		{
+		for (Map.Entry<Double, BuiltInEntry> builtInTableEntry : builtInTable.entrySet()) {
 			final double x = builtInTableEntry.getKey();
 
-			double erfTable = builtInTableEntry.getValue().erf();
-
-			double erfEstimate5P = GaussLegendreQuadratureGenerator.FivePoint (
-				0.,
-				x
-			).integrate (erfIntegrand);
-
-			double erfEstimate4P = GaussLegendreQuadratureGenerator.FourPoint (
-				0.,
-				x
-			).integrate (erfIntegrand);
-
-			double erfEstimate3P = GaussLegendreQuadratureGenerator.ThreePoint (
-				0.,
-				x
-			).integrate (erfIntegrand);
-
-			double erfEstimate2P = GaussLegendreQuadratureGenerator.TwoPoint (
-				0.,
-				x
-			).integrate (erfIntegrand);
-
-			double erfEstimate1P = GaussLegendreQuadratureGenerator.OnePoint (
-				0.,
-				x
-			).integrate (erfIntegrand);
-
 			System.out.println (
-				"\t| " + FormatUtil.FormatDouble (x, 1, 2, 1.) + " => " +
-				FormatUtil.FormatDouble (erfTable, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate5P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate4P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate3P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate2P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate1P, 1, 9, 1.) + " ||"
+				"\t| " + FormatUtil.FormatDouble (
+					x,
+					1,
+					2,
+					1.
+				) + " => " + FormatUtil.FormatDouble (
+					builtInTableEntry.getValue().erf(),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.FivePoint (0., x).integrate (erfIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.FourPoint (0., x).integrate (erfIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.ThreePoint (0., x).integrate (erfIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.TwoPoint (0., x).integrate (erfIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.OnePoint (0., x).integrate (erfIntegrand),
+					1,
+					9,
+					1.
+				) + " ||"
 			);
 		}
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

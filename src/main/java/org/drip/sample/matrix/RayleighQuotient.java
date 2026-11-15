@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,7 +92,7 @@ import org.drip.service.env.EnvManager;
 
 /**
  * <i>RayleighQuotient</i> demonstrates the Computation of an Approximate to the Eigenvalue using the
- * Rayleigh Quotient. The References are:
+ * 	Rayleigh Quotient. The References are:
  *  
  * <br><br>
  *  <ul>
@@ -96,15 +104,15 @@ import org.drip.service.env.EnvManager;
  *  			https://en.wikipedia.org/wiki/Rayleigh_quotient_iteration
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -118,13 +126,14 @@ public class RayleighQuotient
 		final double eigenvalue)
 		throws Exception
 	{
-		java.lang.String strDump = "\t|| Iteration => " + FormatUtil.FormatDouble (iteration, 2, 0, 1.) +
-			"[" + FormatUtil.FormatDouble (eigenvalue, 3, 4, 1.) + "] => ";
+		String dump = "\t|| Iteration => " + FormatUtil.FormatDouble (iteration, 2, 0, 1.) + "[" +
+			FormatUtil.FormatDouble (eigenvalue, 3, 4, 1.) + "] => ";
 
-		for (int i = 0; i < eigenvector.length; ++i)
-			strDump += FormatUtil.FormatDouble (eigenvector[i], 1, 4, 1.) + " | ";
+		for (int i = 0; i < eigenvector.length; ++i) {
+			dump += FormatUtil.FormatDouble (eigenvector[i], 1, 4, 1.) + " | ";
+		}
 
-		System.out.println ("\t" + strDump);
+		System.out.println (dump);
 	}
 
 	/**
@@ -143,42 +152,33 @@ public class RayleighQuotient
 
 		int iterationCount = 5;
 		double eigenvalue = 200.;
-		double[][] a = {
+		double[][] a =
+		{
 			{1., 2., 3.},
 			{1., 2., 1.},
 			{3., 2., 1.},
 		};
-		double[] eigenvector = {
+		double[] eigenvector =
+		{
 			1. / Math.sqrt (3.),
 			1. / Math.sqrt (3.),
 			1. / Math.sqrt (3.)
 		};
 
-		NumberUtil.PrintMatrix (
-			"\t|| A ",
-			a
-		);
+		NumberUtil.PrintMatrix ("\t|| A ", a);
 
-		EigenDump (
-			0,
-			eigenvector,
-			eigenvalue
-		);
+		EigenDump (0, eigenvector, eigenvalue);
 
 		int iterationIndex = 0;
 
-		while (++iterationIndex < iterationCount)
-		{
+		while (++iterationIndex < iterationCount) {
 			double[][] deDiagonalized = new double[a.length][a.length];
 
-			for (int row = 0; row < a.length; ++row)
-			{
-				for (int column = 0; column < a.length; ++column)
-				{
+			for (int row = 0; row < a.length; ++row) {
+				for (int column = 0; column < a.length; ++column) {
 					deDiagonalized[row][column] = a[row][column];
 
-					if (row == column)
-					{
+					if (row == column) {
 						deDiagonalized[row][column] -= eigenvalue;
 					}
 				}
@@ -191,19 +191,9 @@ public class RayleighQuotient
 				)
 			);
 
-			eigenvalue = R1MatrixUtil.DotProduct (
-				eigenvector,
-				R1MatrixUtil.Product (
-					a,
-					eigenvector
-				)
-			);
+			eigenvalue = R1MatrixUtil.DotProduct (eigenvector, R1MatrixUtil.Product (a, eigenvector));
 
-			EigenDump (
-				iterationIndex,
-				eigenvector,
-				eigenvalue
-			);
+			EigenDump (iterationIndex, eigenvector, eigenvalue);
 		}
 
 		EnvManager.TerminateEnv();

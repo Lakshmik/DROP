@@ -11,6 +11,14 @@ import org.drip.specialfunction.incompletegamma.LowerSFixed;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -111,13 +119,14 @@ import org.drip.specialfunction.incompletegamma.LowerSFixed;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -131,14 +140,13 @@ public class LowerNIST2019Estimate
 		final double[] zArray)
 		throws Exception
 	{
-		LowerSFixed lowerSFixed = LowerSFixed.NIST2019 (
-			s,
-			termCount
-		);
+		LowerSFixed lowerSFixed = LowerSFixed.NIST2019 (s, termCount);
 
 		System.out.println ("\t|-----------------------------------------------------------------------||");
 
-		System.out.println ("\t|                      TERM COUNT => " + FormatUtil.FormatDouble (termCount, 2, 0, 1.));
+		System.out.println (
+			"\t|                      TERM COUNT => " + FormatUtil.FormatDouble (termCount, 2, 0, 1.)
+		);
 
 		System.out.println ("\t|-----------------------------------------------------------------------||");
 
@@ -150,21 +158,17 @@ public class LowerNIST2019Estimate
 
 		System.out.println ("\t|            - Unscaled Lower Incomplete Gamma                          ||");
 
+		System.out.println ("\t|            - Lower Euler Integral Estimate                            ||");
+
 		System.out.println ("\t|-----------------------------------------------------------------------||");
 
-		for (double z : zArray)
-		{
-			LowerEulerIntegral lowerEulerIntegral = new LowerEulerIntegral (
-				null,
-				z
-			);
-
+		for (double z : zArray) {
 			System.out.println (
 				"\t|" + FormatUtil.FormatDouble (z, 1, 2, 1.) + " => " +
 				FormatUtil.FormatDouble (lowerSFixed.weierstrassLimit (z), 1, 10, 1.) + " | " +
 				FormatUtil.FormatDouble (lowerSFixed.nonDimensional (z), 1, 10, 1.) + " | " +
 				FormatUtil.FormatDouble (lowerSFixed.evaluate (z), 1, 10, 1.) + " | " +
-				FormatUtil.FormatDouble (lowerEulerIntegral.evaluate (s), 1, 10, 1.) + " ||"
+				FormatUtil.FormatDouble (new LowerEulerIntegral (null, z).evaluate (s), 1, 10, 1.) + " ||"
 			);
 		}
 
@@ -219,13 +223,8 @@ public class LowerNIST2019Estimate
 			0.01,
 		};
 
-		for (int termCount : termCountArray)
-		{
-			EulerIntegralComparison (
-				termCount,
-				s,
-				zArray
-			);
+		for (int termCount : termCountArray) {
+			EulerIntegralComparison (termCount, s, zArray);
 		}
 
 		EnvManager.TerminateEnv();

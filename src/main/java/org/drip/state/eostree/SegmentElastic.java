@@ -4,7 +4,6 @@ package org.drip.state.eostree;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.drip.numerical.common.NumberUtil;
 import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
 
 /*
@@ -84,9 +83,9 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
  */
 
 /**
- * <i>SegmentCouponMeasures</i> holds Measures associated with a Single Coupon/Exercise Segment built
+ * <i>SegmentElastic</i> holds the Path-independent Properties of a Single Cross-vertex Segment built
  * 	according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded
- * 	Options. The References are:
+ *  Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -124,32 +123,30 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
  * @author Lakshmi Krishnamurthy
  */
 
-public class SegmentCouponMeasures
+public class SegmentElastic
 {
 	private boolean _isPut = false;
-	private SegmentConfine _confine = null;
-	private double[] _forwardYieldArray = null;
-	private double[] _forwardRightPVArray = null;
+	private double[] _flatYieldArray = null;
+	private VertexElastic _rightVertexElastic = null;
+	private VertexInelastic _leftVertexInelastic = null;
 	private TreeMap<Double, Double> _exerciseTimeToPriceMap = null;
 
 	/**
-	 * Construct the Standard Instance of <i>SegmentCouponMeasures</i>
+	 * Construct the Standard Instance of <i>SegmentElastic</i>
 	 * 
-	 * @param leftTime Left Time
-	 * @param rightTime Right Time
-	 * @param amount Period Amount
+	 * @param leftVertexInelastic Left <i>VertexInelastic</i> Instance
+	 * @param rightVertexElastic Right <i>VertexElastic</i> Instance
 	 * @param kalotayWilliamsFabozziPeriodStateList List of <i>KalotayWilliamsFabozziPeriodState</i>
 	 * 												Instances
 	 * @param isPut Put Indicator
 	 * @param exerciseTimeToPriceMap Exercise Time To Price Map
 	 * 
-	 * @return Standard Instance of <i>SegmentCouponMeasures</i>
+	 * @return Standard Instance of <i>SegmentElastic</i>
 	 */
 
-	public static final SegmentCouponMeasures Terminal (
-		final double leftTime,
-		final double rightTime,
-		final double amount,
+	public static final SegmentElastic Standard (
+		final VertexInelastic leftVertexInelastic,
+		final VertexElastic rightVertexElastic,
 		final List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList,
 		final boolean isPut,
 		final TreeMap<Double, Double> exerciseTimeToPriceMap)
@@ -164,21 +161,18 @@ public class SegmentCouponMeasures
 			return null;
 		}
 
-		double[] spotRightPVArray = new double[periodStateCount];
-		double[] forwardYieldArray = new double[periodStateCount];
+		double[] flatYieldArray = new double[periodStateCount];
 
 		for (int periodStateIndex = 0; periodStateIndex < periodStateCount; ++periodStateIndex) {
-			spotRightPVArray[periodStateIndex] = 1.;
-
-			forwardYieldArray[periodStateIndex] =
+			flatYieldArray[periodStateIndex] =
 				kalotayWilliamsFabozziPeriodStateList.get (periodStateIndex).forwardYield();
 		}
 
 		try {
-			return new SegmentCouponMeasures (
-				new SegmentConfine (leftTime, rightTime, amount),
-				forwardYieldArray,
-				spotRightPVArray,
+			return new SegmentElastic (
+				leftVertexInelastic,
+				rightVertexElastic,
+				flatYieldArray,
 				isPut,
 				exerciseTimeToPriceMap
 			);
@@ -189,95 +183,90 @@ public class SegmentCouponMeasures
 		return null;
 	}
 
-	/**
-	 * Construct the Preceding Instance of <i>SegmentCouponMeasures</i>
-	 * 
-	 * @param leftTime Left Time
-	 * @param rightTime Right Time
-	 * @param amount Period Amount
-	 * @param kalotayWilliamsFabozziPeriodStateList List of <i>KalotayWilliamsFabozziPeriodState</i>
-	 * 												Instances
-	 * @param succeedingSegmentCouponMeasures Succeeding Instance of <i>SegmentCouponMeasures</i>
-	 * @param isPut Put Indicator
-	 * @param exerciseTimeToPriceMap Exercise Time To Price Map
-	 * 
-	 * @return Preceding Instance of <i>SegmentCouponMeasures</i>
-	 */
-
-	public static final SegmentCouponMeasures Preceding (
-		final double leftTime,
-		final double rightTime,
-		final double amount,
-		final List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList,
-		final SegmentCouponMeasures succeedingSegmentCouponMeasures,
-		final boolean isPut,
-		final TreeMap<Double, Double> exerciseTimeToPriceMap)
+	private double[] leftPVArray()
 	{
-		if (null == kalotayWilliamsFabozziPeriodStateList || null == succeedingSegmentCouponMeasures) {
-			return null;
+		VertexInelastic rightVertexInelastic = _rightVertexElastic.inelastic();
+
+		double[] rightPVArray = _rightVertexElastic.pvArray();
+
+		double leftTime = _leftVertexInelastic.time();
+
+		double timeGap = rightVertexInelastic.time() - leftTime;
+
+		double[] leftPVArray = new double[_flatYieldArray.length];
+
+		double leftTimePayAmount = _leftVertexInelastic.payAmount();
+
+		double leftDirtyExercisePrice = _exerciseTimeToPriceMap.containsKey (leftTime) ? 
+			_exerciseTimeToPriceMap.get (leftTime) + _leftVertexInelastic.accrual().amount() : Double.NaN;
+
+		if (_flatYieldArray.length == rightPVArray.length) {
+			for (int rightDiscountFactorIndex = 0;
+				rightDiscountFactorIndex < leftPVArray.length;
+				++rightDiscountFactorIndex)
+			{
+				double leftPV = (rightPVArray[rightDiscountFactorIndex] + leftTimePayAmount)
+					/ (1. + _flatYieldArray[rightDiscountFactorIndex] * timeGap);
+
+				if (Double.isNaN (leftDirtyExercisePrice)) {
+					leftPVArray[rightDiscountFactorIndex] = leftPV;
+				} else {
+					leftPVArray[rightDiscountFactorIndex] = _isPut ?
+						Math.max (leftPV, leftDirtyExercisePrice) :
+						Math.min (leftPV, leftDirtyExercisePrice);
+				}
+			}
+		} else {
+			for (int rightDiscountFactorIndex = 0;
+				rightDiscountFactorIndex < leftPVArray.length;
+				++rightDiscountFactorIndex)
+			{
+				double forwardLeftPV = (
+					0.5 * (
+						rightPVArray[rightDiscountFactorIndex] + rightPVArray[rightDiscountFactorIndex + 1]
+					) + leftTimePayAmount
+				) / (
+					1. + _flatYieldArray[rightDiscountFactorIndex] * timeGap
+				);
+
+				if (Double.isNaN (leftDirtyExercisePrice)) {
+					leftPVArray[rightDiscountFactorIndex] = forwardLeftPV;
+				} else {
+					leftPVArray[rightDiscountFactorIndex] = _isPut ?
+						Math.max (forwardLeftPV, leftDirtyExercisePrice) :
+						Math.min (forwardLeftPV, leftDirtyExercisePrice);
+				}
+			}
 		}
 
-		int periodStateCount = kalotayWilliamsFabozziPeriodStateList.size();
-
-		if (0 == periodStateCount) {
-			return null;
-		}
-
-		double[] forwardYieldArray = new double[periodStateCount];
-
-		for (int periodStateIndex = 0; periodStateIndex < periodStateCount; ++periodStateIndex) {
-			forwardYieldArray[periodStateIndex] =
-				kalotayWilliamsFabozziPeriodStateList.get (periodStateIndex).forwardYield();
-		}
-
-		try {
-			return new SegmentCouponMeasures (
-				new SegmentConfine (leftTime, rightTime, amount),
-				forwardYieldArray,
-				succeedingSegmentCouponMeasures.forwardLeftPVArray(),
-				isPut,
-				exerciseTimeToPriceMap
-			);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
+		return leftPVArray;
 	}
 
 	/**
-	 * <i>SegmentCouponMeasures</i> Constructor
+	 * <i>SegmentElastic</i> Constructor
 	 * 
-	 * @param confine <i>SegmentConfine</i> Instance
-	 * @param forwardYieldArray Forward Yield Array
-	 * @param forwardRightPVArray Forward Right PV Array
+	 * @param leftVertexInelastic Left <i>VertexInelastic</i> Instance
+	 * @param rightVertexElastic Right <i>VertexElastic</i> Instance
+	 * @param flatYieldArray Segment's Flat Yield Array
 	 * @param isPut Put Indicator
-	 * @param exerciseTimeToPriceMap Exercise Time To Price Map
+	 * @param exerciseTimeToPriceMap Map of Time to Exercise Price
 	 * 
-	 * @throws Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
-	public SegmentCouponMeasures (
-		final SegmentConfine confine,
-		final double[] forwardYieldArray,
-		final double[] forwardRightPVArray,
+	public SegmentElastic (
+		final VertexInelastic leftVertexInelastic,
+		final VertexElastic rightVertexElastic,
+		final double[] flatYieldArray,
 		final boolean isPut,
 		final TreeMap<Double, Double> exerciseTimeToPriceMap)
 		throws Exception
 	{
-		if (null == (_confine = confine) ||
-			null == (_forwardYieldArray = forwardYieldArray) || 0 == _forwardYieldArray.length ||
-				!NumberUtil.IsValid (_forwardYieldArray) ||
-			null == (_forwardRightPVArray = forwardRightPVArray) || 0 == _forwardRightPVArray.length ||
-				!NumberUtil.IsValid (_forwardRightPVArray))
+		if (null == (_leftVertexInelastic = leftVertexInelastic) ||
+			null == (_rightVertexElastic = rightVertexElastic) ||
+			null == (_flatYieldArray = flatYieldArray) || 0 == _flatYieldArray.length)
 		{
-			throw new Exception ("SegmentCouponMeasures Constructor => Invalid Inputs");
-		}
-
-		if (_forwardYieldArray.length != _forwardRightPVArray.length &&
-			_forwardYieldArray.length + 1 != _forwardRightPVArray.length)
-		{
-			throw new Exception ("SegmentCouponMeasures Constructor => Invalid Inputs");
+			throw new Exception ("SegmentElastic Constructor => Invlid Inputs");
 		}
 
 		_isPut = isPut;
@@ -285,36 +274,25 @@ public class SegmentCouponMeasures
 	}
 
 	/**
-	 * Retrieve the <i>SegmentConfine</i> Instance
+	 * Retrieve the Left <i>VertexInelastic</i> Instance
 	 * 
-	 * @return <i>SegmentConfine</i> Instance
+	 * @return Left <i>VertexInelastic</i> Instance
 	 */
 
-	public SegmentConfine confine()
+	public VertexInelastic leftVertexInelastic()
 	{
-		return _confine;
+		return _leftVertexInelastic;
 	}
 
 	/**
-	 * Retrieve the Forward Yield Array
+	 * Retrieve the Right <i>VertexElastic</i> Instance
 	 * 
-	 * @return Forward Yield Array
+	 * @return Right <i>VertexElastic</i> Instance
 	 */
 
-	public double[] forwardYieldArray()
+	public VertexElastic rightVertexElastic()
 	{
-		return _forwardYieldArray;
-	}
-
-	/**
-	 * Retrieve the Forward Right PV Array
-	 * 
-	 * @return Forward Right PV Array
-	 */
-
-	public double[] forwardRightPVArray()
-	{
-		return _forwardRightPVArray;
+		return _rightVertexElastic;
 	}
 
 	/**
@@ -329,6 +307,17 @@ public class SegmentCouponMeasures
 	}
 
 	/**
+	 * Retrieve the Segment's Flat Yield Array
+	 * 
+	 * @return Segment's Flat Yield Array
+	 */
+
+	public double[] flatYieldArray()
+	{
+		return _flatYieldArray;
+	}
+
+	/**
 	 * Retrieve the Map of Time to Exercise Price
 	 * 
 	 * @return Map of Time to Exercise Price
@@ -340,62 +329,19 @@ public class SegmentCouponMeasures
 	}
 
 	/**
-	 * Retrieve the Forward Left PV Array
+	 * Construct the Left <i>VertexElastic</i> Instance
 	 * 
-	 * @return Forward Left PV Array
+	 * @return Left <i>VertexElastic</i> Instance
 	 */
 
-	public double[] forwardLeftPVArray()
+	public VertexElastic leftVertexElastic()
 	{
-		double amount = _confine.amount();
-
-		double leftTime = _confine.leftTime();
-
-		double timeGap = _confine.rightTime() - leftTime;
-
-		double exercisePrice = _exerciseTimeToPriceMap.containsKey (leftTime) ? 
-			_exerciseTimeToPriceMap.get (leftTime) : Double.NaN;
-
-		double[] forwardLeftPVArray = new double[_forwardYieldArray.length];
-
-		if (_forwardYieldArray.length == _forwardRightPVArray.length) {
-			for (int rightDiscountFactorIndex = 0;
-				rightDiscountFactorIndex < forwardLeftPVArray.length;
-				++rightDiscountFactorIndex)
-			{
-				double forwardLeftPV = (_forwardRightPVArray[rightDiscountFactorIndex] + amount) /
-					(1. + _forwardYieldArray[rightDiscountFactorIndex] * timeGap);
-
-				if (Double.isNaN (exercisePrice)) {
-					forwardLeftPVArray[rightDiscountFactorIndex] = forwardLeftPV;
-				} else {
-					forwardLeftPVArray[rightDiscountFactorIndex] = _isPut ?
-						Math.max (forwardLeftPV, exercisePrice) : Math.min (forwardLeftPV, exercisePrice);
-				}
-			}
-		} else {
-			for (int rightDiscountFactorIndex = 0;
-				rightDiscountFactorIndex < forwardLeftPVArray.length;
-				++rightDiscountFactorIndex)
-			{
-				double forwardLeftPV = (
-					0.5 * (
-						_forwardRightPVArray[rightDiscountFactorIndex] +
-							_forwardRightPVArray[rightDiscountFactorIndex + 1]
-					) + amount
-				) / (
-					1. + _forwardYieldArray[rightDiscountFactorIndex] * timeGap
-				);
-
-				if (Double.isNaN (exercisePrice)) {
-					forwardLeftPVArray[rightDiscountFactorIndex] = forwardLeftPV;
-				} else {
-					forwardLeftPVArray[rightDiscountFactorIndex] = _isPut ?
-						Math.max (forwardLeftPV, exercisePrice) : Math.min (forwardLeftPV, exercisePrice);
-				}
-			}
+		try {
+			return new VertexElastic (_leftVertexInelastic, leftPVArray());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		return forwardLeftPVArray;
+		return null;
 	}
 }

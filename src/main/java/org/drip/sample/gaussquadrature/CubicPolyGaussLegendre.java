@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,13 +116,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/numerical/gaussquadrature/README.md">R<sup>1</sup> Gauss-Legendre Gauss-Lobatto Quadratures</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/gaussquadrature/README.md">R<sup>1</sup> Gauss-Legendre Gauss-Lobatto Quadratures</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -135,16 +144,6 @@ public class CubicPolyGaussLegendre
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
-
-		R1ToR1 cubicPolyIntegrand = new R1ToR1 (null)
-		{
-			@Override public double evaluate (
-				final double x)
-				throws Exception
-			{
-				return 7. * x * x * x - 8. * x * x - 3. * x + 3;
-			}
-		};
 
 		double[] xArray =
 		{
@@ -170,66 +169,99 @@ public class CubicPolyGaussLegendre
 			 1.00,
 		};
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|                             Cubic Polynomial Estimate                             ||");
-
-		System.out.println ("\t|-----------------------------------------------------------------------------------||");
-
-		System.out.println ("\t|        L -> R:                                                                    ||");
-
-		System.out.println ("\t|                - x                                                                ||");
-
-		System.out.println ("\t|                - 5P Estimate                                                      ||");
-
-		System.out.println ("\t|                - 4P Estimate                                                      ||");
-
-		System.out.println ("\t|                - 3P Estimate                                                      ||");
-
-		System.out.println ("\t|                - 2P Estimate                                                      ||");
-
-		System.out.println ("\t|                - 1P Estimate                                                      ||");
-
-		System.out.println ("\t|-----------------------------------------------------------------------------------||");
-
-		for (double x : xArray)
+		R1ToR1 cubicPolyIntegrand = new R1ToR1 (null)
 		{
-			double erfEstimate5P = GaussLegendreQuadratureGenerator.FivePoint (
-				-1.,
-				x
-			).integrate (cubicPolyIntegrand);
+			@Override public double evaluate (
+				final double x)
+				throws Exception
+			{
+				return 7. * x * x * x - 8. * x * x - 3. * x + 3;
+			}
+		};
 
-			double erfEstimate4P = GaussLegendreQuadratureGenerator.FourPoint (
-				-1.,
-				x
-			).integrate (cubicPolyIntegrand);
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------||"
+		);
 
-			double erfEstimate3P = GaussLegendreQuadratureGenerator.ThreePoint (
-				-1.,
-				x
-			).integrate (cubicPolyIntegrand);
+		System.out.println (
+			"\t|                             Cubic Polynomial Estimate                             ||"
+		);
 
-			double erfEstimate2P = GaussLegendreQuadratureGenerator.TwoPoint (
-				-1.,
-				x
-			).integrate (cubicPolyIntegrand);
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------||"
+		);
 
-			double erfEstimate1P = GaussLegendreQuadratureGenerator.OnePoint (
-				-1.,
-				x
-			).integrate (cubicPolyIntegrand);
+		System.out.println (
+			"\t|        L -> R:                                                                    ||"
+		);
 
+		System.out.println (
+			"\t|                - x                                                                ||"
+		);
+
+		System.out.println (
+			"\t|                - 5P Estimate                                                      ||"
+		);
+
+		System.out.println (
+			"\t|                - 4P Estimate                                                      ||"
+		);
+
+		System.out.println (
+			"\t|                - 3P Estimate                                                      ||"
+		);
+
+		System.out.println (
+			"\t|                - 2P Estimate                                                      ||"
+		);
+
+		System.out.println (
+			"\t|                - 1P Estimate                                                      ||"
+		);
+
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------||"
+		);
+
+		for (double x : xArray) {
 			System.out.println (
-				"\t| " + FormatUtil.FormatDouble (x, 1, 2, 1.) + " => " +
-				FormatUtil.FormatDouble (erfEstimate5P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate4P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate3P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate2P, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfEstimate1P, 1, 9, 1.) + " ||"
+				"\t| " + FormatUtil.FormatDouble (
+					x,
+					1,
+					2,
+					1.
+				) + " => " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.FivePoint (-1., x).integrate (cubicPolyIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.FourPoint (-1., x).integrate (cubicPolyIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.ThreePoint (-1., x).integrate (cubicPolyIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.TwoPoint (-1., x).integrate (cubicPolyIntegrand),
+					1,
+					9,
+					1.
+				) + " | " + FormatUtil.FormatDouble (
+					GaussLegendreQuadratureGenerator.OnePoint (-1., x).integrate (cubicPolyIntegrand),
+					1,
+					9,
+					1.
+				) + " ||"
 			);
 		}
 
-		System.out.println ("\t|-----------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|-----------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

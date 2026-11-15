@@ -1,11 +1,22 @@
 
 package org.drip.function.e2erf;
 
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.estimation.R1ToR1SeriesTerm;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,14 +115,22 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Generate the Convergent Version of E<sub>2</sub> erf Hans-Heinrich-Burmann Series Term</li>
+ * 		<li>Generate the Schopf-Supancic (2014) Version of E<sub>2</sub> erf Hans-Heinrich-Burmann Series Term</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -125,27 +144,20 @@ public class HansHeinrichBurmannTerm
 	 * @return The Convergent Version of E<sub>2</sub> erf Hans-Heinrich-Burmann Series Term
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1SeriesTerm Convergent()
+	public static final R1ToR1SeriesTerm Convergent()
 	{
-		return new org.drip.numerical.estimation.R1ToR1SeriesTerm()
+		return new R1ToR1SeriesTerm()
 		{
-
 			@Override public double value (
 				final int order,
 				final double z)
-				throws java.lang.Exception
+				throws Exception
 			{
-				if (0 > order ||
-					!org.drip.numerical.common.NumberUtil.IsValid (z))
-				{
-					throw new java.lang.Exception
-						("HansHeinrichBurmannTerm::Convergent::value => Invalid Inputs");
+				if (0 > order || !NumberUtil.IsValid (z)) {
+					throw new Exception ("HansHeinrichBurmannTerm::Convergent::value => Invalid Inputs");
 				}
 
-				return 0 == order ? 1. : java.lang.Math.pow (
-					1. - java.lang.Math.exp (-1. * z * z),
-					order
-				);
+				return 0 == order ? 1. : Math.pow (1. - Math.exp (-1. * z * z), order);
 			}
 		};
 	}
@@ -156,24 +168,22 @@ public class HansHeinrichBurmannTerm
 	 * @return The Schopf-Supancic (2014) Version of E<sub>2</sub> erf Hans-Heinrich-Burmann Series Term
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1SeriesTerm SchopfSupancic2014()
+	public static final R1ToR1SeriesTerm SchopfSupancic2014()
 	{
-		return new org.drip.numerical.estimation.R1ToR1SeriesTerm()
+		return new R1ToR1SeriesTerm()
 		{
-
 			@Override public double value (
 				final int order,
 				final double z)
-				throws java.lang.Exception
+				throws Exception
 			{
-				if (0 > order ||
-					!org.drip.numerical.common.NumberUtil.IsValid (z))
-				{
-					throw new java.lang.Exception
-						("HansHeinrichBurmannTerm::SchopfSupancic2014::value => Invalid Inputs");
+				if (0 > order || !NumberUtil.IsValid (z)) {
+					throw new Exception (
+						"HansHeinrichBurmannTerm::SchopfSupancic2014::value => Invalid Inputs"
+					);
 				}
 
-				return 0 == order ? 1. : java.lang.Math.exp (-1. * order * z * z);
+				return 0 == order ? 1. : Math.exp (-1. * order * z * z);
 			}
 		};
 	}

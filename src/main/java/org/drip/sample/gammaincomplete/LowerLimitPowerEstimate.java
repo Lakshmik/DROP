@@ -11,6 +11,14 @@ import org.drip.specialfunction.incompletegamma.LowerLimitPowerIntegrand;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -111,13 +119,14 @@ import org.drip.specialfunction.incompletegamma.LowerLimitPowerIntegrand;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -134,44 +143,65 @@ public class LowerLimitPowerEstimate
 		final int intermediatePointCount)
 		throws Exception
 	{
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                         QUADRATURE COMPARISON - s => " + FormatUtil.FormatDouble (s, 1, 1, 1.) + " | Exponent => " + FormatUtil.FormatDouble (limitExponent, 1, 1, 1.));
+		System.out.println (
+			"\t|                                         QUADRATURE COMPARISON - s => " +
+				FormatUtil.FormatDouble (s, 1, 1, 1.) + " | Exponent => " +
+				FormatUtil.FormatDouble (limitExponent, 1, 1, 1.)
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                           ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                           ||"
+		);
 
-		System.out.println ("\t|                - s                                                                                                       ||");
+		System.out.println (
+			"\t|                - s                                                                                                       ||"
+		);
 
-		System.out.println ("\t|                - [Comparison Pair]                                                                                       ||");
+		System.out.println (
+			"\t|                - [Comparison Pair]                                                                                       ||"
+		);
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double left : leftArray)
-		{
+		for (double left : leftArray) {
 			String display = "\t|" + FormatUtil.FormatDouble (left, 1, 1, 1.) + " => ";
 
-			for (double right : rightArray)
-			{
+			for (double right : rightArray) {
 				display = display + "[" + FormatUtil.FormatDouble (
 					NewtonCotesQuadratureGenerator.Zero_PlusOne (
 						left,
 						right,
 						intermediatePointCount
-					).integrate (lowerLimitPowerIntegrand), 4, 2, 1.
+					).integrate (
+						lowerLimitPowerIntegrand
+					),
+					4,
+					2,
+					1.
 				) + " - " + FormatUtil.FormatDouble (
-					lowerLimitPowerIntegrand.integrate (
-						left,
-						right
-					), 4, 2, 1.
+					lowerLimitPowerIntegrand.integrate (left, right),
+					4,
+					2,
+					1.
 				) + "] |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println ("\t|--------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|--------------------------------------------------------------------------------------------------------------------------||"
+		);
 	}
 
 	/**
@@ -222,18 +252,10 @@ public class LowerLimitPowerEstimate
 			7.,
 		};
 
-		for (double s : sArray)
-		{
-			for (double limitExponent : limitExponentArray)
-			{
-				LowerLimitPowerIntegrand lowerLimitPowerIntegrand = new LowerLimitPowerIntegrand (
-					null,
-					s,
-					limitExponent
-				);
-
+		for (double s : sArray) {
+			for (double limitExponent : limitExponentArray) {
 				QuadratureComparison (
-					lowerLimitPowerIntegrand,
+					new LowerLimitPowerIntegrand (null, s, limitExponent),
 					s,
 					limitExponent,
 					leftArray,

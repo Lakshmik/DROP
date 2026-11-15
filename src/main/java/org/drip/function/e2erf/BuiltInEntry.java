@@ -1,11 +1,24 @@
 
 package org.drip.function.e2erf;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,22 +117,32 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Generate a Table of Built-in E<sub>2</sub> erf/erfc Entries</li>
+ * 		<li><i>BuiltInEntry</i> Constructor</li>
+ * 		<li>Retrieve the E<sub>2</sub> erf</li>
+ * 		<li>Retrieve the E<sub>2</sub> erfc</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class BuiltInEntry
 {
-	private double _erf = java.lang.Double.NaN;
-	private double _erfc = java.lang.Double.NaN;
+	private double _erf = Double.NaN;
+	private double _erfc = Double.NaN;
 
 	/**
 	 * Generate a Table of Built-in E<sub>2</sub> erf/erfc Entries
@@ -127,273 +150,77 @@ public class BuiltInEntry
 	 * @return The Table of Built-in E<sub>2</sub> erf/erfc Entries
 	 */
 
-	public static final java.util.Map<java.lang.Double, BuiltInEntry> Table()
+	public static final Map<Double, BuiltInEntry> Table()
 	{
-		java.util.Map<java.lang.Double, BuiltInEntry> builtInEntryTable = new
-			java.util.TreeMap<java.lang.Double, BuiltInEntry>();
+		Map<Double, BuiltInEntry> builtInEntryTable = new TreeMap<Double, BuiltInEntry>();
 
-		try
-		{
-			builtInEntryTable.put (
-				0.00,
-				new BuiltInEntry (
-					0.000000000,
-					1.000000000
-				)
-			);
+		try {
+			builtInEntryTable.put (0.00, new BuiltInEntry (0.000000000, 1.000000000));
 
-			builtInEntryTable.put (
-				0.02,
-				new BuiltInEntry (
-					0.022564575,
-					0.977435425
-				)
-			);
+			builtInEntryTable.put (0.02, new BuiltInEntry (0.022564575, 0.977435425));
 
-			builtInEntryTable.put (
-				0.04,
-				new BuiltInEntry (
-					0.045111106,
-					0.954888894
-				)
-			);
+			builtInEntryTable.put (0.04, new BuiltInEntry (0.045111106, 0.954888894));
 
-			builtInEntryTable.put (
-				0.06,
-				new BuiltInEntry (
-					0.067621594,
-					0.932378406
-				)
-			);
+			builtInEntryTable.put (0.06, new BuiltInEntry (0.067621594, 0.932378406));
 
-			builtInEntryTable.put (
-				0.08,
-				new BuiltInEntry (
-					0.090078126,
-					0.909921874
-				)
-			);
+			builtInEntryTable.put (0.08, new BuiltInEntry (0.090078126, 0.909921874));
 
-			builtInEntryTable.put (
-				0.10,
-				new BuiltInEntry (
-					0.112462916,
-					0.887537084
-				)
-			);
+			builtInEntryTable.put (0.10, new BuiltInEntry (0.112462916, 0.887537084));
 
-			builtInEntryTable.put (
-				0.20,
-				new BuiltInEntry (
-					0.222792589,
-					0.777297411
-				)
-			);
+			builtInEntryTable.put (0.20, new BuiltInEntry (0.222792589, 0.777297411));
 
-			builtInEntryTable.put (
-				0.30,
-				new BuiltInEntry (
-					0.328626759,
-					0.671373241
-				)
-			);
+			builtInEntryTable.put (0.30, new BuiltInEntry (0.328626759, 0.671373241));
 
-			builtInEntryTable.put (
-				0.40,
-				new BuiltInEntry (
-					0.428392355,
-					0.571607645
-				)
-			);
+			builtInEntryTable.put (0.40, new BuiltInEntry (0.428392355, 0.571607645));
 
-			builtInEntryTable.put (
-				0.50,
-				new BuiltInEntry (
-					0.520499878,
-					0.479500122
-				)
-			);
+			builtInEntryTable.put (0.50, new BuiltInEntry (0.520499878, 0.479500122));
 
-			builtInEntryTable.put (
-				0.60,
-				new BuiltInEntry (
-					0.603856091,
-					0.396143909
-				)
-			);
+			builtInEntryTable.put (0.60, new BuiltInEntry (0.603856091, 0.396143909));
 
-			builtInEntryTable.put (
-				0.70,
-				new BuiltInEntry (
-					0.677801194,
-					0.322198806
-				)
-			);
+			builtInEntryTable.put (0.70, new BuiltInEntry (0.677801194, 0.322198806));
 
-			builtInEntryTable.put (
-				0.80,
-				new BuiltInEntry (
-					0.742100965,
-					0.257899035
-				)
-			);
+			builtInEntryTable.put (0.80, new BuiltInEntry (0.742100965, 0.257899035));
 
-			builtInEntryTable.put (
-				0.90,
-				new BuiltInEntry (
-					0.796908212,
-					0.203091788
-				)
-			);
+			builtInEntryTable.put (0.90, new BuiltInEntry (0.796908212, 0.203091788));
 
-			builtInEntryTable.put (
-				1.00,
-				new BuiltInEntry (
-					0.842700793,
-					0.157299207
-				)
-			);
+			builtInEntryTable.put (1.00, new BuiltInEntry (0.842700793, 0.157299207));
 
-			builtInEntryTable.put (
-				1.10,
-				new BuiltInEntry (
-					0.880205070,
-					0.119794930
-				)
-			);
+			builtInEntryTable.put (1.10, new BuiltInEntry (0.880205070, 0.119794930));
 
-			builtInEntryTable.put (
-				1.20,
-				new BuiltInEntry (
-					0.910313978,
-					0.089686022
-				)
-			);
+			builtInEntryTable.put (1.20, new BuiltInEntry (0.910313978, 0.089686022));
 
-			builtInEntryTable.put (
-				1.30,
-				new BuiltInEntry (
-					0.934007945,
-					0.065992055
-				)
-			);
+			builtInEntryTable.put (1.30, new BuiltInEntry (0.934007945, 0.065992055));
 
-			builtInEntryTable.put (
-				1.40,
-				new BuiltInEntry (
-					0.952285120,
-					0.047714880
-				)
-			);
+			builtInEntryTable.put (1.40, new BuiltInEntry (0.952285120, 0.047714880));
 
-			builtInEntryTable.put (
-				1.50,
-				new BuiltInEntry (
-					0.966105146,
-					0.033894854
-				)
-			);
+			builtInEntryTable.put (1.50, new BuiltInEntry (0.966105146, 0.033894854));
 
-			builtInEntryTable.put (
-				1.60,
-				new BuiltInEntry (
-					0.976348383,
-					0.023651617
-				)
-			);
+			builtInEntryTable.put (1.60, new BuiltInEntry (0.976348383, 0.023651617));
 
-			builtInEntryTable.put (
-				1.70,
-				new BuiltInEntry (
-					0.983790459,
-					0.016209541
-				)
-			);
+			builtInEntryTable.put (1.70, new BuiltInEntry (0.983790459, 0.016209541));
 
-			builtInEntryTable.put (
-				1.80,
-				new BuiltInEntry (
-					0.989090502,
-					0.010909498
-				)
-			);
+			builtInEntryTable.put (1.80, new BuiltInEntry (0.989090502, 0.010909498));
 
-			builtInEntryTable.put (
-				1.90,
-				new BuiltInEntry (
-					0.992790429,
-					0.007209571
-				)
-			);
+			builtInEntryTable.put (1.90, new BuiltInEntry (0.992790429, 0.007209571));
 
-			builtInEntryTable.put (
-				2.00,
-				new BuiltInEntry (
-					0.995322265,
-					0.004677735
-				)
-			);
+			builtInEntryTable.put (2.00, new BuiltInEntry (0.995322265, 0.004677735));
 
-			builtInEntryTable.put (
-				2.10,
-				new BuiltInEntry (
-					0.997020533,
-					0.002979467
-				)
-			);
+			builtInEntryTable.put (2.10, new BuiltInEntry (0.997020533, 0.002979467));
 
-			builtInEntryTable.put (
-				2.20,
-				new BuiltInEntry (
-					0.998137154,
-					0.001862846
-				)
-			);
+			builtInEntryTable.put (2.20, new BuiltInEntry (0.998137154, 0.001862846));
 
-			builtInEntryTable.put (
-				2.30,
-				new BuiltInEntry (
-					0.998856823,
-					0.001143177
-				)
-			);
+			builtInEntryTable.put (2.30, new BuiltInEntry (0.998856823, 0.001143177));
 
-			builtInEntryTable.put (
-				2.40,
-				new BuiltInEntry (
-					0.999311486,
-					0.000688514
-				)
-			);
+			builtInEntryTable.put (2.40, new BuiltInEntry (0.999311486, 0.000688514));
 
-			builtInEntryTable.put (
-				2.50,
-				new BuiltInEntry (
-					0.999593048,
-					0.000406952
-				)
-			);
+			builtInEntryTable.put (2.50, new BuiltInEntry (0.999593048, 0.000406952));
 
-			builtInEntryTable.put (
-				3.00,
-				new BuiltInEntry (
-					0.999977910,
-					0.000022090
-				)
-			);
+			builtInEntryTable.put (3.00, new BuiltInEntry (0.999977910, 0.000022090));
 
-			builtInEntryTable.put (
-				3.50,
-				new BuiltInEntry (
-					0.999999257,
-					0.000000743
-				)
-			);
+			builtInEntryTable.put (3.50, new BuiltInEntry (0.999999257, 0.000000743));
 
 			return builtInEntryTable;
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -401,23 +228,21 @@ public class BuiltInEntry
 	}
 
 	/**
-	 * BuiltInEntry Constructor
+	 * <i>BuiltInEntry</i> Constructor
 	 * 
 	 * @param erf E<sub>2</sub> erf Value
 	 * @param erfc E<sub>2</sub> erfc Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public BuiltInEntry (
 		final double erf,
 		final double erfc)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_erf = erf) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_erfc = erfc))
-		{
-			throw new java.lang.Exception ("BuiltInE2Entry Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_erf = erf) || !NumberUtil.IsValid (_erfc = erfc)) {
+			throw new Exception ("BuiltInE2Entry Constructor => Invalid Inputs");
 		}
 	}
 

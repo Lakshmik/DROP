@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -88,68 +96,62 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>QRDecomposition</i> demonstrates the technique to perform a QR Decomposition of the Input Square Matrix
  *  into an Orthogonal and an Upper Triangular Counterparts.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class QRDecomposition {
+public class QRDecomposition
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		/* double[][] aadblA = {
-			{ 12, -51,   4},
-			{  6, 167, -68},
-			{ -4,  24, -41}
-		}; */
-
-		double[][] aadblA = {
+		double[][] a =
+		{
 			{ 1.0, 0.1, 0.0},
 			{ 0.1, 1.0, 0.4},
 			{ 0.0, 0.4, 1.0}
 		};
 
-		QR qr = R1MatrixUtil.QRDecomposition (aadblA);
+		QR qr = R1MatrixUtil.QRDecomposition (a);
 
-		double[][] aadblR = qr.r();
+		double[][] r = qr.r();
 
-		NumberUtil.PrintMatrix ("Initial R:   ", aadblR);
-
-		System.out.println();
-
-		double[][] aadblQ = qr.q();
-
-		NumberUtil.PrintMatrix ("Initial Q:   ", aadblQ);
+		NumberUtil.PrintMatrix ("\t|| Initial R:   ", r);
 
 		System.out.println();
 
-		NumberUtil.PrintMatrix ("Inverse Q:   ", R1MatrixUtil.InvertUsingGaussianElimination (aadblQ));
+		double[][] q = qr.q();
+
+		NumberUtil.PrintMatrix ("\t|| Initial Q:   ", q);
 
 		System.out.println();
 
-		double[][] aadblQT = R1MatrixUtil.Transpose (aadblQ);
+		NumberUtil.PrintMatrix ("\t|| Inverse Q:   ", R1MatrixUtil.InvertUsingGaussianElimination (q));
 
-		NumberUtil.PrintMatrix ("Transpose Q: ", aadblQT);
+		System.out.println();
+
+		NumberUtil.PrintMatrix ("\t|| Transpose Q: ", R1MatrixUtil.Transpose (q));
 
 		System.out.println();
 

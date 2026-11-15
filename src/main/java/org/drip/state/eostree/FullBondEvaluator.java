@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.drip.analytics.cashflow.CompositePeriod;
 import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
 import org.drip.product.credit.BondComponent;
-import org.drip.product.params.EmbeddedOptionSchedule;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
 
@@ -134,6 +132,37 @@ public class FullBondEvaluator
 {
 	private BondComponent _underlying = null;
 
+	private static final VertexInelastic MakeVertexInelastic (
+		final double time,
+		final EventPillarTimeComposite eventPillarTimeComposite,
+		final boolean isMaturity)
+	{
+		TreeMap<Double, Double> timeToFullCouponMap = eventPillarTimeComposite.timeToFullCouponMap();
+
+		TreeMap<Double, VertexAccrual> timeToAccrualMap = eventPillarTimeComposite.timeToAccrualMap();
+
+		TreeMap<Double, Double> timeToPrincipalPaydownMap =
+			eventPillarTimeComposite.timeToPrincipalPaydownMap();
+
+		try {
+			return new VertexInelastic (
+				time,
+				(
+					timeToPrincipalPaydownMap.containsKey (time) ?
+						timeToPrincipalPaydownMap.get (time) : (isMaturity ? 1. : 0.)
+				) + (
+					timeToFullCouponMap.containsKey (time) ? timeToFullCouponMap.get (time) : 0.
+				),
+				!timeToAccrualMap.containsKey (time) || isMaturity ?
+					VertexAccrual.Zero() : timeToAccrualMap.get (time)
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
 	/**
 	 * <i>FullBondEvaluator</i> Constructor
 	 * 
@@ -163,108 +192,6 @@ public class FullBondEvaluator
 	}
 
 	/**
-	 * Construct the Bond Coupon Cash Flow PV Tree using the Calibrated <i>KalotayWilliamsFabozzi</i>
-	 *  Instance
-	 * 
-	 * @param spotDate Spot Date
-	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
-	 * 
-	 * @return Bond Value Tree
-	 */
-
-	public TreeMap<Double, List<Double>> cashFlowPVValueTree (
-		final JulianDate spotDate,
-		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
-	{
-		if (null == spotDate || null == kalotayWilliamsFabozzi) {
-			return null;
-		}
-
-		int spotDateJulian = spotDate.julian();
-
-		TreeMap<Double, List<Double>> cashFlowPVValueTree = new TreeMap<Double, List<Double>>();
-
-		for (CompositePeriod compositePeriod : _underlying.couponPeriods()) {
-			int payDateJulian = compositePeriod.payDate();
-
-			if (spotDateJulian >= payDateJulian) {
-				continue;
-			}
-
-			double cashflow = Double.NaN;
-			double periodStartTime = ((double) (compositePeriod.startDate() - spotDateJulian)) / 365.25;
-
-			try {
-				cashflow = _underlying.couponSetting().couponRate() * compositePeriod.couponDCF();
-			} catch (Exception e) {
-				e.printStackTrace();
-
-				return null;
-			}
-
-			List<KalotayWilliamsFabozziPeriodState> bespokePeriodStateList =
-				kalotayWilliamsFabozzi.bespokePeriodStateList (
-					((double) (payDateJulian - spotDateJulian)) / 365.25
-				);
-
-			for (KalotayWilliamsFabozziPeriodState bespokePeriodState : bespokePeriodStateList) {
-				if (!cashFlowPVValueTree.containsKey (periodStartTime)) {
-					cashFlowPVValueTree.put (periodStartTime, new ArrayList<Double>());
-				}
-
-				cashFlowPVValueTree.get (
-					periodStartTime
-				).add (
-					cashflow * bespokePeriodState.cumulativeEndDiscountFactor()
-				);
-			}
-		}
-
-		return cashFlowPVValueTree;
-	}
-
-	/**
-	 * Construct the Date to Cash Flow PV Map
-	 * 
-	 * @param spotDate Spot Date
-	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
-	 * 
-	 * @return Date to Cash Flow PV Map
-	 */
-
-	public TreeMap<JulianDate, Double> dateCashflowPVMap (
-		final JulianDate spotDate,
-		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
-	{
-		TreeMap<Double, List<Double>> cashFlowPVValueTree = cashFlowPVValueTree (
-			spotDate,
-			kalotayWilliamsFabozzi
-		);
-
-		if (null == cashFlowPVValueTree) {
-			return null;
-		}
-
-		TreeMap<JulianDate, Double> dateCashflowPVMap = new TreeMap<JulianDate, Double>();
-
-		for (Double cashFlowTime : cashFlowPVValueTree.keySet()) {
-			double cumulativeCashFlowPV = 0.;
-
-			JulianDate payDate = spotDate.addDays ((int) (365.25 * cashFlowTime));
-
-			List<Double> periodCashflowPVList = cashFlowPVValueTree.get (cashFlowTime);
-
-			for (Double cashflowPV : periodCashflowPVList) {
-				cumulativeCashFlowPV += cashflowPV;
-			}
-
-			dateCashflowPVMap.put (payDate, cumulativeCashFlowPV / periodCashflowPVList.size());
-		}
-
-		return dateCashflowPVMap;
-	}
-
-	/**
 	 * Roll the List of <i>SegmentCouponMeasures</i> Instances Backwards
 	 * 
 	 * @param spotDate Spot Date
@@ -273,71 +200,61 @@ public class FullBondEvaluator
 	 * @return List of <i>SegmentCouponMeasures</i> Instances Backwards
 	 */
 
-	public List<SegmentCouponMeasures> rollBackwards (
+	public List<SegmentElastic> rollBackwards (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
-		EventPillarTimeComposite couponExerciseComposite = EventPillarTimeComposite.Standard (
+		EventPillarTimeComposite eventPillarTimeComposite = EventPillarTimeComposite.Standard (
 			spotDate,
 			_underlying,
 			kalotayWilliamsFabozzi
 		);
 
-		if (null == couponExerciseComposite) {
+		if (null == eventPillarTimeComposite) {
 			return null;
 		}
 
 		boolean isPut = _underlying.putable();
 
 		double rightTime = Double.NaN;
-		SegmentCouponMeasures previousSegmentCouponMeasures = null;
+		SegmentElastic previousSegmentElastic = null;
 
-		double couponRate = _underlying.couponSetting().couponRate();
+		List<SegmentElastic> segmentElasticList = new ArrayList<SegmentElastic>();
 
-		List<SegmentCouponMeasures> segmentCouponMeasuresList = new ArrayList<SegmentCouponMeasures>();
-
-		TreeMap<Double, Double> exerciseTimeToPriceMap = couponExerciseComposite.exerciseTimeToPriceMap();
+		TreeMap<Double, Double> exerciseTimeToPriceMap = eventPillarTimeComposite.exerciseTimeToPriceMap();
 
 		double maturityTime = ((double) (_underlying.maturityDate().julian() - spotDate.julian())) / 365.25;
 
 		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToPeriodStateListMap =
-			couponExerciseComposite.timeToPeriodStateListMap();
+			eventPillarTimeComposite.timeToPeriodStateListMap();
 
-		for (double endTime : timeToPeriodStateListMap.descendingKeySet()) {
-			if (maturityTime < endTime) {
-				rightTime = endTime;
+		for (double leftTime : timeToPeriodStateListMap.descendingKeySet()) {
+			if (maturityTime <= leftTime) {
+				rightTime = leftTime;
 				continue;
 			}
 
-			if (null == previousSegmentCouponMeasures) {
-				segmentCouponMeasuresList.add (
-					previousSegmentCouponMeasures = SegmentCouponMeasures.Terminal (
-						endTime,
-						rightTime,
-						couponRate * (rightTime - endTime),
-						timeToPeriodStateListMap.get (endTime),
-						isPut,
-						exerciseTimeToPriceMap
-					)
-				);
-			} else {
-				segmentCouponMeasuresList.add (
-					previousSegmentCouponMeasures = SegmentCouponMeasures.Preceding (
-						endTime,
-						rightTime,
-						couponRate * (rightTime - endTime),
-						timeToPeriodStateListMap.get (endTime),
-						previousSegmentCouponMeasures,
-						isPut,
-						exerciseTimeToPriceMap
-					)
-				);
-			}
+			List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+				timeToPeriodStateListMap.get (rightTime);
 
-			rightTime = endTime;
+			SegmentElastic segmentElastic = SegmentElastic.Standard (
+				MakeVertexInelastic (leftTime, eventPillarTimeComposite, false),
+				null == previousSegmentElastic ? VertexElastic.Terminal (
+					MakeVertexInelastic (rightTime, eventPillarTimeComposite, true),
+					kalotayWilliamsFabozziPeriodStateList.size()
+				) : previousSegmentElastic.leftVertexElastic(),
+				kalotayWilliamsFabozziPeriodStateList,
+				isPut,
+				exerciseTimeToPriceMap
+			);
+
+			segmentElasticList.add (segmentElastic);
+
+			previousSegmentElastic = segmentElastic;
+			rightTime = leftTime;
 		}
 
-		return segmentCouponMeasuresList;
+		return segmentElasticList;
 	}
 
 	/**
@@ -374,62 +291,35 @@ public class FullBondEvaluator
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
-		TreeMap<JulianDate, Double> dateCashflowPVMap = dateCashflowPVMap (spotDate, kalotayWilliamsFabozzi);
+		List<SegmentElastic> segmentElasticList = rollBackwards (spotDate, kalotayWilliamsFabozzi);
 
-		if (null == dateCashflowPVMap) {
-			return null;
-		}
-
-		EmbeddedOptionSchedule putSchedule = _underlying.putSchedule();
-
-		EmbeddedOptionSchedule callSchedule = _underlying.callSchedule();
-
-		if (null == callSchedule && null == putSchedule) {
-			double cashFlowPV = 0.;
-
-			for (double periodCashFlowPV : dateCashflowPVMap.values()) {
-				cashFlowPV += periodCashFlowPV;
-			}
-
-			List<Double> cashFlowList = new ArrayList<Double>();
-
-			cashFlowList.add (cashFlowPV + dateCashflowPVMap.lastEntry().getValue());
-
-			TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
-
-			valueTree.put (0., cashFlowList);
-
-			return valueTree;
-		}
-
-		List<SegmentCouponMeasures> segmentCouponMeasuresList =
-			rollBackwards (spotDate, kalotayWilliamsFabozzi);
-
-		if (null == segmentCouponMeasuresList || segmentCouponMeasuresList.isEmpty()) {
+		if (null == segmentElasticList || segmentElasticList.isEmpty()) {
 			return null;
 		}
 
 		TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
 
-		for (SegmentCouponMeasures segmentCouponMeasures : segmentCouponMeasuresList) {
+		for (SegmentElastic segmentElastic : segmentElasticList) {
 			List<Double> forwardLeftPVList = new ArrayList<Double>();
 
-			for (double forwardLeftPV : segmentCouponMeasures.forwardLeftPVArray()) {
+			VertexElastic leftVertexElastic = segmentElastic.leftVertexElastic();
+
+			for (double forwardLeftPV : leftVertexElastic.pvArray()) {
 				forwardLeftPVList.add (forwardLeftPV);
 			}
 
-			valueTree.put (segmentCouponMeasures.confine().leftTime(), forwardLeftPVList);
+			valueTree.put (leftVertexElastic.inelastic().time(), forwardLeftPVList);
 		}
 
 		List<Double> cashFlowList = new ArrayList<Double>();
 
-		SegmentCouponMeasures leadingSegmentCouponMeasures =
-			segmentCouponMeasuresList.get (segmentCouponMeasuresList.size() - 1);
+		SegmentElastic leadingSegmentElastic = segmentElasticList.get (segmentElasticList.size() - 1);
+
+		VertexElastic leadingVertexElastic = leadingSegmentElastic.leftVertexElastic();
 
 		cashFlowList.add (
-			leadingSegmentCouponMeasures.forwardLeftPVArray()[0] / (
-				1. + leadingSegmentCouponMeasures.forwardYieldArray()[0] *
-					leadingSegmentCouponMeasures.confine().leftTime()
+			leadingVertexElastic.pvArray()[0] / (
+				1. + leadingSegmentElastic.flatYieldArray()[0] * leadingVertexElastic.inelastic().time()
 			)
 		);
 

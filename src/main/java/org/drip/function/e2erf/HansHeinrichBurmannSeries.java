@@ -1,11 +1,23 @@
 
 package org.drip.function.e2erf;
 
+import java.util.TreeMap;
+
+import org.drip.numerical.estimation.R1ToR1Series;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,14 +116,23 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Construct Winitzki (2008) Version of the Analytical E<sub>2</sub> erf Inverse</li>
+ * 		<li>Construct the Convergent E<sub>2</sub> erf Hans Heinrich Burmann Version</li>
+ * 		<li>Construct the Schopf-Supancic (2014) E<sub>2</sub> erf Hans Heinrich Burmann Version</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -125,46 +146,23 @@ public class HansHeinrichBurmannSeries
 	 * @return The Convergent E<sub>2</sub> erf Hans Heinrich Burmann Version
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1Series Convergent()
+	public static final R1ToR1Series Convergent()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			0,
-			1.
-		);
+		termWeightMap.put (0, 1.);
 
-		termWeightMap.put (
-			1,
-			-1. / 12.
-		);
+		termWeightMap.put (1, -1. / 12.);
 
-		termWeightMap.put (
-			2,
-			-7. / 480.
-		);
+		termWeightMap.put (2, -7. / 480.);
 
-		termWeightMap.put (
-			3,
-			-5. / 896.
-		);
+		termWeightMap.put (3, -5. / 896.);
 
-		termWeightMap.put (
-			4,
-			-787. / 276480.
-		);
+		termWeightMap.put (4, -787. / 276480.);
 
-		try
-		{
-			return new org.drip.numerical.estimation.R1ToR1Series (
-				org.drip.function.e2erf.HansHeinrichBurmannTerm.Convergent(),
-				false,
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new R1ToR1Series (HansHeinrichBurmannTerm.Convergent(), false, termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -177,36 +175,19 @@ public class HansHeinrichBurmannSeries
 	 * @return The Schopf-Supancic (2014) E<sub>2</sub> erf Hans Heinrich Burmann Version
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1Series SchopfSupancic2014()
+	public static final R1ToR1Series SchopfSupancic2014()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			0,
-			0.5 * java.lang.Math.sqrt (java.lang.Math.PI)
-		);
+		termWeightMap.put (0, 0.5 * Math.sqrt (Math.PI));
 
-		termWeightMap.put (
-			1,
-			31. / 200.
-		);
+		termWeightMap.put (1, 31. / 200.);
 
-		termWeightMap.put (
-			2,
-			-341. / 8000.
-		);
+		termWeightMap.put (2, -341. / 8000.);
 
-		try
-		{
-			return new org.drip.numerical.estimation.R1ToR1Series (
-				org.drip.function.e2erf.HansHeinrichBurmannTerm.SchopfSupancic2014(),
-				false,
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new R1ToR1Series (HansHeinrichBurmannTerm.SchopfSupancic2014(), false, termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

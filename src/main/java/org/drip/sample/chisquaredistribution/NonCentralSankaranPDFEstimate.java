@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -108,14 +116,15 @@ import org.drip.service.env.EnvManager;
  * 				Statistical Software</i> <b>36 (5)</b> 1-39
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -186,40 +195,48 @@ public class NonCentralSankaranPDFEstimate
 			 0.60,
 		};
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                             PROBABILITY DENSITY FUNCTION ESTIMATE                                            ||");
+		System.out.println (
+			"\t|                                             PROBABILITY DENSITY FUNCTION ESTIMATE                                            ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom; Non-centrality Parameter                                                                ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom; Non-centrality Parameter                                                                ||"
+		);
 
-		System.out.println ("\t|                - Values for different t                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different t                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double nonCentralityParameter : nonCentralityParameterArray)
-		{
-			for (int dof : dofArray)
-			{
-				R1NonCentralSankaran r1NonCentralSankaran = R1NonCentralSankaran.Standard (
-					dof,
-					1.
-				);
+		for (double nonCentralityParameter : nonCentralityParameterArray) {
+			for (int dof : dofArray) {
+				R1NonCentralSankaran r1NonCentralSankaran = R1NonCentralSankaran.Standard (dof, 1.);
 
-				String display = "\t| [" +
-					FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
-					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) +
-				"] =>";
+				String display = "\t| [" + FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
+					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) + "] =>";
 
-				for (double t : tArray)
-				{
+				for (double t : tArray) {
 					display = display + " " + FormatUtil.FormatDouble (
-						r1NonCentralSankaran.density (
-							t
-						), 1, 5, 1., false
+						r1NonCentralSankaran.density (t),
+						1,
+						5,
+						1.,
+						false
 					) + " |";
 				}
 
@@ -227,44 +244,54 @@ public class NonCentralSankaranPDFEstimate
 			}
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                           CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                          ||");
+		System.out.println (
+			"\t|                                           CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                          ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom; Non-centrality Parameter                                                                ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom; Non-centrality Parameter                                                                ||"
+		);
 
-		System.out.println ("\t|                - Values for different t                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different t                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double nonCentralityParameter : nonCentralityParameterArray)
-		{
-			for (int dof : dofArray)
-			{
-				R1NonCentralSankaran r1NonCentralSankaran = R1NonCentralSankaran.Standard (
-					dof,
-					1.
-				);
+		for (double nonCentralityParameter : nonCentralityParameterArray) {
+			for (int dof : dofArray) {
+				R1NonCentralSankaran r1NonCentralSankaran = R1NonCentralSankaran.Standard (dof, 1.);
 
-				String display = "\t| [" +
-					FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
-					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) +
-				"] =>";
+				String display = "\t| [" + FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
+					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) + "] =>";
 
-				for (double t : tArray)
-				{
+				for (double t : tArray) {
 					display = display + " " + FormatUtil.FormatDouble (
-						r1NonCentralSankaran.cumulative (
-							t
-						), 1, 5, 1., false
+						r1NonCentralSankaran.cumulative (t),
+						1,
+						5,
+						1.,
+						false
 					) + " |";
 				}
 
@@ -272,44 +299,54 @@ public class NonCentralSankaranPDFEstimate
 			}
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                       INVERSE CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                      ||");
+		System.out.println (
+			"\t|                                       INVERSE CUMULATIVE DISTRIBUTION FUNCTION ESTIMATE                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom; Non-centrality Parameter                                                                ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom; Non-centrality Parameter                                                                ||"
+		);
 
-		System.out.println ("\t|                - Values for different p                                                                                      ||");
+		System.out.println (
+			"\t|                - Values for different p                                                                                      ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double nonCentralityParameter : nonCentralityParameterArray)
-		{
-			for (int dof : dofArray)
-			{
-				R1NonCentralSankaran r1NonCentralSankaran = R1NonCentralSankaran.Standard (
-					dof,
-					1.
-				);
+		for (double nonCentralityParameter : nonCentralityParameterArray) {
+			for (int dof : dofArray) {
+				R1NonCentralSankaran r1NonCentralSankaran = R1NonCentralSankaran.Standard (dof, 1.);
 
-				String display = "\t| [" +
-					FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
-					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) +
-				"] =>";
+				String display = "\t| [" + FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
+					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) + "] =>";
 
-				for (double p : pValueArray)
-				{
+				for (double p : pValueArray) {
 					display = display + " " + FormatUtil.FormatDouble (
-						r1NonCentralSankaran.invCumulative (
-							p
-						), 1, 5, 1., false
+						r1NonCentralSankaran.invCumulative (p),
+						1,
+						5,
+						1.,
+						false
 					) + " |";
 				}
 
@@ -317,7 +354,9 @@ public class NonCentralSankaranPDFEstimate
 			}
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

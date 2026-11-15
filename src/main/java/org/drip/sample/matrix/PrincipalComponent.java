@@ -10,6 +10,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -87,73 +95,73 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>PrincipalComponent</i> demonstrates how to generate the Principal eigenvalue and eigenvector for the
  *  Input Matrix.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class PrincipalComponent {
+public class PrincipalComponent
+{
 
 	private static final void PrincipalComponentRun (
-		final PowerIterationComponentExtractor pice)
+		final PowerIterationComponentExtractor powerIterationComponentExtractor)
 		throws Exception
 	{
-		double dblCorr1 = 0.5 * Math.random();
+		double correlation1 = 0.5 * Math.random();
 
-		double dblCorr2 = 0.5 * Math.random();
+		double correlation2 = 0.5 * Math.random();
 
-		double[][] aadblA = {
-			{     1.0, dblCorr1,      0.0},
-			{dblCorr1,      1.0, dblCorr2},
-			{     0.0, dblCorr2,      1.0}
+		double[][] a =
+		{
+			{           1., correlation1,           0.},
+			{correlation1,            1., correlation2},
+			{          0.,  correlation2,           1.}
 		};
 
-		EigenComponent ec = pice.principalComponent (aadblA);
+		EigenComponent eigenComponent = powerIterationComponentExtractor.principalComponent (a);
 
-		double[] adblEigenvector = ec.eigenVector();
+		double[] eigenVector = eigenComponent.eigenVector();
 
-		java.lang.String strDump = "[" + FormatUtil.FormatDouble (ec.eigenValue(), 1, 4, 1.) + "] => ";
+		String dump = "[" + FormatUtil.FormatDouble (eigenComponent.eigenValue(), 1, 4, 1.) + "] => ";
 
-		for (int i = 0; i < adblEigenvector.length; ++i)
-			strDump += FormatUtil.FormatDouble (adblEigenvector[i], 1, 4, 1.) + " | ";
+		for (int i = 0; i < eigenVector.length; ++i) {
+			dump += FormatUtil.FormatDouble (eigenVector[i], 1, 4, 1.) + " | ";
+		}
 
 		System.out.println (
-			"\t{" +
-			FormatUtil.FormatDouble (dblCorr1, 1, 4, 1.) + " ||" +
-			FormatUtil.FormatDouble (dblCorr2, 1, 4, 1.) + "} => " + strDump
+			"\t|| {" + FormatUtil.FormatDouble (correlation1, 1, 4, 1.) + " ||" +
+			FormatUtil.FormatDouble (correlation2, 1, 4, 1.) + "} => " + dump
 		);
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		PowerIterationComponentExtractor pice = new PowerIterationComponentExtractor (
-			50,
-			0.000001,
-			false
-		);
+		PowerIterationComponentExtractor powerIterationComponentExtractor =
+			new PowerIterationComponentExtractor (50, 0.000001, false);
 
-		for (int i = 0; i < 50; ++i)
-			PrincipalComponentRun (pice);
+		for (int i = 0; i < 50; ++i) {
+			PrincipalComponentRun (powerIterationComponentExtractor);
+		}
 
 		EnvManager.TerminateEnv();
 	}

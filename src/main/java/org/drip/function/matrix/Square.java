@@ -1,11 +1,27 @@
 
 package org.drip.function.matrix;
 
+import java.util.Map;
+
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.eigenization.EigenOutput;
+import org.drip.numerical.eigenization.QREigenComponentExtractor;
+import org.drip.numerical.linearalgebra.R1MatrixUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -102,15 +118,25 @@ package org.drip.function.matrix;
  *  		Wikipedia (2019): Sylvester Formula https://en.wikipedia.org/wiki/Sylvester%27s_formula
  *  	</li>
  *  </ul>
- *  
- * <br><br>
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/matrix/README.md">Support for Functions of Matrices</a></li>
+ * 		<li><i>Square</i> Constructor</li>
+ * 		<li>Retrieve the Grid of Elements/li>
+ * 		<li>Retrieve the Dimension of the Square Matrix/li>
+ * 		<li>Retrieve the Eigen-Components of the Square Matrix/li>
+ * 		<li>Generate the Frobenius Covariance/li>
+ * 		<li>Compute the Value of the Matrix using the specified Function/li>
+ * 		<li>Compute the Determinant/li>
  *  </ul>
- * <br><br>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/matrix/README.md">Support for Functions of Matrices</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -120,47 +146,28 @@ public class Square
 	private double[][] _grid = null;
 
 	/**
-	 * Square Constructor
+	 * <i>Square</i> Constructor
 	 * 
 	 * @param grid Grid of Elements
 	 * 
-	 * @throws java.lang.Exception Throwjn if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public Square (
 		final double[][] grid)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (null == (_grid = grid))
-		{
-			throw new java.lang.Exception (
-				"Square Constructor => Invalid Inputs"
-			);
+		if (null == (_grid = grid) || 0 == _grid.length) {
+			throw new Exception ("Square Constructor => Invalid Inputs");
 		}
 
-		int dimension = _grid.length;
-
-		if (0 == dimension)
-		{
-			throw new java.lang.Exception (
-				"Square Constructor => Invalid Inputs"
-			);
-		}
-
-		for (int dimensionIndex = 0;
-			dimensionIndex < dimension;
-			++dimensionIndex)
-		{
+		for (int dimensionIndex = 0; dimensionIndex < _grid.length; ++dimensionIndex) {
 			if (null == _grid[dimensionIndex] ||
-				dimension != _grid[dimensionIndex].length ||
-				!org.drip.numerical.common.NumberUtil.IsValid (
-					_grid[dimensionIndex]
-				)
+				_grid.length != _grid[dimensionIndex].length ||
+				!NumberUtil.IsValid (_grid[dimensionIndex])
 			)
 			{
-				throw new java.lang.Exception (
-					"Square Constructor => Invalid Inputs"
-				);
+				throw new Exception ("Square Constructor => Invalid Inputs");
 			}
 		}
 	}
@@ -193,18 +200,11 @@ public class Square
 	 * @return The Eigen-Components of the Square Matrix
 	 */
 
-	public org.drip.numerical.eigenization.EigenOutput eigenize()
+	public EigenOutput eigenize()
 	{
-		try
-		{
-			return new org.drip.numerical.eigenization.QREigenComponentExtractor (
-				100
-			).eigenize (
-				_grid
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new QREigenComponentExtractor (100).eigenize (_grid);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -217,35 +217,23 @@ public class Square
 	 * @return The Frobenius Covariance
 	 */
 
-	public org.drip.function.matrix.FrobeniusCovariance frobeniusCovariance()
+	public FrobeniusCovariance frobeniusCovariance()
 	{
-		org.drip.function.matrix.FrobeniusCovariance frobeniusCovariance =
-			new org.drip.function.matrix.FrobeniusCovariance();
+		FrobeniusCovariance frobeniusCovariance = new FrobeniusCovariance();
 
-		org.drip.numerical.eigenization.EigenOutput eigenOutput = eigenize();
+		EigenOutput eigenOutput = eigenize();
 
-		if (null == eigenOutput)
-		{
+		if (null == eigenOutput) {
 			return null;
 		}
 
 		double[] eigenValueArray = eigenOutput.eigenValueArray();
 
-		int dimension = _grid.length;
-		double[][][] eigenShadowArray = new double[dimension][dimension][dimension];
+		double[][][] eigenShadowArray = new double[_grid.length][_grid.length][_grid.length];
 
-		for (int eigenIndex = 0;
-			eigenIndex < dimension;
-			++eigenIndex)
-		{
-			for (int dimensionIndexI = 0;
-				dimensionIndexI < dimension;
-				++dimensionIndexI)
-			{
-				for (int dimensionIndexJ = 0;
-					dimensionIndexJ < dimension;
-					++dimensionIndexJ)
-				{
+		for (int eigenIndex = 0; eigenIndex < _grid.length; ++eigenIndex) {
+			for (int dimensionIndexI = 0; dimensionIndexI < _grid.length; ++dimensionIndexI) {
+				for (int dimensionIndexJ = 0; dimensionIndexJ < _grid.length; ++dimensionIndexJ) {
 					eigenShadowArray[eigenIndex][dimensionIndexI][dimensionIndexJ] =
 						_grid[dimensionIndexI][dimensionIndexJ] - (
 							dimensionIndexI == dimensionIndexJ ? eigenValueArray[eigenIndex] : 0.
@@ -254,54 +242,38 @@ public class Square
 			}
 		}
 
-		for (int componentIndex = 0;
-			componentIndex < dimension;
-			++componentIndex)
-		{
+		for (int componentIndex = 0; componentIndex < _grid.length; ++componentIndex) {
 			double[][] frobeniusComponentMatrix = null;
 			double componentEigenValue = eigenValueArray[componentIndex];
 
-			for (int eigenIndex = 0;
-				eigenIndex < dimension;
-				++eigenIndex)
-			{
-				if (eigenIndex == componentIndex)
-				{
+			for (int eigenIndex = 0; eigenIndex < _grid.length; ++eigenIndex) {
+				if (eigenIndex == componentIndex) {
 					continue;
 				}
 
-				if (null == frobeniusComponentMatrix)
-				{
-					frobeniusComponentMatrix = org.drip.numerical.linearalgebra.R1MatrixUtil.Scale2D (
+				if (null == frobeniusComponentMatrix) {
+					frobeniusComponentMatrix = R1MatrixUtil.Scale2D (
 						eigenShadowArray[eigenIndex],
 						1. / (componentEigenValue - eigenValueArray[eigenIndex])
 					);
-				}
-				else
-				{
-					frobeniusComponentMatrix = org.drip.numerical.linearalgebra.R1MatrixUtil.Scale2D (
-						org.drip.numerical.linearalgebra.R1MatrixUtil.Product (
-							frobeniusComponentMatrix,
-							eigenShadowArray[eigenIndex]
-						),
+				} else {
+					frobeniusComponentMatrix = R1MatrixUtil.Scale2D (
+						R1MatrixUtil.Product (frobeniusComponentMatrix, eigenShadowArray[eigenIndex]),
 						1. / (componentEigenValue - eigenValueArray[eigenIndex])
 					);
 				}
 			}
 
-			try
-			{
+			try {
 				if (!frobeniusCovariance.addComponent (
 					componentEigenValue,
-					new org.drip.function.matrix.Square (
-						frobeniusComponentMatrix
-					)
+					new Square (frobeniusComponentMatrix)
 				))
 				{
 					return null;
 				}
 			}
-			catch (java.lang.Exception e)
+			catch (Exception e)
 			{
 				e.printStackTrace();
 			}
@@ -319,63 +291,43 @@ public class Square
 	 */
 
 	public double[][] evaluate (
-		final org.drip.function.definition.R1ToR1 r1ToR1Function)
+		final R1ToR1 r1ToR1Function)
 	{
-		if (null == r1ToR1Function)
-		{
+		if (null == r1ToR1Function) {
 			return null;
 		}
 
-		int dimension = _grid.length;
 		double[][] matrixFunction = null;
 
-		org.drip.function.matrix.FrobeniusCovariance frobeniusCovariance = frobeniusCovariance();
+		FrobeniusCovariance frobeniusCovariance = frobeniusCovariance();
 
-		if (null == frobeniusCovariance)
-		{
+		if (null == frobeniusCovariance) {
 			return null;
 		}
 
-		for (java.util.Map.Entry<java.lang.Double, org.drip.function.matrix.Square> componentMapEntry :
-			frobeniusCovariance.componentMap().entrySet())
-		{
+		for (Map.Entry<Double, Square> componentMapEntry : frobeniusCovariance.componentMap().entrySet()) {
 			double[][] frobeniusComponentFunctionProjection = null;
 
-			try
-			{
-				frobeniusComponentFunctionProjection = org.drip.numerical.linearalgebra.R1MatrixUtil.Scale2D (
+			try {
+				frobeniusComponentFunctionProjection = R1MatrixUtil.Scale2D (
 					componentMapEntry.getValue().grid(),
-					r1ToR1Function.evaluate (
-						componentMapEntry.getKey()
-					)
+					r1ToR1Function.evaluate (componentMapEntry.getKey())
 				);
-			}
-			catch (java.lang.Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 
-			if (null == frobeniusComponentFunctionProjection)
-			{
+			if (null == frobeniusComponentFunctionProjection) {
 				return null;
 			}
 
-			if (null == matrixFunction)
-			{
+			if (null == matrixFunction) {
 				matrixFunction = frobeniusComponentFunctionProjection;
-			}
-			else
-			{
-				for (int dimensionIndexI = 0;
-					dimensionIndexI < dimension;
-					++dimensionIndexI)
-				{
-					for (int dimensionIndexJ = 0;
-						dimensionIndexJ < dimension;
-						++dimensionIndexJ)
-					{
+			} else {
+				for (int dimensionIndexI = 0; dimensionIndexI < _grid.length; ++dimensionIndexI) {
+					for (int dimensionIndexJ = 0; dimensionIndexJ < _grid.length; ++dimensionIndexJ) {
 						matrixFunction[dimensionIndexI][dimensionIndexJ] =
 							matrixFunction[dimensionIndexI][dimensionIndexJ] +
 							frobeniusComponentFunctionProjection[dimensionIndexI][dimensionIndexJ];
@@ -395,22 +347,17 @@ public class Square
 
 	public double determinant()
 	{
-		org.drip.numerical.eigenization.EigenOutput eigenOutput = eigenize();
+		EigenOutput eigenOutput = eigenize();
 
-		if (null == eigenOutput)
-		{
+		if (null == eigenOutput) {
 			return 0.;
 		}
 
+		double determinant = 1.;
+
 		double[] eigenValueArray = eigenOutput.eigenValueArray();
 
-		double determinant = 1.;
-		int dimension = _grid.length;
-
-		for (int eigenIndex = 0;
-			eigenIndex < dimension;
-	        ++eigenIndex)
-		{
+		for (int eigenIndex = 0; eigenIndex < _grid.length; ++eigenIndex) {
 	         determinant = determinant * eigenValueArray[eigenIndex];
 		}
 

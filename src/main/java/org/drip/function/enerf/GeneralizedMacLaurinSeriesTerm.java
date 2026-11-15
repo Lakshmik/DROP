@@ -1,11 +1,22 @@
 
 package org.drip.function.enerf;
 
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.estimation.R1ToR1SeriesTerm;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,37 +115,46 @@ package org.drip.function.enerf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ * It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/enerf/README.md">E<sub>n</sub> erf Series and Generators</a></li>
+ * 		<li><i>GeneralizedMacLaurinSeriesTerm</i> Constructor</li>
+ * 		<li>Retrieve the Degree of the Generalized E<sub>n</sub> Series Term</li>
+ * 		<li>Compute the Value of the R<sup>1</sup> To R<sup>1</sup> Series Expansion Term</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/enerf/README.md">E<sub>n</sub> erf Series and Generators</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class GeneralizedMacLaurinSeriesTerm extends org.drip.numerical.estimation.R1ToR1SeriesTerm
+public class GeneralizedMacLaurinSeriesTerm
+	extends R1ToR1SeriesTerm
 {
 	private int _degree = -1;
 
 	/**
-	 * GeneralizedMacLaurinSeriesTerm Constructor
+	 * <i>GeneralizedMacLaurinSeriesTerm</i> Constructor
 	 * 
 	 * @param degree Generalized E<sub>n</sub> Degree
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public GeneralizedMacLaurinSeriesTerm (
 		final int degree)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (0 > (_degree = degree))
-		{
-			throw new java.lang.Exception ("GeneralizedMacLaurinSeriesTerm Constructor => Invalid Inputs");
+		if (0 > (_degree = degree)) {
+			throw new Exception ("GeneralizedMacLaurinSeriesTerm Constructor => Invalid Inputs");
 		}
 	}
 
@@ -149,20 +169,26 @@ public class GeneralizedMacLaurinSeriesTerm extends org.drip.numerical.estimatio
 		return _degree;
 	}
 
+	/**
+	 * Compute the Value of the R<sup>1</sup> To R<sup>1</sup> Series Expansion Term
+	 * 
+	 * @param order Order of the R<sup>1</sup> To R<sup>1</sup> Series Expansion Term
+	 * @param z Z
+	 * 
+	 * @return The Value of the R<sup>1</sup> To R<sup>1</sup> Series Expansion Term
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
 	@Override public double value (
 		final int order,
 		final double z)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (0 > order ||
-			!org.drip.numerical.common.NumberUtil.IsValid (z))
-		{
-			throw new java.lang.Exception ("GeneralizedMacLaurinSeriesTerm::value => Invalid Inputs");
+		if (0 > order || !NumberUtil.IsValid (z)) {
+			throw new Exception ("GeneralizedMacLaurinSeriesTerm::value => Invalid Inputs");
 		}
 
-		return java.lang.Math.pow (
-			z,
-			_degree * order + 1
-		);
+		return Math.pow (z, _degree * order + 1);
 	}
 }

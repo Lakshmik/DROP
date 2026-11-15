@@ -1,11 +1,23 @@
 
 package org.drip.function.e2erf;
 
+import java.util.TreeMap;
+
+import org.drip.numerical.estimation.R1ToR1Series;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -103,19 +115,30 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Generate the ERFI E<sub>2</sub> MacLaurin Coefficient corresponding to the specified Series Index</li>
+ * 		<li>Construct the E<sub>2</sub> erf MacLaurin Series Generator Version</li>
+ * 		<li>Construct the E<sub>2</sub> erfi MacLaurin Series Generator Version</li>
+ * 		<li><i>MacLaurinSeries</i> Constructor</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class MacLaurinSeries extends org.drip.numerical.estimation.R1ToR1Series
+public class MacLaurinSeries
+	extends R1ToR1Series
 {
 
 	/**
@@ -129,18 +152,16 @@ public class MacLaurinSeries extends org.drip.numerical.estimation.R1ToR1Series
 	public static final double ERFICoefficient (
 		final int seriesIndex)
 	{
-		if (0 >= seriesIndex)
-		{
+		if (0 >= seriesIndex) {
 			return 1.;
 		}
 
 		double seriesIndexLoader = 0.;
 
-		for (int termIndex = 0; termIndex < seriesIndex; ++termIndex)
-		{
+		for (int termIndex = 0; termIndex < seriesIndex; ++termIndex) {
 			seriesIndexLoader = seriesIndexLoader +
-				ERFICoefficient (termIndex) * ERFICoefficient (seriesIndex - 1 - termIndex)
-				/ ((1. + termIndex) * (1. + 2. * termIndex));
+				ERFICoefficient (termIndex) * ERFICoefficient (seriesIndex - 1 - termIndex) /
+					((1. + termIndex) * (1. + 2. * termIndex));
 		}
 
 		return seriesIndexLoader;
@@ -157,30 +178,19 @@ public class MacLaurinSeries extends org.drip.numerical.estimation.R1ToR1Series
 	public static final MacLaurinSeries ERF (
 		final int termCount)
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
 		double signedInverseFactorial = 1.;
 
-		for (int termIndex = 0; termIndex <= termCount; ++termIndex)
-		{
+		for (int termIndex = 0; termIndex <= termCount; ++termIndex) {
 			signedInverseFactorial = 0 == termIndex ? 1. : signedInverseFactorial * -1. / termIndex;
 
-			termWeightMap.put (
-				termIndex,
-				signedInverseFactorial / (2. * termIndex + 1.)
-			);
+			termWeightMap.put (termIndex, signedInverseFactorial / (2. * termIndex + 1.));
 		}
 
-		try
-		{
-			return new MacLaurinSeries (
-				new org.drip.function.e2erf.MacLaurinSeriesTerm(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new MacLaurinSeries (new MacLaurinSeriesTerm(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -198,33 +208,23 @@ public class MacLaurinSeries extends org.drip.numerical.estimation.R1ToR1Series
 	public static final MacLaurinSeries ERFI (
 		final int termCount)
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		double sqrtPIOver2 = 0.5 * java.lang.Math.sqrt (java.lang.Math.PI);
+		double sqrtPIOver2 = 0.5 * Math.sqrt (Math.PI);
 
-		for (int termIndex = 0; termIndex <= termCount; ++termIndex)
-		{
+		for (int termIndex = 0; termIndex <= termCount; ++termIndex) {
 			int twoKPlusOne = 2 * termIndex + 1;
 
 			termWeightMap.put (
 				termIndex,
-				(termIndex % 2 == 0 ? 1. : -1.) * ERFICoefficient (termIndex) * java.lang.Math.pow (
-					sqrtPIOver2,
-					twoKPlusOne
-				) / twoKPlusOne
+				(termIndex % 2 == 0 ? 1. : -1.) * ERFICoefficient (termIndex) *
+					Math.pow (sqrtPIOver2, twoKPlusOne) / twoKPlusOne
 			);
 		}
 
-		try
-		{
-			return new MacLaurinSeries (
-				new org.drip.function.e2erf.MacLaurinSeriesTerm(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new MacLaurinSeries (new MacLaurinSeriesTerm(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -232,23 +232,19 @@ public class MacLaurinSeries extends org.drip.numerical.estimation.R1ToR1Series
 	}
 
 	/**
-	 * MacLaurinSeries Constructor
+	 * <i>MacLaurinSeries</i> Constructor
 	 * 
 	 * @param macLaurinSeriesTerm E<sub>2</sub> erf MacLaurin Series Term
 	 * @param termWeightMap Series Term Weight Map
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public MacLaurinSeries (
-		final org.drip.function.e2erf.MacLaurinSeriesTerm macLaurinSeriesTerm,
-		final java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap)
-		throws java.lang.Exception
+		final MacLaurinSeriesTerm macLaurinSeriesTerm,
+		final TreeMap<Integer, Double> termWeightMap)
+		throws Exception
 	{
-		super (
-			macLaurinSeriesTerm,
-			false,
-			termWeightMap
-		);
+		super (macLaurinSeriesTerm, false, termWeightMap);
 	}
 }

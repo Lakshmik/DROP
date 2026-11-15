@@ -1,11 +1,23 @@
 
 package org.drip.function.enerf;
 
+import java.util.TreeMap;
+
+import org.drip.numerical.estimation.R1ToR1Series;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,14 +116,21 @@ package org.drip.function.enerf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ * It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/enerf/README.md">E<sub>n</sub> erf Series and Generators</a></li>
+ * 		<li>Construct the E<sub>n</sub> erf MacLaurin Series Generator</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/enerf/README.md">E<sub>n</sub> erf Series and Generators</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -128,35 +147,23 @@ public class GeneralizedMacLaurinSeriesGenerator
 	 * @return E<sub>n</sub> erf MacLaurin Series Generator
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1Series ERF (
+	public static final R1ToR1Series ERF (
 		final int degree,
 		final int termCount)
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
 		double signedInverseFactorial = 1.;
 
-		for (int termIndex = 0; termIndex <= termCount; ++termIndex)
-		{
+		for (int termIndex = 0; termIndex <= termCount; ++termIndex) {
 			signedInverseFactorial = 0 == termIndex ? 1. : signedInverseFactorial * -1. / termIndex;
 
-			termWeightMap.put (
-				termIndex,
-				signedInverseFactorial / (degree * termIndex + 1.)
-			);
+			termWeightMap.put (termIndex, signedInverseFactorial / (degree * termIndex + 1.));
 		}
 
-		try
-		{
-			return new org.drip.numerical.estimation.R1ToR1Series (
-				new org.drip.function.enerf.GeneralizedMacLaurinSeriesTerm (degree),
-				false,
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new R1ToR1Series (new GeneralizedMacLaurinSeriesTerm (degree), false, termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

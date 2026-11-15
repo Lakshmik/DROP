@@ -17,6 +17,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -114,15 +122,15 @@ import org.drip.service.env.EnvManager;
  *  		Wikipedia (2019): Sylvester Formula https://en.wikipedia.org/wiki/Sylvester%27s_formula
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
@@ -142,9 +150,7 @@ public class SylvesterInterpolantReconciler
 		final String[] argumentArray)
 		throws Exception
 	{
-		EnvManager.InitEnv (
-			""
-		);
+		EnvManager.InitEnv ("");
 
 		double[][] a =
 		{
@@ -152,22 +158,13 @@ public class SylvesterInterpolantReconciler
 			{4, 2},
 		};
 
-		QREigenComponentExtractor qrece = new QREigenComponentExtractor (
-			50
-		);
-
-		EigenOutput eigenOutput = qrece.eigenize (
-			a
-		);
+		EigenOutput eigenOutput = new QREigenComponentExtractor (50).eigenize (a);
 
 		double[] eigenValueArray = eigenOutput.eigenValueArray();
 
 		System.out.println ("\t|-----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| ORIGINAL MATRIX",
-			a
-		);
+		NumberUtil.PrintMatrix ("\t| ORIGINAL MATRIX", a);
 
 		System.out.println ("\t|-----------------------------------------|");
 
@@ -185,12 +182,16 @@ public class SylvesterInterpolantReconciler
 
 		double[][] frobeniusCovariant0 = new double[2][2];
 		double[][] frobeniusCovariant1 = new double[2][2];
-		frobeniusCovariant0[0][0] = (a[0][0] - eigenValueArray[1]) / (eigenValueArray[0] - eigenValueArray[1]);
-		frobeniusCovariant0[1][1] = (a[1][1] - eigenValueArray[1]) / (eigenValueArray[0] - eigenValueArray[1]);
+		frobeniusCovariant0[0][0] =
+			(a[0][0] - eigenValueArray[1]) / (eigenValueArray[0] - eigenValueArray[1]);
+		frobeniusCovariant0[1][1] =
+			(a[1][1] - eigenValueArray[1]) / (eigenValueArray[0] - eigenValueArray[1]);
 		frobeniusCovariant0[0][1] = a[0][1] / (eigenValueArray[0] - eigenValueArray[1]);
 		frobeniusCovariant0[1][0] = a[1][0] / (eigenValueArray[0] - eigenValueArray[1]);
-		frobeniusCovariant1[0][0] = (a[0][0] - eigenValueArray[0]) / (eigenValueArray[1] - eigenValueArray[0]);
-		frobeniusCovariant1[1][1] = (a[1][1] - eigenValueArray[0]) / (eigenValueArray[1] - eigenValueArray[0]);
+		frobeniusCovariant1[0][0] =
+			(a[0][0] - eigenValueArray[0]) / (eigenValueArray[1] - eigenValueArray[0]);
+		frobeniusCovariant1[1][1] =
+			(a[1][1] - eigenValueArray[0]) / (eigenValueArray[1] - eigenValueArray[0]);
 		frobeniusCovariant1[0][1] = a[0][1] / (eigenValueArray[1] - eigenValueArray[0]);
 		frobeniusCovariant1[1][0] = a[1][0] / (eigenValueArray[1] - eigenValueArray[0]);
 
@@ -202,29 +203,17 @@ public class SylvesterInterpolantReconciler
 
 		System.out.println ("\t|-----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| FROBENIUS COVARIANT 0",
-			frobeniusCovariant0
-		);
+		NumberUtil.PrintMatrix ("\t| FROBENIUS COVARIANT 0", frobeniusCovariant0);
 
 		System.out.println ("\t|-----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| FROBENIUS COVARIANT 1",
-			frobeniusCovariant1
-		);
+		NumberUtil.PrintMatrix ("\t| FROBENIUS COVARIANT 1", frobeniusCovariant1);
 
 		System.out.println ("\t|-----------------------------------------|");
 
-		double[][] recoveredA = R1MatrixUtil.Scale2D (
-			frobeniusCovariant0,
-			eigenValueArray[0]
-		);
+		double[][] recoveredA = R1MatrixUtil.Scale2D (frobeniusCovariant0, eigenValueArray[0]);
 
-		double[][] recoveredA1 = R1MatrixUtil.Scale2D (
-			frobeniusCovariant1,
-			eigenValueArray[1]
-		);
+		double[][] recoveredA1 = R1MatrixUtil.Scale2D (frobeniusCovariant1, eigenValueArray[1]);
 
 		recoveredA[0][0] += recoveredA1[0][0];
 		recoveredA[0][1] += recoveredA1[0][1];
@@ -233,22 +222,13 @@ public class SylvesterInterpolantReconciler
 
 		System.out.println ("\t|------------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| RECOVERED MATRIX",
-			recoveredA
-		);
+		NumberUtil.PrintMatrix ("\t| RECOVERED MATRIX", recoveredA);
 
 		System.out.println ("\t|------------------------------------------|");
 
-		double[][] inverseA = R1MatrixUtil.Scale2D (
-			frobeniusCovariant0,
-			1. / eigenValueArray[0]
-		);
+		double[][] inverseA = R1MatrixUtil.Scale2D (frobeniusCovariant0, 1. / eigenValueArray[0]);
 
-		double[][] inverseA1 = R1MatrixUtil.Scale2D (
-			frobeniusCovariant1,
-			1. / eigenValueArray[1]
-		);
+		double[][] inverseA1 = R1MatrixUtil.Scale2D (frobeniusCovariant1, 1. / eigenValueArray[1]);
 
 		inverseA[0][0] += inverseA1[0][0];
 		inverseA[0][1] += inverseA1[0][1];
@@ -257,26 +237,15 @@ public class SylvesterInterpolantReconciler
 
 		System.out.println ("\t|----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| INVERSE MATRIX",
-			inverseA
-		);
+		NumberUtil.PrintMatrix ("\t| INVERSE MATRIX", inverseA);
 
 		System.out.println ("\t|----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| INVERSE MATRIX",
-			R1MatrixUtil.Invert (
-				a,
-				""
-			)
-		);
+		NumberUtil.PrintMatrix ("\t| INVERSE MATRIX", R1MatrixUtil.Invert (a, ""));
 
 		System.out.println ("\t|----------------------------------------|");
 
-		Square aSquare = new Square (
-			a
-		);
+		Square aSquare = new Square (a);
 
 		FrobeniusCovariance frobeniusCovariance = aSquare.frobeniusCovariance();
 
@@ -284,13 +253,9 @@ public class SylvesterInterpolantReconciler
 
 		Object[] eigenValueKey = componentMap.keySet().toArray();
 
-		frobeniusCovariant0 = componentMap.get (
-			eigenValueKey[0]
-		).grid();
+		frobeniusCovariant0 = componentMap.get (eigenValueKey[0]).grid();
 
-		frobeniusCovariant1 = frobeniusCovariance.componentMap().get (
-			eigenValueKey[1]
-		).grid();
+		frobeniusCovariant1 = frobeniusCovariance.componentMap().get (eigenValueKey[1]).grid();
 
 		System.out.println ("\t|-----------------------------------------|");
 
@@ -298,24 +263,16 @@ public class SylvesterInterpolantReconciler
 
 		System.out.println ("\t|-----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| FROBENIUS COVARIANT 0",
-			frobeniusCovariant0
-		);
+		NumberUtil.PrintMatrix ("\t| FROBENIUS COVARIANT 0", frobeniusCovariant0);
 
 		System.out.println ("\t|-----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| FROBENIUS COVARIANT 1",
-			frobeniusCovariant1
-		);
+		NumberUtil.PrintMatrix ("\t| FROBENIUS COVARIANT 1", frobeniusCovariant1);
 
 		System.out.println ("\t|-----------------------------------------|");
 
 		recoveredA = aSquare.evaluate (
-			new R1ToR1 (
-				null
-			)
+			new R1ToR1 (null)
 			{
 				@Override public double evaluate (
 					final double x)
@@ -328,17 +285,12 @@ public class SylvesterInterpolantReconciler
 
 		System.out.println ("\t|----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| RECOVERED MATRIX",
-			recoveredA
-		);
+		NumberUtil.PrintMatrix ("\t| RECOVERED MATRIX", recoveredA);
 
 		System.out.println ("\t|----------------------------------------|");
 
 		inverseA = aSquare.evaluate (
-			new R1ToR1 (
-				null
-			)
+			new R1ToR1 (null)
 			{
 				@Override public double evaluate (
 					final double x)
@@ -351,10 +303,7 @@ public class SylvesterInterpolantReconciler
 
 		System.out.println ("\t|----------------------------------------|");
 
-		NumberUtil.PrintMatrix (
-			"\t| INVERSE MATRIX",
-			inverseA
-		);
+		NumberUtil.PrintMatrix ("\t| INVERSE MATRIX", inverseA);
 
 		System.out.println ("\t|----------------------------------------|");
 

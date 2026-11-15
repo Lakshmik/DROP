@@ -17,6 +17,14 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -114,14 +122,15 @@ import org.drip.specialfunction.incompletegamma.LowerEulerIntegral;
  * 				Statistical Software</i> <b>36 (5)</b> 1-39
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></li>
- *  </ul>
+ *  
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/chisquaredistribution/README.md">Chi-Square Distribution Usage/Properties</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -139,12 +148,7 @@ public class NonCentralCentralMoments
 				final double t)
 				throws Exception
 			{
-				return new LowerEulerIntegral (
-					null,
-					t
-				).evaluate (
-					s
-				);
+				return new LowerEulerIntegral (null, t).evaluate (s);
 			}
 		};
 	}
@@ -190,41 +194,46 @@ public class NonCentralCentralMoments
 			 9,
 		};
 
-		R1ToR1 gammaEstimator = new EulerIntegralSecondKind (
-			null
-		);
+		R1ToR1 gammaEstimator = new EulerIntegralSecondKind (null);
 
 		R2ToR1 lowerIncompleteGammaEstimator = LowerIncompleteGamma();
 
-		R1ToR1 digammaEstimator = CumulativeSeriesEstimator.AbramowitzStegun2007 (
-			digammaTermCount
-		);
+		R1ToR1 digammaEstimator = CumulativeSeriesEstimator.AbramowitzStegun2007 (digammaTermCount);
 
 		ModifiedBesselFirstKindEstimator modifiedBesselFirstKindEstimator =
-			ModifiedFirstFrobeniusSeriesEstimator.Standard (
-				gammaEstimator,
-				besselFirstTermCount
-			);
+			ModifiedFirstFrobeniusSeriesEstimator.Standard (gammaEstimator, besselFirstTermCount);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                                  NON CENTRAL CENTRAL MOMENTS                                                 ||");
+		System.out.println (
+			"\t|                                                  NON CENTRAL CENTRAL MOMENTS                                                 ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                                                                               ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                               ||"
+		);
 
-		System.out.println ("\t|                - Degrees of Freedom; Non Centrality Parameter                                                                ||");
+		System.out.println (
+			"\t|                - Degrees of Freedom; Non Centrality Parameter                                                                ||"
+		);
 
-		System.out.println ("\t|                - Four Leading Moments                                                                                        ||");
+		System.out.println (
+			"\t|                - Four Leading Moments                                                                                        ||"
+		);
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (double nonCentralityParameter : nonCentralityParameterArray)
-		{
-			for (int dof : dofArray)
-			{
-				R1NonCentral r1UnivariateNonCentral = R1NonCentral.Standard (
+		for (double nonCentralityParameter : nonCentralityParameterArray) {
+			for (int dof : dofArray) {
+				R1NonCentral r1NonCentralChisquared = R1NonCentral.Standard (
 					dof,
 					nonCentralityParameter,
 					gammaEstimator,
@@ -233,19 +242,18 @@ public class NonCentralCentralMoments
 					modifiedBesselFirstKindEstimator
 				);
 
-				String display = "\t| [" +
-					FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
-					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) +
-				"] =>";
+				String display = "\t| [" + FormatUtil.FormatDouble (dof, 2, 0, 1., false) + " | " +
+					FormatUtil.FormatDouble (nonCentralityParameter, 1, 1, 1., false) + "] =>";
 
-				double[] leadingCentralMoments = r1UnivariateNonCentral.leadingCentralMoments();
+				double[] leadingCentralMoments = r1NonCentralChisquared.leadingCentralMoments();
 
-				for (int i = 0;
-					i <= 3;
-					++i)
-				{
+				for (int i = 0; i <= 3; ++i) {
 					display = display + " " + FormatUtil.FormatDouble (
-						leadingCentralMoments[i], 5, 5, 1., false
+						leadingCentralMoments[i],
+						5,
+						5,
+						1.,
+						false
 					) + " |";
 				}
 
@@ -253,7 +261,9 @@ public class NonCentralCentralMoments
 			}
 		}
 
-		System.out.println ("\t|------------------------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|------------------------------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 

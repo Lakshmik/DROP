@@ -1,11 +1,25 @@
 
 package org.drip.function.enerf;
 
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+import org.drip.numerical.estimation.R1Estimate;
+import org.drip.numerical.estimation.R1ToR1Estimator;
+import org.drip.numerical.estimation.R1ToR1Series;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,22 +118,32 @@ package org.drip.function.enerf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ * It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/enerf/README.md">E<sub>n</sub> erf Series and Generators</a></li>
+ * 		<li>Construct the Euler-MacLaurin Instance of the E<sub>n</sub> erf</li>
+ * 		<li>Retrieve the Degree of the E<sub>n</sub> erf</li>
+ * 		<li>Compute the Built-in Higher Order Series Estimates</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/enerf/README.md">E<sub>n</sub> erf Series and Generators</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class GeneralizedErrorFunction extends org.drip.numerical.estimation.R1ToR1Estimator
+public abstract class GeneralizedErrorFunction
+	extends R1ToR1Estimator
 {
 	private int _degree = -1;
-	private org.drip.numerical.estimation.R1ToR1Series _r1ToR1SeriesGenerator = null;
+	private R1ToR1Series _r1ToR1SeriesGenerator = null;
 
 	/**
 	 * Construct the Euler-MacLaurin Instance of the E<sub>n</sub> erf
@@ -134,48 +158,33 @@ public abstract class GeneralizedErrorFunction extends org.drip.numerical.estima
 		final int degree,
 		final int termCount)
 	{
-		final org.drip.numerical.estimation.R1ToR1Series r1ToR1SeriesGenerator =
-			org.drip.function.enerf.GeneralizedMacLaurinSeriesGenerator.ERF (
-				degree,
-				termCount
-			);
+		final R1ToR1Series r1ToR1SeriesGenerator =
+			GeneralizedMacLaurinSeriesGenerator.ERF (degree, termCount);
 
-		if (null == r1ToR1SeriesGenerator)
-		{
+		if (null == r1ToR1SeriesGenerator) {
 			return null;
 		}
 
-		try
-		{
-			return new GeneralizedErrorFunction (
-				r1ToR1SeriesGenerator,
-				null,
-				degree
-			)
+		try {
+			return new GeneralizedErrorFunction (r1ToR1SeriesGenerator, null, degree)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("GeneralizedErrorFunction::MacLaurin::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"GeneralizedErrorFunction::MacLaurin::evaluate => Invalid Inputs"
+						);
 					}
 
-					double erf = org.drip.numerical.common.NumberUtil.Factorial (degree) /
-						java.lang.Math.sqrt (java.lang.Math.PI) *
-						r1ToR1SeriesGenerator.cumulative (
-							0.,
-							z
-						);
+					double erf = NumberUtil.Factorial (degree) / Math.sqrt (Math.PI) *
+						r1ToR1SeriesGenerator.cumulative (0., z);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -183,18 +192,17 @@ public abstract class GeneralizedErrorFunction extends org.drip.numerical.estima
 	}
 
 	protected GeneralizedErrorFunction (
-		final org.drip.numerical.estimation.R1ToR1Series r1ToR1SeriesGenerator,
-		final org.drip.numerical.differentiation.DerivativeControl dc,
+		final R1ToR1Series r1ToR1SeriesGenerator,
+		final DerivativeControl derivativeControl,
 		final int degree)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (dc);
+		super (derivativeControl);
 
 		_r1ToR1SeriesGenerator = r1ToR1SeriesGenerator;
 
-		if (0 > (_degree = degree))
-		{
-			throw new java.lang.Exception ("GeneralizedErrorFunction Constructor => Invalid Inputs");
+		if (0 > (_degree = degree)) {
+			throw new Exception ("GeneralizedErrorFunction Constructor => Invalid Inputs");
 		}
 	}
 
@@ -209,17 +217,18 @@ public abstract class GeneralizedErrorFunction extends org.drip.numerical.estima
 		return _degree;
 	}
 
-	@Override public org.drip.numerical.estimation.R1Estimate seriesEstimateNative (
+	/**
+	 * Compute the Built-in Higher Order Series Estimates
+	 * 
+	 * @param x X
+	 * 
+	 * @return The Built-in Higher Order Series Estimates
+	 */
+
+	@Override public R1Estimate seriesEstimateNative (
 		final double x)
 	{
-		return null == _r1ToR1SeriesGenerator ? seriesEstimate (
-			x,
-			null,
-			null
-		) : seriesEstimate (
-			x,
-			_r1ToR1SeriesGenerator.termWeightMap(),
-			_r1ToR1SeriesGenerator
-		);
+		return null == _r1ToR1SeriesGenerator ? seriesEstimate (x, null, null) :
+			seriesEstimate (x, _r1ToR1SeriesGenerator.termWeightMap(), _r1ToR1SeriesGenerator);
 	}
 }

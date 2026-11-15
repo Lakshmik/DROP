@@ -14,8 +14,9 @@ import org.drip.service.env.EnvManager;
 import org.drip.state.eostree.BondPriceFunction;
 import org.drip.state.eostree.EventPillarTimeComposite;
 import org.drip.state.eostree.FullBondEvaluator;
-import org.drip.state.eostree.SegmentConfine;
-import org.drip.state.eostree.SegmentCouponMeasures;
+import org.drip.state.eostree.SegmentElastic;
+import org.drip.state.eostree.VertexElastic;
+import org.drip.state.eostree.VertexInelastic;
 import org.drip.state.municipal.BondSensitivity;
 import org.drip.state.municipal.ExplicitBootMuniCurve;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
@@ -459,16 +460,19 @@ public class KozhikodeLattice
 
 		System.out.println ("\t||------------------------------------||");
 
-		for (SegmentCouponMeasures segmentCouponMeasures :
+		for (SegmentElastic segmentElastic :
 			bondEvaluator.rollBackwards (spotDate, kalotayWilliamsFabozzi))
 		{
-			SegmentConfine confine = segmentCouponMeasures.confine();
+			VertexElastic rightVertexElastic = segmentElastic.rightVertexElastic();
 
-			String segment = "\t|| [" + FormatUtil.FormatDouble (confine.leftTime(), 2, 2, 1., false) + "-" +
-				FormatUtil.FormatDouble (confine.rightTime(), 2, 2, 1., false) + "] =>";
+			VertexInelastic leftVertexInelastic = segmentElastic.leftVertexInelastic();
 
-			for (double forwardRightPV : segmentCouponMeasures.forwardLeftPVArray()) {
-				segment += FormatUtil.FormatDouble (forwardRightPV, 1, 5, 1.) + " |";
+			String segment = "\t|| [" +
+				FormatUtil.FormatDouble (leftVertexInelastic.time(), 2, 2, 1., false) + "-" +
+				FormatUtil.FormatDouble (rightVertexElastic.inelastic().time(), 2, 2, 1., false) + "] =>";
+
+			for (double leftCleanPV : segmentElastic.leftVertexElastic().cleanPVArray()) {
+				segment += FormatUtil.FormatDouble (leftCleanPV, 1, 5, 1.) + " |";
 			}
 
 			System.out.println (segment);

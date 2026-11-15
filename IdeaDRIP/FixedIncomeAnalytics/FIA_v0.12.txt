@@ -76,6 +76,104 @@
 	- Notification Period:
 		- ValueToExercise=(v(i-1,j,k)+accrued_Adjusted (i-1,j)-fee_(i-1))/df(i-1,j,NotificationDate_k )  where
 		- accrued_Adjusted (i-1,j)=Notional_l×Coupon_l×[DCF_(l,Full)×df(i-1,j,CouponPayDate_l )/df(i-1,j,NotificationDate_k ) -DCF_(l,Partial) ]
+  4.5 Mid-period Exercise
+	- IndexFixing(i,j,t)=1/(DCF_l ) [df(i,j,CouponStartDate_l )/df(i,j,CouponEndDate_l ) -1]
+		- Index Start Date after t_i => Easy to compute df's
+		- Index Start Date before t_i => Approximations needed to compute df's
+	- Case: CouponStartDate < CurrentSliceDate < CouponEndDate
+		- State variable at the end date, rolls back the value to the slice date
+	- HW Deterministic Drift + Wander => r_t=X_t+g_t - deterministic drift g_t and a mean zero process X_t
+		- ∆X_t=λX_t ∆t+σ(t)∆W
+		- X_t=e^(-λt) ∫_0^t▒〖σ(s)∙e^λs dW_s 〗
+		- X_0 = 0
+	- Index fixing estimate: Payoff function C ̃(X_t ) such that E[C ̃(X_(τ+∆τ) )  | X_τ ]=C(X_τ )×P(τ,τ+∆τ; X_τ )
+		- C(X_τ )×P(τ,τ+∆τ; X_τ )=IndexFixing(X_τ )∙DCF∙P(τ,τ+∆τ; X_τ )=1-P(τ,τ+∆τ; X_τ )
+		- IndexFixing(X_τ )∙DCF=1/P(τ,τ+∆τ; X_τ ) -1
+	- Exponential Affine HW Dynamics: P(τ,τ+∆τ; X_τ )=e^(A(τ,τ+∆τ)-B(τ,τ+∆τ)∙X_τ-β(τ,τ+∆τ)∙g_(τ+∆τ) )
+	- Estimation of α and β:
+		- P ̃(τ,τ+∆τ; X_(τ+∆τ) )=e^(α(τ,τ+∆τ)-β(τ,τ+∆τ)∙X_τ-β(τ,τ+∆τ)∙g_(τ+∆τ) )
+		- C ̃(X_( τ+∆τ) )=1-P ̃(τ,τ+∆τ; X_(τ+∆τ) )
+		- Solve for α and β
+		- β=e^λ(τ,τ+∆τ) ∙B(τ,τ+∆τ)
+		- α=A(τ,τ+∆τ)-g_τ∙B(τ,τ+∆τ)-1/2 B^2 (τ,τ+∆τ)∙{e^2λ(τ+∆τ-τ) ∙V[X_(τ+∆τ) ]-V[X_τ ]}
+		- V[X_t ]=e^(-2λt)∙∫_0^t▒〖σ(s)∙e^λs ds〗
+	- Approximate P(τ,τ+∆τ; X_τ ) by P ̃(τ,τ+∆τ; X_τ )
+		- Values in terms of X_(τ+∆τ) - the state variable at coupon end date
+	- Credit Handling
+		- additional_cpn (i-1,j)=∑_l▒〖Notional_(l,Adjusted)×Coupon_l×DCF_l×df(i-1,CouponPayDate_l ) 〗
+		- accres(i-1,j)=Notional_(l,Adjusted)×Coupon_l×[DCF_(l,Full)×df(i-1,j,CouponPayDate_l )-DCF_(l,Partial) ]
+		- Notional_(l,Adjusted)=Notional∙[S_l+(S_(l-1)-S_l )∙RR]
+  4.6 Handling Alternate Reference Rate - ARR
+	- ARR Features (mutually exclusive): fixing cutoff, reset lag, and observation period shift
+	- ZCB_f (t_s,t_e,X): HZ zero-coupon bond price given X - forward looking
+	- ZCB_b (t_s,t_e,X): HZ zero-coupon bond price given X - backward looking
+	- P(t_s,t_e,t_ref,X)={■(ZCB_f (t_s,t_e,X)&t_ref≤t_s<t_e@ZCB_b (t_s,t_e,X)&t_s≤t_e<t_ref@ZCB_b (t_s,t_e,X)×ZCB_f (t_s,t_e,X)&t_s<t_ref<t_e )┤
+	- f(t,t_ref,X): Instantaneous Forward Rate
+		- f(t,t_ref,X)={■((ln⁡〖ZCB_f (t_ref,t,X)〗-ln⁡〖ZCB_f (t_ref,t+δ,X)〗)/δ&t_ref≤t@(ln⁡〖ZCB_b (t^*,t,X)〗-ln⁡〖ZCB_b (t^*,t+δ,X)〗)/δ&t_ref>t)┤
+		- t^* is the nearest slice time on the tree that is smaller than t
+	- ARR Features:
+		- Fixing Cutoff - Lockout => T_c is the cutoff time
+			- Coupon_(i,j,FC)=∑_k▒[e^f(T_(c,k),T_i,X_(i,j) )τ(T_(c,k),T_(end,k) ) /P(T_(start,k),T_(c,k),T_i,X_(i,j) ) -1.0] 
+			- Iteration over the Current Slice Coupons
+		- Location of the Cutoff Time: Lies within the first coupon period, i.e., T_start<T_C<T_i<T_end
+			- Accrual_(i,j,FC)=1.0/P(T_start,T_c,T_i,X_(i,j) ) -1.0
+			- AccRes_(i,j,FC)=[e^f(T_c,T_i,X_(i,j) )τ(T_c,T_end ) /P(T_(start,k),T_c,T_i,X_(i,j) ) -1.0]∙P(T_i,T_pay,T_i,X_(i,j) )-Accual_(i,j,FC)
+		- Location of the Cutoff Time: T_start<T_i<T_C<T_end
+			- Accrual_(i,j,FC)=Accrual_(i,j,FC)=1.0/P(T_start,T_c,T_i,X_(i,j) ) -1.0
+			- AccRes_(i,j,FC)=[e^f(T_c,T_i,X_(i,j) )τ(T_c,T_end ) /P(T_(start,k),T_c,T_i,X_(i,j) ) -1.0]∙P(T_i,T_pay,T_i,X_(i,j) )-Accual_(i,j,FC)
+		- Observation Period Shift => Index and calculation periods shifted backward
+			- Coupon_(i,j,OS)=∑_k▒〖[1.0/P(T_(start,k)^*,T_(end,k)^*,T_i,X_(i,j) ) -1.0]∙τ(T_start,T_end )/τ(T_start^*,T_end^* ) 〗∙P(T_i,T_(pay,k),T_i,X_(i,j) )
+			- Accrual_(i,j,OS)=1.0/P(T_start^*,T_c,T_i,X_(i,j) ) -1.0
+			- AccRes_(i,j,OS)=[1.0/P(T_start^*,T_end^*,T_i,X_(i,j) ) -1.0]∙τ(T_start,T_end )/τ(T_start^*,T_end^* ) ∙P(T_i,T_pay,T_i,X_(i,j) )-Accual_(i,j,OIS)
+		- Reset Lag – Lookback: Only index period gets shifted backward
+			- OIS Coupon Rate C=(∏_k▒(1+r_k τ_k ) )/(∑_k▒τ_k )
+			- Only r_k is shifted
+			- λ=(∑_k▒〖τ_k^* ∏_k▒(1+r_k^* τ_k ) 〗)/(∑_k▒〖τ_k ∏_k▒(1+r_k^* τ_k^* ) 〗)≈(∑_k▒〖τ_k^* ∏_k▒(τ_k/(τ_k^* )+r_k^* τ_k^*  τ_k/(τ_k^* )) 〗)/(∑_k▒〖τ_k ∏_k▒(1+r_k^* τ_k^* ) 〗)=(∑_k▒τ_k^* )/(∑_k▒τ_k ) ∏_k▒τ_k/(τ_k^* )
+			- Thresholding for τ_k/(τ_k^* ):
+				- Threshold is breached for a certain k, it will not be used in calculating λ
+				- Coupon_(i,j,RL)=∑_k▒〖[1.0/P(T_(start,k)^*,T_(end,k)^*,T_i,X_(i,j) ) -1.0]∙τ(T_start,T_end )/τ(T_start^*,T_end^* ) 〗∙λ_k∙P(T_i,T_(pay,k),T_i,X_(i,j) )
+				- Accrual_(i,j,RL)=Accrual_(i,j,OS)∙λ_Accrual
+				- AccRes_(i,j,RL)=(AccRes_(i,j,OS)+Accrual_(i,j,OS) )∙λ_Full-Accrual_(i,j,RL)
+  4.7 Flipper Callable Bond
+	- coupon_flipper=coupon_fix∙(1-indexGearing)+coupon_float∙indexGearing
+	- indexGearing=1 for floating period
+  4.8 Yield Curve Calibration
+	- Adds g_t to x at each node, starting from root
+	- Ensures Z(t_0,t)=E[e^(-∫_(t_0)^t▒〖r_u du〗) ]
+	- Notation:
+		- Q(i,j | h,k) is the value at node (h,k) of security paying $1 at node (i,j)
+		- Q_(i,j) is Q(i,j | 0,0) - root price at node (i,j)
+		- p(i,j | h,k) is the probability of transitioning from node (h,k) to node (i,j)
+		- g_t is g(t_i )
+	- Root Price at Node (i,j):
+		- Q_(i,j)=∑_k▒〖Q(i,j | i-1,k) Q_(i-1,k) 〗=∑_k▒〖p(i,j | i-1,k) e^(-f(g_(i-1)+x_(i-1,k) )(t_(i-1)-t_i ) ) Q_(i-1,k) 〗
+	- At each time step t_(i+1) the zero-coupon price is matched Z(t_0,t_(i+1) )=∑_j▒〖Q_(i,j) e^(-f(g_(i-1)+x_(i,j) )(t_(i+1)-t_i ) ) 〗
+	- Calibration of g:
+		- Q_(0,0)=1 => g_0=(-ln⁡Z(t_0,t_1 ))/(t_1-t_0 )
+	- Use root Price at Node (i,j) to calculate Q_(i,j)
+		- Use Z(t_0,t_(i+1) )=∑_j▒〖Q_(i,j) e^(-f(g_(i-1)+x_(i,j) )(t_(i+1)-t_i ) ) 〗to find g_1 that matches Z(t_0,t_2 )
+  4.9 Calibration European Swaption Selection
+	- In-the-Tail ITT Approach => Each of the underlying European swaption has term and tenor that matches the Bermudan
+	- On-node Expiry/Tenor Pairs => Directly in the VolCube
+	- Off-node Expiry/Tenor Pairs => VolCube’s internal interpolation method
+	- Variance Burnout - Negative Forward Variance
+		- Happens when the calibration dates are very dense, such as monthly
+	- Explicit Calibration Frequency: Tuple Format -{{1M,2Y},{3M,4Y},{6M}}
+	- Exercise Dates from Calibration Frequency:
+		- Exercise dates t_1<t_2<⋯<t_n
+			- Subset t_(1,C)<t_(2,C)<⋯<t_(n,C) selected for calibrating European swaptions using the following procedure
+				- Step #1: Set t_(1,C)=t_1
+				- Step #2: t_(j,C)=t_i where j>1 is the smallest integer such that t_i-t_(j-1,C)≥1M
+				- Step #3: Continue step #2 to identify t_(j,C) until condition in step #4 is met: t_j-t_(1,C)≥2Y
+				- Step #4: Say t_(j,C)=t_i has been selected and t_j-t_(1,C)≥2Y:
+					- Then t_(j+1,C)=t_l where l is the smallest integer greater than i such that t_l-t_(j,C)≥3M
+						- {3M,4Y} will then be applied to get the next expiration date until t_j-t_(1,C)≥4Y
+				- Step #5: Note that the next date t_(j,C)=t_i where j>1 is the smallest integer such that t_i-t_(j-1,C)≥6M
+				- Step #6: Selection stops at t_(m,C) when:
+					- t_(m,C) reaches the end of {t_1,t_2,⋯,t_n }
+					- No more expiration available
+					- t_(m+1,C) is too close to the Bermudan’s maturity T_Maturity: T_Maturity-t_(m+1,C)<f_swap
+						- f_swap is the calibration swaption’s underlying swap leg coupon frequency for the leg with larger period
  --------------------------
 
  --------------------------

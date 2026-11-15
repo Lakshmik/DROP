@@ -134,36 +134,58 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
 public class EventPillarTimeComposite
 {
 	private boolean _isPut = false;
+	private TreeMap<Double, Double> _timeToFullCouponMap = null;
 	private TreeMap<Double, Double> _exerciseTimeToPriceMap = null;
+	private TreeMap<Double, VertexAccrual> _timeToAccrualMap = null;
 	private TreeMap<Double, Double> _timeToPrincipalPaydownMap = null;
 	private TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> _timeToPeriodStateListMap = null;
 
 	private static final boolean FromCoupons (
-		final EventPillarTimeComposite couponExerciseComposite,
+		final EventPillarTimeComposite eventPillarTimeComposite,
 		final int spotDateJulian,
-		final List<CompositePeriod> compositePeriodList,
+		final BondComponent bond,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
-		if (null == compositePeriodList || compositePeriodList.isEmpty()) {
+		if (null == bond) {
 			return true;
 		}
 
-		for (CompositePeriod compositePeriod : compositePeriodList) {
+		double couponRate = bond.couponSetting().couponRate();
+
+		if (!NumberUtil.IsValid (couponRate) || 0. == couponRate) {
+			return true;
+		}
+
+		for (CompositePeriod compositePeriod : bond.couponPeriods()) {
 			int payDateJulian = compositePeriod.payDate();
 
 			if (payDateJulian < spotDateJulian) {
-				break;
+				continue;
 			}
 
 			double payTime = (payDateJulian - spotDateJulian) / 365.25;
 
-			if (!couponExerciseComposite.containsTime (payTime) &&
-				!couponExerciseComposite.addStateList (
-					payTime,
-					kalotayWilliamsFabozzi.bespokePeriodStateList (payTime)
+			try {
+				if (!eventPillarTimeComposite.containsTime (payTime) &&
+					!eventPillarTimeComposite.addStateList (
+						payTime,
+						kalotayWilliamsFabozzi.bespokePeriodStateList (payTime)
+					)
 				)
-			)
-			{
+				{
+					return false;
+				}
+
+				if (!eventPillarTimeComposite.addFullCoupon (
+					payTime,
+					couponRate * bond.notional (compositePeriod.endDate()) * compositePeriod.couponDCF()
+				))
+				{
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+
 				return false;
 			}
 		}
@@ -172,7 +194,7 @@ public class EventPillarTimeComposite
 	}
 
 	private static final boolean FromNotionalSchedule (
-		final EventPillarTimeComposite couponExerciseComposite,
+		final EventPillarTimeComposite eventPillarTimeComposite,
 		final int spotDateJulian,
 		final int maturityDateJulian,
 		final NotionalSetting notionalSetting,
@@ -184,8 +206,8 @@ public class EventPillarTimeComposite
 		if (null == outstandingFactorSchedule) {
 			double maturityTime = (maturityDateJulian - spotDateJulian) / 365.25;
 
-			return couponExerciseComposite.containsTime (maturityTime) ||
-				couponExerciseComposite.addStateList (
+			return eventPillarTimeComposite.containsTime (maturityTime) ||
+				eventPillarTimeComposite.addStateList (
 					maturityTime,
 					kalotayWilliamsFabozzi.bespokePeriodStateList (maturityTime)
 				);
@@ -199,30 +221,20 @@ public class EventPillarTimeComposite
 
 		for (int dateIndex = 0; dateIndex < dateArray.length; ++dateIndex) {
 			if (dateArray[dateIndex] < spotDateJulian) {
-				break;
+				continue;
 			}
 
 			double notionalTime = (dateArray[dateIndex] - spotDateJulian) / 365.25;
 
-			/* if (!couponExerciseComposite.containsTime (notionalTime) &&
-				!couponExerciseComposite.addStateList (
-					notionalTime,
-					kalotayWilliamsFabozzi.bespokePeriodStateList (notionalTime)
-				)
-			)
-			{
-				return false;
-			} */
-
 			if (
 				(
 					priorOutstandingFactor != outstandingFactorArray[dateIndex] &&
-					!couponExerciseComposite.containsTime (notionalTime) &&
-					!couponExerciseComposite.addStateList (
+					!eventPillarTimeComposite.containsTime (notionalTime) &&
+					!eventPillarTimeComposite.addStateList (
 						notionalTime,
 						kalotayWilliamsFabozzi.bespokePeriodStateList (notionalTime)
 					)
-				) || !couponExerciseComposite.addPrincipalPaydown (
+				) || !eventPillarTimeComposite.addPrincipalPaydown (
 					notionalTime,
 					priorOutstandingFactor - outstandingFactorArray[dateIndex]
 				)
@@ -238,7 +250,7 @@ public class EventPillarTimeComposite
 	}
 
 	private static final boolean FromEOS (
-		final EventPillarTimeComposite couponExerciseComposite,
+		final EventPillarTimeComposite eventPillarTimeComposite,
 		final int spotDateJulian,
 		final EmbeddedOptionSchedule embeddedOptionSchedule,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
@@ -260,12 +272,12 @@ public class EventPillarTimeComposite
 
 			if (
 				(
-					!couponExerciseComposite.containsTime (exerciseTime) &&
-					!couponExerciseComposite.addStateList (
+					!eventPillarTimeComposite.containsTime (exerciseTime) &&
+					!eventPillarTimeComposite.addStateList (
 						exerciseTime,
 						kalotayWilliamsFabozzi.bespokePeriodStateList (exerciseTime)
 					)
-				) || !couponExerciseComposite.addExercise (
+				) || !eventPillarTimeComposite.addExercise (
 					exerciseTime,
 					exerciseFactorArray[exerciseIndex]
 				)
@@ -275,7 +287,43 @@ public class EventPillarTimeComposite
 			}
 		}
 
-		return couponExerciseComposite.isPut (embeddedOptionSchedule.isPut());
+		return eventPillarTimeComposite.isPut (embeddedOptionSchedule.isPut());
+	}
+
+	private static final boolean FromAccrual (
+		final EventPillarTimeComposite eventPillarTimeComposite,
+		final JulianDate spotDate,
+		final BondComponent bond)
+	{
+		double couponRate = bond.couponSetting().couponRate();
+
+		for (double endTime : eventPillarTimeComposite.timeToPeriodStateListMap().keySet()) {
+			int dateJulian = spotDate.addDays ((int) (endTime * 365.25)).julian();
+
+			CompositePeriod containingPeriod = bond.containingPeriod (dateJulian);
+
+			if (null != containingPeriod) {
+				try {
+					if (!eventPillarTimeComposite.addAccrual (
+						endTime,
+						new VertexAccrual (
+							containingPeriod.accrualDCF (dateJulian),
+							couponRate,
+							bond.notional (dateJulian)
+						)
+					))
+					{
+						return false;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -297,13 +345,16 @@ public class EventPillarTimeComposite
 			return null;
 		}
 
-		EventPillarTimeComposite couponExerciseComposite = new EventPillarTimeComposite();
+		EventPillarTimeComposite eventPillarTimeComposite = new EventPillarTimeComposite();
 
 		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
 			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
 
 		for (double endTime : timeToProjectedPeriodStateMap.keySet()) {
-			if (!couponExerciseComposite.addStateList (endTime, timeToProjectedPeriodStateMap.get (endTime)))
+			if (!eventPillarTimeComposite.addStateList (
+				endTime,
+				timeToProjectedPeriodStateMap.get (endTime)
+			))
 			{
 				return null;
 			}
@@ -312,12 +363,12 @@ public class EventPillarTimeComposite
 		int spotDateJulian = spotDate.julian();
 
 		if (!FromCoupons (
-			couponExerciseComposite,
+			eventPillarTimeComposite,
 			spotDateJulian,
-			bond.couponPeriods(),
+			bond,
 			kalotayWilliamsFabozzi
 		) || !FromNotionalSchedule (
-			couponExerciseComposite,
+			eventPillarTimeComposite,
 			spotDateJulian,
 			bond.maturityDate().julian(),
 			bond.notionalSetting(),
@@ -330,11 +381,15 @@ public class EventPillarTimeComposite
 		EmbeddedOptionSchedule embeddedOptionSchedule = bond.callSchedule();
 
 		return FromEOS (
-			couponExerciseComposite,
+			eventPillarTimeComposite,
 			spotDateJulian,
 			null == embeddedOptionSchedule ? bond.putSchedule() : embeddedOptionSchedule,
 			kalotayWilliamsFabozzi
-		) ? couponExerciseComposite : null;
+		) && FromAccrual (
+			eventPillarTimeComposite,
+			spotDate,
+			bond
+		) ? eventPillarTimeComposite : null;
 	}
 
 	/**
@@ -343,7 +398,11 @@ public class EventPillarTimeComposite
 
 	public EventPillarTimeComposite()
 	{
+		_timeToFullCouponMap = new TreeMap<Double, Double>();
+
 		_exerciseTimeToPriceMap = new TreeMap<Double, Double>();
+
+		_timeToAccrualMap = new TreeMap<Double, VertexAccrual>();
 
 		_timeToPrincipalPaydownMap = new TreeMap<Double, Double>();
 
@@ -359,6 +418,28 @@ public class EventPillarTimeComposite
 	public TreeMap<Double, Double> exerciseTimeToPriceMap()
 	{
 		return _exerciseTimeToPriceMap;
+	}
+
+	/**
+	 * Retrieve the Map of Time to Full Coupon
+	 * 
+	 * @return Map of Time to Full Coupon
+	 */
+
+	public TreeMap<Double, Double> timeToFullCouponMap()
+	{
+		return _timeToFullCouponMap;
+	}
+
+	/**
+	 * Retrieve the Map of Time to Accrual
+	 * 
+	 * @return Map of Time to Accrual
+	 */
+
+	public TreeMap<Double, VertexAccrual> timeToAccrualMap()
+	{
+		return _timeToAccrualMap;
 	}
 
 	/**
@@ -437,6 +518,50 @@ public class EventPillarTimeComposite
 		}
 
 		_exerciseTimeToPriceMap.put (time, price);
+
+		return true;
+	}
+
+	/**
+	 * Add a Full Coupon Node
+	 * 
+	 * @param time Time
+	 * @param fullCoupon Full Coupon
+	 * 
+	 * @return TRUE - Full Coupon Node successfully added
+	 */
+
+	public boolean addFullCoupon (
+		final double time,
+		final double fullCoupon)
+	{
+		if (!NumberUtil.IsValid (time) || 0. > time || !NumberUtil.IsValid (fullCoupon)) {
+			return false;
+		}
+
+		_timeToFullCouponMap.put (time, fullCoupon);
+
+		return true;
+	}
+
+	/**
+	 * Add an Vertex Accrual Node
+	 * 
+	 * @param time Time
+	 * @param vertexAccrual Vertex Accrual
+	 * 
+	 * @return TRUE - Accrual Node successfully added
+	 */
+
+	public boolean addAccrual (
+		final double time,
+		final VertexAccrual vertexAccrual)
+	{
+		if (!NumberUtil.IsValid (time) || 0. > time || null == vertexAccrual) {
+			return false;
+		}
+
+		_timeToAccrualMap.put (time, vertexAccrual);
 
 		return true;
 	}

@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -102,115 +110,124 @@ import org.drip.service.env.EnvManager;
  * 			Solves system of linear equations using one the exposed techniques
  *  	</li>
  *  </ul>
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class LinearAlgebra {
-
-	/*
-	 * Sample illustrating the Invocation of Base Matrix Inversion and Product Computation Verification.
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
+public class LinearAlgebra
+{
 
 	private static final void InverseVerifyDump (
-		final String strLabel,
-		final double[][] aadblA)
+		final String label,
+		final double[][] a)
 	{
-		double[][] aadblAInv = R1MatrixUtil.InvertUsingGaussianElimination (aadblA);
+		double[][] aInverse = R1MatrixUtil.InvertUsingGaussianElimination (a);
 
-		System.out.println ("--- TESTS FOR " + strLabel + "---");
+		System.out.println ("\t||--- TESTS FOR " + label + "---");
 
-		System.out.println ("---------------------------------");
+		System.out.println ("\t||---------------------------------");
 
 		NumberUtil.Print2DArrayTriplet (
-			"\tSOURCE" + strLabel,
-			"INVERSE" + strLabel,
-			"PRODUCT" + strLabel,
-			aadblA,
-			aadblAInv,
-			R1MatrixUtil.Product (
-				aadblA,
-				aadblAInv
-			),
+			"\t|| SOURCE" + label,
+			"|| INVERSE" + label,
+			"|| PRODUCT" + label,
+			a,
+			aInverse,
+			R1MatrixUtil.Product (a, aInverse),
 			false
 		);
 
-		System.out.println ("---------------------------------\n\n");
+		System.out.println ("\t||---------------------------------\n\n");
 	}
-
-	/*
-	 * Sample illustrating the Invocation of Base Matrix Manipulation Functionality
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
 
 	private static final void MatrixManipulation()
 	{
-		InverseVerifyDump ("#A", new double[][] {
-			{1, 2, 3},
-			{4, 5, 6},
-			{7, 8, 9.01}
-		});
+		InverseVerifyDump (
+			"#A",
+			new double[][]
+			{
+				{1, 2, 3},
+				{4, 5, 6},
+				{7, 8, 9.01}
+			}
+		);
 
-		InverseVerifyDump ("#B", new double[][] {
-			{ 0.1667,  0.0000,  0.0000,  0.0000},
-			{ 0.0000,  0.0000,  0.0000,  0.1667},
-			{-0.6667,  0.5000,  0.0000,  0.0000},
-			{ 2.6667, -3.0000,  1.0000,  0.0000}
-		});
+		InverseVerifyDump (
+			"#B",
+			new double[][]
+			{
+				{ 0.1667,  0.0000,  0.0000,  0.0000},
+				{ 0.0000,  0.0000,  0.0000,  0.1667},
+				{-0.6667,  0.5000,  0.0000,  0.0000},
+				{ 2.6667, -3.0000,  1.0000,  0.0000}
+			}
+		);
 
-		InverseVerifyDump ("#C", new double[][] {
-			{ 1.0000,  0.0000,  0.0000,  0.0000},
-			{ 1.0000,  1.0000,  1.0000,  1.0000},
-			{ 0.0000,  1.0000,  0.0000,  0.0000},
-			{ 0.0000,  0.0000,  2.0000,  0.0000}
-		});
+		InverseVerifyDump (
+			"#C",
+			new double[][]
+			{
+				{ 1.0000,  0.0000,  0.0000,  0.0000},
+				{ 1.0000,  1.0000,  1.0000,  1.0000},
+				{ 0.0000,  1.0000,  0.0000,  0.0000},
+				{ 0.0000,  0.0000,  2.0000,  0.0000}
+			}
+		);
 
-		InverseVerifyDump ("#D", new double[][] {
-			{ 0.0000,  1.0000},
-			{ 1.0000,  2.0000}
-		});
+		InverseVerifyDump (
+			"#D",
+			new double[][]
+			{
+				{ 0.0000,  1.0000},
+				{ 1.0000,  2.0000}
+			}
+		);
 
-		InverseVerifyDump ("#E", new double[][] {
-			{ 0.0000,  1.0000},
-			{ 1.0000,  0.0000}
-		});
+		InverseVerifyDump (
+			"#E",
+			new double[][]
+			{
+				{ 0.0000,  1.0000},
+				{ 1.0000,  0.0000}
+			}
+		);
 
-		InverseVerifyDump ("#F", new double[][] {
-			{ 1.0000,  0.0000,  0.0000,  0.0000},
-			{ 1.0000,  1.0000,  1.0000,  1.0000},
-			{-1.0000,  1.0000,  0.0000,  0.0000},
-			{ 1.0000,  2.0000,  3.0000,  4.0000}
-		});
+		InverseVerifyDump (
+			"#F",
+			new double[][]
+			{
+				{ 1.0000,  0.0000,  0.0000,  0.0000},
+				{ 1.0000,  1.0000,  1.0000,  1.0000},
+				{-1.0000,  1.0000,  0.0000,  0.0000},
+				{ 1.0000,  2.0000,  3.0000,  4.0000}
+			}
+		);
 
-		InverseVerifyDump ("#G", new double[][] {
-			{ 0.0000,  1.0000,  0.0000,  0.0000},
-			{ 0.0000,  0.0000,  2.0000,  0.0000},
-			{ 0.0434,  0.0188, 16.0083, 24.0037},
-			{ 0.0188,  0.0083, 24.0037, 48.0017}
-		});
+		InverseVerifyDump (
+			"#G",
+			new double[][]
+			{
+				{ 0.0000,  1.0000,  0.0000,  0.0000},
+				{ 0.0000,  0.0000,  2.0000,  0.0000},
+				{ 0.0434,  0.0188, 16.0083, 24.0037},
+				{ 0.0188,  0.0083, 24.0037, 48.0017}
+			}
+		);
 	}
-
-	/*
-	 * Sample illustrating the Invocation of Linear System Solver Functionality
-	 * 
-	 * 	WARNING: Insufficient Error Checking, so use caution
-	 */
 
 	private static final void LinearSystemSolver()
 	{
-		double[][] aadblA = new double[][] {
+		double[][] a =
+		{
 			{1.000, 0.500, 0.333,  0.000,  0.000, 0.000},
 			{0.000, 0.000, 0.000,  1.000,  0.500, 0.333},
 			{1.000, 1.000, 1.000, -1.000,  0.000, 0.000},
@@ -218,54 +235,46 @@ public class LinearAlgebra {
 			{0.000, 1.000, 0.000,  0.000,  0.000, 0.000},
 			{0.000, 0.000, 0.000,  0.000,  1.000, 0.000},
 		};
-		double[] adblB = new double[] {0.02, 0.026, 0., 0., 0., 0.};
+		double[] b =
+		{
+			0.020,
+			0.026,
+			0.000,
+			0.000,
+			0.000,
+			0.000
+		};
 
-		org.drip.numerical.common.NumberUtil.Print2DArray (
-			"\tCOEFF",
-			aadblA,
-			false
-		);
+		NumberUtil.Print2DArray ("\t|| COEFF", a, false);
 
-		/*
-		 * Solve the Linear System using Gaussian Elimination
-		 */
+		double[] transformedRHS = LinearSystem.SolveUsingGaussianElimination (a, b).getTransformedRHS();
 
-		LinearizationOutput lssGaussianElimination = LinearSystem.SolveUsingGaussianElimination (
-			aadblA,
-			adblB
-		);
-
-		for (int i = 0; i < lssGaussianElimination.getTransformedRHS().length; ++i)
-			System.out.println ("GaussianElimination[" + i + "] = " + FormatUtil.FormatDouble
-				(lssGaussianElimination.getTransformedRHS()[i], 0, 6, 1.));
-
-		for (int i = 0; i < 6; ++i) {
-			double dblRHS = 0.;
-
-			for (int j = 0; j < 6; ++j)
-				dblRHS += aadblA[i][j] * lssGaussianElimination.getTransformedRHS()[j];
-
-			System.out.println ("RHS[" + i + "]: " + dblRHS);
+		for (int i = 0; i < transformedRHS.length; ++i) {
+			System.out.println (
+				"\t|| GaussianElimination[" + i + "] = " +
+					FormatUtil.FormatDouble (transformedRHS[i], 0, 6, 1.)
+			);
 		}
 
-		/*
-		 * Solve the Linear System using the Gauss-Seidel method
-		 */
+		for (int i = 0; i < 6; ++i) {
+			double rhs = 0.;
 
-		/* LinearSystemSolution lssGaussSeidel = LinearSystemSolver.SolveUsingGaussSeidel (aadblA, adblB);
+			for (int j = 0; j < 6; ++j) {
+				rhs += a[i][j] * transformedRHS[j];
+			}
 
-		for (int i = 0; i < lssGaussSeidel.getSolution().length; ++i)
-			System.out.println ("GaussSeidel[" + i + "] = " + FormatUtil.FormatDouble (lssGaussSeidel.getSolution()[i], 0, 2, 1.)); */
+			System.out.println ("\t|| RHS[" + i + "]: " + rhs);
+		}
 	}
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 	{
 		EnvManager.InitEnv ("");
 

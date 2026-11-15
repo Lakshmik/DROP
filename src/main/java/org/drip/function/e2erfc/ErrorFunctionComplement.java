@@ -1,11 +1,26 @@
 
 package org.drip.function.e2erfc;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+import org.drip.numerical.estimation.R1Estimate;
+import org.drip.numerical.estimation.R1ToR1IntegrandLimitEstimator;
+import org.drip.numerical.estimation.R1ToR1Series;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -103,73 +118,77 @@ package org.drip.function.e2erfc;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ * It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erfc/README.md">E<sub>2</sub> erfc Estimation Function Implementation</a></li>
+ * 		<li>Construct the Asymptotic Expansion Version of <i>ErrorFunctionComplement</i></li>
+ * 		<li>Construct the Inverse Factorial Expansion Version of <i>ErrorFunctionComplement</i></li>
+ * 		<li><i>ErrorFunctionComplement</i> Constructor</li>
+ * 		<li>Compute the Built-in Higher Order Series Estimates</li>
+ * 		<li>Retrieve the R<sup>1</sup> To R<sup>1</sup> erf Integrand</li>
+ * 		<li>Compute the Q Value for the given X</li>
+ * 		<li>Compute the CDF Value for the given X</li>
+ * 		<li>Compute the erf Value for the given X</li>
+ * 		<li>Compute the erfcx Value for the given X</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erfc/README.md">E<sub>2</sub> erfc Estimation Function Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR1IntegrandLimitEstimator
+public class ErrorFunctionComplement
+	extends R1ToR1IntegrandLimitEstimator
 {
-	private org.drip.numerical.estimation.R1ToR1Series _r1ToR1SeriesGenerator = null;
+	private R1ToR1Series _r1ToR1SeriesGenerator = null;
 
 	/**
-	 * Construct the Asymptotic Expansion Version of ErrorFunctionComplement
+	 * Construct the Asymptotic Expansion Version of <i>ErrorFunctionComplement</i>
 	 * 
 	 * @param termCount Count of the Number of Terms
 	 * 
-	 * @return The Asymptotic Expansion Version of ErrorFunctionComplement
+	 * @return The Asymptotic Expansion Version of <i>ErrorFunctionComplement</i>
 	 */
 
 	public static final ErrorFunctionComplement AsymptoticExpansion (
 		final int termCount)
 	{
-		final org.drip.numerical.estimation.R1ToR1Series r1ToR1SeriesGenerator =
-			org.drip.function.e2erfc.AsymptoticExpansion.SeriesGenerator (termCount);
+		final R1ToR1Series r1ToR1SeriesGenerator = AsymptoticExpansion.SeriesGenerator (termCount);
 
-		try
-		{
-			return new ErrorFunctionComplement (
-				r1ToR1SeriesGenerator,
-				null
-			)
+		try {
+			return new ErrorFunctionComplement (r1ToR1SeriesGenerator, null)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("ErrorFunctionComplement::AsymptoticExpansion::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"ErrorFunctionComplement::AsymptoticExpansion::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (0. == z)
-					{
+					if (0. == z) {
 						return 1.;
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return 2. - evaluate (-1. * z);
 					}
 
-					return java.lang.Math.exp (-1. * z * z) / (z * java.lang.Math.sqrt (java.lang.Math.PI)) *
-						r1ToR1SeriesGenerator.cumulative (
-							0.,
-							z
-						);
+					return Math.exp (-1. * z * z) / (z * Math.sqrt (Math.PI)) *
+						r1ToR1SeriesGenerator.cumulative (0., z);
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -177,56 +196,44 @@ public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR
 	}
 
 	/**
-	 * Construct the Inverse Factorial Expansion Version of ErrorFunctionComplement
+	 * Construct the Inverse Factorial Expansion Version of <i>ErrorFunctionComplement</i>
 	 * 
 	 * @param termCount Count of the Number of Terms
 	 * 
-	 * @return The Inverse Factorial Expansion Version of ErrorFunctionComplement
+	 * @return The Inverse Factorial Expansion Version of <i>ErrorFunctionComplement</i>
 	 */
 
 	public static final ErrorFunctionComplement InverseFactorialExpansion (
 		final int termCount)
 	{
-		final org.drip.numerical.estimation.R1ToR1Series r1ToR1SeriesGenerator =
-			org.drip.function.e2erfc.InverseFactorialExpansion.SeriesGenerator (termCount);
+		final R1ToR1Series r1ToR1SeriesGenerator = InverseFactorialExpansion.SeriesGenerator (termCount);
 
-		try
-		{
-			return new ErrorFunctionComplement (
-				r1ToR1SeriesGenerator,
-				null
-			)
+		try {
+			return new ErrorFunctionComplement (r1ToR1SeriesGenerator, null)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("ErrorFunctionComplement::InverseFactorialExpansion::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"ErrorFunctionComplement::InverseFactorialExpansion::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (0. == z)
-					{
+					if (0. == z) {
 						return 1.;
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return 2. - evaluate (-1. * z);
 					}
 
-					return java.lang.Math.exp (-1. * z * z) / (z * java.lang.Math.sqrt (java.lang.Math.PI)) *
-						r1ToR1SeriesGenerator.cumulative (
-							0.,
-							z
-						);
+					return Math.exp (-1. * z * z) / (z * Math.sqrt (Math.PI)) *
+						r1ToR1SeriesGenerator.cumulative (0., z);
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -234,49 +241,53 @@ public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR
 	}
 
 	/**
-	 * ErrorFunctionComplement Constructor
+	 * <i>ErrorFunctionComplement</i> Constructor
 	 * 
 	 * @param r1ToR1SeriesGenerator R<sup>1</sup> To R<sup>1</sup> Series Generator
-	 * @param dc Differential Control
+	 * @param derivativeControl Differential Control
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ErrorFunctionComplement (
-		final org.drip.numerical.estimation.R1ToR1Series r1ToR1SeriesGenerator,
-		final org.drip.numerical.differentiation.DerivativeControl dc)
-		throws java.lang.Exception
+		final R1ToR1Series r1ToR1SeriesGenerator,
+		final DerivativeControl derivativeControl)
+		throws Exception
 	{
-		super (
-			dc,
-			0.
-		);
+		super (derivativeControl, 0.);
 
 		_r1ToR1SeriesGenerator = r1ToR1SeriesGenerator;
 	}
 
-	@Override public org.drip.numerical.estimation.R1Estimate seriesEstimateNative (
+	/**
+	 * Compute the Built-in Higher Order Series Estimates
+	 * 
+	 * @param x X
+	 * 
+	 * @return The Built-in Higher Order Series Estimates
+	 */
+
+	@Override public R1Estimate seriesEstimateNative (
 		final double x)
 	{
-		return null == _r1ToR1SeriesGenerator ? seriesEstimate (
-			x,
-			null,
-			null
-		) : seriesEstimate (
-			x,
-			_r1ToR1SeriesGenerator.termWeightMap(),
-			_r1ToR1SeriesGenerator
-		);
+		return null == _r1ToR1SeriesGenerator ? seriesEstimate (x, null, null) :
+			seriesEstimate (x, _r1ToR1SeriesGenerator.termWeightMap(), _r1ToR1SeriesGenerator);
 	}
 
-	@Override public org.drip.function.definition.R1ToR1 integrand()
+	/**
+	 * Retrieve the R<sup>1</sup> To R<sup>1</sup> erf Integrand
+	 * 
+	 * @return The R<sup>1</sup> To R<sup>1</sup> erf Integrand
+	 */
+
+	@Override public R1ToR1 integrand()
 	{
-		return new org.drip.function.definition.R1ToR1 (null)
+		return new R1ToR1 (null)
 		{
 			@Override public double evaluate (
 				final double z)
 			{
-				return 1. - 2. * java.lang.Math.exp (-1. * z * z) / java.lang.Math.sqrt (java.lang.Math.PI);
+				return 1. - 2. * Math.exp (-1. * z * z) / Math.sqrt (Math.PI);
 			}
 		};
 	}
@@ -288,19 +299,18 @@ public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR
 	 * 
 	 * @return The Q Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double q (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (x))
-		{
-			throw new java.lang.Exception ("ErrorFunctionComplement::q => Invalid Inputs");
+		if (!NumberUtil.IsValid (x)) {
+			throw new Exception ("ErrorFunctionComplement::q => Invalid Inputs");
 		}
 
-		return 0.5 * evaluate (x / java.lang.Math.sqrt (2.));
+		return 0.5 * evaluate (x / Math.sqrt (2.));
 	}
 
 	/**
@@ -310,19 +320,18 @@ public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR
 	 * 
 	 * @return The CDF Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double cdf (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (x))
-		{
-			throw new java.lang.Exception ("ErrorFunctionComplement::cdf => Invalid Inputs");
+		if (!NumberUtil.IsValid (x)) {
+			throw new Exception ("ErrorFunctionComplement::cdf => Invalid Inputs");
 		}
 
-		return 0.5 * evaluate (-1. * x / java.lang.Math.sqrt (2.));
+		return 0.5 * evaluate (-1. * x / Math.sqrt (2.));
 	}
 
 	/**
@@ -332,12 +341,12 @@ public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR
 	 * 
 	 * @return The erf Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double erf (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
 		return 1. - evaluate (x);
 	}
@@ -349,13 +358,13 @@ public class ErrorFunctionComplement extends org.drip.numerical.estimation.R1ToR
 	 * 
 	 * @return The erfcx Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double erfcx (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		return java.lang.Math.exp (x * x) * evaluate (x);
+		return Math.exp (x * x) * evaluate (x);
 	}
 }

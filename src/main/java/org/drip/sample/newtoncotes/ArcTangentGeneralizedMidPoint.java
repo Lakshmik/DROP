@@ -9,6 +9,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -105,13 +113,14 @@ import org.drip.service.env.EnvManager;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/newtoncotes/README.md">R<sup>1</sup> Newton-Cotes Quadrature Schemes</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/newtoncotes/README.md">R<sup>1</sup> Newton-Cotes Quadrature Schemes</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -128,8 +137,7 @@ public class ArcTangentGeneralizedMidPoint
 		double a = 2. / z;
 		double arcTangent = 0.;
 
-		for (int termIndex = 1; termIndex <= termCount; ++termIndex)
-		{
+		for (int termIndex = 1; termIndex <= termCount; ++termIndex) {
 			arcTangent = arcTangent + (a / ((a * a + b * b) * (2 * termIndex - 1)));
 			a = a * (1. - (4. / (z * z))) + 4. * (b / z);
 			b = b * (1. - (4. / (z * z))) - 4. * (a / z);
@@ -185,17 +193,11 @@ public class ArcTangentGeneralizedMidPoint
 
 		System.out.println ("\t|-----------------------------------||");
 
-		for (double rValue : rValueArray)
-		{
+		for (double rValue : rValueArray) {
 			System.out.println (
 				"\t|" + FormatUtil.FormatDouble (rValue, 2, 5, 1.) + " => " +
 				FormatUtil.FormatDouble (Math.atan (rValue), 1, 6, 1.) + " | " +
-				FormatUtil.FormatDouble (
-					ArcTangent (
-						rValue,
-						termCount
-					), 1, 6, 1.
-				) + " ||"
+				FormatUtil.FormatDouble (ArcTangent (rValue, termCount), 1, 6, 1.) + " ||"
 			);
 		}
 

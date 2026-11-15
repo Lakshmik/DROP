@@ -10,6 +10,14 @@ import org.drip.specialfunction.incompletegamma.UpperSFixed;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -110,13 +118,14 @@ import org.drip.specialfunction.incompletegamma.UpperSFixed;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -161,50 +170,50 @@ public class UpperSRecurrenceEstimate
 			9,
 		};
 
-		System.out.println
-			("\t|----------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println
-			("\t|                  RECURRENCE ESTIMATION OF UPPER INCOMEPLETE GAMMA FUNCTION - NEGATIVE VALUES                   ||");
+		System.out.println (
+			"\t|                  RECURRENCE ESTIMATION OF UPPER INCOMEPLETE GAMMA FUNCTION - NEGATIVE VALUES                   ||"
+		);
 
-		System.out.println
-			("\t|----------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println
-			("\t|        L -> R:                                                                                                 ||");
+		System.out.println (
+			"\t|        L -> R:                                                                                                 ||"
+		);
 
-		System.out.println
-			("\t|                - (Negative) n                                                                                  ||");
+		System.out.println (
+			"\t|                - (Negative) n                                                                                  ||"
+		);
 
-		System.out.println
-			("\t|                - Upper Incomplete Gamma for for z = 0 -> 1                                                     ||");
+		System.out.println (
+			"\t|                - Upper Incomplete Gamma for for z = 0 -> 1                                                     ||"
+		);
 
-		System.out.println
-			("\t|----------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------||"
+		);
 
-		for (int n : nArray)
-		{
+		for (int n : nArray) {
 			String display = "\t| n ->" + FormatUtil.FormatDouble (n, 1, 0, 1.) + " => ";
 
 			UpperSFixed upperSRecursive = UpperSFixed.NIST2019 (termCount);
 
-			for (double z : zArray)
-			{
+			for (double z : zArray) {
 				display = display + " " +
-					FormatUtil.FormatDouble (
-						upperSRecursive.evaluateRecursive (
-							n,
-							z
-						), 6, 6, 1.
-					)
-				+ " |";
+					FormatUtil.FormatDouble (upperSRecursive.evaluateRecursive (n, z), 6, 6, 1.) + " |";
 			}
 
 			System.out.println (display + "|");
 		}
 
-		System.out.println
-			("\t|----------------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

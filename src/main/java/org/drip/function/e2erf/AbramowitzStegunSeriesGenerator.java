@@ -1,11 +1,24 @@
 
 package org.drip.function.e2erf;
 
+import java.util.TreeMap;
+
+import org.drip.numerical.estimation.R1ToR1Series;
+import org.drip.numerical.estimation.R1ToR1SeriesTerm;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,66 +117,59 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Construct a Inverse Polynomial Degree 4 Version of E<sub>2</sub> erf <i>AbramowitzStegunSeriesGenerator</i> Instance</li>
+ * 		<li>Construct a Mixed Polynomial Degree 3 Version of E<sub>2</sub> erf <i>AbramowitzStegunSeriesGenerator</i> Instance</li>
+ * 		<li>Construct a Inverse Polynomial Degree 6 Version of E<sub>2</sub> erf <i>AbramowitzStegunSeriesGenerator</i> Instance</li>
+ * 		<li>Construct a Mixed Polynomial Degree 5 Version of E<sub>2</sub> erf <i>AbramowitzStegunSeriesGenerator</i> Instance</li>
+ * 		<li>Construct the Numerical Recipes Version of E<sub>2</sub> erf <i>AbramowitzStegunSeriesGenerator</i> Instance</li>
+ * 		<li><i>AbramowitzStegunSeriesGenerator</i> Constructor</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class AbramowitzStegunSeriesGenerator extends org.drip.numerical.estimation.R1ToR1Series
+public class AbramowitzStegunSeriesGenerator
+	extends R1ToR1Series
 {
 
 	/**
-	 * Construct a Inverse Polynomial Degree 4 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * Construct a Inverse Polynomial Degree 4 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 * 
-	 * @return Inverse Polynomial Degree 4 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * @return Inverse Polynomial Degree 4 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 */
 
 	public static final AbramowitzStegunSeriesGenerator InversePolynomial4()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			0,
-			1.000000
-		);
+		termWeightMap.put (0, 1.000000);
 
-		termWeightMap.put (
-			1,
-			0.278393
-		);
+		termWeightMap.put (1, 0.278393);
 
-		termWeightMap.put (
-			2,
-			0.230289
-		);
+		termWeightMap.put (2, 0.230289);
 
-		termWeightMap.put (
-			3,
-			0.000972
-		);
+		termWeightMap.put (3, 0.000972);
 
-		termWeightMap.put (
-			4,
-			0.078108
-		);
+		termWeightMap.put (4, 0.078108);
 
-		try
-		{
-			return new AbramowitzStegunSeriesGenerator (
-				org.drip.numerical.estimation.R1ToR1SeriesTerm.Taylor(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new AbramowitzStegunSeriesGenerator (R1ToR1SeriesTerm.Taylor(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -171,40 +177,26 @@ public class AbramowitzStegunSeriesGenerator extends org.drip.numerical.estimati
 	}
 
 	/**
-	 * Construct a Mixed Polynomial Degree 3 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * Construct a Mixed Polynomial Degree 3 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 * 
-	 * @return Mixed Polynomial Degree 3 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * @return Mixed Polynomial Degree 3 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 */
 
 	public static final AbramowitzStegunSeriesGenerator MixedPolynomial3()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			1,
-			0.3480242
-		);
+		termWeightMap.put (1, 0.3480242);
 
-		termWeightMap.put (
-			2,
-			-0.0958798
-		);
+		termWeightMap.put (2, -0.0958798);
 
-		termWeightMap.put (
-			3,
-			0.7478556
-		);
+		termWeightMap.put (3, 0.7478556);
 
-		try
-		{
-			return new AbramowitzStegunSeriesGenerator (
-				org.drip.numerical.estimation.R1ToR1SeriesTerm.Taylor(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new AbramowitzStegunSeriesGenerator (R1ToR1SeriesTerm.Taylor(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -212,60 +204,34 @@ public class AbramowitzStegunSeriesGenerator extends org.drip.numerical.estimati
 	}
 
 	/**
-	 * Construct a Inverse Polynomial Degree 6 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * Construct a Inverse Polynomial Degree 6 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 * 
-	 * @return Inverse Polynomial Degree 6 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * @return Inverse Polynomial Degree 6 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 */
 
 	public static final AbramowitzStegunSeriesGenerator InversePolynomial6()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			0,
-			1.0000000000
-		);
+		termWeightMap.put (0, 1.0000000000);
 
-		termWeightMap.put (
-			1,
-			0.0705230784
-		);
+		termWeightMap.put (1, 0.0705230784);
 
-		termWeightMap.put (
-			2,
-			0.0422820123
-		);
+		termWeightMap.put (2, 0.0422820123);
 
-		termWeightMap.put (
-			3,
-			0.0092705272
-		);
+		termWeightMap.put (3, 0.0092705272);
 
-		termWeightMap.put (
-			4,
-			0.0001520143
-		);
+		termWeightMap.put (4, 0.0001520143);
 
-		termWeightMap.put (
-			5,
-			0.0002765672
-		);
+		termWeightMap.put (5, 0.0002765672);
 
-		termWeightMap.put (
-			6,
-			0.0000430638
-		);
+		termWeightMap.put (6, 0.0000430638);
 
-		try
-		{
-			return new AbramowitzStegunSeriesGenerator (
-				org.drip.numerical.estimation.R1ToR1SeriesTerm.Taylor(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new AbramowitzStegunSeriesGenerator (R1ToR1SeriesTerm.Taylor(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -273,50 +239,30 @@ public class AbramowitzStegunSeriesGenerator extends org.drip.numerical.estimati
 	}
 
 	/**
-	 * Construct a Mixed Polynomial Degree 5 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * Construct a Mixed Polynomial Degree 5 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 * 
-	 * @return Mixed Polynomial Degree 5 Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * @return Mixed Polynomial Degree 5 Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 */
 
 	public static final AbramowitzStegunSeriesGenerator MixedPolynomial5()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			1,
-			0.254829592
-		);
+		termWeightMap.put (1, 0.254829592);
 
-		termWeightMap.put (
-			2,
-			-0.284496736
-		);
+		termWeightMap.put (2, -0.284496736);
 
-		termWeightMap.put (
-			3,
-			1.421413741
-		);
+		termWeightMap.put (3, 1.421413741);
 
-		termWeightMap.put (
-			4,
-			-1.453152027
-		);
+		termWeightMap.put (4, -1.453152027);
 
-		termWeightMap.put (
-			5,
-			1.061405429
-		);
+		termWeightMap.put (5, 1.061405429);
 
-		try
-		{
-			return new AbramowitzStegunSeriesGenerator (
-				org.drip.numerical.estimation.R1ToR1SeriesTerm.Taylor(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new AbramowitzStegunSeriesGenerator (R1ToR1SeriesTerm.Taylor(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -324,75 +270,40 @@ public class AbramowitzStegunSeriesGenerator extends org.drip.numerical.estimati
 	}
 
 	/**
-	 * Construct the Numerical Recipes Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * Construct the Numerical Recipes Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 * 
-	 * @return Numerical Recipes Version of E<sub>2</sub> erf AbramowitzStegunSeriesGenerator
+	 * @return Numerical Recipes Version of E<sub>2</sub> erf
+	 * 	<i>AbramowitzStegunSeriesGenerator</i> Instance
 	 */
 
 	public static final AbramowitzStegunSeriesGenerator NumericalRecipe2007()
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		termWeightMap.put (
-			0,
-			-1.26551223
-		);
+		termWeightMap.put (0, -1.26551223);
 
-		termWeightMap.put (
-			1,
-			1.00002368
-		);
+		termWeightMap.put (1, 1.00002368);
 
-		termWeightMap.put (
-			2,
-			0.37409196
-		);
+		termWeightMap.put (2, 0.37409196);
 
-		termWeightMap.put (
-			3,
-			0.09678418
-		);
+		termWeightMap.put (3, 0.09678418);
 
-		termWeightMap.put (
-			4,
-			-0.18628806
-		);
+		termWeightMap.put (4, -0.18628806);
 
-		termWeightMap.put (
-			5,
-			0.27886807
-		);
+		termWeightMap.put (5, 0.27886807);
 
-		termWeightMap.put (
-			6,
-			-1.13520398
-		);
+		termWeightMap.put (6, -1.13520398);
 
-		termWeightMap.put (
-			7,
-			1.48851587
-		);
+		termWeightMap.put (7, 1.48851587);
 
-		termWeightMap.put (
-			8,
-			-0.82215223
-		);
+		termWeightMap.put (8, -0.82215223);
 
-		termWeightMap.put (
-			9,
-			0.17087277
-		);
+		termWeightMap.put (9, 0.17087277);
 
-		try
-		{
-			return new AbramowitzStegunSeriesGenerator (
-				org.drip.numerical.estimation.R1ToR1SeriesTerm.Taylor(),
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new AbramowitzStegunSeriesGenerator (R1ToR1SeriesTerm.Taylor(), termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -400,23 +311,19 @@ public class AbramowitzStegunSeriesGenerator extends org.drip.numerical.estimati
 	}
 
 	/**
-	 * AbramowitzStegunSeriesGenerator Constructor
+	 * <i>AbramowitzStegunSeriesGenerator</i> Constructor
 	 * 
 	 * @param r1ToR1SeriesTerm R<sup>1</sup> To R<sup>1</sup> Series Expansion Term
 	 * @param termWeightMap Error Term Weight Map
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public AbramowitzStegunSeriesGenerator (
-		final org.drip.numerical.estimation.R1ToR1SeriesTerm r1ToR1SeriesTerm,
-		final java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap)
-		throws java.lang.Exception
+		final R1ToR1SeriesTerm r1ToR1SeriesTerm,
+		final TreeMap<Integer, Double> termWeightMap)
+		throws Exception
 	{
-		super (
-			r1ToR1SeriesTerm,
-			false,
-			termWeightMap
-		);
+		super (r1ToR1SeriesTerm, false, termWeightMap);
 	}
 }

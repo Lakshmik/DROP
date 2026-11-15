@@ -80,9 +80,9 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>SegmentConfine</i> holds the Confines of a Single Coupon/Exercise Segment built according to the
- * 	Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The
- * 	References are:
+ * <i>VertexAccrual</i> holds the Path-independent Vertex Accrual Properties of a Single Event Pillar Segment
+ *  built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with
+ *  Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -120,66 +120,94 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class SegmentConfine
+public class VertexAccrual
 {
-	private double _amount = Double.NaN;
-	private double _leftTime = Double.NaN;
-	private double _rightTime = Double.NaN;
+	private double _couponRate = Double.NaN;
+	private double _yearFraction = Double.NaN;
+	private double _couponNotional = Double.NaN;
 
 	/**
-	 * <i>SegmentConfine</i> Constructor
+	 * Retrieve the "Zero" <i>VertexAccrual</i> Instance
 	 * 
-	 * @param leftTime Left Time
-	 * @param rightTime Right Time
-	 * @param amount Period Amount
-	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
+	 * @return "Zero" <i>VertexAccrual</i> Instance
 	 */
 
-	public SegmentConfine (
-		final double leftTime,
-		final double rightTime,
-		final double amount)
+	public static final VertexAccrual Zero()
+	{
+		try {
+			return new VertexAccrual (0., 0., 0.);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * <i>VertexAccrual</i> Constructor
+	 * 
+	 * @param yearFraction Accrual Year Fraction
+	 * @param couponRate Accrual Coupon Rate
+	 * @param couponNotional Accrual Coupon Notional
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
+
+	public VertexAccrual (
+		final double yearFraction,
+		final double couponRate,
+		final double couponNotional)
 		throws Exception
 	{
-		if (!NumberUtil.IsValid (_leftTime = leftTime) ||
-			!NumberUtil.IsValid (_rightTime = rightTime) || _rightTime <= _leftTime ||
-			!NumberUtil.IsValid (_amount = amount))
+		if (!NumberUtil.IsValid (_yearFraction = yearFraction) || 0. > yearFraction ||
+			!NumberUtil.IsValid (_couponRate = couponRate) ||
+			!NumberUtil.IsValid (_couponNotional = couponNotional))
 		{
-			throw new Exception ("SegmentConfine Constructor => Invalid Inputs");
+			throw new Exception ("VertexAccrual Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Segment Left Time
+	 * Retrieve the Accrual Year Fraction
 	 * 
-	 * @return Segment Left Time
+	 * @return Accrual Year Fraction
 	 */
 
-	public double leftTime()
+	public double yearFraction()
 	{
-		return _leftTime;
+		return _yearFraction;
 	}
 
 	/**
-	 * Retrieve the Segment Right Time
+	 * Retrieve the Accrual Coupon Rate
 	 * 
-	 * @return Segment Right Time
+	 * @return Accrual Coupon Rate
 	 */
 
-	public double rightTime()
+	public double couponRate()
 	{
-		return _rightTime;
+		return _couponRate;
 	}
 
 	/**
-	 * Retrieve the Segment Coupon Amount
+	 * Retrieve the Accrual Coupon Notional
 	 * 
-	 * @return Segment Coupon Amount
+	 * @return Accrual Coupon Notional
+	 */
+
+	public double couponNotional()
+	{
+		return _couponNotional;
+	}
+
+	/**
+	 * Retrieve the Accrual Amount
+	 * 
+	 * @return Accrual Amount
 	 */
 
 	public double amount()
 	{
-		return _amount;
+		return _yearFraction * _couponRate * _couponNotional;
 	}
 }

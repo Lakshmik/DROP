@@ -1,11 +1,24 @@
 
 package org.drip.function.matrix;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,24 +117,32 @@ package org.drip.function.matrix;
  *  	</li>
  *  </ul>
  *  
- * <br><br>
+ * It provides the following Functions:
+ *
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/matrix/README.md">Support for Functions of Matrices</a></li>
+ * 		<li><i>FrobeniusCovariance</i> Constructor</li>
+ * 		<li>Add a Frobenius Component</li>
+ * 		<li>Retrieve the Map of Frobenius Components</li>
  *  </ul>
- * <br><br>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/matrix/README.md">Support for Functions of Matrices</a></td></tr>
+ *  </table>
+ *	<br>
  * 
  * @author Lakshmi Krishnamurthy
  */
 
 public class FrobeniusCovariance
 {
-	private java.util.Map<java.lang.Double, org.drip.function.matrix.Square> _componentMap = null;
+	private Map<Double, Square> _componentMap = null;
 
 	/**
-	 * Empty FrobeniusCovariance Constructor
+	 * Empty <i>FrobeniusCovariance</i> Constructor
 	 */
 
 	public FrobeniusCovariance()
@@ -139,25 +160,17 @@ public class FrobeniusCovariance
 
 	public boolean addComponent (
 		final double eigenValue,
-		final org.drip.function.matrix.Square component)
+		final Square component)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (
-				eigenValue
-			) || null == component
-		)
-		{
+		if (!NumberUtil.IsValid (eigenValue) || null == component) {
 			return false;
 		}
 
-		if (null == _componentMap)
-		{
-			_componentMap = new java.util.TreeMap<java.lang.Double, org.drip.function.matrix.Square>();
+		if (null == _componentMap) {
+			_componentMap = new TreeMap<Double, Square>();
 		}
 
-		_componentMap.put (
-			eigenValue,
-			component
-		);
+		_componentMap.put (eigenValue, component);
 
 		return true;
 	}
@@ -168,7 +181,7 @@ public class FrobeniusCovariance
 	 * @return Map of Frobenius Components
 	 */
 
-	public java.util.Map<java.lang.Double, org.drip.function.matrix.Square> componentMap()
+	public Map<Double, Square> componentMap()
 	{
 		return _componentMap;
 	}

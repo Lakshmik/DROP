@@ -13,6 +13,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -111,14 +119,15 @@ import org.drip.service.env.EnvManager;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
- *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/FunctionAnalysisLibrary.md">Function Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/feed/erfx/README.md">E<sup>2</sup> erfc and erfi Estimation</a></li>
- *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/FunctionAnalysisLibrary.md">Function Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/erfx/README.md">E<sup>2</sup> erfc and erfi Estimation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -152,48 +161,61 @@ public class ERFIMacLaurin
 
 		ErrorFunctionInverse erfiMacLaurin15 = ErrorFunctionInverse.MacLaurin (termCount15);
 
-		System.out.println ("\t|---------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                           MacLaurin erfi Estimate                         ||");
+		System.out.println (
+			"\t|                           MacLaurin erfi Estimate                         ||"
+		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|        L -> R:                                                            ||");
+		System.out.println (
+			"\t|        L -> R:                                                            ||"
+		);
 
-		System.out.println ("\t|                - erf                                                      ||");
+		System.out.println (
+			"\t|                - erf                                                      ||"
+		);
 
-		System.out.println ("\t|                - erfi Estimate Built-in                                   ||");
+		System.out.println (
+			"\t|                - erfi Estimate Built-in                                   ||"
+		);
 
-		System.out.println ("\t|                - erfi Estimate MacLaurin ( 5 Terms)                       ||");
+		System.out.println (
+			"\t|                - erfi Estimate MacLaurin ( 5 Terms)                       ||"
+		);
 
-		System.out.println ("\t|                - erfi Estimate MacLaurin (10 Terms)                       ||");
+		System.out.println (
+			"\t|                - erfi Estimate MacLaurin (10 Terms)                       ||"
+		);
 
-		System.out.println ("\t|                - erfi Estimate MacLaurin (15 Terms)                       ||");
+		System.out.println (
+			"\t|                - erfi Estimate MacLaurin (15 Terms)                       ||"
+		);
 
-		System.out.println ("\t|---------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------||"
+		);
 
-		for (Map.Entry<Double, BuiltInEntry> builtInTableEntry : builtInTable.entrySet())
-		{
+		for (Map.Entry<Double, BuiltInEntry> builtInTableEntry : builtInTable.entrySet()) {
 			double erf = builtInTableEntry.getValue().erf();
-
-			double erfi = builtInTableEntry.getKey();
-
-			double erfiEstimate5 = erfiMacLaurin5.evaluate (erf);
-
-			double erfiEstimate10 = erfiMacLaurin10.evaluate (erf);
-
-			double erfiEstimate15 = erfiMacLaurin15.evaluate (erf);
 
 			System.out.println (
 				"\t| " + FormatUtil.FormatDouble (erf, 1, 9, 1.) + " => " +
-				FormatUtil.FormatDouble (erfi, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfiEstimate5, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfiEstimate10, 1, 9, 1.) + " | " +
-				FormatUtil.FormatDouble (erfiEstimate15, 1, 9, 1.) + " ||"
+				FormatUtil.FormatDouble (builtInTableEntry.getKey(), 1, 9, 1.) + " | " +
+				FormatUtil.FormatDouble (erfiMacLaurin5.evaluate (erf), 1, 9, 1.) + " | " +
+				FormatUtil.FormatDouble (erfiMacLaurin10.evaluate (erf), 1, 9, 1.) + " | " +
+				FormatUtil.FormatDouble (erfiMacLaurin15.evaluate (erf), 1, 9, 1.) + " ||"
 			);
 		}
 
-		System.out.println ("\t|---------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|---------------------------------------------------------------------------||"
+		);
 
 		EnvManager.TerminateEnv();
 	}

@@ -1,11 +1,22 @@
 
 package org.drip.function.e2erf;
 
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,21 +115,35 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Construct the Inverse Degree 4 Polynomial Version of Abramowitz-Stegun E<sub>2</sub> erf Estimator</li>
+ * 		<li>Construct the Mixed Degree 3 Polynomial Version of Abramowitz-Stegun E<sub>2</sub> erf Estimator</li>
+ * 		<li>Construct the Inverse Degree 6 Polynomial Version of Abramowitz-Stegun E<sub>2</sub> erf Estimator</li>
+ * 		<li>Construct the Mixed Degree 5 Polynomial Version of Abramowitz-Stegun E<sub>2</sub> erf Estimator</li>
+ * 		<li>Construct the Numerical Recipe Version of Abramowitz-Stegun E<sub>2</sub> erf Estimator</li>
+ * 		<li><i>AbramowitzStegun</i> Constructor</li>
+ * 		<li>Retrieve the Maximum Error</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunction
+public abstract class AbramowitzStegun
+	extends ErrorFunction
 {
-	private double _maximumError = java.lang.Double.NaN;
+	private double _maximumError = Double.NaN;
 
 	/**
 	 * Construct the Inverse Degree 4 Polynomial Version of Abramowitz-Stegun E<sub>2</sub> erf Estimator
@@ -131,43 +156,29 @@ public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunc
 		final AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator =
 			AbramowitzStegunSeriesGenerator.InversePolynomial4();
 
-		try
-		{
-			return new AbramowitzStegun (
-				abramowitzStegunSeriesGenerator,
-				null,
-				0.0005
-			)
+		try {
+			return new AbramowitzStegun (abramowitzStegunSeriesGenerator, null, 0.0005)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("AbramowitzStegun::InversePolynomial4::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"AbramowitzStegun::InversePolynomial4::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return -1. * evaluate (-1. * z);
 					}
 
-					double erf = 1. - java.lang.Math.pow (
-						abramowitzStegunSeriesGenerator.cumulative (
-							0.,
-							z
-						),
-						-4
-					);
+					double erf = 1. - Math.pow (abramowitzStegunSeriesGenerator.cumulative (0., z), -4);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -185,40 +196,34 @@ public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunc
 		final AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator =
 			AbramowitzStegunSeriesGenerator.MixedPolynomial3();
 
-		try
-		{
-			return new AbramowitzStegun (
-				abramowitzStegunSeriesGenerator,
-				null,
-				0.000025
-			)
+		try {
+			return new AbramowitzStegun (abramowitzStegunSeriesGenerator, null, 0.000025)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("AbramowitzStegun::MixedPolynomial3::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"AbramowitzStegun::MixedPolynomial3::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return -1. * evaluate (-1. * z);
 					}
 
 					double erf = 1. - abramowitzStegunSeriesGenerator.cumulative (
 						0.,
 						1. / (1. + 0.47047 * z)
-					) * java.lang.Math.exp (-1. * z * z);
+					) * Math.exp (
+						-1. * z * z
+					);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -236,43 +241,29 @@ public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunc
 		final AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator =
 			AbramowitzStegunSeriesGenerator.InversePolynomial6();
 
-		try
-		{
-			return new AbramowitzStegun (
-				abramowitzStegunSeriesGenerator,
-				null,
-				0.0000003
-			)
+		try {
+			return new AbramowitzStegun (abramowitzStegunSeriesGenerator, null, 0.0000003)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("AbramowitzStegun::InversePolynomial6::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"AbramowitzStegun::InversePolynomial6::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return -1. * evaluate (-1. * z);
 					}
 
-					double erf = 1. - java.lang.Math.pow (
-						abramowitzStegunSeriesGenerator.cumulative (
-							0.,
-							z
-						),
-						-16
-					);
+					double erf = 1. - Math.pow (abramowitzStegunSeriesGenerator.cumulative (0., z), -16);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -290,40 +281,34 @@ public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunc
 		final AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator =
 			AbramowitzStegunSeriesGenerator.MixedPolynomial5();
 
-		try
-		{
-			return new AbramowitzStegun (
-				abramowitzStegunSeriesGenerator,
-				null,
-				0.00000015
-			)
+		try {
+			return new AbramowitzStegun (abramowitzStegunSeriesGenerator, null, 0.00000015)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("AbramowitzStegun::MixedPolynomial5::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"AbramowitzStegun::MixedPolynomial5::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return -1. * evaluate (-1. * z);
 					}
 
 					double erf = 1. - abramowitzStegunSeriesGenerator.cumulative (
 						0.,
 						1. / (1. + 0.3275911 * z)
-					) * java.lang.Math.exp (-1. * z * z);
+					) * Math.exp (
+						-1. * z * z
+					);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -341,44 +326,33 @@ public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunc
 		final AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator =
 			AbramowitzStegunSeriesGenerator.NumericalRecipe2007();
 
-		try
-		{
-			return new AbramowitzStegun (
-				abramowitzStegunSeriesGenerator,
-				null,
-				0.00000012
-			)
+		try {
+			return new AbramowitzStegun (abramowitzStegunSeriesGenerator, null, 0.00000012)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("AbramowitzStegun::NumericalRecipe2007::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"AbramowitzStegun::NumericalRecipe2007::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return -1. * evaluate (-1. * z);
 					}
 
 					double t = 1. / (1. + 0.5 * z);
 
-					double erf = 1. - t * java.lang.Math.exp (
-						abramowitzStegunSeriesGenerator.cumulative (
-							0.,
-							t
-						) - z * z
+					double erf = 1. - t * Math.exp (
+						abramowitzStegunSeriesGenerator.cumulative (0., t) - z * z
 					);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -386,29 +360,25 @@ public abstract class AbramowitzStegun extends org.drip.function.e2erf.ErrorFunc
 	}
 
 	/**
-	 * E2AbramowitzStegun Constructor
+	 * <i>AbramowitzStegun</i> Constructor
 	 * 
 	 * @param abramowitzStegunSeriesGenerator Abramowitz Stegun Series Generator
-	 * @param dc The Derivative Control
+	 * @param derivativeControl The Derivative Control
 	 * @param maximumError Maximum Error
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public AbramowitzStegun (
-		final org.drip.function.e2erf.AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator,
-		final org.drip.numerical.differentiation.DerivativeControl dc,
+		final AbramowitzStegunSeriesGenerator abramowitzStegunSeriesGenerator,
+		final DerivativeControl derivativeControl,
 		final double maximumError)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (
-			abramowitzStegunSeriesGenerator,
-			dc
-		);
+		super (abramowitzStegunSeriesGenerator, derivativeControl);
 
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_maximumError = maximumError) || 0. >= _maximumError)
-		{
-			throw new java.lang.Exception ("AbramowitzStegun Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_maximumError = maximumError) || 0. >= _maximumError) {
+			throw new Exception ("AbramowitzStegun Constructor => Invalid Inputs");
 		}
 	}
 

@@ -1,11 +1,26 @@
 
 package org.drip.function.e2erf;
 
+import org.drip.function.definition.R1ToR1;
+import org.drip.measure.gaussian.R1UnivariateNormal;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.estimation.R1Estimate;
+import org.drip.numerical.estimation.R1ToR1IntegrandLimitEstimator;
+import org.drip.numerical.estimation.R1ToR1Series;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -103,21 +118,40 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Construct the Euler-MacLaurin Instance of the E<sub>2</sub> erf</li>
+ * 		<li>Construct the Convergent Hans Heinrich Burmann Version of the E<sub>2</sub> erf</li>
+ * 		<li>Construct the Schopf-Supancic (2014) Hans Heinrich Burmann Version of the E<sub>2</sub> erf</li>
+ * 		<li><i>ErrorFunction</i> Constructor</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Compute the Anti-Derivative Function</li>
+ * 		<li>Compute the Built-in Higher Order Series Estimates</li>
+ * 		<li>Retrieve the R<sup>1</sup> To R<sup>1</sup> erf Integrand</li>
+ * 		<li>Compute the Q Value for the given X</li>
+ * 		<li>Compute the CDF Value for the given X</li>
+ * 		<li>Compute the erfc Value for the given X</li>
+ * 		<li>Compute the E<sub>2</sub> erf Gaussian Density Integral over -inf to +inf</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1IntegrandLimitEstimator
+public class ErrorFunction
+	extends R1ToR1IntegrandLimitEstimator
 {
-	private org.drip.numerical.estimation.R1ToR1Series _r1ToR1SeriesGenerator = null;
+	private R1ToR1Series _r1ToR1SeriesGenerator = null;
 
 	/**
 	 * Construct the Euler-MacLaurin Instance of the E<sub>2</sub> erf
@@ -130,43 +164,29 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 	public static final ErrorFunction MacLaurin (
 		final int termCount)
 	{
-		final org.drip.function.e2erf.MacLaurinSeries e2MacLaurinSeriesGenerator =
-			org.drip.function.e2erf.MacLaurinSeries.ERF (termCount);
+		final MacLaurinSeries e2MacLaurinSeriesGenerator = MacLaurinSeries.ERF (termCount);
 
-		if (null == e2MacLaurinSeriesGenerator)
-		{
+		if (null == e2MacLaurinSeriesGenerator) {
 			return null;
 		}
 
-		try
-		{
-			return new ErrorFunction (
-				e2MacLaurinSeriesGenerator,
-				null
-			)
+		try {
+			return new ErrorFunction (e2MacLaurinSeriesGenerator, null)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("ErrorFunction::MacLaurin::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception ("ErrorFunction::MacLaurin::evaluate => Invalid Inputs");
 					}
 
-					double erf = 2. / java.lang.Math.sqrt (java.lang.Math.PI) *
-						e2MacLaurinSeriesGenerator.cumulative (
-							0.,
-							z
-						);
+					double erf = 2. / Math.sqrt (Math.PI) * e2MacLaurinSeriesGenerator.cumulative (0., z);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -181,45 +201,33 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 
 	public static final ErrorFunction HansHeinrichBurmannConvergent()
 	{
-		final org.drip.numerical.estimation.R1ToR1Series
-			hansHeinrichBurmannConvergentSeriesGenerator =
-				org.drip.function.e2erf.HansHeinrichBurmannSeries.Convergent();
+		final R1ToR1Series hansHeinrichBurmannConvergentSeriesGenerator =
+			HansHeinrichBurmannSeries.Convergent();
 
-		if (null == hansHeinrichBurmannConvergentSeriesGenerator)
-		{
+		if (null == hansHeinrichBurmannConvergentSeriesGenerator) {
 			return null;
 		}
 
-		try
-		{
-			return new ErrorFunction (
-				hansHeinrichBurmannConvergentSeriesGenerator,
-				null
-			)
+		try {
+			return new ErrorFunction (hansHeinrichBurmannConvergentSeriesGenerator, null)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("ErrorFunction::HansHeinrichBurmannConvergent::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"ErrorFunction::HansHeinrichBurmannConvergent::evaluate => Invalid Inputs"
+						);
 					}
 
-					double erf = 2. / java.lang.Math.sqrt (java.lang.Math.PI) *
-						java.lang.Math.sqrt (1. - java.lang.Math.exp (-1. * z * z)) *
-						hansHeinrichBurmannConvergentSeriesGenerator.cumulative (
-							0.,
-							z
-						);
+					double erf = 2. / Math.sqrt (Math.PI) * Math.sqrt (1. - Math.exp (-1. * z * z)) *
+						hansHeinrichBurmannConvergentSeriesGenerator.cumulative (0., z);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -234,44 +242,33 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 
 	public static final ErrorFunction HansHeinrichBurmannSchopfSupancic2014()
 	{
-		final org.drip.numerical.estimation.R1ToR1Series hansHeinrichBurmannConvergentSeriesGenerator
-			= org.drip.function.e2erf.HansHeinrichBurmannSeries.SchopfSupancic2014();
+		final R1ToR1Series hansHeinrichBurmannConvergentSeriesGenerator =
+			HansHeinrichBurmannSeries.SchopfSupancic2014();
 
-		if (null == hansHeinrichBurmannConvergentSeriesGenerator)
-		{
+		if (null == hansHeinrichBurmannConvergentSeriesGenerator) {
 			return null;
 		}
 
-		try
-		{
-			return new ErrorFunction (
-				hansHeinrichBurmannConvergentSeriesGenerator,
-				null
-			)
+		try {
+			return new ErrorFunction (hansHeinrichBurmannConvergentSeriesGenerator, null)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("ErrorFunction::HansHeinrichBurmannSchopfSupancic2014::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"ErrorFunction::HansHeinrichBurmannSchopfSupancic2014::evaluate => Invalid Inputs"
+						);
 					}
 
-					double erf = 2. / java.lang.Math.sqrt (java.lang.Math.PI) *
-						java.lang.Math.sqrt (1. - java.lang.Math.exp (-1. * z * z)) *
-						hansHeinrichBurmannConvergentSeriesGenerator.cumulative (
-							0.,
-							z
-						);
+					double erf = 2. / Math.sqrt (Math.PI) * Math.sqrt (1. - Math.exp (-1. * z * z)) *
+						hansHeinrichBurmannConvergentSeriesGenerator.cumulative (0., z);
 
 					return erf > 1. ? 1. : erf;
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -279,87 +276,99 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 	}
 
 	/**
-	 * ErrorFunction Constructor
+	 * <i>ErrorFunction</i> Constructor
 	 * 
 	 * @param r1ToR1SeriesGenerator R<sup>1</sup> To R<sup>1</sup> Series Generator
-	 * @param dc Differential Control
+	 * @param derivativeControl Differential Control
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public ErrorFunction (
-		final org.drip.numerical.estimation.R1ToR1Series r1ToR1SeriesGenerator,
-		final org.drip.numerical.differentiation.DerivativeControl dc)
-		throws java.lang.Exception
+		final R1ToR1Series r1ToR1SeriesGenerator,
+		final org.drip.numerical.differentiation.DerivativeControl derivativeControl)
+		throws Exception
 	{
-		super (
-			dc,
-			0.
-		);
+		super (derivativeControl, 0.);
 
 		_r1ToR1SeriesGenerator = r1ToR1SeriesGenerator;
 	}
 
+	/**
+	 * Calculate the derivative as a double
+	 * 
+	 * @param z Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
+	 * 
+	 * @return The Derivative
+	 * 
+	 * @throws Exception Thrown if Inputs are Invalid
+	 */
+
 	@Override public double derivative (
 		final double z,
 		final int order)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (z) ||
-			1 > order)
-		{
-			throw new java.lang.Exception ("ErrorFunction::derivative => Invalid Inputs");
+		if (!NumberUtil.IsValid (z) || 1 > order) {
+			throw new Exception ("ErrorFunction::derivative => Invalid Inputs");
 		}
 
-		return 1 == order ? 2. * java.lang.Math.exp (-1. * z * z) / java.lang.Math.sqrt (java.lang.Math.PI) :
-			super.derivative (
-				z,
-				order
-			);
+		return 1 == order ? 2. * Math.exp (-1. * z * z) / Math.sqrt (Math.PI) : super.derivative (z, order);
 	}
 
-	@Override public org.drip.function.definition.R1ToR1 antiDerivative()
+	/**
+	 * Compute the Anti-Derivative Function
+	 * 
+	 * @return The Anti-Derivative Function
+	 */
+
+	@Override public R1ToR1 antiDerivative()
 	{
-		return new org.drip.function.definition.R1ToR1 (null)
+		return new R1ToR1 (null)
 		{
 			@Override public double evaluate (
 				final double x)
-				throws java.lang.Exception
+				throws Exception
 			{
-				if (!org.drip.numerical.common.NumberUtil.IsValid (x))
-				{
-					throw new java.lang.Exception
-						("ErrorFunction::antiDerivative::evaluate => Invalid Inputs");
+				if (!NumberUtil.IsValid (x)) {
+					throw new Exception ("ErrorFunction::antiDerivative::evaluate => Invalid Inputs");
 				}
 
-				return x * this.evaluate (x) + java.lang.Math.exp (-1. * x * x) / java.lang.Math.sqrt
-					(java.lang.Math.PI);
+				return x * this.evaluate (x) + Math.exp (-1. * x * x) / Math.sqrt (Math.PI);
 			}
 		};
 	}
 
-	@Override public org.drip.numerical.estimation.R1Estimate seriesEstimateNative (
+	/**
+	 * Compute the Built-in Higher Order Series Estimates
+	 * 
+	 * @param x X
+	 * 
+	 * @return The Built-in Higher Order Series Estimates
+	 */
+
+	@Override public R1Estimate seriesEstimateNative (
 		final double x)
 	{
-		return null == _r1ToR1SeriesGenerator ? seriesEstimate (
-			x,
-			null,
-			null
-		) : seriesEstimate (
-			x,
-			_r1ToR1SeriesGenerator.termWeightMap(),
-			_r1ToR1SeriesGenerator
-		);
+		return null == _r1ToR1SeriesGenerator ? seriesEstimate (x, null, null) :
+			seriesEstimate (x, _r1ToR1SeriesGenerator.termWeightMap(), _r1ToR1SeriesGenerator);
 	}
 
-	@Override public org.drip.function.definition.R1ToR1 integrand()
+	/**
+	 * Retrieve the R<sup>1</sup> To R<sup>1</sup> erf Integrand
+	 * 
+	 * @return The R<sup>1</sup> To R<sup>1</sup> erf Integrand
+	 */
+
+	@Override public R1ToR1 integrand()
 	{
-		return new org.drip.function.definition.R1ToR1 (null)
+		return new R1ToR1 (null)
 		{
 			@Override public double evaluate (
 				final double z)
 			{
-				return 2. * java.lang.Math.exp (-1. * z * z) / java.lang.Math.sqrt (java.lang.Math.PI);
+				return 2. * Math.exp (-1. * z * z) / Math.sqrt (Math.PI);
 			}
 		};
 	}
@@ -371,14 +380,14 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 	 * 
 	 * @return The Q Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double q (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		return 0.5 * (1. - evaluate (x / java.lang.Math.sqrt (2.)));
+		return 0.5 * (1. - evaluate (x / Math.sqrt (2.)));
 	}
 
 	/**
@@ -388,14 +397,14 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 	 * 
 	 * @return The CDF Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double cdf (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
-		return 0.5 * (1. + evaluate (x / java.lang.Math.sqrt (2.)));
+		return 0.5 * (1. + evaluate (x / Math.sqrt (2.)));
 	}
 
 	/**
@@ -405,12 +414,12 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 	 * 
 	 * @return The erfc Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double erfc (
 		final double x)
-		throws java.lang.Exception
+		throws Exception
 	{
 		return 1. - evaluate (x);
 	}
@@ -424,26 +433,21 @@ public class ErrorFunction extends org.drip.numerical.estimation.R1ToR1Integrand
 	 * 
 	 * @return The E<sub>2</sub> erf Gaussian Density Integral over -inf to +inf
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double gaussianDensityIntegral (
 		final double a,
 		final double b,
-		final org.drip.measure.gaussian.R1UnivariateNormal r1UnivariateNormal)
-		throws java.lang.Exception
+		final R1UnivariateNormal r1UnivariateNormal)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (a) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (b) ||
-			null == r1UnivariateNormal)
-		{
-			throw new java.lang.Exception ("ErrorFunction::gaussianDensityIntegral => Invalid Inputs");
+		if (!NumberUtil.IsValid (a) || !NumberUtil.IsValid (b) || null == r1UnivariateNormal) {
+			throw new Exception ("ErrorFunction::gaussianDensityIntegral => Invalid Inputs");
 		}
 
 		double sigma = r1UnivariateNormal.variance();
 
-		return evaluate (
-			(a * r1UnivariateNormal.mean() + b) / java.lang.Math.sqrt (1. + 2 * sigma * sigma * a * a)
-		);
+		return evaluate ((a * r1UnivariateNormal.mean() + b) / Math.sqrt (1. + 2 * sigma * sigma * a * a));
 	}
 }

@@ -1,11 +1,21 @@
 
 package org.drip.function.e2erf;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,14 +114,23 @@ package org.drip.function.e2erf;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementations</a></li>
+ * 		<li>Construct Winitzki (2008) Version of the E<sub>2</sub> erf Analytical</li>
+ * 		<li>Construct Winitzki (2008a) Version of E<sub>2</sub> erf Analytical</li>
+ * 		<li>Construct Winitzki (2008b) Version of E<sub>2</sub> erf Analytical</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erf/README.md">E<sub>2</sub> erf and erf<sup>-1</sup> Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -128,50 +147,40 @@ public class ErrorFunctionAnalytical
 	 * @return Winitzki (2008) Version of the E<sub>2</sub> erf Analytical
 	 */
 
-	public static final org.drip.function.e2erf.AbramowitzStegun Winitzki2008 (
+	public static final AbramowitzStegun Winitzki2008 (
 		final double a,
 		final double maximumError)
 	{
-		try
-		{
-			return !org.drip.numerical.common.NumberUtil.IsValid (a) ? null :
-				new org.drip.function.e2erf.AbramowitzStegun (
-					null,
-					null,
-					maximumError
-				)
+		try {
+			return !NumberUtil.IsValid (a) ? null : new AbramowitzStegun (null, null, maximumError)
 			{
 				@Override public double evaluate (
 					final double z)
-					throws java.lang.Exception
+					throws Exception
 				{
-					if (!org.drip.numerical.common.NumberUtil.IsValid (z))
-					{
-						throw new java.lang.Exception
-							("ErrorFunctionAnalytical::Winitzki2008::evaluate => Invalid Inputs");
+					if (!NumberUtil.IsValid (z)) {
+						throw new Exception (
+							"ErrorFunctionAnalytical::Winitzki2008::evaluate => Invalid Inputs"
+						);
 					}
 
-					if (0. == z)
-					{
+					if (0. == z) {
 						return 0.;
 					}
 
-					if (z < 0)
-					{
+					if (z < 0) {
 						return -1. * evaluate (-1. * z);
 					}
 
-					double z2 = z * z;
-					double az2 = a * z * z;
+					double zSquared = z * z;
+					double azSquared = a * zSquared;
 
-					return java.lang.Math.sqrt (1. - java.lang.Math.exp (
-						-1. * z2 * (az2 + (4. / java.lang.Math.PI)) / (az2 + 1.))
+					return Math.sqrt (
+						1. - Math.exp (-1. * zSquared * (azSquared + (4. / Math.PI)) / (azSquared + 1.))
 					);
 				}
 			};
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -184,12 +193,9 @@ public class ErrorFunctionAnalytical
 	 * @return Winitzki (2008a) Version of E<sub>2</sub> erf Analytical
 	 */
 
-	public static final org.drip.function.e2erf.AbramowitzStegun Winitzki2008a()
+	public static final AbramowitzStegun Winitzki2008a()
 	{
-		return Winitzki2008 (
-			8. * (java.lang.Math.PI - 3.) / (3. * java.lang.Math.PI * (4. - java.lang.Math.PI)),
-			0.00035
-		);
+		return Winitzki2008 (8. * (Math.PI - 3.) / (3. * Math.PI * (4. - Math.PI)), 0.00035);
 	}
 
 	/**
@@ -198,11 +204,8 @@ public class ErrorFunctionAnalytical
 	 * @return Winitzki (2008b) Version of E<sub>2</sub> erf Analytical
 	 */
 
-	public static final org.drip.function.e2erf.AbramowitzStegun Winitzki2008b()
+	public static final AbramowitzStegun Winitzki2008b()
 	{
-		return Winitzki2008 (
-			0.147,
-			0.00012
-		);
+		return Winitzki2008 (0.147, 0.00012);
 	}
 }

@@ -1,11 +1,23 @@
 
 package org.drip.function.e2erfc;
 
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+import org.drip.numerical.estimation.R1ToR1Estimator;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,26 +116,35 @@ package org.drip.function.e2erfc;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ * It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erfc/README.md">E<sub>2</sub> erfc Estimation Function Implementation</a></li>
+ * 		<li>Compute the Probit Value for the given p</li>
+ * 		<li>Compute the Inverse CDF Value for the given p</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erfc/README.md">E<sub>2</sub> erfc Estimation Function Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class ErrorFunctionComplementInverse extends org.drip.numerical.estimation.R1ToR1Estimator
+public abstract class ErrorFunctionComplementInverse
+	extends R1ToR1Estimator
 {
 
 	protected ErrorFunctionComplementInverse (
-		final org.drip.numerical.differentiation.DerivativeControl dc)
-		throws java.lang.Exception
+		final DerivativeControl derivativeControl)
+		throws Exception
 	{
-		super (dc);
+		super (derivativeControl);
 	}
 
 	/**
@@ -133,19 +154,18 @@ public abstract class ErrorFunctionComplementInverse extends org.drip.numerical.
 	 * 
 	 * @return The Probit Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double probit (
 		final double p)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (p))
-		{
-			throw new java.lang.Exception ("ErrorFunctionComplementInverse::probit => Invalid Inputs");
+		if (NumberUtil.IsValid (p)) {
+			throw new Exception ("ErrorFunctionComplementInverse::probit => Invalid Inputs");
 		}
 
-		return -1. * java.lang.Math.sqrt (2.) * evaluate (2. * p);
+		return -1. * Math.sqrt (2.) * evaluate (2. * p);
 	}
 
 	/**
@@ -155,18 +175,17 @@ public abstract class ErrorFunctionComplementInverse extends org.drip.numerical.
 	 * 
 	 * @return The Inverse CDF Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double inverseCDF (
 		final double p)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (p))
-		{
-			throw new java.lang.Exception ("ErrorFunctionComplementInverse::inverseCDF => Invalid Inputs");
+		if (NumberUtil.IsValid (p)) {
+			throw new Exception ("ErrorFunctionComplementInverse::inverseCDF => Invalid Inputs");
 		}
 
-		return -1. * java.lang.Math.sqrt (2.) * evaluate (2. * p);
+		return -1. * Math.sqrt (2.) * evaluate (2. * p);
 	}
 }

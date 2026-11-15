@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -88,61 +96,64 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>CholeskyFactorization</i> demonstrates the Cholesky Factorization and Transpose Reconciliation of the
  * 	Input Matrix.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class CholeskyFactorization {
+public class CholeskyFactorization
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double[][] aadblA = {
+		double[][] a =
+		{
 			{1.0, 0.3, 0.0},
 			{0.3, 1.0, 0.1},
 			{0.0, 0.1, 1.0}
 		};
 
-		double[][] aadblACholesky = R1MatrixUtil.CholeskyBanachiewiczFactorization (aadblA);
+		double[][] aCholesky = R1MatrixUtil.CholeskyBanachiewiczFactorization (a);
 
-		double[][] aadblACholeskyTranspose = R1MatrixUtil.Transpose (aadblACholesky);
+		double[][] aCholeskyTranspose = R1MatrixUtil.Transpose (aCholesky);
 
-		System.out.println ("\n\t------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\n\t||------------------------------------------------------------------------------------------------------"
+		);
 
 		NumberUtil.Print2DArrayTriplet (
 			"\t\tSOURCE",
 			"CHOLESKY",
 			"ORIGINAL",
-			aadblA,
-			aadblACholesky,
-			R1MatrixUtil.Product (
-				aadblACholesky,
-				aadblACholeskyTranspose
-			),
+			a,
+			aCholesky,
+			R1MatrixUtil.Product (aCholesky, aCholeskyTranspose),
 			false
 		);
 
-		System.out.println ("\t------------------------------------------------------------------------------------------------------");
+		System.out.println (
+			"\t||------------------------------------------------------------------------------------------------------"
+		);
 
 		EnvManager.TerminateEnv();
 	}

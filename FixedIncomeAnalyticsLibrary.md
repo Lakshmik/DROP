@@ -11,7 +11,7 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 
  |        Document         | Link |
  |-------------------------|------|
- | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics/FixedIncomeAnalytics_v7.98.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics) |
+ | Technical Specification | [*Latest*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics/FixedIncomeAnalytics_v8.05.pdf) [*Previous*](https://github.com/lakshmik/DROP/blob/master/Docs/Internal/FixedIncomeAnalytics) |
  | User Guide              |  |
  | API                     | [*Javadoc*](https://lakshmik.github.io/DROP/Javadoc/index.html)|
 
@@ -252,8 +252,33 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 	* Realtive Value Cross Metric Grid
 	* Basic Measures
 	* Some Trivial Closed Form Analytical Bond Math Results
- * Municipal Rate Dynamics and Tax Adjustment
- * Scaling of Yield Volatility in Pricing Callable Tax-exempt Municipal Bonds
+ * Callable Bond Pricer
+	* Underlying Bond Type
+	* Model Design and Assumptions
+	* Notation
+	* Tree Construction
+	* Discretizing the Time Dimension
+	* Exercise Dates for American Callable Bond
+	* Refining Time Grid
+	* Discretizing the x Dimension
+	* Choosing the Branching Process
+	* Backward Induction Pricer
+	* Construction of Time Line
+	* Standard Roll-back
+	* Business Day Adjustment and Compounding Types
+	* Mid-period Exercise
+	* Z-spread Calibration
+	* Credit Handling
+	* Handling Alternate Reference Rate ARR
+	* Flipper Callable Bond
+	* Yield Curve Calibration
+	* Volatilities Calibration
+	* Calibration European Swaption Selection
+	* Swaption Strike
+	* First Order Risk
+	* Modeling Approach
+	* References
+ * A Model for Valuing Bonds with Embedded Options
 	* Abstract
 	* Introduction
 	* Background
@@ -272,6 +297,10 @@ Fixed Income Analytics Library contains the Valuation and Risk Functionality of 
 	* After-tax Valuation
 	* The Challenge of Implementation
 	* References
+ * Scaling of Yield Volatility in Pricing Callable Tax-exempt Municipal Bonds
+	* Background
+	* Yield Analysis and Calibration on Scaling Factor
+ * Municipal Rate Dynamics and Tax Adjustment
  * AAA Municipal Curve
 	* Overview
 	* Constituent Selection

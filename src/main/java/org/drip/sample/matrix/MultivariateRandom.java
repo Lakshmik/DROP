@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -88,61 +96,65 @@ import org.drip.service.env.EnvManager;
 /**
  * <i>MultivariateRandom</i> demonstrates the Technique to generate Correlated Multivariate Random Variables
  * 	using Cholesky Factorial Method.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class MultivariateRandom {
+public class MultivariateRandom
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double[][] aadblCorrelation = {
+		double[][] correlationMatrix =
+		{
 			{1.0, 0.3, 0.0},
 			{0.3, 1.0, 0.1},
 			{0.0, 0.1, 1.0}
 		};
 
-		UnivariateSequenceGenerator[] aUSG = new UnivariateSequenceGenerator[] {
+		UnivariateSequenceGenerator[] univariateSequenceGeneratorArray =
+		{
 			new BoxMullerGaussian (0., 1.),
 			new BoxMullerGaussian (0., 1.),
 			new BoxMullerGaussian (0., 1.)
 		};
 
-		MultivariateSequenceGenerator msg = new MultivariateSequenceGenerator (
-			aUSG,
-			aadblCorrelation
+		MultivariateSequenceGenerator multivariateSequenceGenerator = new MultivariateSequenceGenerator (
+			univariateSequenceGeneratorArray,
+			correlationMatrix
 		);
 
 		for (int j = 0; j < 100; ++j) {
-			String strDump = "[" + j + "] => ";
+			String dump = "\t|| [" + j + "] => ";
 
-			double[] adblRandom = msg.random();
+			double[] randomArray = multivariateSequenceGenerator.random();
 
-			for (int i = 0; i < aadblCorrelation.length; ++i)
-				strDump += FormatUtil.FormatDouble (adblRandom[i], 1, 4, 1.) + " | ";
+			for (int i = 0; i < randomArray.length; ++i) {
+				dump += FormatUtil.FormatDouble (randomArray[i], 1, 4, 1.) + " | ";
+			}
 
-			System.out.println ("\t" + strDump);
+			System.out.println (dump);
 		}
 
 		EnvManager.TerminateEnv();

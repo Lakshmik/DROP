@@ -11,6 +11,14 @@ import org.drip.service.env.EnvManager;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -86,37 +94,39 @@ import org.drip.service.env.EnvManager;
  */
 
 /**
- * <i>GrahamSchmidtProcess</i> illustrates the Graham Schmidt Orthogonalization and Orthonormalization.
- *  
- * <br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></li>
- *  </ul>
- * <br><br>
+ * <i>GrahamSchmidtProcess</i> illustrates the Graham Schmidt Orthogonalization and Ortho-normalization.
+ *
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/matrix/README.md">Cholesky Factorization, PCA, and Eigenization</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class GrahamSchmidtProcess {
+public class GrahamSchmidtProcess
+{
 
 	/**
 	 * Entry Point
 	 * 
-	 * @param astrArgs Command Line Argument Array
+	 * @param argumentArray Command Line Argument Array
 	 * 
 	 * @throws Exception Thrown on Error/Exception Situation
 	 */
 
 	public static final void main (
-		final String[] astrArgs)
+		final String[] argumentArray)
 		throws Exception
 	{
 		EnvManager.InitEnv ("");
 
-		double[][] a = new double[][] {
+		double[][] a =
+		{
 			{12, -51,   4},
 			{ 6, 167, -68},
 			{-4,  24, -41}
@@ -124,23 +134,23 @@ public class GrahamSchmidtProcess {
 
 		double[][] u = R1MatrixUtil.QRGrahamSchmidtOrthogonalization (a);
 
-		NumberUtil.PrintMatrix ("ORTHOGONAL", u);
+		NumberUtil.PrintMatrix ("\t|| ORTHOGONAL", u);
 
 		double[][] uTranspose = R1MatrixUtil.Transpose (u);
 
 		System.out.println (
-			"ORTHOGONAL TEST: " +
-			FormatUtil.FormatDouble ( R1MatrixUtil.DotProduct (uTranspose[0], uTranspose[1]), 1, 1, 1.)
+			"\t|| ORTHOGONAL TEST: " +
+			FormatUtil.FormatDouble (R1MatrixUtil.DotProduct (uTranspose[0], uTranspose[1]), 1, 1, 1.)
 		);
 
 		double[][] q = R1MatrixUtil.QRGrahamSchmidtOrthonormalization (a);
 
-		NumberUtil.PrintMatrix ("ORTHONORMAL", q);
+		NumberUtil.PrintMatrix ("\t|| ORTHONORMAL", q);
 
 		double[][] qTranspose = R1MatrixUtil.Transpose (q);
 
 		System.out.println (
-			"ORTHONORMAL TEST: " +
+			"\t|| ORTHONORMAL TEST: " +
 			FormatUtil.FormatDouble (R1MatrixUtil.DotProduct (qTranspose[0], qTranspose[1]), 1, 1, 1.)
 		);
 
@@ -148,11 +158,11 @@ public class GrahamSchmidtProcess {
 
 		double[][] uvTranspose = R1MatrixUtil.Product (R1MatrixUtil.Transpose (q), a);
 
-		NumberUtil.PrintMatrix ("R CHECK #1.1", uvTranspose);
+		NumberUtil.PrintMatrix ("\t|| R CHECK #1.1", uvTranspose);
 
 		System.out.println();
 
-		NumberUtil.PrintMatrix ("R CHECK #1.2", R1MatrixUtil.Product (q, uvTranspose));
+		NumberUtil.PrintMatrix ("\t|| R CHECK #1.2", R1MatrixUtil.Product (q, uvTranspose));
 
 		System.out.println();
 

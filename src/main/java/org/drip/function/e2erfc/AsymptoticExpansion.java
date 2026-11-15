@@ -1,11 +1,25 @@
 
 package org.drip.function.e2erfc;
 
+import java.util.TreeMap;
+
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.estimation.R1ToR1Series;
+import org.drip.numerical.estimation.R1ToR1SeriesTerm;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -104,14 +118,22 @@ package org.drip.function.e2erfc;
  * 			Wikipedia (2019): Error Function https://en.wikipedia.org/wiki/Error_function
  * 		</li>
  * 	</ul>
+ *  
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/e2erfc/README.md">E<sub>2</sub> erfc Estimation Function Implementation</a></li>
+ * 		<li>Construct the Asymptotic Version of Error Function Complement Series Term</li>
+ * 		<li>Construct the Asymptotic Version of Error Function Complement Series Generator</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/e2erfc/README.md">E<sub>2</sub> erfc Estimation Function Implementation</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -125,27 +147,20 @@ public class AsymptoticExpansion
 	 * @return The Asymptotic Version of Error Function Complement Series Term
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1SeriesTerm SeriesTerm()
+	public static final R1ToR1SeriesTerm SeriesTerm()
 	{
-		return new org.drip.numerical.estimation.R1ToR1SeriesTerm()
+		return new R1ToR1SeriesTerm()
 		{
-
 			@Override public double value (
 				final int order,
 				final double z)
-				throws java.lang.Exception
+				throws Exception
 			{
-				if (0 > order ||
-					!org.drip.numerical.common.NumberUtil.IsValid (z))
-				{
-					throw new java.lang.Exception
-						("AsymptoticExpansion::SeriesTerm::value => Invalid Inputs");
+				if (0 > order || !NumberUtil.IsValid (z)) {
+					throw new Exception ("AsymptoticExpansion::SeriesTerm::value => Invalid Inputs");
 				}
 
-				return 0 == order ? 1. : java.lang.Math.pow (
-					0.5 * z * z,
-					-1 * order
-				);
+				return 0 == order ? 1. : Math.pow (0.5 * z * z, -1 * order);
 			}
 		};
 	}
@@ -158,31 +173,21 @@ public class AsymptoticExpansion
 	 * @return The Asymptotic Version of Error Function Complement Series Generator
 	 */
 
-	public static final org.drip.numerical.estimation.R1ToR1Series SeriesGenerator (
+	public static final R1ToR1Series SeriesGenerator (
 		final int termCount)
 	{
-		java.util.TreeMap<java.lang.Integer, java.lang.Double> termWeightMap = new
-			java.util.TreeMap<java.lang.Integer, java.lang.Double>();
+		TreeMap<Integer, Double> termWeightMap = new TreeMap<Integer, Double>();
 
-		try
-		{
-			for (int termIndex = 0; termIndex <= termCount; ++termIndex)
-			{
+		try {
+			for (int termIndex = 0; termIndex <= termCount; ++termIndex) {
 				termWeightMap.put (
 					termIndex,
-					(1 == termIndex % 2 ? -1. : 1.) * org.drip.numerical.common.NumberUtil.DoubleFactorial
-						(termIndex)
+					(1 == termIndex % 2 ? -1. : 1.) * NumberUtil.DoubleFactorial (termIndex)
 				);
 			}
 
-			return new org.drip.numerical.estimation.R1ToR1Series (
-				SeriesTerm(),
-				false,
-				termWeightMap
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+			return new R1ToR1Series (SeriesTerm(), false, termWeightMap);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

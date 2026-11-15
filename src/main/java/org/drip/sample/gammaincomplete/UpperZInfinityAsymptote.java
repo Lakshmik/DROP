@@ -12,6 +12,14 @@ import org.drip.specialfunction.incompletegamma.UpperEulerIntegral;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -112,13 +120,14 @@ import org.drip.specialfunction.incompletegamma.UpperEulerIntegral;
  * 		</li>
  * 	</ul>
  *
- *	<br><br>
- *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></li>
- *  </ul>
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/README.md">DROP API Construction and Usage</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/sample/gammaincomplete/README.md">Estimates of Incomplete Gamma Functions</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -136,15 +145,9 @@ public class UpperZInfinityAsymptote
 
 		R1ToR1 zInfinityLimitAsymptote = LimitAsymptote.Upper().zInfinity (s);
 
-		for (double z : zArray)
-		{
-			UpperEulerIntegral upperEulerIntegral = new UpperEulerIntegral (
-				null,
-				z
-			);
-
+		for (double z : zArray) {
 			display = display + " [" +
-				FormatUtil.FormatDouble (upperEulerIntegral.evaluate (s), 1, 10, 1.) + " -" +
+				FormatUtil.FormatDouble (new UpperEulerIntegral (null, z).evaluate (s), 1, 10, 1.) + " -" +
 				FormatUtil.FormatDouble (zInfinityLimitAsymptote.evaluate (z), 1, 10, 1.) + "] |";
 		}
 
@@ -189,30 +192,36 @@ public class UpperZInfinityAsymptote
 			30.
 		};
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------||"
+		);
 
-		System.out.println ("\t|                                   UPPER INCOMPLETE ASYMPTOTE BEHAVIOR                                    ||");
+		System.out.println (
+			"\t|                                   UPPER INCOMPLETE ASYMPTOTE BEHAVIOR                                    ||"
+		);
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------||");
 
-		System.out.println ("\t|    L -> R:                                                                                               ||");
+		System.out.println (
+			"\t|    L -> R:                                                                                               ||");
 
-		System.out.println ("\t|            - s                                                                                           ||");
+		System.out.println (
+			"\t|            - s                                                                                           ||");
 
-		System.out.println ("\t|            - Weierstrass vs. Asymptote Lower Incomplete Gamma                                            ||");
+		System.out.println (
+			"\t|            - Weierstrass vs. Asymptote Lower Incomplete Gamma                                            ||");
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------||");
 
-		for (double s : sArray)
-		{
-			WeierstrassAsymptoteComparison (
-				termCount,
-				s,
-				zArray
-			);
+		for (double s : sArray) {
+			WeierstrassAsymptoteComparison (termCount, s, zArray);
 		}
 
-		System.out.println ("\t|----------------------------------------------------------------------------------------------------------||");
+		System.out.println (
+			"\t|----------------------------------------------------------------------------------------------------------||"
+		);
 
 		System.out.println();
 
