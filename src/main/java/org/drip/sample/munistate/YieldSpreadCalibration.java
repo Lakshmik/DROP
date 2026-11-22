@@ -222,15 +222,12 @@ public class YieldSpreadCalibration
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
 
 		for (double time : timeToCalibrationYieldMapInput.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMapInput.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMapInput.get (time));
 		}
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
 		ProxyBondEvaluator proxyBulletBond = ProxyBondEvaluator.Bullet (maturityTime, bondCoupon);
@@ -241,37 +238,31 @@ public class YieldSpreadCalibration
 			callPriceSchedule
 		);
 
-		double baseBulletPrice =
-			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		double baseBulletPrice = proxyBulletBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
-		double baseCallablePrice =
-			proxyCallableBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		double baseCallablePrice = proxyCallableBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
 		kalotayWilliamsFabozzi.applyBasisYield (0.0050);
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
-		double bumpedBulletPrice =
-			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		double bumpedBulletPrice = proxyBulletBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
-		double bumpedCallablePrice =
-			proxyCallableBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		double bumpedCallablePrice = proxyCallableBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
 		kalotayWilliamsFabozzi.removeBasisYield();
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
-		double resetBulletPrice =
-			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		double resetBulletPrice = proxyBulletBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
-		double resetCallablePrice =
-			proxyCallableBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+		double resetCallablePrice = proxyCallableBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
 		System.out.println ("\t||---------------------------------------------------------------||");
 

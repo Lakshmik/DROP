@@ -6,6 +6,14 @@ package org.drip.function.definition;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -78,51 +86,55 @@ package org.drip.function.definition;
 
 /**
  * <i>R2ToR1Property</i> evaluates the Specified Pair of R<sup>2</sup> To R<sup>1</sup> Functions, and
- * 	verifies the Properties.
+ * 	verifies the Properties. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li><i>R2ToR1Property</i> Constructor</li>
+ * 		<li>Retrieve the Left R<sup>2</sup> To R<sup>1</sup> Function</li>
+ * 		<li>Retrieve the Right R<sup>2</sup> To R<sup>1</sup> Function</li>
+ * 		<li>Verify the specified R<sup>2</sup> To R<sup>1</sup> Functions</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class R2ToR1Property extends org.drip.function.definition.RxToR1Property
+public class R2ToR1Property
+	extends RxToR1Property
 {
-	private org.drip.function.definition.R2ToR1 _r2ToR1Left = null;
-	private org.drip.function.definition.R2ToR1 _r2ToR1Right = null;
+	private R2ToR1 _r2ToR1Left = null;
+	private R2ToR1 _r2ToR1Right = null;
 
 	/**
-	 * R2ToR1Property Constructor
+	 * <i>R2ToR1Property</i> Constructor
 	 * 
 	 * @param type The Comparator Type
 	 * @param r2ToR1Left The Left R<sup>2</sup> To R<sup>1</sup> Function
 	 * @param r2ToR1Right The Right R<sup>2</sup> To R<sup>1</sup> Function
 	 * @param mismatchTolerance The Mismatch Tolerance
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R2ToR1Property (
-		final java.lang.String type,
-		final org.drip.function.definition.R2ToR1 r2ToR1Left,
-		final org.drip.function.definition.R2ToR1 r2ToR1Right,
+		final String type,
+		final R2ToR1 r2ToR1Left,
+		final R2ToR1 r2ToR1Right,
 		final double mismatchTolerance)
-		throws java.lang.Exception
+		throws Exception
 	{
-		super (
-			type,
-			mismatchTolerance
-		);
+		super (type, mismatchTolerance);
 
-		if (null == (_r2ToR1Left = r2ToR1Left) ||
-			null == (_r2ToR1Right = r2ToR1Right))
-		{
-			throw new java.lang.Exception ("R2ToR1Property Constructor => Invalid Inputs");
+		if (null == (_r2ToR1Left = r2ToR1Left) || null == (_r2ToR1Right = r2ToR1Right)) {
+			throw new Exception ("R2ToR1Property Constructor => Invalid Inputs");
 		}
 	}
 
@@ -132,7 +144,7 @@ public class R2ToR1Property extends org.drip.function.definition.RxToR1Property
 	 * @return The Left R<sup>2</sup> To R<sup>1</sup> Function
 	 */
 
-	public org.drip.function.definition.R2ToR1 r2ToR1Left()
+	public R2ToR1 r2ToR1Left()
 	{
 		return _r2ToR1Left;
 	}
@@ -143,7 +155,7 @@ public class R2ToR1Property extends org.drip.function.definition.RxToR1Property
 	 * @return The Right R<sup>2</sup> To R<sup>1</sup> Function
 	 */
 
-	public org.drip.function.definition.R2ToR1 r2ToR1Right()
+	public R2ToR1 r2ToR1Right()
 	{
 		return _r2ToR1Right;
 	}
@@ -157,25 +169,13 @@ public class R2ToR1Property extends org.drip.function.definition.RxToR1Property
 	 * @return Results of the Verification
 	 */
 
-	public org.drip.function.definition.R1PropertyVerification verify (
+	public R1PropertyVerification verify (
 		final double x,
 		final double y)
 	{
-		try
-		{
-			return super.verify (
-				_r2ToR1Left.evaluate (
-					x,
-					y
-				),
-				_r2ToR1Right.evaluate (
-					x,
-					y
-				)
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return super.verify (_r2ToR1Left.evaluate (x, y), _r2ToR1Right.evaluate (x, y));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

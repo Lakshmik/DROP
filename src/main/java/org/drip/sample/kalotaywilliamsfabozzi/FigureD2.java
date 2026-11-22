@@ -11,7 +11,7 @@ import org.drip.service.env.EnvManager;
 import org.drip.state.eostree.ProxyBondEvaluator;
 import org.drip.state.eostree.BondPriceFunction;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -209,10 +209,7 @@ public class FigureD2
 		TreeMap<Double, Double> timeToCalibrationYieldMap = TimeToCalibrationYieldMap();
 
 		for (double time : timeToCalibrationYieldMap.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMap.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMap.get (time));
 		}
 
 		TreeMap<Double, Double> projectedBaseForwardYieldMap = new TreeMap<Double, Double>();
@@ -256,13 +253,13 @@ public class FigureD2
 
 		projectedBaseForwardYieldMap.put (calibrationEndTime, calibratedBaseBulletYield);
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applyBaseForwardYield (
 			annualizedForwardVolatility,
 			projectedBaseForwardYieldMap
 		);
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
+		TreeMap<Double, List<SegmentElastic>> timeToProjectedPeriodStateMap =
+			kalotayWilliamsFabozzi.pillarTimeToSegmentElasticListMap();
 
 		Map<Double, List<Double>> timeToProjectedForwardYieldListMapReconciler =
 			TimeToProjectedForwardYieldListMapReconciler();
@@ -285,7 +282,7 @@ public class FigureD2
 			if (timeToProjectedForwardYieldListMapReconciler.containsKey (time)) {
 				String dump = "\t|" + FormatUtil.FormatDouble (time, 1, 0, 1.) + " => ";
 
-				List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+				List<SegmentElastic> kalotayWilliamsFabozziPeriodStateList =
 					timeToProjectedPeriodStateMap.get (time);
 
 				List<Double> projectedForwardYieldListReconciliation =
@@ -317,7 +314,7 @@ public class FigureD2
 			TimeToProjectedBulletBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedBulletBondValueListMap =
-			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi);
+			proxyBulletBond.valueGrid (null, kalotayWilliamsFabozzi).timetoPVListMap();
 
 		System.out.println ("\t|-------------------------------------------------||");
 

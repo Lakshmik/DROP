@@ -81,9 +81,11 @@ import org.drip.service.common.FormatUtil;
  */
 
 /**
- * <i>KalotayWilliamsFabozziPeriodState</i> holds the Period's Inferred State Metrics. The References are:
+ * <i>YieldSensitivity</i> contains the Yield Duration and the Yield Convexity of a Bond using the Kalotay,
+ * 	Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References
+ *  are:
  *  
- * 	<br><br>
+ * 	<br>
  *  <ul>
  * 		<li>
  * 			Black, F., E. Derman, and W. Toy (1990): A One-Factor Model of Interest Rates and Its Application
@@ -119,117 +121,148 @@ import org.drip.service.common.FormatUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class KalotayWilliamsFabozziPeriodState
+public class YieldSensitivity
 {
-	private double _forwardYield = Double.NaN;
-	private double _forwardDiscountFactor = Double.NaN;
-	private KalotayWilliamsFabozziPeriod _period = null;
-	private double _cumulativeEndDiscountFactor = Double.NaN;
+	private double _basis = Double.NaN;
+	private double _duration = Double.NaN;
+	private double _convexity = Double.NaN;
+	private double _marketPrice = Double.NaN;
+	private double _theoreticalPrice = Double.NaN;
 
 	/**
-	 * <i>KalotayWilliamsFabozziPeriodState</i> Constructor
+	 * Construct the <i>YieldSensitivity</i> Instance from the Market and the Yield Bump Up/Down Prices
 	 * 
-	 * @param period <i>KalotayWilliamsFabozziPeriod</i> Instance
-	 * @param forwardYield Forward Yield
-	 * @param forwardDiscountFactor Forward Discount Factor
-	 * @param cumulativeEndDiscountFactor Cumulative Period End Discount Factor
+	 * @param theoreticalPrice Theoretical Price
+	 * @param marketPrice Market Price
+	 * @param basis Yield Basis
+	 * @param bumpUpMarketPrice Yield Bumped Up Market Price
+	 * @param bumpDownMarketPrice Yield Bumped Down Market Price
+	 * @param yieldBump Yield Bump
 	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
+	 * @return <i>YieldSensitivity</i> Instance
 	 */
 
-	public KalotayWilliamsFabozziPeriodState (
-		final KalotayWilliamsFabozziPeriod period,
-		final double forwardYield,
-		final double forwardDiscountFactor,
-		final double cumulativeEndDiscountFactor)
-		throws Exception
+	public static final YieldSensitivity FromBaseUpDown (
+		final double theoreticalPrice,
+		final double marketPrice,
+		final double basis,
+		final double bumpUpMarketPrice,
+		final double bumpDownMarketPrice,
+		final double yieldBump)
 	{
-		if (null == (_period = period) ||
-			!NumberUtil.IsValid (_forwardYield = forwardYield) || 
-			!NumberUtil.IsValid (_forwardDiscountFactor = forwardDiscountFactor) ||
-				0. > _forwardDiscountFactor || 
-			!NumberUtil.IsValid (_cumulativeEndDiscountFactor = cumulativeEndDiscountFactor) ||
-				0. > _cumulativeEndDiscountFactor)
+		if (!NumberUtil.IsValid (marketPrice) ||
+			!NumberUtil.IsValid (bumpUpMarketPrice) ||
+			!NumberUtil.IsValid (bumpDownMarketPrice) ||
+			!NumberUtil.IsValid (yieldBump) || 0. == yieldBump)
 		{
-			throw new Exception ("KalotayWilliamsFabozziPeriodState Constructor => Invalid Inputs");
+			return null;
 		}
-	}
 
-	/**
-	 * Retrieve the <i>KalotayWilliamsFabozziPeriod</i> Instance
-	 * 
-	 * @return <i>KalotayWilliamsFabozziPeriod</i> Instance
-	 */
+		double yieldBumpReciprocal = 1. / yieldBump;
 
-	public KalotayWilliamsFabozziPeriod period()
-	{
-		return _period;
-	}
-
-	/**
-	 * Retrieve the Forward Yield
-	 * 
-	 * @return Forward Yield
-	 */
-
-	public double forwardYield()
-	{
-		return _forwardYield;
-	}
-
-	/**
-	 * Retrieve the Forward Discount Factor
-	 * 
-	 * @return Forward Discount Factor
-	 */
-
-	public double forwardDiscountFactor()
-	{
-		return _forwardDiscountFactor;
-	}
-
-	/**
-	 * Retrieve the Cumulative Discount Period End Factor
-	 * 
-	 * @return Cumulative Discount Period End Factor
-	 */
-
-	public double cumulativeEndDiscountFactor()
-	{
-		return _cumulativeEndDiscountFactor;
-	}
-
-	/**
-	 * Retrieve the Cumulative Discount Period Begin Factor
-	 * 
-	 * @return Cumulative Discount Period Begin Factor
-	 */
-
-	public double cumulativeBeginDiscountFactor()
-	{
-		return _cumulativeEndDiscountFactor / _forwardDiscountFactor;
-	}
-
-	/**
-	 * Clone the Instance
-	 * 
-	 * @return The Cloned Instance
-	 */
-
-	@Override public KalotayWilliamsFabozziPeriodState clone()
-	{
 		try {
-			return new KalotayWilliamsFabozziPeriodState (
-				_period.clone(),
-				_forwardYield,
-				_forwardDiscountFactor,
-				_cumulativeEndDiscountFactor
-			);
+			return NumberUtil.IsValid (marketPrice) &&
+				NumberUtil.IsValid (bumpUpMarketPrice) &&
+				NumberUtil.IsValid (bumpDownMarketPrice) &&
+				NumberUtil.IsValid (yieldBump) && 0. != yieldBump ?
+				new YieldSensitivity (
+					theoreticalPrice,
+					marketPrice,
+					basis,
+					0.5 * (bumpDownMarketPrice - bumpUpMarketPrice) * yieldBumpReciprocal,
+					(bumpDownMarketPrice + bumpUpMarketPrice - 2. * marketPrice) * yieldBumpReciprocal *
+						yieldBumpReciprocal
+				) : null;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	/**
+	 * <i>YieldSensitivity</i> Constructor
+	 * 
+	 * @param theoreticalPrice Theoretical Price
+	 * @param marketPrice Market Price
+	 * @param basis Yield Basis
+	 * @param duration Duration
+	 * @param convexity Convexity
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
+	 */
+
+	public YieldSensitivity (
+		final double theoreticalPrice,
+		final double marketPrice,
+		final double basis,
+		final double duration,
+		final double convexity)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (_theoreticalPrice = theoreticalPrice) || 0. > _theoreticalPrice ||
+			!NumberUtil.IsValid (_marketPrice = marketPrice) || 0. > _marketPrice ||
+			!NumberUtil.IsValid (_basis = basis) ||
+			!NumberUtil.IsValid (_duration = duration) ||
+			!NumberUtil.IsValid (_convexity = convexity))
+		{
+			throw new Exception ("YieldSensitivity Constructor => Invalid Inputs");
+		}
+	}
+
+	/**
+	 * Retrieve the Theoretical Price
+	 * 
+	 * @return Theoretical Price
+	 */
+
+	public double theoreticalPrice()
+	{
+		return _theoreticalPrice;
+	}
+
+	/**
+	 * Retrieve the Market Price
+	 * 
+	 * @return Market Price
+	 */
+
+	public double marketPrice()
+	{
+		return _marketPrice;
+	}
+
+	/**
+	 * Retrieve the Yield Basis
+	 * 
+	 * @return Yield Basis
+	 */
+
+	public double basis()
+	{
+		return _basis;
+	}
+
+	/**
+	 * Retrieve the Duration
+	 * 
+	 * @return Duration
+	 */
+
+	public double duration()
+	{
+		return _duration;
+	}
+
+	/**
+	 * Retrieve the Convexity
+	 * 
+	 * @return Convexity
+	 */
+
+	public double convexity()
+	{
+		return _convexity;
 	}
 
 	/**
@@ -243,11 +276,11 @@ public class KalotayWilliamsFabozziPeriodState
 	public String toString (
 		final String prefix)
 	{
-		return prefix + "Period => " + _period +
-			"; Forward Yield => " + FormatUtil.FormatDouble (_forwardYield, 1, 6, 1.) +
-			"; Forward Discount Factor => " + FormatUtil.FormatDouble (_forwardDiscountFactor, 1, 6, 1.) +
-			"; Cumulative Period End Discount Factor => " +
-				FormatUtil.FormatDouble (_cumulativeEndDiscountFactor, 1, 6, 1.);
+		return prefix + "Theoretical Price: " + FormatUtil.FormatDouble (_theoreticalPrice, 1, 5, 1.) +
+			"; Market Price: " + FormatUtil.FormatDouble (_marketPrice, 1, 5, 1.) +
+			"; Yield Basis: " + FormatUtil.FormatDouble (_basis, 1, 6, 1.) +
+			"; Duration: " + FormatUtil.FormatDouble (_duration, 1, 6, 1.) +
+			"; Convexity: " + FormatUtil.FormatDouble (_convexity, 1, 8, 1.);
 	}
 
 	/**

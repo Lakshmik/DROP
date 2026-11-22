@@ -1,11 +1,27 @@
 
 package org.drip.function.definition;
 
+import org.drip.function.r1tor1solver.FixedPointFinder;
+import org.drip.function.r1tor1solver.FixedPointFinderOutput;
+import org.drip.function.r1tor1solver.FixedPointFinderZheng;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+import org.drip.numerical.differentiation.Differential;
+import org.drip.numerical.r1integration.Integrator;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -85,78 +101,102 @@ package org.drip.function.definition;
 
 /**
  * <i>R1ToR1</i> provides the evaluation of the objective function and its derivatives for a specified
- * variate. Default implementation of the derivatives are for non-analytical black box objective functions.
+ * 	variate. Default implementation of the derivatives are for non-analytical black box objective functions.
+ *  It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Evaluate for the given variate</li>
+ * 		<li>Calculate the Differential</li>
+ * 		<li>Calculate the Ordered Derivative</li>
+ * 		<li>Calculate the derivative as a double</li>
+ * 		<li>Integrate over the given range</li>
+ * 		<li>Compute the Maximal Variate and the Corresponding Function Value</li>
+ * 		<li>Compute the Maximum VOP within the Variate Range</li>
+ * 		<li>Compute the Minimal Variate and the Corresponding Function Value</li>
+ * 		<li>Compute the Minimum VOP within the Variate Range</li>
+ * 		<li>Compute the Anti-Derivative Function</li>
+ * 		<li>Compute the Residue if the Variate is a Pole</li>
+ * 		<li>Compute the Condition Number at the specified Variate</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class R1ToR1 {
-	protected org.drip.numerical.differentiation.DerivativeControl _dc = null;
+public abstract class R1ToR1
+{
+	protected DerivativeControl _derivativeControl = null;
 
 	protected R1ToR1 (
-		final org.drip.numerical.differentiation.DerivativeControl dc)
+		final DerivativeControl derivativeControl)
 	{
-		if (null == (_dc = dc)) _dc = new org.drip.numerical.differentiation.DerivativeControl();
+		if (null == (_derivativeControl = derivativeControl)) {
+			_derivativeControl = new DerivativeControl();
+		}
 	}
 
 	/**
 	 * Evaluate for the given variate
 	 * 
-	 * @param dblVariate Variate
+	 * @param variate Variate
 	 *  
 	 * @return Returns the calculated value
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double evaluate (
-		final double dblVariate)
-		throws java.lang.Exception;
+		final double variate)
+		throws Exception;
 
 	/**
 	 * Calculate the Differential
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param dblOFBase Base Value for the Objective Function
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param objectiveFunctionBase Base Value for the Objective Function
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Derivative
 	 */
 
-	public org.drip.numerical.differentiation.Differential differential (
-		final double dblVariate,
-		final double dblOFBase,
-		final int iOrder)
+	public Differential differential (
+		final double variate,
+		final double objectiveFunctionBase,
+		final int order)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 >= iOrder) return null;
+		if (!NumberUtil.IsValid (variate) || 0 >= order) {
+			return null;
+		}
 
-		double dblDerivative = 0.;
-		double dblOrderedVariateInfinitesimal = 1.;
-		double dblVariateInfinitesimal = java.lang.Double.NaN;
+		double derivative = 0.;
+		double orderedVariateInfinitesimal = 1.;
+		double variateInfinitesimal = Double.NaN;
 
 		try {
-			dblVariateInfinitesimal = _dc.getVariateInfinitesimal (dblVariate);
-		} catch (java.lang.Exception e) {
+			variateInfinitesimal = _derivativeControl.getVariateInfinitesimal (variate);
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		for (int i = 0; i <= iOrder; ++i) {
-			if (0 != i) dblOrderedVariateInfinitesimal *= (2. * dblVariateInfinitesimal);
+		for (int orderIndex = 0; orderIndex <= order; ++orderIndex) {
+			if (0 != orderIndex) {
+				orderedVariateInfinitesimal *= (2. * variateInfinitesimal);
+			}
 
 			try {
-				dblDerivative += (i % 2 == 0 ? 1 : -1) * org.drip.numerical.common.NumberUtil.NCK (iOrder, i) *
-					evaluate (dblVariate + dblVariateInfinitesimal * (iOrder - 2. * i));
-			} catch (java.lang.Exception e) {
+				derivative += (orderIndex % 2 == 0 ? 1 : -1) * NumberUtil.NCK (order, orderIndex) *
+					evaluate (variate + variateInfinitesimal * (order - 2. * orderIndex));
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
@@ -164,8 +204,8 @@ public abstract class R1ToR1 {
 		}
 
 		try {
-			return new org.drip.numerical.differentiation.Differential (dblOrderedVariateInfinitesimal, dblDerivative);
-		} catch (java.lang.Exception e) {
+			return new Differential (orderedVariateInfinitesimal, derivative);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -175,19 +215,19 @@ public abstract class R1ToR1 {
 	/**
 	 * Calculate the Ordered Derivative
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Derivative
 	 */
 
-	public org.drip.numerical.differentiation.Differential differential (
-		final double dblVariate,
-		final int iOrder)
+	public Differential differential (
+		final double variate,
+		final int order)
 	{
 		try {
-			return differential (dblVariate, evaluate (dblVariate), iOrder);
-		} catch (java.lang.Exception e) {
+			return differential (variate, evaluate (variate), order);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -197,39 +237,39 @@ public abstract class R1ToR1 {
 	/**
 	 * Calculate the derivative as a double
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Derivative
 	 * 
-	 * @throws java.lang.Exception Thrown if Inputs are Invalid
+	 * @throws Exception Thrown if Inputs are Invalid
 	 */
 
 	public double derivative (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception
+		final double variate,
+		final int order)
+		throws Exception
 	{
-		return differential (dblVariate, evaluate (dblVariate), iOrder).calcSlope (true);
+		return differential (variate, evaluate (variate), order).calcSlope (true);
 	}
 
 	/**
 	 * Integrate over the given range
 	 * 
-	 * @param dblBegin Range Begin 
-	 * @param dblEnd Range End 
+	 * @param begin Range Begin 
+	 * @param end Range End 
 	 *  
 	 * @return The Integrated Value
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public double integrate (
-		final double dblBegin,
-		final double dblEnd)
-		throws java.lang.Exception
+		final double begin,
+		final double end)
+		throws Exception
 	{
-		return org.drip.numerical.r1integration.Integrator.Boole (this, dblBegin, dblEnd);
+		return Integrator.Boole (this, begin, end);
 	}
 
 	/**
@@ -238,32 +278,41 @@ public abstract class R1ToR1 {
 	 * @return The Maximal Variate and the Corresponding Function Value
 	 */
 
-	public org.drip.function.definition.VariateOutputPair maxima()
+	public VariateOutputPair maxima()
 	{
-		R1ToR1 auDerivative = new R1ToR1 (null) {
-			@Override public double evaluate (
-				final double dblX)
-				throws java.lang.Exception
-			{
-				return derivative (dblX, 1);
-			}
-		};
-
 		try {
-			org.drip.function.r1tor1solver.FixedPointFinder fpf = new
-				org.drip.function.r1tor1solver.FixedPointFinderZheng (0., auDerivative, false);
+			FixedPointFinder fixedPointFinder = new FixedPointFinderZheng (
+				0.,
+				new R1ToR1 (null)
+				{
+					@Override public double evaluate (
+						final double x)
+						throws Exception
+					{
+						return derivative (x, 1);
+					}
+				},
+				false
+			);
 
-			org.drip.function.r1tor1solver.FixedPointFinderOutput fpfo = fpf.findRoot();
+			FixedPointFinderOutput fixedPointFinderOutput = fixedPointFinder.findRoot();
 
-			if (null == fpfo) return null;
+			if (null == fixedPointFinderOutput) {
+				return null;
+			}
 
-			double dblExtrema = fpfo.root();
+			double extrema = fixedPointFinderOutput.root();
 
-			if (0. <= derivative (dblExtrema, 2)) return null;
-
-			return new org.drip.function.definition.VariateOutputPair (new double[] {dblExtrema}, new
-				double[] {evaluate (dblExtrema)});
-		} catch (java.lang.Exception e) {
+			return 0. <= derivative (extrema, 2) ? null : new VariateOutputPair (
+				new double[]
+				{
+					extrema
+				},
+				new double[] {
+					evaluate (extrema)
+				}
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -273,38 +322,57 @@ public abstract class R1ToR1 {
 	/**
 	 * Compute the Maximum VOP within the Variate Range
 	 * 
-	 * @param dblVariateLeft The Range Left End
-	 * @param dblVariateRight The Range Right End
+	 * @param variateLeft The Range Left End
+	 * @param variateRight The Range Right End
 	 * 
 	 * @return The Maximum VOP
 	 */
 
-	public org.drip.function.definition.VariateOutputPair maxima (
-		final double dblVariateLeft,
-		final double dblVariateRight)
+	public VariateOutputPair maxima (
+		final double variateLeft,
+		final double variateRight)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariateLeft) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (dblVariateRight) || dblVariateLeft >= dblVariateRight)
+		if (!NumberUtil.IsValid (variateLeft) ||
+			!NumberUtil.IsValid (variateRight) || variateLeft >= variateRight)
+		{
 			return null;
+		}
 
-		org.drip.function.definition.VariateOutputPair vop = maxima();
+		VariateOutputPair variateOutputPair = maxima();
 
-		if (null != vop) {
-			double dblRoot = vop.variates()[0];
+		if (null != variateOutputPair) {
+			double root = variateOutputPair.variates()[0];
 
-			if (dblVariateLeft <= dblRoot && dblVariateRight >= dblRoot) return vop;
+			if (variateLeft <= root && variateRight >= root) {
+				return variateOutputPair;
+			}
 		}
 
 		try {
-			double dblLeftOutput = evaluate (dblVariateLeft);
+			double leftOutput = evaluate (variateLeft);
 
-			double dblRightOutput = evaluate (dblVariateRight);
+			double rightOutput = evaluate (variateRight);
 
-			return dblLeftOutput > dblRightOutput ? new org.drip.function.definition.VariateOutputPair
-				(new double[] {dblVariateLeft}, new double[] {dblLeftOutput}) : new
-					org.drip.function.definition.VariateOutputPair (new double[] {dblVariateRight}, new
-						double[] {dblRightOutput});
-		} catch (java.lang.Exception e) {
+			return leftOutput > rightOutput ? new VariateOutputPair (
+				new double[]
+				{
+					variateLeft
+				},
+				new double[]
+				{
+					leftOutput
+				}
+			) : new VariateOutputPair (
+				new double[]
+				{
+					variateRight
+				},
+				new double[]
+				{
+					rightOutput
+				}
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -317,32 +385,42 @@ public abstract class R1ToR1 {
 	 * @return The Minimal Variate and the Corresponding Function Value
 	 */
 
-	public org.drip.function.definition.VariateOutputPair minima()
+	public VariateOutputPair minima()
 	{
-		R1ToR1 auDerivative = new R1ToR1 (null) {
-			@Override public double evaluate (
-				final double dblX)
-				throws java.lang.Exception
-			{
-				return derivative (dblX, 1);
-			}
-		};
-
 		try {
-			org.drip.function.r1tor1solver.FixedPointFinder fpf = new
-				org.drip.function.r1tor1solver.FixedPointFinderZheng (0., auDerivative, false);
+			FixedPointFinder fixedPointFinder = new FixedPointFinderZheng (
+				0.,
+				new R1ToR1 (null)
+				{
+					@Override public double evaluate (
+						final double x)
+						throws Exception
+					{
+						return derivative (x, 1);
+					}
+				},
+				false
+			);
 
-			org.drip.function.r1tor1solver.FixedPointFinderOutput fpfo = fpf.findRoot();
+			FixedPointFinderOutput fixedPointFinderOutput = fixedPointFinder.findRoot();
 
-			if (null == fpfo) return null;
+			if (null == fixedPointFinderOutput) {
+				return null;
+			}
 
-			double dblExtrema = fpfo.root();
+			double extrema = fixedPointFinderOutput.root();
 
-			if (0. >= derivative (dblExtrema, 2)) return null;
-
-			return new org.drip.function.definition.VariateOutputPair (new double[] {dblExtrema}, new
-				double[] {evaluate (dblExtrema)});
-		} catch (java.lang.Exception e) {
+			return 0. >= derivative (extrema, 2) ? null : new VariateOutputPair (
+				new double[]
+				{
+					extrema
+				},
+				new double[]
+				{
+					evaluate (extrema)
+				}
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -352,38 +430,57 @@ public abstract class R1ToR1 {
 	/**
 	 * Compute the Minimum VOP within the Variate Range
 	 * 
-	 * @param dblVariateLeft The Range Left End
-	 * @param dblVariateRight The Range Right End
+	 * @param variateLeft The Range Left End
+	 * @param variateRight The Range Right End
 	 * 
 	 * @return The Minimum VOP
 	 */
 
-	public org.drip.function.definition.VariateOutputPair minima (
-		final double dblVariateLeft,
-		final double dblVariateRight)
+	public VariateOutputPair minima (
+		final double variateLeft,
+		final double variateRight)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariateLeft) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (dblVariateRight) || dblVariateLeft >= dblVariateRight)
+		if (!NumberUtil.IsValid (variateLeft) ||
+			!NumberUtil.IsValid (variateRight) || variateLeft >= variateRight)
+		{
 			return null;
+		}
 
-		org.drip.function.definition.VariateOutputPair vop = minima();
+		VariateOutputPair variateOutputPair = minima();
 
-		if (null != vop) {
-			double dblRoot = vop.variates()[0];
+		if (null != variateOutputPair) {
+			double root = variateOutputPair.variates()[0];
 
-			if (dblVariateLeft <= dblRoot && dblVariateRight >= dblRoot) return vop;
+			if (variateLeft <= root && variateRight >= root) {
+				return variateOutputPair;
+			}
 		}
 
 		try {
-			double dblLeftOutput = evaluate (dblVariateLeft);
+			double leftOutput = evaluate (variateLeft);
 
-			double dblRightOutput = evaluate (dblVariateRight);
+			double rightOutput = evaluate (variateRight);
 
-			return dblLeftOutput < dblRightOutput ? new org.drip.function.definition.VariateOutputPair
-				(new double[] {dblVariateLeft}, new double[] {dblLeftOutput}) : new
-					org.drip.function.definition.VariateOutputPair (new double[] {dblVariateRight}, new
-						double[] {dblRightOutput});
-		} catch (java.lang.Exception e) {
+			return leftOutput < rightOutput ? new VariateOutputPair (
+				new double[]
+				{
+					variateLeft
+				},
+				new double[]
+				{
+					leftOutput
+				}
+			) : new VariateOutputPair (
+				new double[]
+				{
+					variateRight
+				},
+				new double[]
+				{
+					rightOutput
+				}
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -409,7 +506,7 @@ public abstract class R1ToR1 {
 	 * @return The Residue if the Variate is a Pole
 	 */
 
-	public org.drip.function.definition.PoleResidue poleResidue (
+	public PoleResidue poleResidue (
 		final double x)
 	{
 		return null;
@@ -429,6 +526,10 @@ public abstract class R1ToR1 {
 		final double x)
 		throws Exception
 	{
+		if (!NumberUtil.IsValid (x)) {
+			throw new Exception ("R1ToR1::conditionNumber=> Invalid Inputs");
+		}
+
 		return x * derivative (x, 1) / evaluate (x);
 	}
 }

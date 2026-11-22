@@ -2036,7 +2036,7 @@ public class LatentStateResponseModel
 				final int order)
 			{
 				try {
-					double variateInfinitesimal = _dc.getVariateInfinitesimal (x);
+					double variateInfinitesimal = _derivativeControl.getVariateInfinitesimal (x);
 
 					return new Differential (
 						variateInfinitesimal,

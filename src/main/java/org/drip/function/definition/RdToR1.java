@@ -2,12 +2,22 @@
 package org.drip.function.definition;
 
 import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+import org.drip.numerical.differentiation.Differential;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -84,47 +94,68 @@ import org.drip.numerical.common.NumberUtil;
 
 /**
  * <i>RdToR1</i> provides the evaluation of the R<sup>d</sup> To R<sup>1</sup> objective function and its
- * derivatives for a specified set of R<sup>d</sup> variates. Default implementation of the derivatives are
- * for non-analytical lack box objective functions.
+ * 	derivatives for a specified set of R<sup>d</sup> variates. Default implementation of the derivatives are
+ * 	for non-analytical lack box objective functions. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Validate the Input Double Array</li>
+ * 		<li>Retrieve the Dimension of the Input Variate</li>
+ * 		<li>Calculate the Differential</li>
+ * 		<li>Calculate the Derivative as a Double</li>
+ * 		<li>Evaluate the Jacobian for the given Input Variates</li>
+ * 		<li>Construct an Instance of the Unit Gradient Vector at the given Input Variates</li>
+ * 		<li>Evaluate The Hessian for the given Input Variates</li>
+ * 		<li>Integrate over the given Input Range Using Uniform Monte-Carlo</li>
+ * 		<li>Compute the Maximum <i>VariateOutputPair</i> within the Variate Array Range Using Uniform Monte-Carlo</li>
+ * 		<li>Compute the Minimum <i>VariateOutputPair</i> within the Variate Array Range Using Uniform Monte-Carlo</li>
+ * 		<li>Compute the Modulus of the Gradient at the Specified Variate</li>
+ * 		<li>Generate the Gradient Modulus Function</li>
+ * 		<li>Retrieve the L<sub>2</sub> Condition Number for the Function at the Domain Value</li>
+ * 		<li>Retrieve the L<sub>p</sub> Condition Number for the Function at the Domain Value</li>
+ * 		<li>Retrieve the L<sub>Infinity</sub> Condition Number for the Function at the Domain Value</li>
+ * 		<li>Retrieve the Default Condition Number for the Function at the Domain Value - this uses L<sub>2</sub> Metric</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class RdToR1 {
+public abstract class RdToR1
+{
 	private static final int EXTREMA_SAMPLING = 10000;
 	private static final int QUADRATURE_SAMPLING = 10000;
 
 	protected static final int DIMENSION_NOT_FIXED = -1;
 
-	protected org.drip.numerical.differentiation.DerivativeControl _dc = null;
+	protected DerivativeControl _derivativeControl = null;
 
 	/**
 	 * Validate the Input Double Array
 	 * 
-	 * @param adblVariate The Input Double Array
+	 * @param variateArray The Input Double Array
 	 * 
 	 * @return The Input Double Array consists of valid Values
 	 */
 
 	public static final boolean ValidateInput (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		if (null == adblVariate) return false;
+		if (null == variateArray || 0 == variateArray.length) {
+			return false;
+		}
 
-		int iNumVariate = adblVariate.length;
-
-		if (0 == iNumVariate) return false;
-
-		for (int i = 0; i < iNumVariate; ++i) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (adblVariate[i])) return false;
+		for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex) {
+			if (!NumberUtil.IsValid (variateArray[variateIndex])) {
+				return false;
+			}
 		}
 
 		return true;
@@ -152,7 +183,8 @@ public abstract class RdToR1 {
 		final int p)
 		throws Exception
 	{
-		if (null == variateArray || 0 == variateArray.length || !NumberUtil.IsValid (variateArray) || 2 >= p)
+		if (null == variateArray || 0 == variateArray.length || !NumberUtil.IsValid (variateArray) ||
+			2 >= p)
 		{
 			throw new Exception ("RdToR1::normedVariateLp => Cannot calculate Jacobian");
 		}
@@ -210,7 +242,8 @@ public abstract class RdToR1 {
 		double[] jacobianArray = jacobian (variateArray);
 
 		if (null == jacobianArray || jacobianArray.length != variateArray.length ||
-			!NumberUtil.IsValid (jacobianArray) || 2 >= p)
+			!NumberUtil.IsValid (jacobianArray) ||
+			2 >= p)
 		{
 			throw new Exception ("RdToR1::normedJacobianLp => Cannot calculate Jacobian");
 		}
@@ -244,9 +277,11 @@ public abstract class RdToR1 {
 	}
 
 	protected RdToR1 (
-		final org.drip.numerical.differentiation.DerivativeControl dc)
+		final DerivativeControl derivativeControl)
 	{
-		if (null == (_dc = dc)) _dc = new org.drip.numerical.differentiation.DerivativeControl();
+		if (null == (_derivativeControl = derivativeControl)) {
+			_derivativeControl = new DerivativeControl();
+		}
 	}
 
 	/**
@@ -260,62 +295,67 @@ public abstract class RdToR1 {
 	/**
 	 * Evaluate for the given Input Variates
 	 * 
-	 * @param adblVariate Array of Input Variates
+	 * @param variateArray Array of Input Variates
 	 *  
 	 * @return The Calculated Value
 	 * 
-	 * @throws java.lang.Exception Thrown if the Evaluation cannot be done
+	 * @throws Exception Thrown if the Evaluation cannot be done
 	 */
 
 	public abstract double evaluate (
-		final double[] adblVariate)
-		throws java.lang.Exception;
+		final double[] variateArray
+	) throws Exception;
 
 	/**
 	 * Calculate the Differential
 	 * 
-	 * @param adblVariate Variate Array at which the derivative is to be calculated
-	 * @param iVariateIndex Index of the Variate whose Derivative is to be computed
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variateArray Variate Array at which the derivative is to be calculated
+	 * @param derivativeVariateIndex Index of the Variate whose Derivative is to be computed
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Derivative
 	 */
 
-	public org.drip.numerical.differentiation.Differential differential (
-		final double[] adblVariate,
-		final int iVariateIndex,
-		final int iOrder)
+	public Differential differential (
+		final double[] variateArray,
+		final int derivativeVariateIndex,
+		final int order)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (adblVariate) || 0 >= iOrder) return null;
+		if (!NumberUtil.IsValid (variateArray) || variateArray.length <= derivativeVariateIndex ||
+			0 >= order)
+		{
+			return null;
+		}
 
-		double dblDerivative = 0.;
-		int iNumVariate = adblVariate.length;
-		double dblOrderedVariateInfinitesimal = 1.;
-		double dblVariateInfinitesimal = java.lang.Double.NaN;
-
-		if (iNumVariate <= iVariateIndex) return null;
+		double derivative = 0.;
+		double orderedVariateInfinitesimal = 1.;
+		double variateInfinitesimal = Double.NaN;
 
 		try {
-			dblVariateInfinitesimal = _dc.getVariateInfinitesimal (adblVariate[iVariateIndex]);
-		} catch (java.lang.Exception e) {
+			variateInfinitesimal =
+				_derivativeControl.getVariateInfinitesimal (variateArray[derivativeVariateIndex]);
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		for (int i = 0; i <= iOrder; ++i) {
-			if (0 != i) dblOrderedVariateInfinitesimal *= (2. * dblVariateInfinitesimal);
+		for (int orderOrdinal = 0; orderOrdinal <= order; ++orderOrdinal) {
+			if (0 != orderOrdinal) {
+				orderedVariateInfinitesimal *= (2. * variateInfinitesimal);
+			}
 
-			double[] adblVariateIncremental = new double[iNumVariate];
+			double[] incrementalArray = new double[variateArray.length];
 
-			for (int j = 0; j < iNumVariate; ++j)
-				adblVariateIncremental[j] = j == iVariateIndex ? adblVariate[j] + dblVariateInfinitesimal *
-					(iOrder - 2. * i) : adblVariate[j];
+			for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex)
+				incrementalArray[variateIndex] = variateIndex == derivativeVariateIndex ?
+					variateArray[variateIndex] + variateInfinitesimal * (order - 2. * orderOrdinal) :
+					variateArray[variateIndex];
 
 			try {
-				dblDerivative += (i % 2 == 0 ? 1 : -1) * org.drip.numerical.common.NumberUtil.NCK (iOrder, i) *
-					evaluate (adblVariateIncremental);
-			} catch (java.lang.Exception e) {
+				derivative += (orderOrdinal % 2 == 0 ? 1 : -1) * NumberUtil.NCK (order, orderOrdinal) *
+					evaluate (incrementalArray);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
@@ -323,8 +363,8 @@ public abstract class RdToR1 {
 		}
 
 		try {
-			return new org.drip.numerical.differentiation.Differential (dblOrderedVariateInfinitesimal, dblDerivative);
-		} catch (java.lang.Exception e) {
+			return new Differential (orderedVariateInfinitesimal, derivative);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -332,111 +372,110 @@ public abstract class RdToR1 {
 	}
 
 	/**
-	 * Calculate the derivative as a double
+	 * Calculate the Derivative as a Double
 	 * 
-	 * @param adblVariate Variate Array at which the derivative is to be calculated
-	 * @param iVariateIndex Index of the Variate whose Derivative is to be computed
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variateArray Variate Array at which the derivative is to be calculated
+	 * @param derivativeVariateIndex Index of the Variate whose Derivative is to be computed
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Derivative
 	 * 
-	 * @throws java.lang.Exception Thrown if the Derivative cannot be calculated
+	 * @throws Exception Thrown if the Derivative cannot be calculated
 	 */
 
 	public double derivative (
-		final double[] adblVariate,
-		final int iVariateIndex,
-		final int iOrder)
-		throws java.lang.Exception
+		final double[] variateArray,
+		final int derivativeVariateIndex,
+		final int order)
+		throws Exception
 	{
-		return differential (adblVariate, iVariateIndex, iOrder).calcSlope (true);
+		return differential (variateArray, derivativeVariateIndex, order).calcSlope (true);
 	}
 
 	/**
 	 * Evaluate the Jacobian for the given Input Variates
 	 * 
-	 * @param adblVariate Array of Input Variates
+	 * @param variateArray Array of Input Variates
 	 *  
 	 * @return The Jacobian Array
 	 */
 
 	public double[] jacobian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		if (null == adblVariate) return null;
+		if (null == variateArray || 0 == variateArray.length) {
+			return null;
+		}
 
-		int iNumVariate = adblVariate.length;
-		double[] adblJacobian = new double[iNumVariate];
+		double[] jacobianArray = new double[variateArray.length];
 
-		if (0 == iNumVariate) return null;
-
-		for (int i = 0; i < iNumVariate; ++i) {
+		for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex) {
 			try {
-				adblJacobian[i] = derivative (adblVariate, i, 1);
-			} catch (java.lang.Exception e) {
+				jacobianArray[variateIndex] = derivative (variateArray, variateIndex, 1);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		return adblJacobian;
+		return jacobianArray;
 	}
 
 	/**
 	 * Construct an Instance of the Unit Gradient Vector at the given Input Variates
 	 * 
-	 * @param adblVariate Array of Input Variates
+	 * @param variateArray Array of Input Variates
 	 *  
 	 * @return Instance of the Unit Gradient Vector Array
 	 */
 
-	public org.drip.function.definition.UnitVector gradient (
-		final double[] adblVariate)
+	public UnitVector gradient (
+		final double[] variateArray)
 	{
-		return org.drip.function.definition.UnitVector.Standard (jacobian (adblVariate));
+		return UnitVector.Standard (jacobian (variateArray));
 	}
 
 	/**
 	 * Evaluate The Hessian for the given Input Variates
 	 * 
-	 * @param adblVariate Array of Input Variates
+	 * @param variateArray Array of Input Variates
 	 *  
 	 * @return The Hessian Matrix
 	 */
 
 	public double[][] hessian (
-		final double[] adblVariate)
+		final double[] variateArray)
 	{
-		if (null == adblVariate) return null;
+		if (null == variateArray || 0 == variateArray.length) {
+			return null;
+		}
 
-		final int iNumVariate = adblVariate.length;
-		double[][] adblHessian = new double[iNumVariate][iNumVariate];
+		double[][] hessian = new double[variateArray.length][variateArray.length];
 
-		if (0 == iNumVariate) return null;
+		for (int variateIndexI = 0; variateIndexI < variateArray.length; ++variateIndexI) {
+			final int derivativeVariateIndex = variateIndexI;
 
-		for (int i = 0; i < iNumVariate; ++i) {
-			final int iVariateIndex = i;
-
-			org.drip.function.definition.RdToR1 gradientRdToR1 = new org.drip.function.definition.RdToR1
-				(null) {
+			RdToR1 gradientRdToR1 = new RdToR1 (null)
+			{
 				@Override public int dimension()
 				{
-					return iNumVariate;
+					return variateArray.length;
 				}
 
 				@Override public double evaluate (
-					final double[] adblVariate)
-					throws java.lang.Exception
+					final double[] variateArray)
+					throws Exception
 				{
-					return derivative (adblVariate, iVariateIndex, 1);
+					return derivative (variateArray, derivativeVariateIndex, 1);
 				}
 			};
 
-			for (int j = 0; j < iNumVariate; ++j) {
+			for (int variateIndexJ = 0; variateIndexJ < variateArray.length; ++variateIndexJ) {
 				try {
-					adblHessian[i][j] = gradientRdToR1.derivative (adblVariate, j, 1);
-				} catch (java.lang.Exception e) {
+					hessian[variateIndexI][variateIndexJ] =
+						gradientRdToR1.derivative (variateArray, variateIndexJ, 1);
+				} catch (Exception e) {
 					e.printStackTrace();
 
 					return null;
@@ -444,113 +483,130 @@ public abstract class RdToR1 {
 			}
 		}
 
-		return adblHessian;
+		return hessian;
 	}
 
 	/**
 	 * Integrate over the given Input Range Using Uniform Monte-Carlo
 	 * 
-	 * @param adblLeftEdge Array of Input Left Edge
-	 * @param adblRightEdge Array of Input Right Edge
+	 * @param leftEdgeArray Array of Input Left Edge
+	 * @param rightEdgeArray Array of Input Right Edge
 	 *  
 	 * @return The Result of the Integration over the specified Range
 	 * 
-	 * @throws java.lang.Exception Thrown if the Integration cannot be done
+	 * @throws Exception Thrown if the Integration cannot be done
 	 */
 
 	public double integrate (
-		final double[] adblLeftEdge,
-		final double[] adblRightEdge)
-		throws java.lang.Exception
+		final double[] leftEdgeArray,
+		final double[] rightEdgeArray)
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (adblLeftEdge) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (adblRightEdge))
-			throw new java.lang.Exception ("RdToR1::integrate => Invalid Inputs");
-
-		double dblIntegrand = 0.;
-		int iNumVariate = adblLeftEdge.length;
-		double[] adblVariate = new double[iNumVariate];
-		double[] adblVariateWidth = new double[iNumVariate];
-
-		if (adblRightEdge.length != iNumVariate)
-			throw new java.lang.Exception ("RdToR1::integrate => Invalid Inputs");
-
-		for (int j = 0; j < iNumVariate; ++j)
-			adblVariateWidth[j] = adblRightEdge[j] - adblLeftEdge[j];
-
-		for (int i = 0; i < QUADRATURE_SAMPLING; ++i) {
-			for (int j = 0; j < iNumVariate; ++j)
-				adblVariate[j] = adblLeftEdge[j] + java.lang.Math.random() * adblVariateWidth[j];
-
-			dblIntegrand += evaluate (adblVariate);
+		if (null == leftEdgeArray || !NumberUtil.IsValid (leftEdgeArray) ||
+			null == rightEdgeArray || !NumberUtil.IsValid (rightEdgeArray))
+		{
+			throw new Exception ("RdToR1::integrate => Invalid Inputs");
 		}
 
-		for (int j = 0; j < iNumVariate; ++j)
-			dblIntegrand = dblIntegrand * adblVariateWidth[j];
+		double integrand = 0.;
+		double[] variateArray = new double[leftEdgeArray.length];
+		double[] variateArrayWidth = new double[leftEdgeArray.length];
 
-		return dblIntegrand / QUADRATURE_SAMPLING;
+		if (rightEdgeArray.length != leftEdgeArray.length) {
+			throw new Exception ("RdToR1::integrate => Invalid Inputs");
+		}
+
+		for (int arrayIndex = 0; arrayIndex < leftEdgeArray.length; ++arrayIndex) {
+			variateArrayWidth[arrayIndex] = rightEdgeArray[arrayIndex] - leftEdgeArray[arrayIndex];
+		}
+
+		for (int sampleIndex = 0; sampleIndex < QUADRATURE_SAMPLING; ++sampleIndex) {
+			for (int arrayIndex = 0; arrayIndex < leftEdgeArray.length; ++arrayIndex) {
+				variateArray[arrayIndex] =
+					leftEdgeArray[arrayIndex] + Math.random() * variateArrayWidth[arrayIndex];
+			}
+
+			integrand += evaluate (variateArray);
+		}
+
+		for (int arrayIndex = 0; arrayIndex < leftEdgeArray.length; ++arrayIndex) {
+			integrand = integrand * variateArrayWidth[arrayIndex];
+		}
+
+		return integrand / QUADRATURE_SAMPLING;
 	}
 
 	/**
-	 * Compute the Maximum VOP within the Variate Array Range Using Uniform Monte-Carlo
+	 * Compute the Maximum <i>VariateOutputPair</i> within the Variate Array Range Using Uniform Monte-Carlo
 	 * 
-	 * @param adblVariateLeft The Range Left End Array
-	 * @param adblVariateRight The Range Right End Array
+	 * @param leftVariateArray The Range Left End Array
+	 * @param rightVariateArray The Range Right End Array
 	 * 
-	 * @return The Maximum VOP
+	 * @return The Maximum <i>VariateOutputPair</i>
 	 */
 
-	public org.drip.function.definition.VariateOutputPair maxima (
-		final double[] adblVariateLeft,
-		final double[] adblVariateRight)
+	public VariateOutputPair maxima (
+		final double[] leftVariateArray,
+		final double[] rightVariateArray)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (adblVariateLeft) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (adblVariateRight))
+		if (null == leftVariateArray || !NumberUtil.IsValid (leftVariateArray) ||
+			null == rightVariateArray || !NumberUtil.IsValid (rightVariateArray) ||
+			rightVariateArray.length != leftVariateArray.length)
+		{
 			return null;
+		}
 
-		double dblValue = java.lang.Double.NaN;
-		double dblMaxima = java.lang.Double.NaN;
-		int iNumVariate = adblVariateLeft.length;
-		double[] adblVariate = new double[iNumVariate];
-		double[] adblVariateWidth = new double[iNumVariate];
-		double[] adblMaximaVariate = new double[iNumVariate];
+		double value = Double.NaN;
+		double maxima = Double.NaN;
+		double[] variateArray = new double[leftVariateArray.length];
+		double[] variateArrayWidth = new double[leftVariateArray.length];
+		double[] maximaVariateArray = new double[leftVariateArray.length];
 
-		if (adblVariateRight.length != iNumVariate) return null;
+		for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+			variateArrayWidth[variateIndex] =
+				rightVariateArray[variateIndex] - leftVariateArray[variateIndex];
+		}
 
-		for (int j = 0; j < iNumVariate; ++j)
-			adblVariateWidth[j] = adblVariateRight[j] - adblVariateLeft[j];
-
-		for (int i = 0; i < EXTREMA_SAMPLING; ++i) {
-			for (int j = 0; j < iNumVariate; ++j)
-				adblVariate[j] = adblVariateLeft[j] + java.lang.Math.random() * adblVariateWidth[j];
+		for (int samplingIndex = 0; samplingIndex < EXTREMA_SAMPLING; ++samplingIndex) {
+			for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+				variateArray[variateIndex] =
+					leftVariateArray[variateIndex] + Math.random() * variateArrayWidth[variateIndex];
+			}
 
 			try {
-				dblValue = evaluate (adblVariate);
-			} catch (java.lang.Exception e) {
+				value = evaluate (variateArray);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 
-			if (!org.drip.numerical.common.NumberUtil.IsValid (dblMaxima)) {
-				dblMaxima = dblValue;
+			if (!NumberUtil.IsValid (maxima)) {
+				maxima = value;
 
-				for (int j = 0; j < iNumVariate; ++j)
-					adblMaximaVariate[j] = adblVariate[j];
+				for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+					maximaVariateArray[variateIndex] = variateArray[variateIndex];
+				}
 			} else {
-				if (dblMaxima < dblValue) {
-					dblMaxima = dblValue;
+				if (maxima < value) {
+					maxima = value;
 
-					for (int j = 0; j < iNumVariate; ++j)
-						adblMaximaVariate[j] = adblVariate[j];
+					for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+						maximaVariateArray[variateIndex] = variateArray[variateIndex];
+					}
 				}
 			}
 		}
 
 		try {
-			return new org.drip.function.definition.VariateOutputPair (adblMaximaVariate, new double[]
-				{dblMaxima});
-		} catch (java.lang.Exception e) {
+			return new VariateOutputPair (
+				maximaVariateArray,
+				new double[]
+				{
+					maxima
+				}
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -558,65 +614,76 @@ public abstract class RdToR1 {
 	}
 
 	/**
-	 * Compute the Minimum VOP within the Variate Array Range Using Uniform Monte-Carlo
+	 * Compute the Minimum <i>VariateOutputPair</i> within the Variate Array Range Using Uniform Monte-Carlo
 	 * 
-	 * @param adblVariateLeft The Range Left End Array
-	 * @param adblVariateRight The Range Right End Array
+	 * @param leftVariateArray The Range Left End Array
+	 * @param rightVariateArray The Range Right End Array
 	 * 
-	 * @return The Minimum VOP
+	 * @return The Minimum <i>VariateOutputPair</i>
 	 */
 
-	public org.drip.function.definition.VariateOutputPair minima (
-		final double[] adblVariateLeft,
-		final double[] adblVariateRight)
+	public VariateOutputPair minima (
+		final double[] leftVariateArray,
+		final double[] rightVariateArray)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (adblVariateLeft) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (adblVariateRight))
+		if (null == leftVariateArray || !NumberUtil.IsValid (leftVariateArray) ||
+			null == rightVariateArray || !NumberUtil.IsValid (rightVariateArray) ||
+			rightVariateArray.length != leftVariateArray.length)
+		{
 			return null;
+		}
 
-		double dblValue = java.lang.Double.NaN;
-		double dblMinima = java.lang.Double.NaN;
-		int iNumVariate = adblVariateLeft.length;
-		double[] adblVariate = new double[iNumVariate];
-		double[] adblVariateWidth = new double[iNumVariate];
-		double[] adblMinimaVariate = new double[iNumVariate];
+		double value = Double.NaN;
+		double minima = Double.NaN;
+		double[] variateArray = new double[leftVariateArray.length];
+		double[] variateArrayWidth = new double[leftVariateArray.length];
+		double[] minimaVariateArray = new double[leftVariateArray.length];
 
-		if (adblVariateRight.length != iNumVariate) return null;
+		for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+			variateArrayWidth[variateIndex] =
+				rightVariateArray[variateIndex] - leftVariateArray[variateIndex];
+		}
 
-		for (int j = 0; j < iNumVariate; ++j)
-			adblVariateWidth[j] = adblVariateRight[j] - adblVariateLeft[j];
-
-		for (int i = 0; i < EXTREMA_SAMPLING; ++i) {
-			for (int j = 0; j < iNumVariate; ++j)
-				adblVariate[j] = adblVariateLeft[j] + java.lang.Math.random() * adblVariateWidth[j];
+		for (int samplingIndex = 0; samplingIndex < EXTREMA_SAMPLING; ++samplingIndex) {
+			for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+				variateArray[variateIndex] =
+					leftVariateArray[variateIndex] + Math.random() * variateArrayWidth[variateIndex];
+			}
 
 			try {
-				dblValue = evaluate (adblVariate);
-			} catch (java.lang.Exception e) {
+				value = evaluate (variateArray);
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 
-			if (!org.drip.numerical.common.NumberUtil.IsValid (dblMinima)) {
-				dblMinima = dblValue;
+			if (!NumberUtil.IsValid (minima)) {
+				minima = value;
 
-				for (int j = 0; j < iNumVariate; ++j)
-					adblMinimaVariate[j] = adblVariate[j];
+				for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+					minimaVariateArray[variateIndex] = variateArray[variateIndex];
+				}
 			} else {
-				if (dblMinima > dblValue) {
-					dblMinima = dblValue;
+				if (minima > value) {
+					minima = value;
 
-					for (int j = 0; j < iNumVariate; ++j)
-						adblMinimaVariate[j] = adblVariate[j];
+					for (int variateIndex = 0; variateIndex < leftVariateArray.length; ++variateIndex) {
+						minimaVariateArray[variateIndex] = variateArray[variateIndex];
+					}
 				}
 			}
 		}
 
 		try {
-			return new org.drip.function.definition.VariateOutputPair (adblMinimaVariate, new double[]
-				{dblMinima});
-		} catch (java.lang.Exception e) {
+			return new VariateOutputPair (
+				minimaVariateArray,
+				new double[]
+				{
+					minima
+				}
+			);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -624,31 +691,32 @@ public abstract class RdToR1 {
 	}
 
 	/**
-	 * Compute the Modulus of the Gradient at the Specified Variate location
+	 * Compute the Modulus of the Gradient at the Specified Variate
 	 * 
-	 * @param adblVariate The Variate Array location
+	 * @param variateArray The Variate Array
 	 * 
-	 * @return The Modulus of the Gradient at the Specified Variate location
+	 * @return The Modulus of the Gradient at the Specified Variate
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public double gradientModulus (
-		final double[] adblVariate)
-		throws java.lang.Exception
+		final double[] variateArray)
+		throws Exception
 	{
-		double[] adblJacobian = jacobian (adblVariate);
+		double[] jacobian = jacobian (variateArray);
 
-		if (null == adblJacobian)
-			throw new java.lang.Exception ("RdToR1::gradientModulus => Invalid Inputs!");
+		if (null == jacobian) {
+			throw new Exception ("RdToR1::gradientModulus => Invalid Inputs!");
+		}
 
-		double dblGradientModulus = 0.;
-		int iNumVariate = adblVariate.length;
+		double gradientModulus = 0.;
 
-		for (int i = 0; i < iNumVariate; ++i)
-			dblGradientModulus += adblJacobian[i] * adblJacobian[i];
+		for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex) {
+			gradientModulus += jacobian[variateIndex] * jacobian[variateIndex];
+		}
 
-		return dblGradientModulus;
+		return gradientModulus;
 	}
 
 	/**
@@ -657,48 +725,49 @@ public abstract class RdToR1 {
 	 * @return The Gradient Modulus Function
 	 */
 
-	public org.drip.function.definition.RdToR1 gradientModulusFunction()
+	public RdToR1 gradientModulusFunction()
 	{
-		org.drip.function.definition.RdToR1 gradientModulusRdToR1 = new org.drip.function.definition.RdToR1
-			(null) {
+		return new RdToR1 (null)
+		{
 			@Override public int dimension()
 			{
 				return dimension();
 			}
 
 			@Override public double evaluate (
-				final double[] adblVariate)
-				throws java.lang.Exception
+				final double[] variateArray)
+				throws Exception
 			{
-				return gradientModulus (adblVariate);
+				return gradientModulus (variateArray);
 			}
 
 			@Override public double[] jacobian (
-				final double[] adblVariate)
+				final double[] variateArray)
 			{
-				double[] adblParentJacobian = jacobian (adblVariate);
+				double[] parentJacobian = jacobian (variateArray);
 
-				double[][] adblParentHessian = hessian (adblVariate);
+				double[][] parentHessian = hessian (variateArray);
 
-				if (null == adblParentJacobian || null == adblParentHessian) return null;
-
-				int iDimension = adblParentJacobian.length;
-				double[] adblGradientModulusJacobian = new double[iDimension];
-
-				for (int k = 0; k < iDimension; ++k) {
-					adblGradientModulusJacobian[k] = 0.;
-
-					for (int i = 0; i < iDimension; ++i)
-						adblGradientModulusJacobian[k] += adblParentJacobian[i] * adblParentHessian[i][k];
-
-					adblGradientModulusJacobian[k] *= 2.;
+				if (null == parentJacobian || null == parentHessian) {
+					return null;
 				}
 
-				return adblGradientModulusJacobian;
+				double[] gradientModulusJacobian = new double[parentJacobian.length];
+
+				for (int indexI = 0; indexI < parentJacobian.length; ++indexI) {
+					gradientModulusJacobian[indexI] = 0.;
+
+					for (int indexJ = 0; indexJ < parentJacobian.length; ++indexJ) {
+						gradientModulusJacobian[indexI] +=
+							parentJacobian[indexJ] * parentHessian[indexJ][indexI];
+					}
+
+					gradientModulusJacobian[indexI] *= 2.;
+				}
+
+				return gradientModulusJacobian;
 			}
 		};
-
-		return gradientModulusRdToR1;
 	}
 
 	/**
@@ -709,7 +778,7 @@ public abstract class RdToR1 {
 	 * @return Condition Number for the Function at the Domain Value
 	 * 
 	 * @throws Exception Thrown if the Condition Number for the Function at the Domain Value cannot be
-	 * 	calculated
+	 * 		   			 calculated
 	 */
 
 	public double conditionNumberL2 (
@@ -730,7 +799,7 @@ public abstract class RdToR1 {
 	 * @return Condition Number for the Function at the Domain Value
 	 * 
 	 * @throws Exception Thrown if the Condition Number for the Function at the Domain Value cannot be
-	 * 	calculated
+	 * 					 calculated
 	 */
 
 	public double conditionNumberLp (
@@ -751,7 +820,7 @@ public abstract class RdToR1 {
 	 * @return Condition Number for the Function at the Domain Value
 	 * 
 	 * @throws Exception Thrown if the Condition Number for the Function at the Domain Value cannot be
-	 * 	calculated
+	 * 					 calculated
 	 */
 
 	public double conditionNumberLInfinity (
@@ -765,7 +834,7 @@ public abstract class RdToR1 {
 	}
 
 	/**
-	 * Retrieve the Default Condition Number for the Function at the Domain Value - this uses L<sub>2</sub> 
+	 * Retrieve the Default Condition Number for the Function at the Domain Value - this uses L<sub>2</sub>
 	 * 	Metric
 	 * 
 	 * @param variateArray Domain Variate Array
@@ -773,7 +842,7 @@ public abstract class RdToR1 {
 	 * @return Condition Number for the Function at the Domain Value
 	 * 
 	 * @throws Exception Thrown if the Condition Number for the Function at the Domain Value cannot be
-	 * 	calculated
+	 * 					 calculated
 	 */
 
 	public double conditionNumber (

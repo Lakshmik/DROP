@@ -1,11 +1,23 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+import org.drip.numerical.differentiation.DerivativeControl;
+import org.drip.numerical.differentiation.Differential;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,176 +94,209 @@ package org.drip.function.definition;
 
 /**
  * <i>R1ToRd</i> provides the evaluation of the R<sup>1</sup> To R<sup>d</sup> Objective Function and its
- * derivatives for a specified variate. Default implementation of the derivatives are for non-analytical
- * black box objective functions.
+ * 	derivatives for a specified variate. Default implementation of the derivatives are for non-analytical
+ * 	black box objective functions. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Evaluate for the given Input R<sup>1</sup> Variate</li>
+ * 		<li>Calculate the Array of Differentials</li>
+ * 		<li>Calculate the Derivative Array as a double</li>
+ * 		<li>Integrate over the given Input Range Using Uniform Monte-Carlo</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public abstract class R1ToRd {
+public abstract class R1ToRd
+{
 	private static final int QUADRATURE_SAMPLING = 10000;
 
-	protected org.drip.numerical.differentiation.DerivativeControl _dc = null;
+	protected DerivativeControl _derivativeControl = null;
 
 	protected R1ToRd (
-		final org.drip.numerical.differentiation.DerivativeControl dc)
+		final DerivativeControl derivativeControl)
 	{
-		if (null == (_dc = dc)) _dc = new org.drip.numerical.differentiation.DerivativeControl();
+		if (null == (_derivativeControl = derivativeControl)) {
+			_derivativeControl = new DerivativeControl();
+		}
 	}
 
 	/**
-	 * Evaluate for the given Input R^1 Variate
+	 * Evaluate for the given Input R<sup>1</sup> Variate
 	 * 
-	 * @param dblVariate The Input R^1 Variate
+	 * @param variate The Input R<sup>1</sup> Variate
 	 *  
-	 * @return The Output R^d Array
+	 * @return The Output R<sup>d</sup> Array
 	 */
 
 	public abstract double[] evaluate (
-		final double dblVariate);
+		final double variate
+	);
 
 	/**
 	 * Calculate the Array of Differentials
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Array of Differentials
 	 */
 
-	public org.drip.numerical.differentiation.Differential[] differential (
-		final double dblVariate,
-		final int iOrder)
+	public Differential[] differential (
+		final double variate,
+		final int order)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblVariate) || 0 >= iOrder) return null;
+		if (!NumberUtil.IsValid (variate) || 0 >= order) {
+			return null;
+		}
 
-		int iOutputDimension = -1;
-		double[] adblDerivative = null;
-		double dblOrderedVariateInfinitesimal = 1.;
-		double dblVariateInfinitesimal = java.lang.Double.NaN;
+		int valueDimension = -1;
+		double[] derivativeArray = null;
+		double orderedVariateInfinitesimal = 1.;
+		double variateInfinitesimal = Double.NaN;
 
 		try {
-			dblVariateInfinitesimal = _dc.getVariateInfinitesimal (dblVariate);
-		} catch (java.lang.Exception e) {
+			variateInfinitesimal = _derivativeControl.getVariateInfinitesimal (variate);
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		for (int i = 0; i <= iOrder; ++i) {
-			if (0 != i) dblOrderedVariateInfinitesimal *= (2. * dblVariateInfinitesimal);
+		for (int orderIndex = 0; orderIndex <= order; ++orderIndex) {
+			if (0 != orderIndex) {
+				orderedVariateInfinitesimal *= (2. * variateInfinitesimal);
+			}
 
-			double dblVariateIncremental = dblVariateInfinitesimal * (iOrder - 2. * i);
+			double[] valueArray = evaluate (variateInfinitesimal * (order - 2. * orderIndex));
 
-			double[] adblValue = evaluate (dblVariateIncremental);
+			if (null == valueArray || 0 == (valueDimension = valueArray.length)) {
+				return null;
+			}
 
-			if (null == adblValue || 0 == (iOutputDimension = adblValue.length)) return null;
+			if (null == derivativeArray) {
+				derivativeArray = new double[valueDimension];
 
-			if (null == adblDerivative) {
-				adblDerivative = new double[iOutputDimension];
-
-				for (int j = 0; j < iOutputDimension; ++j)
-					adblDerivative[j] = 0.;
+				for (int valueDimensionIndex = 0;
+					valueDimensionIndex < valueDimension;
+					++valueDimensionIndex)
+				{
+					derivativeArray[valueDimensionIndex] = 0.;
+				}
 			}
 
 			try {
-				for (int j = 0; j < iOutputDimension; ++j)
-					adblDerivative[j] += (i % 2 == 0 ? 1 : -1) * org.drip.numerical.common.NumberUtil.NCK
-						(iOrder, i) * adblValue[j];
-			} catch (java.lang.Exception e) {
+				for (int valueDimensionIndex = 0;
+					valueDimensionIndex < valueDimension;
+					++valueDimensionIndex)
+				{
+					derivativeArray[valueDimensionIndex] += (orderIndex % 2 == 0 ? 1 : -1) *
+						NumberUtil.NCK (order, orderIndex) * valueArray[valueDimensionIndex];
+				}
+			} catch (Exception e) {
 				e.printStackTrace();
 
 				return null;
 			}
 		}
 
-		org.drip.numerical.differentiation.Differential[] aDiff = new
-			org.drip.numerical.differentiation.Differential[iOutputDimension];
+		Differential[] differentialArray = new Differential[valueDimension];
 
 		try {
-			for (int j = 0; j < iOutputDimension; ++j)
-				aDiff[j] = new org.drip.numerical.differentiation.Differential (dblOrderedVariateInfinitesimal,
-					adblDerivative[j]);
-		} catch (java.lang.Exception e) {
+			for (int valueDimensionIndex = 0; valueDimensionIndex < valueDimension; ++valueDimensionIndex) {
+				differentialArray[valueDimensionIndex] =
+					new Differential (orderedVariateInfinitesimal, derivativeArray[valueDimensionIndex]);
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 
 			return null;
 		}
 
-		return aDiff;
+		return differentialArray;
 	}
 
 	/**
 	 * Calculate the Derivative Array as a double
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
 	 * 
 	 * @return The Derivative Array
 	 */
 
 	public double[] derivative (
-		final double dblVariate,
-		final int iOrder)
+		final double variate,
+		final int order)
 	{
-		org.drip.numerical.differentiation.Differential[] aDiff = differential (dblVariate, iOrder);
+		Differential[] differentialArray = differential (variate, order);
 
-		if (null == aDiff) return null;
+		if (null == differentialArray || 0 == differentialArray.length) {
+			return null;
+		}
 
-		int iOutputDimension = aDiff.length;
-		double[] adblDerivative = new double[iOutputDimension];
+		double[] derivativeArray = new double[differentialArray.length];
 
-		if (0 == iOutputDimension) return null;
+		for (int valueDimensionIndex = 0;
+			valueDimensionIndex < differentialArray.length;
+			++valueDimensionIndex)
+		{
+			derivativeArray[valueDimensionIndex] = differentialArray[valueDimensionIndex].calcSlope (true);
+		}
 
-		for (int i = 0; i < iOutputDimension; ++i)
-			adblDerivative[i] = aDiff[i].calcSlope (true);
-
-		return adblDerivative;
+		return derivativeArray;
 	}
 
 	/**
 	 * Integrate over the given Input Range Using Uniform Monte-Carlo
 	 * 
-	 * @param dblLeftEdge Input Left Edge
-	 * @param dblRightEdge Input Right Edge
+	 * @param leftEdge Input Left Edge
+	 * @param rightEdge Input Right Edge
 	 *  
 	 * @return The Array Containing the Result of the Integration over the specified Range
 	 */
 
 	public double[] integrate (
-		final double dblLeftEdge,
-		final double dblRightEdge)
+		final double leftEdge,
+		final double rightEdge)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (dblLeftEdge) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (dblRightEdge) || dblRightEdge <= dblLeftEdge)
+		if (!NumberUtil.IsValid (leftEdge) || !NumberUtil.IsValid (rightEdge) || rightEdge <= leftEdge) {
 			return null;
-
-		int iOutputDimension = -1;
-		double[] adblIntegrand = null;
-		double dblVariateWidth = dblRightEdge - dblLeftEdge;
-
-		for (int i = 0; i < QUADRATURE_SAMPLING; ++i) {
-			double[] adblValue = evaluate (dblLeftEdge + java.lang.Math.random() * dblVariateWidth);
-
-			if (null == adblValue || 0 == (iOutputDimension = adblValue.length)) return null;
-
-			if (null == adblIntegrand) adblIntegrand = new double[iOutputDimension];
-
-			for (int j = 0; j < iOutputDimension; ++j)
-				adblIntegrand[j] += adblValue[j];
 		}
 
-		for (int i = 0; i < iOutputDimension; ++i)
-			adblIntegrand[i] *= (dblVariateWidth / QUADRATURE_SAMPLING);
+		int valueDimension = -1;
+		double[] integrandArray = null;
+		double variateWidth = rightEdge - leftEdge;
 
-		return adblIntegrand;
+		for (int sampleIndex = 0; sampleIndex < QUADRATURE_SAMPLING; ++sampleIndex) {
+			double[] valueArray = evaluate (leftEdge + Math.random() * variateWidth);
+
+			if (null == valueArray || 0 == (valueDimension = valueArray.length)) {
+				return null;
+			}
+
+			if (null == integrandArray) {
+				integrandArray = new double[valueDimension];
+			}
+
+			for (int valueDimensionIndex = 0; valueDimensionIndex < valueDimension; ++valueDimensionIndex) {
+				integrandArray[valueDimensionIndex] += valueArray[valueDimensionIndex];
+			}
+		}
+
+		for (int valueDimensionIndex = 0; valueDimensionIndex < valueDimension; ++valueDimensionIndex) {
+			integrandArray[valueDimensionIndex] *= (variateWidth / QUADRATURE_SAMPLING);
+		}
+
+		return integrandArray;
 	}
 }

@@ -8,8 +8,8 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.eostree.ProxyBondEvaluator;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
-import org.drip.state.municipal.ZeroVolatilityPeriodState;
+import org.drip.state.municipal.SegmentElastic;
+import org.drip.state.municipal.CalibrationSegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -220,10 +220,7 @@ public class MSRBCurve
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
 
 		for (double time : timeToCalibrationYieldMapInput.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMapInput.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMapInput.get (time));
 		}
 
 		System.out.println ("\t|----------------------------------------------------------------||");
@@ -240,16 +237,16 @@ public class MSRBCurve
 
 		System.out.println ("\t|----------------------------------------------------------------||");
 
-		TreeMap<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToZeroVolatilityPeriodStateMap();
+		TreeMap<Double, CalibrationSegmentElastic> timeToZeroVolatilityPeriodStateMap =
+			kalotayWilliamsFabozzi.pillarTimeToCalibrationSegmentElasticMap();
 
 		for (Double endTime : timeToZeroVolatilityPeriodStateMap.keySet()) {
-			ZeroVolatilityPeriodState zeroVolatilityPeriodState =
+			CalibrationSegmentElastic zeroVolatilityPeriodState =
 				timeToZeroVolatilityPeriodStateMap.get (endTime);
 
 			System.out.println (
-				"\t| " + zeroVolatilityPeriodState.period() + " => " + FormatUtil.FormatDouble (
-					zeroVolatilityPeriodState.cumulativeMarketYield(),
+				"\t| " + zeroVolatilityPeriodState.inelastic() + " => " + FormatUtil.FormatDouble (
+					zeroVolatilityPeriodState.marketYield(),
 					1,
 					4,
 					100.,
@@ -276,21 +273,21 @@ public class MSRBCurve
 
 		System.out.println ("\t|--------------------------------------------------------------------------");
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_UNADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_UNADJUSTED_SEGMENT_YIELD
 		);
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
+		TreeMap<Double, List<SegmentElastic>> timeToProjectedPeriodStateMap =
+			kalotayWilliamsFabozzi.pillarTimeToSegmentElasticListMap();
 
 		System.out.println ("\t|--------------------------------------------------------------------------");
 
 		for (double endTime : timeToProjectedPeriodStateMap.keySet()) {
-			List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+			List<SegmentElastic> kalotayWilliamsFabozziPeriodStateList =
 				timeToProjectedPeriodStateMap.get (endTime);
 
-			String dump = "\t|" + kalotayWilliamsFabozziPeriodStateList.get (0).period() + " =>";
+			String dump = "\t|" + kalotayWilliamsFabozziPeriodStateList.get (0).inelastic() + " =>";
 
 			for (int i = 0; i < kalotayWilliamsFabozziPeriodStateList.size(); ++i) {
 				dump += FormatUtil.FormatDouble (
@@ -320,20 +317,20 @@ public class MSRBCurve
 
 		System.out.println ("\t|--------------------------------------------------------------------------");
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
-		timeToProjectedPeriodStateMap = kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
+		timeToProjectedPeriodStateMap = kalotayWilliamsFabozzi.pillarTimeToSegmentElasticListMap();
 
 		System.out.println ("\t|--------------------------------------------------------------------------");
 
 		for (double endTime : timeToProjectedPeriodStateMap.keySet()) {
-			List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+			List<SegmentElastic> kalotayWilliamsFabozziPeriodStateList =
 				timeToProjectedPeriodStateMap.get (endTime);
 
-			String dump = "\t|" + kalotayWilliamsFabozziPeriodStateList.get (0).period() + " =>";
+			String dump = "\t|" + kalotayWilliamsFabozziPeriodStateList.get (0).inelastic() + " =>";
 
 			for (int i = 0; i < kalotayWilliamsFabozziPeriodStateList.size(); ++i) {
 				dump += FormatUtil.FormatDouble (
@@ -379,16 +376,13 @@ public class MSRBCurve
 					1.,
 					false
 				) + " | " + FormatUtil.FormatDouble (
-					proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0),
+					proxyBulletBond.valueGrid (null, kalotayWilliamsFabozzi).pv(),
 					3,
 					3,
 					100.,
 					false
 				) + " | " + FormatUtil.FormatDouble (
-					proxyCallableBond.valueTree (
-						null,
-						kalotayWilliamsFabozzi
-					).firstEntry().getValue().get (0),
+					proxyCallableBond.valueGrid (null, kalotayWilliamsFabozzi).pv(),
 					3,
 					3,
 					100.,
@@ -419,7 +413,7 @@ public class MSRBCurve
 				ProxyBondEvaluator.Callable (maturityTime, bondCoupon, callPriceSchedule);
 
 			TreeMap<Double, List<Double>> projectedBondValueListMap =
-				proxyBond.valueTree (null, kalotayWilliamsFabozzi);
+				proxyBond.valueGrid (null, kalotayWilliamsFabozzi).timetoPVListMap();
 
 			for (double periodStartTime : projectedBondValueListMap.descendingKeySet()) {
 				String dump = "\t|" + FormatUtil.FormatDouble (periodStartTime, 2, 0, 1.) + " => ";

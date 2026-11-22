@@ -1,11 +1,21 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,58 +90,72 @@ package org.drip.function.definition;
  */
 
 /**
- * <i>SizedVector</i> holds the R<sup>d</sup> Unit Direction Vector along with its Magnitude.
+ * <i>SizedVector</i> holds the R<sup>d</sup> Unit Direction Vector along with its Magnitude. It provides the
+ * 	following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Construct an Instance of the Sized Vector from the Input Array</li>
+ * 		<li><i>SizedVector</i> Constructor</li>
+ * 		<li>Retrieve the Unit Direction Vector</li>
+ * 		<li>Retrieve the Vector Magnitude</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class SizedVector {
-	private double _dblMagnitude = java.lang.Double.NaN;
-	private org.drip.function.definition.UnitVector _uv = null;
+public class SizedVector
+{
+	private UnitVector _unitVector = null;
+	private double _magnitude = Double.NaN;
 
 	/**
 	 * Construct an Instance of the Sized Vector from the Input Array
 	 * 
-	 * @param adbl The Input Double Array
+	 * @param variateArray The Input Double Array
 	 * 
 	 * @return The Sized Vector Instance
 	 */
 
 	public static final SizedVector Standard (
-		final double[] adbl)
+		final double[] variateArray)
 	{
-		if (null == adbl) return null;
-
-		double dblModulus = 0.;
-		int iDimension = adbl.length;
-		double[] adblComponent = 0 == iDimension ? null : new double[iDimension];
-
-		if (0 == iDimension) return null;
-
-		for (int i = 0; i < iDimension; ++i) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (adbl[i])) return null;
-
-			dblModulus += adbl[i] * adbl[i];
+		if (null == variateArray || 0 == variateArray.length) {
+			return null;
 		}
 
-		if (0. == dblModulus) return null;
+		double modulus = 0.;
+		double[] componentArray = new double[variateArray.length];
 
-		dblModulus = java.lang.Math.sqrt (dblModulus);
+		for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex) {
+			if (!NumberUtil.IsValid (variateArray[variateIndex])) {
+				return null;
+			}
 
-		for (int i = 0; i < iDimension; ++i)
-			adblComponent[i] = adbl[i] / dblModulus;
+			modulus += variateArray[variateIndex] * variateArray[variateIndex];
+		}
+
+		if (0. == modulus) {
+			return null;
+		}
+
+		modulus = Math.sqrt (modulus);
+
+		for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex) {
+			componentArray[variateIndex] = variateArray[variateIndex] / modulus;
+		}
 
 		try {
-			return new SizedVector (new org.drip.function.definition.UnitVector (adblComponent), dblModulus);
-		} catch (java.lang.Exception e) {
+			return new SizedVector (new UnitVector (componentArray), modulus);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -139,21 +163,22 @@ public class SizedVector {
 	}
 
 	/**
-	 * SizedVector Constructor
+	 * <i>SizedVector</i> Constructor
 	 * 
-	 * @param uv The Unit Vector
-	 * @param dblMagnitude Magnitude of the Vector
+	 * @param unitVector The Unit Vector
+	 * @param magnitude Magnitude of the Vector
 	 * 
-	 * @throws java.lang.Exception Thriwn if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public SizedVector (
-		final org.drip.function.definition.UnitVector uv,
-		final double dblMagnitude)
-		throws java.lang.Exception
+		final UnitVector unitVector,
+		final double magnitude)
+		throws Exception
 	{
-		if (null == (_uv = uv) || !org.drip.numerical.common.NumberUtil.IsValid (_dblMagnitude = dblMagnitude))
-			throw new java.lang.Exception ("SizedVector Constructor => Invalid Inputs");
+		if (null == (_unitVector = unitVector) || !NumberUtil.IsValid (_magnitude = magnitude)) {
+			throw new Exception ("SizedVector Constructor => Invalid Inputs");
+		}
 	}
 
 	/**
@@ -162,9 +187,9 @@ public class SizedVector {
 	 * @return The Unit Vector Direction Instance
 	 */
 
-	public org.drip.function.definition.UnitVector direction()
+	public UnitVector direction()
 	{
-		return _uv;
+		return _unitVector;
 	}
 
 	/**
@@ -175,6 +200,6 @@ public class SizedVector {
 
 	public double magnitude()
 	{
-		return _dblMagnitude;
+		return _magnitude;
 	}
 }

@@ -9,7 +9,7 @@ import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
 import org.drip.product.credit.BondComponent;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -134,27 +134,57 @@ public class FullBondEvaluator
 
 	private static final VertexInelastic MakeVertexInelastic (
 		final double time,
-		final EventPillarTimeComposite eventPillarTimeComposite,
-		final boolean isMaturity)
+		final JulianDate spotDate,
+		final VertexEventComposite vertexEventComposite,
+		final boolean isMaturity,
+		final boolean isExercisable)
 	{
-		TreeMap<Double, Double> timeToFullCouponMap = eventPillarTimeComposite.timeToFullCouponMap();
+		TreeMap<Double, Double> timeToPrincipalPaydownMap = vertexEventComposite.timeToPrincipalPaydownMap();
 
-		TreeMap<Double, VertexAccrual> timeToAccrualMap = eventPillarTimeComposite.timeToAccrualMap();
+		TreeMap<Double, Double> payTimeToFullCouponMap = vertexEventComposite.payTimeToFullCouponMap();
 
-		TreeMap<Double, Double> timeToPrincipalPaydownMap =
-			eventPillarTimeComposite.timeToPrincipalPaydownMap();
+		TreeMap<Double, VertexAccrual> timeToAccrualMap = vertexEventComposite.timeToAccrualMap();
+
+		boolean isPrincipalPayDown = timeToPrincipalPaydownMap.containsKey (time);
+
+		boolean isFullCoupon = payTimeToFullCouponMap.containsKey (time);
+
+		boolean isAccrual = timeToAccrualMap.containsKey (time);
+
+		String eventFlags = "[";
+
+		if (isMaturity) {
+			eventFlags += "MATURITY, ";
+		}
+
+		if (isPrincipalPayDown) {
+			eventFlags += "PRINCIPALPAYDOWN, ";
+		}
+
+		if (isFullCoupon) {
+			eventFlags += "FULLCOUPON, ";
+		}
+
+		if (isAccrual) {
+			eventFlags += "ACCRUAL, ";
+		}
+
+		if (isExercisable) {
+			eventFlags += "EXERCISABLE, ";
+		}
+
+		if (vertexEventComposite.isCalibrationPillar (time)) {
+			eventFlags += "CALIBRATIONPILLAR, ";
+		}
 
 		try {
 			return new VertexInelastic (
 				time,
-				(
-					timeToPrincipalPaydownMap.containsKey (time) ?
-						timeToPrincipalPaydownMap.get (time) : (isMaturity ? 1. : 0.)
-				) + (
-					timeToFullCouponMap.containsKey (time) ? timeToFullCouponMap.get (time) : 0.
-				),
-				!timeToAccrualMap.containsKey (time) || isMaturity ?
-					VertexAccrual.Zero() : timeToAccrualMap.get (time)
+				spotDate.addDays ((int) (365.25 * time + 0.5)),
+				(isPrincipalPayDown ? timeToPrincipalPaydownMap.get (time) : (isMaturity ? 1. : 0.)) +
+					(isFullCoupon ? payTimeToFullCouponMap.get (time) : 0.),
+				isAccrual ? timeToAccrualMap.get (time) : VertexAccrual.Zero(),
+				eventFlags + "]"
 			);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -192,69 +222,96 @@ public class FullBondEvaluator
 	}
 
 	/**
-	 * Roll the List of <i>SegmentCouponMeasures</i> Instances Backwards
+	 * Roll the List of <i>SliceElastic</i> Instances Backwards
 	 * 
 	 * @param spotDate Spot Date
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @return List of <i>SegmentCouponMeasures</i> Instances Backwards
+	 * @return List of <i>SliceElastic</i> Instances Backwards
 	 */
 
-	public List<SegmentElastic> rollBackwards (
+	public List<SliceElastic> backwardsInduction (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
-		EventPillarTimeComposite eventPillarTimeComposite = EventPillarTimeComposite.Standard (
-			spotDate,
-			_underlying,
-			kalotayWilliamsFabozzi
-		);
+		VertexEventComposite vertexEventComposite =
+			VertexEventComposite.Standard (spotDate, _underlying, kalotayWilliamsFabozzi);
 
-		if (null == eventPillarTimeComposite) {
+		if (null == vertexEventComposite) {
 			return null;
 		}
 
+		double rightVertexTime = Double.NaN;
+
 		boolean isPut = _underlying.putable();
 
-		double rightTime = Double.NaN;
-		SegmentElastic previousSegmentElastic = null;
-
-		List<SegmentElastic> segmentElasticList = new ArrayList<SegmentElastic>();
-
-		TreeMap<Double, Double> exerciseTimeToPriceMap = eventPillarTimeComposite.exerciseTimeToPriceMap();
+		List<SliceElastic> sliceElasticList = new ArrayList<SliceElastic>();
 
 		double maturityTime = ((double) (_underlying.maturityDate().julian() - spotDate.julian())) / 365.25;
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToPeriodStateListMap =
-			eventPillarTimeComposite.timeToPeriodStateListMap();
+		TreeMap<Double, Double> exerciseTimeToPriceMap = vertexEventComposite.exerciseTimeToCleanPriceMap();
 
-		for (double leftTime : timeToPeriodStateListMap.descendingKeySet()) {
-			if (maturityTime <= leftTime) {
-				rightTime = leftTime;
+		TreeMap<Double, List<SegmentElastic>> timeToSegmentElasticListMap =
+			vertexEventComposite.timeToSegmentElasticListMap();
+
+		double peakPillarTime = timeToSegmentElasticListMap.lastKey();
+
+		VertexElastic rightVertexElastic = maturityTime <= peakPillarTime ? null :
+			VertexElastic.Terminal (
+				MakeVertexInelastic (
+					rightVertexTime = maturityTime,
+					spotDate,
+					vertexEventComposite,
+					true,
+					exerciseTimeToPriceMap.containsKey (rightVertexTime)
+				),
+				timeToSegmentElasticListMap.get (
+					peakPillarTime
+				).size()
+			);
+
+		for (double leftVertexTime : timeToSegmentElasticListMap.descendingKeySet()) {
+			if (maturityTime <= leftVertexTime) {
+				rightVertexTime = maturityTime;
 				continue;
 			}
 
-			List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
-				timeToPeriodStateListMap.get (rightTime);
+			List<SegmentElastic> segmentElasticList =
+				timeToSegmentElasticListMap.containsKey (rightVertexTime) ?
+				timeToSegmentElasticListMap.get (rightVertexTime) :
+				kalotayWilliamsFabozzi.bespokeSegmentElasticList (rightVertexTime);
 
-			SegmentElastic segmentElastic = SegmentElastic.Standard (
-				MakeVertexInelastic (leftTime, eventPillarTimeComposite, false),
-				null == previousSegmentElastic ? VertexElastic.Terminal (
-					MakeVertexInelastic (rightTime, eventPillarTimeComposite, true),
-					kalotayWilliamsFabozziPeriodStateList.size()
-				) : previousSegmentElastic.leftVertexElastic(),
-				kalotayWilliamsFabozziPeriodStateList,
+			SliceElastic sliceElastic = SliceElastic.Standard (
+				MakeVertexInelastic (
+					leftVertexTime,
+					spotDate,
+					vertexEventComposite,
+					false,
+					exerciseTimeToPriceMap.containsKey (leftVertexTime)
+				),
+				null == rightVertexElastic ? VertexElastic.Terminal (
+					MakeVertexInelastic (
+						rightVertexTime,
+						spotDate,
+						vertexEventComposite,
+						true,
+						exerciseTimeToPriceMap.containsKey (rightVertexTime)
+					),
+					segmentElasticList.size()
+				) : rightVertexElastic,
+				segmentElasticList,
 				isPut,
 				exerciseTimeToPriceMap
 			);
 
-			segmentElasticList.add (segmentElastic);
+			rightVertexElastic = sliceElastic.leftVertexElastic();
 
-			previousSegmentElastic = segmentElastic;
-			rightTime = leftTime;
+			sliceElasticList.add (sliceElastic);
+
+			rightVertexTime = leftVertexTime;
 		}
 
-		return segmentElasticList;
+		return sliceElasticList;
 	}
 
 	/**
@@ -279,52 +336,49 @@ public class FullBondEvaluator
 	}
 
 	/**
-	 * Construct the Bond Value Tree using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
+	 * Construct the Bond Value Grid using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
 	 * @param spotDate Spot Date
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @return Bond Value Tree
+	 * @return Bond Value Grid
 	 */
 
-	@Override public TreeMap<Double, List<Double>> valueTree (
+	@Override public ValueGrid valueGrid (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
-		List<SegmentElastic> segmentElasticList = rollBackwards (spotDate, kalotayWilliamsFabozzi);
-
-		if (null == segmentElasticList || segmentElasticList.isEmpty()) {
-			return null;
+		try {
+			return new FullBondValueGrid (backwardsInduction (spotDate, kalotayWilliamsFabozzi));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
+		return null;
+	}
 
-		for (SegmentElastic segmentElastic : segmentElasticList) {
-			List<Double> forwardLeftPVList = new ArrayList<Double>();
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
 
-			VertexElastic leftVertexElastic = segmentElastic.leftVertexElastic();
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " {Underlying Bond: " + _underlying.name() + "}";
+	}
 
-			for (double forwardLeftPV : leftVertexElastic.pvArray()) {
-				forwardLeftPVList.add (forwardLeftPV);
-			}
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
 
-			valueTree.put (leftVertexElastic.inelastic().time(), forwardLeftPVList);
-		}
-
-		List<Double> cashFlowList = new ArrayList<Double>();
-
-		SegmentElastic leadingSegmentElastic = segmentElasticList.get (segmentElasticList.size() - 1);
-
-		VertexElastic leadingVertexElastic = leadingSegmentElastic.leftVertexElastic();
-
-		cashFlowList.add (
-			leadingVertexElastic.pvArray()[0] / (
-				1. + leadingSegmentElastic.flatYieldArray()[0] * leadingVertexElastic.inelastic().time()
-			)
-		);
-
-		valueTree.put (0., cashFlowList);
-
-		return valueTree;
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

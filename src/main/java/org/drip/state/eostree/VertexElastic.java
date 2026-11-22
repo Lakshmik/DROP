@@ -1,6 +1,8 @@
 
 package org.drip.state.eostree;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
@@ -78,9 +80,9 @@ package org.drip.state.eostree;
  */
 
 /**
- * <i>VertexElastic</i> holds the Path-dependent Vertex Properties of a Single Event Pillar Segment built
- * 	according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded
- *  Options. The References are:
+ * <i>VertexElastic</i> holds the Path-dependent Vertex Properties of a Single Slice Vertex with Pillar
+ *  Segments built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds
+ *  with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -120,8 +122,9 @@ package org.drip.state.eostree;
 
 public class VertexElastic
 {
-	private double[] _pvArray = null;
 	private VertexInelastic _inelastic = null;
+	private double[] _preExerciseDirtyPVArray = null;
+	private double[] _postExerciseDirtyPVArray = null;
 
 	/**
 	 * Retrieve the Terminal <i>VertexElastic</i> Instance
@@ -149,7 +152,7 @@ public class VertexElastic
 		}
 
 		try {
-			return new VertexElastic (inelastic, pvArray);
+			return new VertexElastic (inelastic, pvArray, pvArray);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -161,17 +164,24 @@ public class VertexElastic
 	 * <i>VertexElastic</i> Constructor
 	 * 
 	 * @param inelastic Underlying <i>VertexInelastic</i> Instance
-	 * @param pvArray Vertex PV Array
+	 * @param postExerciseDirtyPVArray Vertex Post-exercise Dirty PV Array
+	 * @param preExerciseDirtyPVArray Vertex Post-exercise Dirty PV Array
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public VertexElastic (
 		final VertexInelastic inelastic,
-		final double[] pvArray)
+		final double[] postExerciseDirtyPVArray,
+		final double[] preExerciseDirtyPVArray)
 		throws Exception
 	{
-		if (null == (_inelastic = inelastic) || null == (_pvArray = pvArray) || 0 == _pvArray.length) {
+		if (null == (_inelastic = inelastic) ||
+			null == (_postExerciseDirtyPVArray = postExerciseDirtyPVArray) ||
+				0 == _postExerciseDirtyPVArray.length || !NumberUtil.IsValid (_postExerciseDirtyPVArray) ||
+			null == (_preExerciseDirtyPVArray = preExerciseDirtyPVArray) ||
+				0 == _preExerciseDirtyPVArray.length || !NumberUtil.IsValid (_preExerciseDirtyPVArray))
+		{
 			throw new Exception ("VertexElastic Constructor => Invalid Inputs");
 		}
 	}
@@ -188,32 +198,91 @@ public class VertexElastic
 	}
 
 	/**
-	 * Retrieve the Vertex PV Array
+	 * Retrieve the Vertex Post-exercise Dirty PV Array
 	 * 
-	 * @return Vertex PV Array
+	 * @return Vertex Post-exercise Dirty PV Array
 	 */
 
-	public double[] pvArray()
+	public double[] postExerciseDirtyPVArray()
 	{
-		return _pvArray;
+		return _postExerciseDirtyPVArray;
 	}
 
 	/**
-	 * Retrieve the Vertex Clean PV Array
+	 * Retrieve the Vertex Pre-exercise Dirty PV Array
 	 * 
-	 * @return Vertex Clean PV Array
+	 * @return Vertex Pre-exercise Dirty PV Array
 	 */
 
-	public double[] cleanPVArray()
+	public double[] preExerciseDirtyPVArray()
 	{
-		double[] cleanPVArray = new double[_pvArray.length];
+		return _preExerciseDirtyPVArray;
+	}
+
+	/**
+	 * Retrieve the Vertex Post-exercise Clean PV Array
+	 * 
+	 * @return Vertex Post-exercise Clean PV Array
+	 */
+
+	public double[] postExerciseCleanPVArray()
+	{
+		double[] postExerciseCleanPVArray = new double[_postExerciseDirtyPVArray.length];
 
 		double accruedAmount = _inelastic.accrual().amount();
 
-		for (int i = 0; i < _pvArray.length; ++i) {
-			cleanPVArray[i] = _pvArray[i] - accruedAmount;
+		for (int i = 0; i < _postExerciseDirtyPVArray.length; ++i) {
+			postExerciseCleanPVArray[i] = _postExerciseDirtyPVArray[i] - accruedAmount;
 		}
 
-		return cleanPVArray;
+		return postExerciseCleanPVArray;
+	}
+
+	/**
+	 * Retrieve the Vertex Pre-exercise Clean PV Array
+	 * 
+	 * @return Vertex Pre-exercise Clean PV Array
+	 */
+
+	public double[] preExerciseCleanPVArray()
+	{
+		double[] preExerciseCleanPVArray = new double[_preExerciseDirtyPVArray.length];
+
+		double accruedAmount = _inelastic.accrual().amount();
+
+		for (int i = 0; i < _postExerciseDirtyPVArray.length; ++i) {
+			preExerciseCleanPVArray[i] = _preExerciseDirtyPVArray[i] - accruedAmount;
+		}
+
+		return preExerciseCleanPVArray;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " (Inelastic: " + _inelastic.toString() +
+			"; Post-exercise Dirty PV Array: " +
+				NumberUtil.ArrayRow (_postExerciseDirtyPVArray, 1, 4, false) +
+				"; Pre-exercise Dirty PV Array: " +
+				NumberUtil.ArrayRow (_preExerciseDirtyPVArray, 1, 4, false) + ")";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

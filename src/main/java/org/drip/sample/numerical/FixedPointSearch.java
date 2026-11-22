@@ -390,7 +390,7 @@ public class FixedPointSearch
 				double variateInfinitesimal = Double.NaN;
 
 				try {
-					variateInfinitesimal = _dc.getVariateInfinitesimal (variate);
+					variateInfinitesimal = _derivativeControl.getVariateInfinitesimal (variate);
 				} catch (Exception e) {
 					e.printStackTrace();
 

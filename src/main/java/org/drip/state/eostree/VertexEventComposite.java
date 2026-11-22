@@ -2,6 +2,7 @@
 package org.drip.state.eostree;
 
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.drip.analytics.cashflow.CompositePeriod;
@@ -12,7 +13,7 @@ import org.drip.product.credit.BondComponent;
 import org.drip.product.params.EmbeddedOptionSchedule;
 import org.drip.product.params.NotionalSetting;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -91,9 +92,9 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
  */
 
 /**
- * <i>EventPillarTimeComposite</i> holds the Composite of the Single Coupon/Exercise/Principal Tree Segments
- * 	built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with
- * 	Embedded Options. The References are:
+ * <i>VertexEventComposite</i> holds the Composite of the Single Coupon/Accrual/MaturityExercise/Principal
+ *  Vertex Events built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing
+ *  bonds with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -131,17 +132,18 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
  * @author Lakshmi Krishnamurthy
  */
 
-public class EventPillarTimeComposite
+public class VertexEventComposite
 {
 	private boolean _isPut = false;
-	private TreeMap<Double, Double> _timeToFullCouponMap = null;
-	private TreeMap<Double, Double> _exerciseTimeToPriceMap = null;
+	private Set<Double> _pillarTimeSet = null;
+	private TreeMap<Double, Double> _payTimeToFullCouponMap = null;
 	private TreeMap<Double, VertexAccrual> _timeToAccrualMap = null;
 	private TreeMap<Double, Double> _timeToPrincipalPaydownMap = null;
-	private TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> _timeToPeriodStateListMap = null;
+	private TreeMap<Double, Double> _exerciseTimeToCleanPriceMap = null;
+	private TreeMap<Double, List<SegmentElastic>> _timeToSegmentElasticListMap = null;
 
 	private static final boolean FromCoupons (
-		final EventPillarTimeComposite eventPillarTimeComposite,
+		final VertexEventComposite vertexEventComposite,
 		final int spotDateJulian,
 		final BondComponent bond,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
@@ -166,17 +168,17 @@ public class EventPillarTimeComposite
 			double payTime = (payDateJulian - spotDateJulian) / 365.25;
 
 			try {
-				if (!eventPillarTimeComposite.containsTime (payTime) &&
-					!eventPillarTimeComposite.addStateList (
+				if (!vertexEventComposite.containsTime (payTime) &&
+					!vertexEventComposite.addStateList (
 						payTime,
-						kalotayWilliamsFabozzi.bespokePeriodStateList (payTime)
+						kalotayWilliamsFabozzi.bespokeSegmentElasticList (payTime)
 					)
 				)
 				{
 					return false;
 				}
 
-				if (!eventPillarTimeComposite.addFullCoupon (
+				if (!vertexEventComposite.addFullCoupon (
 					payTime,
 					couponRate * bond.notional (compositePeriod.endDate()) * compositePeriod.couponDCF()
 				))
@@ -194,7 +196,7 @@ public class EventPillarTimeComposite
 	}
 
 	private static final boolean FromNotionalSchedule (
-		final EventPillarTimeComposite eventPillarTimeComposite,
+		final VertexEventComposite vertexEventComposite,
 		final int spotDateJulian,
 		final int maturityDateJulian,
 		final NotionalSetting notionalSetting,
@@ -206,10 +208,10 @@ public class EventPillarTimeComposite
 		if (null == outstandingFactorSchedule) {
 			double maturityTime = (maturityDateJulian - spotDateJulian) / 365.25;
 
-			return eventPillarTimeComposite.containsTime (maturityTime) ||
-				eventPillarTimeComposite.addStateList (
+			return vertexEventComposite.containsTime (maturityTime) ||
+				vertexEventComposite.addStateList (
 					maturityTime,
-					kalotayWilliamsFabozzi.bespokePeriodStateList (maturityTime)
+					kalotayWilliamsFabozzi.bespokeSegmentElasticList (maturityTime)
 				);
 		}
 
@@ -229,12 +231,12 @@ public class EventPillarTimeComposite
 			if (
 				(
 					priorOutstandingFactor != outstandingFactorArray[dateIndex] &&
-					!eventPillarTimeComposite.containsTime (notionalTime) &&
-					!eventPillarTimeComposite.addStateList (
+					!vertexEventComposite.containsTime (notionalTime) &&
+					!vertexEventComposite.addStateList (
 						notionalTime,
-						kalotayWilliamsFabozzi.bespokePeriodStateList (notionalTime)
+						kalotayWilliamsFabozzi.bespokeSegmentElasticList (notionalTime)
 					)
-				) || !eventPillarTimeComposite.addPrincipalPaydown (
+				) || !vertexEventComposite.addPrincipalPaydown (
 					notionalTime,
 					priorOutstandingFactor - outstandingFactorArray[dateIndex]
 				)
@@ -250,7 +252,7 @@ public class EventPillarTimeComposite
 	}
 
 	private static final boolean FromEOS (
-		final EventPillarTimeComposite eventPillarTimeComposite,
+		final VertexEventComposite vertexEventComposite,
 		final int spotDateJulian,
 		final EmbeddedOptionSchedule embeddedOptionSchedule,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
@@ -272,12 +274,12 @@ public class EventPillarTimeComposite
 
 			if (
 				(
-					!eventPillarTimeComposite.containsTime (exerciseTime) &&
-					!eventPillarTimeComposite.addStateList (
+					!vertexEventComposite.containsTime (exerciseTime) &&
+					!vertexEventComposite.addStateList (
 						exerciseTime,
-						kalotayWilliamsFabozzi.bespokePeriodStateList (exerciseTime)
+						kalotayWilliamsFabozzi.bespokeSegmentElasticList (exerciseTime)
 					)
-				) || !eventPillarTimeComposite.addExercise (
+				) || !vertexEventComposite.addExercise (
 					exerciseTime,
 					exerciseFactorArray[exerciseIndex]
 				)
@@ -287,25 +289,29 @@ public class EventPillarTimeComposite
 			}
 		}
 
-		return eventPillarTimeComposite.isPut (embeddedOptionSchedule.isPut());
+		return vertexEventComposite.isPut (embeddedOptionSchedule.isPut());
 	}
 
 	private static final boolean FromAccrual (
-		final EventPillarTimeComposite eventPillarTimeComposite,
+		final VertexEventComposite vertexEventComposite,
 		final JulianDate spotDate,
 		final BondComponent bond)
 	{
 		double couponRate = bond.couponSetting().couponRate();
 
-		for (double endTime : eventPillarTimeComposite.timeToPeriodStateListMap().keySet()) {
-			int dateJulian = spotDate.addDays ((int) (endTime * 365.25)).julian();
+		if (0. == couponRate) {
+			return true;
+		}
+
+		for (double vertexTime : vertexEventComposite.timeToSegmentElasticListMap().descendingKeySet()) {
+			int dateJulian = spotDate.addDays ((int) (vertexTime * 365.25)).julian();
 
 			CompositePeriod containingPeriod = bond.containingPeriod (dateJulian);
 
 			if (null != containingPeriod) {
 				try {
-					if (!eventPillarTimeComposite.addAccrual (
-						endTime,
+					if (!vertexEventComposite.addAccrual (
+						vertexTime,
 						new VertexAccrual (
 							containingPeriod.accrualDCF (dateJulian),
 							couponRate,
@@ -327,16 +333,16 @@ public class EventPillarTimeComposite
 	}
 
 	/**
-	 * Construct a Standard Instance of <i>EventPillarTimeComposite</i>
+	 * Construct a Standard Instance of <i>VertexEventComposite</i>
 	 * 
 	 * @param spotDate Spot Date
 	 * @param bond Bond
 	 * @param kalotayWilliamsFabozzi The <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @return Standard Instance of <i>EventPillarTimeComposite</i>
+	 * @return Standard Instance of <i>VertexEventComposite</i>
 	 */
 
-	public static final EventPillarTimeComposite Standard (
+	public static final VertexEventComposite Standard (
 		final JulianDate spotDate,
 		final BondComponent bond,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
@@ -345,15 +351,23 @@ public class EventPillarTimeComposite
 			return null;
 		}
 
-		EventPillarTimeComposite eventPillarTimeComposite = new EventPillarTimeComposite();
+		TreeMap<Double, List<SegmentElastic>> pillarTimeToSegmentElasticListMap =
+			kalotayWilliamsFabozzi.pillarTimeToSegmentElasticListMap();
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
+		VertexEventComposite vertexEventComposite = null;
 
-		for (double endTime : timeToProjectedPeriodStateMap.keySet()) {
-			if (!eventPillarTimeComposite.addStateList (
-				endTime,
-				timeToProjectedPeriodStateMap.get (endTime)
+		try {
+			vertexEventComposite = new VertexEventComposite (pillarTimeToSegmentElasticListMap.keySet());
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+
+		for (double pillarTime : pillarTimeToSegmentElasticListMap.keySet()) {
+			if (!vertexEventComposite.addStateList (
+				pillarTime,
+				pillarTimeToSegmentElasticListMap.get (pillarTime)
 			))
 			{
 				return null;
@@ -363,12 +377,12 @@ public class EventPillarTimeComposite
 		int spotDateJulian = spotDate.julian();
 
 		if (!FromCoupons (
-			eventPillarTimeComposite,
+			vertexEventComposite,
 			spotDateJulian,
 			bond,
 			kalotayWilliamsFabozzi
 		) || !FromNotionalSchedule (
-			eventPillarTimeComposite,
+			vertexEventComposite,
 			spotDateJulian,
 			bond.maturityDate().julian(),
 			bond.notionalSetting(),
@@ -381,54 +395,75 @@ public class EventPillarTimeComposite
 		EmbeddedOptionSchedule embeddedOptionSchedule = bond.callSchedule();
 
 		return FromEOS (
-			eventPillarTimeComposite,
+			vertexEventComposite,
 			spotDateJulian,
 			null == embeddedOptionSchedule ? bond.putSchedule() : embeddedOptionSchedule,
 			kalotayWilliamsFabozzi
 		) && FromAccrual (
-			eventPillarTimeComposite,
+			vertexEventComposite,
 			spotDate,
 			bond
-		) ? eventPillarTimeComposite : null;
+		) ? vertexEventComposite : null;
 	}
 
 	/**
-	 * Empty <i>EventPillarTimeComposite</i> Constructor
+	 * <i>VertexEventComposite</i> Constructor
+	 * 
+	 * @param pillarTimeSet Set of Calibration Time Pillars
+	 * 
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public EventPillarTimeComposite()
+	public VertexEventComposite (
+		final Set<Double> pillarTimeSet)
+		throws Exception
 	{
-		_timeToFullCouponMap = new TreeMap<Double, Double>();
+		if (null == (_pillarTimeSet = pillarTimeSet) || _pillarTimeSet.isEmpty()) {
+			throw new Exception ("VertexEventComposite Constructor => Invalid Inputs");
+		}
 
-		_exerciseTimeToPriceMap = new TreeMap<Double, Double>();
+		_payTimeToFullCouponMap = new TreeMap<Double, Double>();
 
 		_timeToAccrualMap = new TreeMap<Double, VertexAccrual>();
 
 		_timeToPrincipalPaydownMap = new TreeMap<Double, Double>();
 
-		_timeToPeriodStateListMap = new TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>>();
+		_exerciseTimeToCleanPriceMap = new TreeMap<Double, Double>();
+
+		_timeToSegmentElasticListMap = new TreeMap<Double, List<SegmentElastic>>();
 	}
 
 	/**
-	 * Retrieve the Map of Time to Exercise Price
+	 * Retrieve the Set of Calibration Pillar Times
 	 * 
-	 * @return Map of Time to Exercise Price
+	 * @return Set of Calibration Pillar Times
 	 */
 
-	public TreeMap<Double, Double> exerciseTimeToPriceMap()
+	public Set<Double> pillarTimeSet()
 	{
-		return _exerciseTimeToPriceMap;
+		return _pillarTimeSet;
 	}
 
 	/**
-	 * Retrieve the Map of Time to Full Coupon
+	 * Retrieve the Map of Pay Time to Exercise Price
 	 * 
-	 * @return Map of Time to Full Coupon
+	 * @return Map of Pay Time to Exercise Price
 	 */
 
-	public TreeMap<Double, Double> timeToFullCouponMap()
+	public TreeMap<Double, Double> exerciseTimeToCleanPriceMap()
 	{
-		return _timeToFullCouponMap;
+		return _exerciseTimeToCleanPriceMap;
+	}
+
+	/**
+	 * Retrieve the Map of Pay Time to Full Coupon
+	 * 
+	 * @return Map of Pay Time to Full Coupon
+	 */
+
+	public TreeMap<Double, Double> payTimeToFullCouponMap()
+	{
+		return _payTimeToFullCouponMap;
 	}
 
 	/**
@@ -454,14 +489,14 @@ public class EventPillarTimeComposite
 	}
 
 	/**
-	 * Retrieve the Map of Time to <i>KalotayWilliamsFabozziPeriodState</i> List
+	 * Retrieve the Map of Time to <i>SegmentElastic</i> List
 	 * 
-	 * @return Map of Time to <i>KalotayWilliamsFabozziPeriodState</i> List
+	 * @return Map of Time to <i>SegmentElastic</i> List
 	 */
 
-	public TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToPeriodStateListMap()
+	public TreeMap<Double, List<SegmentElastic>> timeToSegmentElasticListMap()
 	{
-		return _timeToPeriodStateListMap;
+		return _timeToSegmentElasticListMap;
 	}
 
 	/**
@@ -476,26 +511,25 @@ public class EventPillarTimeComposite
 	}
 
 	/**
-	 * Add the List of <i>KalotayWilliamsFabozziPeriodState</i> Instances at the Time Node
+	 * Add the List of <i>SegmentElastic</i> Instances at the Time Node
 	 * 
 	 * @param time Time
-	 * @param periodStateList List of <i>KalotayWilliamsFabozziPeriodState</i> Instances
+	 * @param segmentElasticList List of <i>SegmentElastic</i> Instances
 	 * 
-	 * @return TRUE - List of <i>KalotayWilliamsFabozziPeriodState</i> Instances at the Time Node
-	 * 		   successfully added
+	 * @return TRUE - List of <i>SegmentElastic</i> Instances at the Time Node successfully added
 	 */
 
 	public boolean addStateList (
 		final double time,
-		final List<KalotayWilliamsFabozziPeriodState> periodStateList)
+		final List<SegmentElastic> segmentElasticList)
 	{
 		if (!NumberUtil.IsValid (time) || 0. > time ||
-			null == periodStateList || 0 == periodStateList.size())
+			null == segmentElasticList || 0 == segmentElasticList.size())
 		{
 			return false;
 		}
 
-		_timeToPeriodStateListMap.put (time, periodStateList);
+		_timeToSegmentElasticListMap.put (time, segmentElasticList);
 
 		return true;
 	}
@@ -503,7 +537,7 @@ public class EventPillarTimeComposite
 	/**
 	 * Add an Exercise Time/Price Node
 	 * 
-	 * @param time Time
+	 * @param time Exercise Time
 	 * @param price Exercise Price
 	 * 
 	 * @return TRUE - Exercise Time/Price Node successfully added
@@ -517,7 +551,7 @@ public class EventPillarTimeComposite
 			return false;
 		}
 
-		_exerciseTimeToPriceMap.put (time, price);
+		_exerciseTimeToCleanPriceMap.put (time, price);
 
 		return true;
 	}
@@ -525,21 +559,21 @@ public class EventPillarTimeComposite
 	/**
 	 * Add a Full Coupon Node
 	 * 
-	 * @param time Time
+	 * @param payTime Pay Time
 	 * @param fullCoupon Full Coupon
 	 * 
 	 * @return TRUE - Full Coupon Node successfully added
 	 */
 
 	public boolean addFullCoupon (
-		final double time,
+		final double payTime,
 		final double fullCoupon)
 	{
-		if (!NumberUtil.IsValid (time) || 0. > time || !NumberUtil.IsValid (fullCoupon)) {
+		if (!NumberUtil.IsValid (payTime) || 0. > payTime || !NumberUtil.IsValid (fullCoupon)) {
 			return false;
 		}
 
-		_timeToFullCouponMap.put (time, fullCoupon);
+		_payTimeToFullCouponMap.put (payTime, fullCoupon);
 
 		return true;
 	}
@@ -614,7 +648,7 @@ public class EventPillarTimeComposite
 	public boolean containsTime (
 		final double time)
 	{
-		return NumberUtil.IsValid (time) && _timeToPeriodStateListMap.containsKey (time);
+		return NumberUtil.IsValid (time) && _timeToSegmentElasticListMap.containsKey (time);
 	}
 
 	/**
@@ -628,6 +662,50 @@ public class EventPillarTimeComposite
 	public boolean isExerciseNode (
 		final double time)
 	{
-		return NumberUtil.IsValid (time) && _exerciseTimeToPriceMap.containsKey (time);
+		return NumberUtil.IsValid (time) && _exerciseTimeToCleanPriceMap.containsKey (time);
+	}
+
+	/**
+	 * Indicate if the Time corresponds to a Calibration Pillar
+	 * 
+	 * @param time Time Key
+	 * 
+	 * @return TRUE - Time corresponds to a Calibration Pillar
+	 */
+
+	public boolean isCalibrationPillar (
+		final double time)
+	{
+		return NumberUtil.IsValid (time) && _pillarTimeSet.contains (time);
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " [Pay Time to Full Coupon Map: " + _payTimeToFullCouponMap +
+			"; Time to Accrual Map: " + _timeToAccrualMap +
+			"; Time to Principal Paydown Map: " + _timeToPrincipalPaydownMap +
+			"; Time to Segment Elastic List Map: " + _timeToSegmentElasticListMap +
+			"; Calibration Pillar Time Set: " + _pillarTimeSet +
+			"; Exercise Time To Price Map: " + _exerciseTimeToCleanPriceMap + "]";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

@@ -3,6 +3,7 @@ package org.drip.state.municipal;
 
 import org.drip.function.r1tor1solver.FixedPointFinderOutput;
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -213,5 +214,32 @@ public class CalibrateAndSensitivity
 	public double secondDerivative()
 	{
 		return _secondDerivative;
+	}
+
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @param prefix Prefix
+	 * 
+	 * @return String Version of the State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + "Calibrated State: " + FormatUtil.FormatDouble (_calibratedState, 1, 5, 1.) +
+			"; First Derivative: " + FormatUtil.FormatDouble (_firstDerivative, 1, 5, 1.) +
+			"; Second Derivative: " + FormatUtil.FormatDouble (_secondDerivative, 1, 5, 1.);
+	}
+
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @return String Version of the State
+	 */
+
+	@Override public String toString()
+	{
+		return toString ("");
 	}
 }

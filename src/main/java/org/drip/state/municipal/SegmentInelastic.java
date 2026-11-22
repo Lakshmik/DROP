@@ -81,10 +81,10 @@ import org.drip.service.common.FormatUtil;
  */
 
 /**
- * <i>ZeroVolatilityPeriodState</i> augments the Period's Inferred State Metrics with the Market Yield. The
- * 	References are:
+ * <i>SegmentInelastic</i> implements a Segment in the Kalotay, Williams, and Fabozzi (1993) Tree-based Model
+ * 	for valuing bonds with Embedded Options. The References are:
  *  
- * 	<br><br>
+ * 	<br>
  *  <ul>
  * 		<li>
  * 			Black, F., E. Derman, and W. Toy (1990): A One-Factor Model of Interest Rates and Its Application
@@ -120,47 +120,137 @@ import org.drip.service.common.FormatUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class ZeroVolatilityPeriodState
-	extends KalotayWilliamsFabozziPeriodState
+public class SegmentInelastic
 {
-	private double _cumulativeMarketYield = Double.NaN;
+	private double _endTime = Double.NaN;
+	private double _startTime = Double.NaN;
 
 	/**
-	 * <i>ZeroVolatilityPeriodState</i> Constructor
+	 * <i>SegmentInelastic</i> Constructor
 	 * 
-	 * @param period <i>KalotayWilliamsFabozziPeriod</i> Instance
-	 * @param forwardYield Forward Yield
-	 * @param forwardDiscountFactor Forward Discount Factor
-	 * @param cumulativeDiscountFactor Cumulative Discount Factor
-	 * @param cumulativeMarketYield Cumulative Market Yield
+	 * @param startTime Start Time of the Period
+	 * @param endTime End Time of the Period
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public ZeroVolatilityPeriodState (
-		final KalotayWilliamsFabozziPeriod period,
-		final double forwardYield,
-		final double forwardDiscountFactor,
-		final double cumulativeDiscountFactor,
-		final double cumulativeMarketYield)
+	public SegmentInelastic (
+		final double startTime,
+		final double endTime)
 		throws Exception
 	{
-		super (period, forwardYield, forwardDiscountFactor, cumulativeDiscountFactor);
-
-		if (!NumberUtil.IsValid (_cumulativeMarketYield = cumulativeMarketYield)) {
-			throw new Exception ("ZeroVolatilityPeriodState Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_startTime = startTime) ||
+			!NumberUtil.IsValid (_endTime = endTime) ||
+			_endTime <= _startTime)
+		{
+			throw new Exception ("SegmentInelastic Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Cumulative Market Yield
+	 * Retrieve the Start Time of the Period
 	 * 
-	 * @return Cumulative Market Yield
+	 * @return Start Time of the Period
 	 */
 
-	public double cumulativeMarketYield()
+	public double startTime()
 	{
-		return _cumulativeMarketYield;
+		return _startTime;
+	}
+
+	/**
+	 * Retrieve the End Time of the Period
+	 * 
+	 * @return End Time of the Period
+	 */
+
+	public double endTime()
+	{
+		return _endTime;
+	}
+
+	/**
+	 * Indicate if the Time is inside the period (exclusive, exclusive)
+	 * 
+	 * @param time Time
+	 * 
+	 * @return TRUE - Time is inside the period (exclusive, exclusive)
+	 * 
+	 * @throws Exception Thrown if the Input is invalid
+	 */
+
+	public boolean in00 (
+		final double time)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (time)) {
+			throw new Exception ("SegmentInelastic::in00 => Invalid Inputs");
+		}
+
+		return time > _startTime && time < _endTime;
+	}
+
+	/**
+	 * Indicate if the Time is inside the period (inclusive, exclusive)
+	 * 
+	 * @param time Time
+	 * 
+	 * @return TRUE - Time is inside the period (inclusive, exclusive)
+	 * 
+	 * @throws Exception Thrown if the Input is invalid
+	 */
+
+	public boolean in10 (
+		final double time)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (time)) {
+			throw new Exception ("SegmentInelastic::in10 => Invalid Inputs");
+		}
+
+		return time >= _startTime && time < _endTime;
+	}
+
+	/**
+	 * Indicate if the Time is inside the period (exclusive, inclusive)
+	 * 
+	 * @param time Time
+	 * 
+	 * @return TRUE - Time is inside the period (exclusive, inclusive)
+	 * 
+	 * @throws Exception Thrown if the Input is invalid
+	 */
+
+	public boolean in01 (
+		final double time)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (time)) {
+			throw new Exception ("SegmentInelastic::in01 => Invalid Inputs");
+		}
+
+		return time > _startTime && time <= _endTime;
+	}
+
+	/**
+	 * Indicate if the Time is inside the period (inclusive, inclusive)
+	 * 
+	 * @param time Time
+	 * 
+	 * @return TRUE - Time is inside the period (inclusive, inclusive)
+	 * 
+	 * @throws Exception Thrown if the Input is invalid
+	 */
+
+	public boolean in11 (
+		final double time)
+		throws Exception
+	{
+		if (!NumberUtil.IsValid (time)) {
+			throw new Exception ("SegmentInelastic::in11 => Invalid Inputs");
+		}
+
+		return time >= _startTime && time <= _endTime;
 	}
 
 	/**
@@ -169,16 +259,10 @@ public class ZeroVolatilityPeriodState
 	 * @return The Cloned Instance
 	 */
 
-	@Override public ZeroVolatilityPeriodState clone()
+	@Override public SegmentInelastic clone()
 	{
 		try {
-			return new ZeroVolatilityPeriodState (
-				period().clone(),
-				forwardYield(),
-				forwardDiscountFactor(),
-				cumulativeEndDiscountFactor(),
-				_cumulativeMarketYield
-			);
+			return new SegmentInelastic (_startTime, _endTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -197,12 +281,8 @@ public class ZeroVolatilityPeriodState
 	public String toString (
 		final String prefix)
 	{
-		return prefix + "Period => " + period() +
-			"; Forward Yield => " + FormatUtil.FormatDouble (forwardYield(), 1, 6, 1.) +
-			"; Forward Discount Factor => " + FormatUtil.FormatDouble (forwardDiscountFactor(), 1, 6, 1.) +
-			"; Cumulative Discount Factor => " +
-				FormatUtil.FormatDouble (cumulativeEndDiscountFactor(), 1, 6, 1.) +
-			"; Cumulative Market Yield => " + FormatUtil.FormatDouble (_cumulativeMarketYield, 1, 6, 1.);
+		return prefix + " {Start Time => " + FormatUtil.FormatDouble (_startTime, 2, 5, 1., false) +
+			"; End Time => " + FormatUtil.FormatDouble (_endTime, 2, 5, 1., false) + "}";
 	}
 
 	/**

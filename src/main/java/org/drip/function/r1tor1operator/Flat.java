@@ -180,7 +180,7 @@ public class Flat
 		}
 
 		try {
-			return new Differential (_dc.getVariateInfinitesimal (variate), 0.);
+			return new Differential (_derivativeControl.getVariateInfinitesimal (variate), 0.);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

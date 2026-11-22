@@ -1,11 +1,21 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -80,61 +90,74 @@ package org.drip.function.definition;
  */
 
 /**
- * <i>UnitVector</i> implements the Normalized R<sup>d</sup> Unit Vector.
+ * <i>UnitVector</i> implements the Normalized R<sup>d</sup> Unit Vector. It provides the following
+ * 	Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Construct an Instance of <i>UnitVector</i> from the Input Vector</li>
+ * 		<li>Retrieve the Unit Vector's Component Array</li>
+ * 		<li>Compute the Directional Increment along the Vector</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class UnitVector {
-	private double[] _adblComponent;
+public class UnitVector
+{
+	private double[] _componentArray = null;
 
 	/**
-	 * Construct an Instance of the Unit Vector from the Input Vector
+	 * Construct an Instance of <i>UnitVector</i> from the Input Vector
 	 * 
-	 * @param adbl The Input Double Vector
+	 * @param doubleArray The Input Double Vector
 	 * 
-	 * @return The Unit Vector Instance
+	 * @return The <i>UnitVector</i> Instance
 	 */
 
 	public static final UnitVector Standard (
-		final double[] adbl)
+		final double[] doubleArray)
 	{
-		if (null == adbl) return null;
-
-		int iDimension = adbl.length;
-		double dblGradientModulus = 0.;
-		double[] adblComponent = new double[iDimension];
-
-		if (0 == iDimension) return null;
-
-		for (int i = 0; i < iDimension; ++i) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (adbl[i])) return null;
-
-			dblGradientModulus += adbl[i] * adbl[i];
+		if (null == doubleArray || 0 == doubleArray.length) {
+			return null;
 		}
 
-		if (0. == dblGradientModulus) return null;
+		double gradientModulus = 0.;
+		double[] componentArray = new double[doubleArray.length];
 
-		dblGradientModulus = java.lang.Math.sqrt (dblGradientModulus);
+		for (int index = 0; index < doubleArray.length; ++index) {
+			if (!NumberUtil.IsValid (doubleArray[index])) {
+				return null;
+			}
 
-		for (int i = 0; i < iDimension; ++i)
-			adblComponent[i] = adbl[i] / dblGradientModulus;
+			gradientModulus += doubleArray[index] * doubleArray[index];
+		}
 
-		return new UnitVector (adblComponent);
+		if (0. == gradientModulus) {
+			return null;
+		}
+
+		gradientModulus = Math.sqrt (gradientModulus);
+
+		for (int index = 0; index < doubleArray.length; ++index) {
+			componentArray[index] = doubleArray[index] / gradientModulus;
+		}
+
+		return new UnitVector (componentArray);
 	}
 
 	protected UnitVector (
-		final double[] adblComponent)
+		final double[] componentArray)
 	{
-		_adblComponent = adblComponent;
+		_componentArray = componentArray;
 	}
 
 	/**
@@ -145,35 +168,40 @@ public class UnitVector {
 
 	public double[] component()
 	{
-		return _adblComponent;
+		return _componentArray;
 	}
 
 	/**
 	 * Compute the Directional Increment along the Vector
 	 * 
-	 * @param adblVariate The Starting R^d Variate
-	 * @param dblStepLength The Step Length
+	 * @param variateArray The Starting R<sup>d</sup> Variate
+	 * @param stepLength The Step Length
 	 * 
 	 * @return The Directionally Incremented Vector
 	 */
 
 	public double[] directionalIncrement (
-		final double[] adblVariate,
-		final double dblStepLength)
+		final double[] variateArray,
+		final double stepLength)
 	{
-		if (null == adblVariate || !org.drip.numerical.common.NumberUtil.IsValid (dblStepLength)) return null;
-
-		int iVariateDimension = adblVariate.length;
-		double[] adblIncrementedVariate = new double[iVariateDimension];
-
-		if (iVariateDimension != _adblComponent.length) return null;
-
-		for (int i = 0; i < iVariateDimension; ++i) {
-			if (!org.drip.numerical.common.NumberUtil.IsValid (adblVariate[i])) return null;
-
-			adblIncrementedVariate[i] = adblVariate[i] + dblStepLength * _adblComponent[i];
+		if (null == variateArray ||
+			!NumberUtil.IsValid (stepLength) ||
+			variateArray.length != _componentArray.length)
+		{
+			return null;
 		}
 
-		return adblIncrementedVariate;
+		double[] incrementedVariateArray = new double[variateArray.length];
+
+		for (int variateIndex = 0; variateIndex < variateArray.length; ++variateIndex) {
+			if (!NumberUtil.IsValid (variateArray[variateIndex])) {
+				return null;
+			}
+
+			incrementedVariateArray[variateIndex] =
+				variateArray[variateIndex] + stepLength * _componentArray[variateIndex];
+		}
+
+		return incrementedVariateArray;
 	}
 }

@@ -288,15 +288,12 @@ public class OASTermStructure
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
 
 		for (double time : timeToCalibrationYieldMapInput.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMapInput.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMapInput.get (time));
 		}
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
 		TreeMap<Double, Double> timeToYieldBasisMap = TimeToYieldBasisMap();
@@ -323,20 +320,16 @@ public class OASTermStructure
 			ProxyBondEvaluator proxyBond =
 				ProxyBondEvaluator.Callable (endTime, bondCoupon, callPriceSchedule);
 
-			double basePrice = proxyBond.valueTree (
-				null,
-				kalotayWilliamsFabozzi
-			).firstEntry().getValue().get (0);
+			double basePrice = proxyBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
 			kalotayWilliamsFabozzi.applyBasisYield (0.0001 * timeToYieldBasisMap.get (endTime));
 
-			kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+			kalotayWilliamsFabozzi.applySegmentBaseYield (
 				annualizedForwardYieldVolatility,
-				KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+				KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 			);
 
-			double bumpedPrice =
-				proxyBond.valueTree (null, kalotayWilliamsFabozzi).firstEntry().getValue().get (0);
+			double bumpedPrice = proxyBond.valueGrid (null, kalotayWilliamsFabozzi).pv();
 
 			kalotayWilliamsFabozzi.removeBasisYield();
 

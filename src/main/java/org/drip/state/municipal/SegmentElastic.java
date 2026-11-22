@@ -2,6 +2,7 @@
 package org.drip.state.municipal;
 
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -80,10 +81,9 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>BondSensitivity</i> contains the Duration and the Convexity of a Bond using the Kalotay, Williams, and
- *  Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The References are:
+ * <i>SegmentElastic</i> holds the Segment's Inferred Path Metrics. The References are:
  *  
- * 	<br>
+ * 	<br><br>
  *  <ul>
  * 		<li>
  * 			Black, F., E. Derman, and W. Toy (1990): A One-Factor Model of Interest Rates and Its Application
@@ -119,58 +119,111 @@ import org.drip.numerical.common.NumberUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class BondSensitivity
+public class SegmentElastic
 {
-	private double _duration = Double.NaN;
-	private double _convexity = Double.NaN;
-	private double _yieldBasis = Double.NaN;
-	private double _marketPrice = Double.NaN;
-	private double _theoreticalPrice = Double.NaN;
+	private double _forwardYield = Double.NaN;
+	private SegmentInelastic _inelastic = null;
+	private double _endDiscountFactor = Double.NaN;
+	private double _forwardDiscountFactor = Double.NaN;
 
 	/**
-	 * Construct the <i>BondSensitivity</i> Instance from the Market and the Yield Bump Up/Down Prices
+	 * <i>SegmentElastic</i> Constructor
 	 * 
-	 * @param theoreticalPrice Theoretical Price
-	 * @param marketPrice Market Price
-	 * @param yieldBasis Yield Basis
-	 * @param bumpUpMarketPrice Yield Bumped Up Market Price
-	 * @param bumpDownMarketPrice Yield Bumped Down Market Price
-	 * @param yieldBump Yield Bump
+	 * @param inelastic Underlying <i>SegmentInelastic</i> Instance
+	 * @param forwardYield Forward Yield
+	 * @param forwardDiscountFactor Forward Discount Factor
+	 * @param endDiscountFactor Segment End Discount Factor
 	 * 
-	 * @return <i>BondSensitivity</i> Instance
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public static final BondSensitivity FromBaseUpDown (
-		final double theoreticalPrice,
-		final double marketPrice,
-		final double yieldBasis,
-		final double bumpUpMarketPrice,
-		final double bumpDownMarketPrice,
-		final double yieldBump)
+	public SegmentElastic (
+		final SegmentInelastic inelastic,
+		final double forwardYield,
+		final double forwardDiscountFactor,
+		final double endDiscountFactor)
+		throws Exception
 	{
-		if (!NumberUtil.IsValid (marketPrice) ||
-			!NumberUtil.IsValid (bumpUpMarketPrice) ||
-			!NumberUtil.IsValid (bumpDownMarketPrice) ||
-			!NumberUtil.IsValid (yieldBump) || 0. == yieldBump)
+		if (null == (_inelastic = inelastic) ||
+			!NumberUtil.IsValid (_forwardYield = forwardYield) || 
+			!NumberUtil.IsValid (_forwardDiscountFactor = forwardDiscountFactor) ||
+				0. > _forwardDiscountFactor || 
+			!NumberUtil.IsValid (_endDiscountFactor = endDiscountFactor) || 0. > _endDiscountFactor)
 		{
-			return null;
+			throw new Exception ("SegmentElastic Constructor => Invalid Inputs");
 		}
+	}
 
-		double yieldBumpReciprocal = 1. / yieldBump;
+	/**
+	 * Retrieve the <i>SegmentInelastic</i> Instance
+	 * 
+	 * @return <i>SegmentInelastic</i> Instance
+	 */
 
+	public SegmentInelastic inelastic()
+	{
+		return _inelastic;
+	}
+
+	/**
+	 * Retrieve the Forward Yield
+	 * 
+	 * @return Forward Yield
+	 */
+
+	public double forwardYield()
+	{
+		return _forwardYield;
+	}
+
+	/**
+	 * Retrieve the Forward Discount Factor
+	 * 
+	 * @return Forward Discount Factor
+	 */
+
+	public double forwardDiscountFactor()
+	{
+		return _forwardDiscountFactor;
+	}
+
+	/**
+	 * Retrieve Segment End Discount Factor
+	 * 
+	 * @return Segment End Discount Factor
+	 */
+
+	public double endDiscountFactor()
+	{
+		return _endDiscountFactor;
+	}
+
+	/**
+	 * Retrieve the Segment Begin Discount Factor
+	 * 
+	 * @return Segment Begin Discount Factor
+	 */
+
+	public double beginDiscountFactor()
+	{
+		return _endDiscountFactor / _forwardDiscountFactor;
+	}
+
+	/**
+	 * Clone the Instance
+	 * 
+	 * @return The Cloned Instance
+	 */
+
+	@Override public SegmentElastic clone()
+	{
 		try {
-			return NumberUtil.IsValid (marketPrice) &&
-				NumberUtil.IsValid (bumpUpMarketPrice) &&
-				NumberUtil.IsValid (bumpDownMarketPrice) &&
-				NumberUtil.IsValid (yieldBump) && 0. != yieldBump ?
-				new BondSensitivity (
-					theoreticalPrice,
-					marketPrice,
-					yieldBasis,
-					0.5 * (bumpDownMarketPrice - bumpUpMarketPrice) * yieldBumpReciprocal,
-					(bumpDownMarketPrice + bumpUpMarketPrice - 2. * marketPrice) * yieldBumpReciprocal *
-						yieldBumpReciprocal
-				) : null;
+			return new SegmentElastic (
+				_inelastic.clone(),
+				_forwardYield,
+				_forwardDiscountFactor,
+				_endDiscountFactor
+			);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -179,87 +232,30 @@ public class BondSensitivity
 	}
 
 	/**
-	 * <i>BondSensitivity</i> Constructor
+	 * Generate a String Version of the State
 	 * 
-	 * @param theoreticalPrice Theoretical Price
-	 * @param marketPrice Market Price
-	 * @param yieldBasis Yield Basis
-	 * @param duration Duration
-	 * @param convexity Convexity
+	 * @param prefix Prefix
 	 * 
-	 * @throws Exception Thrown if the Inputs are Invalid
+	 * @return String Version of the State
 	 */
 
-	public BondSensitivity (
-		final double theoreticalPrice,
-		final double marketPrice,
-		final double yieldBasis,
-		final double duration,
-		final double convexity)
-		throws Exception
+	public String toString (
+		final String prefix)
 	{
-		if (!NumberUtil.IsValid (_theoreticalPrice = theoreticalPrice) || 0. > _theoreticalPrice ||
-			!NumberUtil.IsValid (_marketPrice = marketPrice) || 0. > _marketPrice ||
-			!NumberUtil.IsValid (_yieldBasis = yieldBasis) ||
-			!NumberUtil.IsValid (_duration = duration) ||
-			!NumberUtil.IsValid (_convexity = convexity))
-		{
-			throw new Exception ("BondSensitivity Constructor => Invalid Inputs");
-		}
+		return prefix + "Segment Inelastic => " + _inelastic +
+			"; Forward Yield => " + FormatUtil.FormatDouble (_forwardYield, 1, 6, 1.) +
+			"; Forward Discount Factor => " + FormatUtil.FormatDouble (_forwardDiscountFactor, 1, 6, 1.) +
+			"; Segment End Discount Factor => " + FormatUtil.FormatDouble (_endDiscountFactor, 1, 6, 1.);
 	}
 
 	/**
-	 * Retrieve the Theoretical Price
+	 * Generate a String Version of the State
 	 * 
-	 * @return Theoretical Price
+	 * @return String Version of the State
 	 */
 
-	public double theoreticalPrice()
+	@Override public String toString()
 	{
-		return _theoreticalPrice;
-	}
-
-	/**
-	 * Retrieve the Market Price
-	 * 
-	 * @return Market Price
-	 */
-
-	public double marketPrice()
-	{
-		return _marketPrice;
-	}
-
-	/**
-	 * Retrieve the Yield Basis
-	 * 
-	 * @return Yield Basis
-	 */
-
-	public double yieldBasis()
-	{
-		return _yieldBasis;
-	}
-
-	/**
-	 * Retrieve the Duration
-	 * 
-	 * @return Duration
-	 */
-
-	public double duration()
-	{
-		return _duration;
-	}
-
-	/**
-	 * Retrieve the Convexity
-	 * 
-	 * @return Convexity
-	 */
-
-	public double convexity()
-	{
-		return _convexity;
+		return toString ("");
 	}
 }

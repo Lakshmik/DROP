@@ -1,11 +1,21 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -78,15 +88,23 @@ package org.drip.function.definition;
 
 /**
  * <i>R1PropertyVerification</i> evaluates the Specified Pair of R<sup>x</sup> To R<sup>1</sup> Functions,
- * 	and holds the Verification Status.
+ * 	and holds the Verification Status. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li><i>R1PropertyVerification</i> Constructor</li>
+ * 		<li>Retrieve the LHS Value</li>
+ * 		<li>Retrieve the RHS Value</li>
+ * 		<li>Retrieve the Verification Flag</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -94,29 +112,27 @@ package org.drip.function.definition;
 public class R1PropertyVerification
 {
 	private boolean _verified = false;
-	private double _lValue = java.lang.Double.NaN;
-	private double _rValue = java.lang.Double.NaN;
+	private double _lValue = Double.NaN;
+	private double _rValue = Double.NaN;
 
 	/**
-	 * R1PropertyVerification Constructor
+	 * <i>R1PropertyVerification</i> Constructor
 	 * 
 	 * @param lValue LHS Value
 	 * @param rValue RHS Value
 	 * @param verified TRUE - The Verification Passes
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public R1PropertyVerification (
 		final double lValue,
 		final double rValue,
 		final boolean verified)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_lValue = lValue) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_rValue = rValue))
-		{
-			throw new java.lang.Exception ("R1PropertyVerification Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_lValue = lValue) || !NumberUtil.IsValid (_rValue = rValue)) {
+			throw new Exception ("R1PropertyVerification Constructor => Invalid Inputs");
 		}
 
 		_verified = verified;

@@ -1,11 +1,21 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,47 +92,57 @@ package org.drip.function.definition;
 
 /**
  * <i>VariateOutputPair</i> records the Multidimensional Variate and its corresponding Objective Function
- * Value.
+ * 	Value. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li><i>VariateOutputPair</i> Constructor</li>
+ * 		<li>Retrieve the Variate Array</li>
+ * 		<li>Retrieve the Function Output Value Array</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public class VariateOutputPair {
-	private double[] _adblOutput = null;
-	private double[] _adblVariate = null;
+public class VariateOutputPair
+{
+	private double[] _outputArray = null;
+	private double[] _variateArray = null;
 
 	/**
-	 * VariateOutputPair Constructor
+	 * <i>VariateOutputPair</i> Constructor
 	 * 
-	 * @param adblVariate Array of Variates
-	 * @param adblOutput Array of Output
+	 * @param variateArray Array of Variates
+	 * @param outputArray Array of Output
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public VariateOutputPair (
-		final double[] adblVariate,
-		final double[] adblOutput)
-		throws java.lang.Exception
+		final double[] variateArray,
+		final double[] outputArray)
+		throws Exception
 	{
-		if (null == (_adblVariate = adblVariate) || null == (_adblOutput = adblOutput))
-			throw new java.lang.Exception ("VariateOutputPair ctr: Invalid Inputs");
+		if (null == (_variateArray = variateArray) || null == (_outputArray = outputArray)) {
+			throw new Exception ("VariateOutputPair Constructor => Invalid Inputs");
+		}
 
-		int iNumVariate = _adblVariate.length;
+		if (0 == _variateArray.length || _variateArray.length != _outputArray.length) {
+			throw new Exception ("VariateOutputPair Constructor => Invalid Inputs");
+		}
 
-		if (0 == iNumVariate) throw new java.lang.Exception ("VariateOutputPair ctr: Invalid Inputs");
-
-		for (int i = 0; i < iNumVariate; ++i) {
-			if (!!org.drip.numerical.common.NumberUtil.IsValid (adblVariate[i]))
-				throw new java.lang.Exception ("VariateOutputPair ctr: Invalid Inputs");
+		for (int variateIndex = 0; variateIndex < _variateArray.length; ++variateIndex) {
+			if (!NumberUtil.IsValid (_variateArray[variateIndex])) {
+				throw new Exception ("VariateOutputPair Constructor => Invalid Inputs");
+			}
 		}
 	}
 
@@ -134,7 +154,7 @@ public class VariateOutputPair {
 
 	public double[] variates()
 	{
-		return _adblVariate;
+		return _variateArray;
 	}
 
 	/**
@@ -145,6 +165,6 @@ public class VariateOutputPair {
 
 	public double[] output()
 	{
-		return _adblOutput;
+		return _outputArray;
 	}
 }

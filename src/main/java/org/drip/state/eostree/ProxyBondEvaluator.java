@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -283,15 +283,15 @@ public class ProxyBondEvaluator
 	}
 
 	/**
-	 * Construct the Bond Value Tree using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
+	 * Construct the Bond Value Grid using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @param spotDate Calibrated <i>KalotayWilliamsFabozzi</i> Instance
+	 * @param spotDate Spot Date
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @return Bond Value Tree
+	 * @return Bond Value Grid
 	 */
 
-	@Override public TreeMap<Double, List<Double>> valueTree (
+	@Override public ValueGrid valueGrid (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi)
 	{
@@ -299,38 +299,34 @@ public class ProxyBondEvaluator
 			return null;
 		}
 
-		double endTimePayoff = 1. + _coupon;
-		List<Double> aboveProjectedBondValueList = null;
+		double segmentEndPayoff = 1. + _coupon;
+		List<Double> succeedingProjectedBondValueList = null;
 
-		TreeMap<Double, List<Double>> valueTree = new TreeMap<Double, List<Double>>();
+		ProxyBondValueGrid proxyBondValueGrid = new ProxyBondValueGrid();
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
+		TreeMap<Double, List<SegmentElastic>> pillarTimeToSegmentElasticListMap =
+			kalotayWilliamsFabozzi.pillarTimeToSegmentElasticListMap();
 
-		for (double endTime : timeToProjectedPeriodStateMap.descendingKeySet()) {
-			if (endTime > _maturityTime) {
+		for (double pillarTime : pillarTimeToSegmentElasticListMap.descendingKeySet()) {
+			if (pillarTime > _maturityTime) {
 				continue;
 			}
 
+			List<SegmentElastic> segmentElasticList = pillarTimeToSegmentElasticListMap.get (pillarTime);
+
+			double startTime = segmentElasticList.get (0).inelastic().startTime();
+
 			List<Double> projectedBondValueList = new ArrayList<Double>();
 
-			List<KalotayWilliamsFabozziPeriodState> projectedPeriodStateList =
-				timeToProjectedPeriodStateMap.get (endTime);
-
-			double startTime = projectedPeriodStateList.get (0).period().startTime();
-
-			for (int projectionIndex = 0;
-				projectionIndex < projectedPeriodStateList.size();
-				++projectionIndex)
-			{
-				double aboveNodeBondPriceAverage = null == aboveProjectedBondValueList ?
-					endTimePayoff : _coupon + 0.5 * (
-						aboveProjectedBondValueList.get (projectionIndex) +
-							aboveProjectedBondValueList.get (projectionIndex + 1)
+			for (int listIndex = 0; listIndex < segmentElasticList.size(); ++listIndex) {
+				double succeedingBondPriceAverage = null == succeedingProjectedBondValueList ?
+					segmentEndPayoff : _coupon + 0.5 * (
+						succeedingProjectedBondValueList.get (listIndex) +
+							succeedingProjectedBondValueList.get (listIndex + 1)
 					);
 
-				double discountedPrice = aboveNodeBondPriceAverage *
-					projectedPeriodStateList.get (projectionIndex).forwardDiscountFactor();
+				double discountedPrice =
+					succeedingBondPriceAverage * segmentElasticList.get (listIndex).forwardDiscountFactor();
 
 				if (null != _callPriceSchedule && _callPriceSchedule.containsKey (startTime)) {
 					discountedPrice = Math.min (discountedPrice, _callPriceSchedule.get (startTime));
@@ -343,9 +339,40 @@ public class ProxyBondEvaluator
 				projectedBondValueList.add (discountedPrice);
 			}
 
-			valueTree.put (startTime, aboveProjectedBondValueList = projectedBondValueList);
+			proxyBondValueGrid.addProjectedBondValueList (
+				startTime,
+				succeedingProjectedBondValueList = projectedBondValueList
+			);
 		}
 
-		return valueTree;
+		return proxyBondValueGrid;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " {Coupon: " + _coupon +
+			"; Maturity Time: " + _maturityTime +
+			"; Call Price Schedule: " + _callPriceSchedule +
+			"; Put Price Schedule: " + _putPriceSchedule + "}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

@@ -1,7 +1,6 @@
 
 package org.drip.state.eostree;
 
-import java.util.List;
 import java.util.TreeMap;
 
 import org.drip.analytics.date.JulianDate;
@@ -11,6 +10,7 @@ import org.drip.function.r1tor1solver.FixedPointFinderBrent;
 import org.drip.function.r1tor1solver.FixedPointFinderOutput;
 import org.drip.function.r1tor1solver.VariateIteratorPrimitive;
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 import org.drip.state.municipal.CalibrateAndSensitivity;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 
@@ -148,7 +148,7 @@ public class BondPriceFunction
 
 		_timeToProjectedBaseForwardYieldMap.put (calibrationEndTime, projectedBaseForwardYield);
 
-		if (!_kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		if (!_kalotayWilliamsFabozzi.applyBaseForwardYield (
 			_annualizedForwardYieldVolatility,
 			_timeToProjectedBaseForwardYieldMap
 		))
@@ -156,16 +156,13 @@ public class BondPriceFunction
 			throw new Exception ("BondPriceFunction::priceFromBaseForwardYield => Invalid Inputs");
 		}
 
-		TreeMap<Double, List<Double>> projectedBondValueListMap = _evaluator.valueTree (
-			null,
-			_kalotayWilliamsFabozzi
-		);
+		ValueGrid valueGrid = _evaluator.valueGrid (null, _kalotayWilliamsFabozzi);
 
-		if (null == projectedBondValueListMap) {
+		if (null == valueGrid) {
 			throw new Exception ("BondPriceFunction::priceFromBaseForwardYield => Invalid Inputs");
 		}
 
-		return projectedBondValueListMap.firstEntry().getValue().get (0);
+		return valueGrid.pv();
 	}
 
 	/**
@@ -261,24 +258,21 @@ public class BondPriceFunction
 			throw new Exception ("BondPriceFunction::priceFromYieldBasis => Invalid Inputs");
 		}
 
-		if (!_kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		if (!_kalotayWilliamsFabozzi.applySegmentBaseYield (
 			_annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		))
 		{
 			throw new Exception ("BondPriceFunction::priceFromYieldBasis => Invalid Inputs");
 		}
 
-		TreeMap<Double, List<Double>> projectedBondValueListMap = _evaluator.valueTree (
-			spotDate,
-			_kalotayWilliamsFabozzi
-		);
+		ValueGrid valueGrid = _evaluator.valueGrid (spotDate, _kalotayWilliamsFabozzi);
 
-		if (null == projectedBondValueListMap) {
+		if (null == valueGrid) {
 			throw new Exception ("BondPriceFunction::priceFromYieldBasis => Invalid Inputs");
 		}
 
-		return projectedBondValueListMap.firstEntry().getValue().get (0);
+		return valueGrid.pv();
 	}
 
 	/**
@@ -360,5 +354,34 @@ public class BondPriceFunction
 		}
 
 		return null;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " {Bond Evaluator: " + _evaluator +
+			"; Annualized Forward Yield Volatility: " +
+				FormatUtil.FormatDouble (_annualizedForwardYieldVolatility, 1, 5, 1.) +
+			"; Kalotay Williams Fabozzi: " + _kalotayWilliamsFabozzi +
+			"; Projected Base Forward Yield Map: " + _timeToProjectedBaseForwardYieldMap + "}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

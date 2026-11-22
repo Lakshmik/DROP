@@ -6,6 +6,14 @@ package org.drip.function.definition;
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -82,111 +90,122 @@ package org.drip.function.definition;
 
 /**
  * <i>R1R1ToR1</i> interface exposes the stubs for the evaluation of the objective function and its
- * derivatives for a R<sup>1</sup> Deterministic + R<sup>1</sup> Random To R<sup>1</sup> Stochastic Function
- * with one Random Component.
+ * 	derivatives for a R<sup>1</sup> Deterministic + R<sup>1</sup> Random To R<sup>1</sup> Stochastic Function
+ * 	with one Random Component. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/README.md">R<sup>d</sup> Continuous/Discrete Probability Measures</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/measure/stochastic/README.md">R<sup>1</sup> R<sup>1</sup> To R<sup>1</sup> Process</a></li>
+ * 		<li>Evaluate a Single Realization for the given Variate</li>
+ * 		<li>Evaluate the Expectation for the given Variate</li>
+ * 		<li>Evaluate the Derivative for a Single Realization for the given Variate</li>
+ * 		<li>Evaluate the Derivative Expectation at the given Variate</li>
+ * 		<li>Evaluate a Path-wise Integral between the Variates</li>
+ * 		<li>Evaluate the Expected Path-wise Integral between the Variates</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
-public interface R1R1ToR1 {
+public interface R1R1ToR1
+{
 
 	/**
-	 * Evaluate a Single Realization for the given variate
+	 * Evaluate a Single Realization for the given Variate
 	 * 
-	 * @param dblVariate Variate
+	 * @param variate Variate
 	 *  
 	 * @return Return the Single Realization for the given variate
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double evaluateRealization (
-		final double dblVariate)
-		throws java.lang.Exception;
+		final double variate)
+		throws Exception;
 
 	/**
-	 * Evaluate the Expectation for the given variate
+	 * Evaluate the Expectation for the given Variate
 	 * 
-	 * @param dblVariate Variate
+	 * @param variate Variate
 	 *  
 	 * @return Return the Expectation for the given variate
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double evaluateExpectation (
-		final double dblVariate)
-		throws java.lang.Exception;
+		final double variate)
+		throws Exception;
 
 	/**
-	 * Evaluate the Derivative for a Single Realization for the given variate
+	 * Evaluate the Derivative for a Single Realization for the given Variate
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
 	 *  
 	 * @return Return the Derivative for a Single Realization for the given variate
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double derivativeRealization (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception;
+		final double variate,
+		final int order)
+		throws Exception;
 
 	/**
-	 * Evaluate the Derivative Expectation at the given variate
+	 * Evaluate the Derivative Expectation at the given Variate
 	 * 
-	 * @param dblVariate Variate at which the derivative is to be calculated
-	 * @param iOrder Order of the derivative to be computed
+	 * @param variate Variate at which the derivative is to be calculated
+	 * @param order Order of the derivative to be computed
 	 *  
 	 * @return Return the Derivative Expectation at the given variate
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double derivativeExpectation (
-		final double dblVariate,
-		final int iOrder)
-		throws java.lang.Exception;
+		final double variate,
+		final int order)
+		throws Exception;
 
 	/**
-	 * Evaluate a Path-wise Integral between the Vriates
+	 * Evaluate a Path-wise Integral between the Variates
 	 * 
-	 * @param dblStart Variate Start
-	 * @param dblEnd Variate End
+	 * @param start Variate Start
+	 * @param end Variate End
 	 *  
 	 * @return The Path-wise Integral between the Variates
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double integralRealization (
-		final double dblStart,
-		final double dblEnd)
-		throws java.lang.Exception;
+		final double start,
+		final double end)
+		throws Exception;
 
 	/**
-	 * Evaluate the Expected Path-wise Integral between the Vriates
+	 * Evaluate the Expected Path-wise Integral between the Variates
 	 * 
-	 * @param dblStart Variate Start
-	 * @param dblEnd Variate End
+	 * @param start Variate Start
+	 * @param end Variate End
 	 *  
 	 * @return The Expected Path-wise Integral between the Variates
 	 * 
-	 * @throws java.lang.Exception Thrown if evaluation cannot be done
+	 * @throws Exception Thrown if evaluation cannot be done
 	 */
 
 	public abstract double integralExpectation (
-		final double dblStart,
-		final double dblEnd)
-		throws java.lang.Exception;
+		final double start,
+		final double end)
+		throws Exception;
 }

@@ -1,7 +1,9 @@
 
 package org.drip.state.eostree;
 
+import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -80,9 +82,9 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>VertexInelastic</i> holds the Path-independent Vertex Properties of a Single Event Pillar Segment built
- * 	according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded
- *  Options. The References are:
+ * <i>VertexInelastic</i> holds the Path-dependent Vertex Properties of a Single Vertex with Pillar Segments
+ *  built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with
+ *  Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -122,6 +124,8 @@ import org.drip.numerical.common.NumberUtil;
 
 public class VertexInelastic
 {
+	private JulianDate _date = null;
+	private String _eventFlags = "";
 	private double _time = Double.NaN;
 	private VertexAccrual _accrual = null;
 	private double _payAmount = Double.NaN;
@@ -130,24 +134,31 @@ public class VertexInelastic
 	 * <i>VertexInelastic</i> Constructor
 	 * 
 	 * @param time Vertex Time
+	 * @param date Vertex Date
 	 * @param payAmount Vertex Pay Amount
 	 * @param accrual Vertex Accrual
+	 * @param eventFlags Event Flags
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public VertexInelastic (
 		final double time,
+		final JulianDate date,
 		final double payAmount,
-		final VertexAccrual accrual)
+		final VertexAccrual accrual,
+		final String eventFlags)
 		throws Exception
 	{
 		if (!NumberUtil.IsValid (_time = time) || 0. > _time ||
+			null == (_date = date) ||
 			!NumberUtil.IsValid (_payAmount = payAmount) ||
 			null == (_accrual = accrual))
 		{
 			throw new Exception ("VertexInelastic Constructor => Invalid Inputs");
 		}
+
+		_eventFlags = eventFlags;
 	}
 
 	/**
@@ -159,6 +170,17 @@ public class VertexInelastic
 	public double time()
 	{
 		return _time;
+	}
+
+	/**
+	 * Retrieve the Vertex Date
+	 * 
+	 * @return Vertex Date
+	 */
+
+	public JulianDate date()
+	{
+		return _date;
 	}
 
 	/**
@@ -181,5 +203,43 @@ public class VertexInelastic
 	public VertexAccrual accrual()
 	{
 		return _accrual;
+	}
+
+	/**
+	 * Retrieve the Vertex Event Flags
+	 * 
+	 * @return Vertex Event Flags
+	 */
+
+	public String eventFlags()
+	{
+		return _eventFlags;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " [Time: " + FormatUtil.FormatDouble (_time, 1, 3, 1.) + "; Date: " + _date +
+			"; Payment Amount: " + FormatUtil.FormatDouble (_payAmount, 1, 5, 1.) +
+			"; Event Flags: " + _eventFlags + "; Vertex Accrual: " + _accrual.toString() + "]";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

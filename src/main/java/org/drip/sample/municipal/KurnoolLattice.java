@@ -12,15 +12,15 @@ import org.drip.product.params.EmbeddedOptionSchedule;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.eostree.BondPriceFunction;
-import org.drip.state.eostree.EventPillarTimeComposite;
+import org.drip.state.eostree.VertexEventComposite;
 import org.drip.state.eostree.FullBondEvaluator;
-import org.drip.state.eostree.SegmentElastic;
+import org.drip.state.eostree.SliceElastic;
 import org.drip.state.eostree.VertexElastic;
 import org.drip.state.eostree.VertexInelastic;
-import org.drip.state.municipal.BondSensitivity;
+import org.drip.state.municipal.YieldSensitivity;
 import org.drip.state.municipal.ExplicitBootMuniCurve;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -331,36 +331,36 @@ public class KurnoolLattice
 
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = explicitBootMuniCurve.kalotayWilliamsFabozzi();
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
 		FullBondEvaluator bondEvaluator = new FullBondEvaluator (bond);
 
-		EventPillarTimeComposite couponExerciseComposite = EventPillarTimeComposite.Standard (
+		VertexEventComposite couponExerciseComposite = VertexEventComposite.Standard (
 			spotDate,
 			bond,
 			kalotayWilliamsFabozzi
 		);
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToPeriodStateListMap =
-			couponExerciseComposite.timeToPeriodStateListMap();
+		TreeMap<Double, List<SegmentElastic>> timeToPeriodStateListMap =
+			couponExerciseComposite.timeToSegmentElasticListMap();
 
 		System.out.println ("\t||------------------------------------||");
 
 		for (double time : timeToPeriodStateListMap.keySet()) {
-			for (KalotayWilliamsFabozziPeriodState kalotayWilliamsFabozziPeriodState :
+			for (SegmentElastic kalotayWilliamsFabozziPeriodState :
 				timeToPeriodStateListMap.get (time))
 			{
 				System.out.println (
 					"\t||" + FormatUtil.FormatDouble (time, 2, 2, 1.) + " =>" + FormatUtil.FormatDouble (
-						kalotayWilliamsFabozziPeriodState.cumulativeBeginDiscountFactor(),
+						kalotayWilliamsFabozziPeriodState.beginDiscountFactor(),
 						1,
 						4,
 						1.
 					) + " |" + FormatUtil.FormatDouble (
-						kalotayWilliamsFabozziPeriodState.cumulativeEndDiscountFactor(),
+						kalotayWilliamsFabozziPeriodState.endDiscountFactor(),
 						1,
 						4,
 						1.
@@ -382,8 +382,8 @@ public class KurnoolLattice
 
 		System.out.println ("\t||------------------------------------||");
 
-		for (SegmentElastic segmentElastic :
-			bondEvaluator.rollBackwards (spotDate, kalotayWilliamsFabozzi))
+		for (SliceElastic segmentElastic :
+			bondEvaluator.backwardsInduction (spotDate, kalotayWilliamsFabozzi))
 		{
 			VertexElastic rightVertexElastic = segmentElastic.rightVertexElastic();
 
@@ -393,8 +393,10 @@ public class KurnoolLattice
 				FormatUtil.FormatDouble (leftVertexInelastic.time(), 2, 2, 1., false) + "-" +
 				FormatUtil.FormatDouble (rightVertexElastic.inelastic().time(), 2, 2, 1., false) + "] =>";
 
-			for (double leftCleanPV : segmentElastic.leftVertexElastic().cleanPVArray()) {
-				segment += FormatUtil.FormatDouble (leftCleanPV, 1, 5, 1.) + " |";
+			for (double leftPostExerciseCleanPV :
+				segmentElastic.leftVertexElastic().postExerciseCleanPVArray())
+			{
+				segment += FormatUtil.FormatDouble (leftPostExerciseCleanPV, 1, 5, 1.) + " |";
 			}
 
 			System.out.println (segment);
@@ -404,7 +406,8 @@ public class KurnoolLattice
 
 		System.out.println();
 
-		TreeMap<Double, List<Double>> valueTree = bondEvaluator.valueTree (spotDate, kalotayWilliamsFabozzi);
+		TreeMap<Double, List<Double>> valueTree =
+			bondEvaluator.valueGrid (spotDate, kalotayWilliamsFabozzi).timetoPVListMap();
 
 		System.out.println ("\t||------------------------------------||");
 
@@ -422,7 +425,7 @@ public class KurnoolLattice
 
 		System.out.println();
 
-		BondSensitivity bondSensitivity = bondEvaluator.secularMeasuresFromYieldBasis (
+		YieldSensitivity bondSensitivity = bondEvaluator.secularMeasuresFromYieldBasis (
 			spotDate,
 			kalotayWilliamsFabozzi,
 			annualizedForwardYieldVolatility,
@@ -477,7 +480,7 @@ public class KurnoolLattice
 
 		System.out.println (
 			"\t|| Yield Basis               =>" + FormatUtil.FormatDouble (
-				bondSensitivity.yieldBasis(),
+				bondSensitivity.basis(),
 				3,
 				4,
 				10000.

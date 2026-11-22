@@ -4,7 +4,8 @@ package org.drip.state.eostree;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.numerical.common.NumberUtil;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -83,9 +84,9 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
  */
 
 /**
- * <i>SegmentElastic</i> holds the Path-independent Properties of a Single Cross-vertex Segment built
- * 	according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded
- *  Options. The References are:
+ * <i>SliceElastic</i> holds the Path-dependent Properties of a Single Cross-vertex Slice built according to
+ * 	the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with Embedded Options. The
+ * 	References are:
  *  
  * 	<br>
  *  <ul>
@@ -123,8 +124,15 @@ import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
  * @author Lakshmi Krishnamurthy
  */
 
-public class SegmentElastic
+public class SliceElastic
 {
+
+	class LeftPVArray
+	{
+		double[] _preExerciseDirtyPrice = null;
+		double[] _postExerciseDirtyPrice = null;
+	}
+
 	private boolean _isPut = false;
 	private double[] _flatYieldArray = null;
 	private VertexElastic _rightVertexElastic = null;
@@ -132,44 +140,43 @@ public class SegmentElastic
 	private TreeMap<Double, Double> _exerciseTimeToPriceMap = null;
 
 	/**
-	 * Construct the Standard Instance of <i>SegmentElastic</i>
+	 * Construct the Standard Instance of <i>SliceElastic</i>
 	 * 
 	 * @param leftVertexInelastic Left <i>VertexInelastic</i> Instance
 	 * @param rightVertexElastic Right <i>VertexElastic</i> Instance
-	 * @param kalotayWilliamsFabozziPeriodStateList List of <i>KalotayWilliamsFabozziPeriodState</i>
-	 * 												Instances
+	 * @param segmentElasticList List of <i>SegmentElastic</i> Instances
 	 * @param isPut Put Indicator
 	 * @param exerciseTimeToPriceMap Exercise Time To Price Map
 	 * 
-	 * @return Standard Instance of <i>SegmentElastic</i>
+	 * @return Standard Instance of <i>SliceElastic</i>
 	 */
 
-	public static final SegmentElastic Standard (
+	public static final SliceElastic Standard (
 		final VertexInelastic leftVertexInelastic,
 		final VertexElastic rightVertexElastic,
-		final List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList,
+		final List<SegmentElastic> segmentElasticList,
 		final boolean isPut,
 		final TreeMap<Double, Double> exerciseTimeToPriceMap)
 	{
-		if (null == kalotayWilliamsFabozziPeriodStateList) {
+		if (null == segmentElasticList) {
 			return null;
 		}
 
-		int periodStateCount = kalotayWilliamsFabozziPeriodStateList.size();
+		int segmentElasticCount = segmentElasticList.size();
 
-		if (0 == periodStateCount) {
+		if (0 == segmentElasticCount) {
 			return null;
 		}
 
-		double[] flatYieldArray = new double[periodStateCount];
+		double[] flatYieldArray = new double[segmentElasticCount];
 
-		for (int periodStateIndex = 0; periodStateIndex < periodStateCount; ++periodStateIndex) {
-			flatYieldArray[periodStateIndex] =
-				kalotayWilliamsFabozziPeriodStateList.get (periodStateIndex).forwardYield();
+		for (int segmentElasticIndex = 0; segmentElasticIndex < segmentElasticCount; ++segmentElasticIndex) {
+			flatYieldArray[segmentElasticIndex] =
+				segmentElasticList.get (segmentElasticIndex).forwardYield();
 		}
 
 		try {
-			return new SegmentElastic (
+			return new SliceElastic (
 				leftVertexInelastic,
 				rightVertexElastic,
 				flatYieldArray,
@@ -183,58 +190,72 @@ public class SegmentElastic
 		return null;
 	}
 
-	private double[] leftPVArray()
+	private LeftPVArray leftPVArray()
 	{
+		double[] rightPostExerciseDirtyPVArray = _rightVertexElastic.postExerciseDirtyPVArray();
+
 		VertexInelastic rightVertexInelastic = _rightVertexElastic.inelastic();
 
-		double[] rightPVArray = _rightVertexElastic.pvArray();
+		LeftPVArray leftPVArray = new LeftPVArray();
 
 		double leftTime = _leftVertexInelastic.time();
 
 		double timeGap = rightVertexInelastic.time() - leftTime;
 
-		double[] leftPVArray = new double[_flatYieldArray.length];
+		double leftPayAmount = _leftVertexInelastic.payAmount();
 
-		double leftTimePayAmount = _leftVertexInelastic.payAmount();
+		leftPVArray._preExerciseDirtyPrice = new double[_flatYieldArray.length];
+		leftPVArray._postExerciseDirtyPrice = new double[_flatYieldArray.length];
 
 		double leftDirtyExercisePrice = _exerciseTimeToPriceMap.containsKey (leftTime) ? 
 			_exerciseTimeToPriceMap.get (leftTime) + _leftVertexInelastic.accrual().amount() : Double.NaN;
 
-		if (_flatYieldArray.length == rightPVArray.length) {
+		if (_flatYieldArray.length == rightPostExerciseDirtyPVArray.length) {
 			for (int rightDiscountFactorIndex = 0;
-				rightDiscountFactorIndex < leftPVArray.length;
+				rightDiscountFactorIndex < leftPVArray._postExerciseDirtyPrice.length;
 				++rightDiscountFactorIndex)
 			{
-				double leftPV = (rightPVArray[rightDiscountFactorIndex] + leftTimePayAmount)
-					/ (1. + _flatYieldArray[rightDiscountFactorIndex] * timeGap);
+				leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex] = leftPayAmount + (
+					rightPostExerciseDirtyPVArray[rightDiscountFactorIndex] /
+						(1. + _flatYieldArray[rightDiscountFactorIndex] * timeGap)
+					);
 
 				if (Double.isNaN (leftDirtyExercisePrice)) {
-					leftPVArray[rightDiscountFactorIndex] = leftPV;
+					leftPVArray._postExerciseDirtyPrice[rightDiscountFactorIndex] =
+						leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex];
 				} else {
-					leftPVArray[rightDiscountFactorIndex] = _isPut ?
-						Math.max (leftPV, leftDirtyExercisePrice) :
-						Math.min (leftPV, leftDirtyExercisePrice);
+					leftPVArray._postExerciseDirtyPrice[rightDiscountFactorIndex] = _isPut ? Math.max (
+						leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex],
+						leftDirtyExercisePrice
+					) : Math.min (
+						leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex],
+						leftDirtyExercisePrice
+					);
 				}
 			}
 		} else {
 			for (int rightDiscountFactorIndex = 0;
-				rightDiscountFactorIndex < leftPVArray.length;
+				rightDiscountFactorIndex < leftPVArray._postExerciseDirtyPrice.length;
 				++rightDiscountFactorIndex)
 			{
-				double forwardLeftPV = (
+				leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex] = leftPayAmount + (
 					0.5 * (
-						rightPVArray[rightDiscountFactorIndex] + rightPVArray[rightDiscountFactorIndex + 1]
-					) + leftTimePayAmount
-				) / (
-					1. + _flatYieldArray[rightDiscountFactorIndex] * timeGap
+						rightPostExerciseDirtyPVArray[rightDiscountFactorIndex] +
+							rightPostExerciseDirtyPVArray[rightDiscountFactorIndex + 1]
+					) / (1. + _flatYieldArray[rightDiscountFactorIndex] * timeGap)
 				);
 
 				if (Double.isNaN (leftDirtyExercisePrice)) {
-					leftPVArray[rightDiscountFactorIndex] = forwardLeftPV;
+					leftPVArray._postExerciseDirtyPrice[rightDiscountFactorIndex] =
+						leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex];
 				} else {
-					leftPVArray[rightDiscountFactorIndex] = _isPut ?
-						Math.max (forwardLeftPV, leftDirtyExercisePrice) :
-						Math.min (forwardLeftPV, leftDirtyExercisePrice);
+					leftPVArray._postExerciseDirtyPrice[rightDiscountFactorIndex] = _isPut ? Math.max (
+						leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex],
+						leftDirtyExercisePrice
+					) : Math.min (
+						leftPVArray._preExerciseDirtyPrice[rightDiscountFactorIndex],
+						leftDirtyExercisePrice
+					);
 				}
 			}
 		}
@@ -243,7 +264,7 @@ public class SegmentElastic
 	}
 
 	/**
-	 * <i>SegmentElastic</i> Constructor
+	 * <i>SliceElastic</i> Constructor
 	 * 
 	 * @param leftVertexInelastic Left <i>VertexInelastic</i> Instance
 	 * @param rightVertexElastic Right <i>VertexElastic</i> Instance
@@ -254,7 +275,7 @@ public class SegmentElastic
 	 * @throws Exception Thrown if the Inputs are invalid
 	 */
 
-	public SegmentElastic (
+	public SliceElastic (
 		final VertexInelastic leftVertexInelastic,
 		final VertexElastic rightVertexElastic,
 		final double[] flatYieldArray,
@@ -266,7 +287,7 @@ public class SegmentElastic
 			null == (_rightVertexElastic = rightVertexElastic) ||
 			null == (_flatYieldArray = flatYieldArray) || 0 == _flatYieldArray.length)
 		{
-			throw new Exception ("SegmentElastic Constructor => Invlid Inputs");
+			throw new Exception ("SliceElastic Constructor => Invlid Inputs");
 		}
 
 		_isPut = isPut;
@@ -337,11 +358,45 @@ public class SegmentElastic
 	public VertexElastic leftVertexElastic()
 	{
 		try {
-			return new VertexElastic (_leftVertexInelastic, leftPVArray());
+			LeftPVArray leftPVArray = leftPVArray();
+
+			return null == leftPVArray ? null : new VertexElastic (
+				_leftVertexInelastic,
+				leftPVArray._postExerciseDirtyPrice,
+				leftPVArray._preExerciseDirtyPrice
+			);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " {Right Vertex Elastic: " + _rightVertexElastic.toString() +
+			"; Left Vertex Elastic: " + _leftVertexInelastic.toString() +
+			"; Flat Yield Array: " + NumberUtil.ArrayRow (_flatYieldArray, 1, 6, false) +
+			"; Is Put? " + _isPut + "; Exercise Time To Price Map: " + _exerciseTimeToPriceMap + "}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

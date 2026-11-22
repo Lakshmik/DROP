@@ -271,6 +271,7 @@ org.drip.sample.dual
 org.drip.sample.efficientfrontier
 org.drip.sample.efronstein
 org.drip.sample.env
+org.drip.sample.eosgrid
 org.drip.sample.erf
 org.drip.sample.erfx
 org.drip.sample.execution

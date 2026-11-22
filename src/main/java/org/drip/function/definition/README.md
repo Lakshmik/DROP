@@ -7,14 +7,14 @@ DROP Function Definition Package contains the Function Execution Ancillary Suppo
 
 ## Class Components
 
- * [***CartesianComplexNumber***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/CartesianComplexNumber.java)
- <i>CartesianComplexNumber</i> implements the functionality for dealing with the Cartesian Form of Complex Numbers.
-
  * [***PoleResidue***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/PoleResidue.java)
  <i>PoleResidue</i> holds the Residue for  given variate, if it is a Pole.
 
  * [***R1PropertyVerification***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/R1PropertyVerification.java)
  <i>R1PropertyVerification</i> evaluates the Specified Pair of R<sup>x</sup> To R<sup>1</sup> Functions, and holds the Verification Status.
+
+ * [***R1R1ToR1***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/R1R1ToR1.java)
+ <i>R1R1ToR1</i> interface exposes the stubs for the evaluation of the objective function and its derivatives for a R<sup>1</sup> Deterministic + R<sup>1</sup> Random To R<sup>1</sup> Stochastic Function with one Random Component.
 
  * [***R1ToR1***](https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/R1ToR1.java)
  <i>R1ToR1</i> provides the evaluation of the objective function and its derivatives for a specified
@@ -81,11 +81,11 @@ DROP Function Definition Package contains the Function Execution Ancillary Suppo
 
  * Whitaker, E. T., and G. N. Watson (1996): <i>A Course on Modern Analysis</i> <b>Cambridge University Press</b> New York
 
- * Wikipedia (2019): Bessel Function https://en.wikipedia.org/wiki/Bessel_function
+ * Wikipedia (2019a): Bessel Function https://en.wikipedia.org/wiki/Bessel_function
 
- * Wikipedia (2019): Beta Function https://en.wikipedia.org/wiki/Beta_function
+ * Wikipedia (2019b): Beta Function https://en.wikipedia.org/wiki/Beta_function
 
- * Wikipedia (2019): Gamma Function https://en.wikipedia.org/wiki/Gamma_function
+ * Wikipedia (2019c): Gamma Function https://en.wikipedia.org/wiki/Gamma_function
 
 
 ## DROP Specifications

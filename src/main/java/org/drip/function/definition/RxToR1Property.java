@@ -1,11 +1,21 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -78,15 +88,28 @@ package org.drip.function.definition;
 
 /**
  * <i>RxToR1Property</i> evaluates the Specified Pair of R<sup>x</sup> To R<sup>1</sup> Functions, and
- * 	verifies the Properties.
+ * 	verifies the Properties. It provides the following Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Mismatch Tolerance</li>
+ * 		<li>EQUAL To Comparison</li>
+ * 		<li>LESS THAN OR EQUAL To Comparison</li>
+ * 		<li>GREATER THAN OR EQUAL To Comparison</li>
+ * 		<li>LESS THAN To Comparison</li>
+ * 		<li>GREATER THAN To Comparison</li>
+ * 		<li>Retrieve the Type of the Comparison</li>
+ * 		<li>Retrieve the Mismatch Tolerance</li>
+ * 		<li>Verify the specified Left and Right Function Values</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
@@ -104,44 +127,44 @@ public abstract class RxToR1Property
 	 * EQUAL To Comparison
 	 */
 
-	public static final java.lang.String EQ = "EQ";
+	public static final String EQ = "EQ";
 
 	/**
 	 * LESS THAN OR EQUAL To Comparison
 	 */
 
-	public static final java.lang.String LTE = "LTE";
+	public static final String LTE = "LTE";
 
 	/**
 	 * GREATER THAN OR EQUAL To Comparison
 	 */
 
-	public static final java.lang.String GTE = "GTE";
+	public static final String GTE = "GTE";
 
 	/**
 	 * LESS THAN To Comparison
 	 */
 
-	public static final java.lang.String LT = "LT";
+	public static final String LT = "LT";
 
 	/**
 	 * GREATER THAN To Comparison
 	 */
 
-	public static final java.lang.String GT = "GT";
+	public static final String GT = "GT";
 
-	private java.lang.String _type = "";
-	private double _mismatchTolerance = java.lang.Double.NaN;
+	private String _type = "";
+	private double _mismatchTolerance = Double.NaN;
 
 	protected RxToR1Property (
-		final java.lang.String type,
+		final String type,
 		final double mismatchTolerance)
-		throws java.lang.Exception
+		throws Exception
 	{
 		if (null == (_type = type) || _type.isEmpty() ||
-			!org.drip.numerical.common.NumberUtil.IsValid (_mismatchTolerance = mismatchTolerance))
+			!NumberUtil.IsValid (_mismatchTolerance = mismatchTolerance))
 		{
-			throw new java.lang.Exception ("RxToR1Property Constructor => Invalid Inputs");
+			throw new Exception ("RxToR1Property Constructor => Invalid Inputs");
 		}
 	}
 
@@ -151,7 +174,7 @@ public abstract class RxToR1Property
 	 * @return The Type of the Comparison
 	 */
 
-	public java.lang.String type()
+	public String type()
 	{
 		return _type;
 	}
@@ -176,76 +199,58 @@ public abstract class RxToR1Property
 	 * @return Results of the Verification
 	 */
 
-	public org.drip.function.definition.R1PropertyVerification verify (
+	public R1PropertyVerification verify (
 		final double leftValue,
 		final double rightValue)
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (leftValue) ||
-			!org.drip.numerical.common.NumberUtil.IsValid (rightValue))
-		{
+		if (!NumberUtil.IsValid (leftValue) || !NumberUtil.IsValid (rightValue)) {
 			return null;
 		}
 
-		java.lang.String type = type();
+		String type = type();
 
-		try
-		{
-			if (LT.equalsIgnoreCase (type))
-			{
-				return new org.drip.function.definition.R1PropertyVerification (
-					leftValue,
-					rightValue,
-					leftValue < rightValue
-				);
+		try {
+			if (LT.equalsIgnoreCase (type)) {
+				return new R1PropertyVerification (leftValue, rightValue,leftValue < rightValue);
 			}
 
-			if (GT.equalsIgnoreCase (type))
-			{
-				return new org.drip.function.definition.R1PropertyVerification (
-					leftValue,
-					rightValue,
-					leftValue > rightValue
-				);
+			if (GT.equalsIgnoreCase (type)) {
+				return new R1PropertyVerification (leftValue, rightValue, leftValue > rightValue);
 			}
 
 			double mismatchTolerance = mismatchTolerance();
 
-			double leftTolerance = java.lang.Math.abs (leftValue * mismatchTolerance);
+			double leftTolerance = Math.abs (leftValue * mismatchTolerance);
 
-			double rightTolerance = java.lang.Math.abs (rightValue * mismatchTolerance);
+			double rightTolerance = Math.abs (rightValue * mismatchTolerance);
 
 			double tolerance = leftTolerance < rightTolerance ? leftTolerance: rightTolerance;
 			tolerance = tolerance < mismatchTolerance ? mismatchTolerance : tolerance;
 
-			if (EQ.equalsIgnoreCase (type))
-			{
-				return new org.drip.function.definition.R1PropertyVerification (
+			if (EQ.equalsIgnoreCase (type)) {
+				return new R1PropertyVerification (
 					leftValue,
 					rightValue,
-					java.lang.Math.abs (leftValue - rightValue) < tolerance
+					Math.abs (leftValue - rightValue) < tolerance
 				);
 			}
 
-			if (LTE.equalsIgnoreCase (type))
-			{
-				return new org.drip.function.definition.R1PropertyVerification (
+			if (LTE.equalsIgnoreCase (type)) {
+				return new R1PropertyVerification (
 					leftValue,
 					rightValue,
-					leftValue < rightValue || java.lang.Math.abs (leftValue - rightValue) < tolerance
+					leftValue < rightValue || Math.abs (leftValue - rightValue) < tolerance
 				);
 			}
 
-			if (GTE.equalsIgnoreCase (type))
-			{
-				return new org.drip.function.definition.R1PropertyVerification (
+			if (GTE.equalsIgnoreCase (type)) {
+				return new R1PropertyVerification (
 					leftValue,
 					rightValue,
-					leftValue > rightValue || java.lang.Math.abs (leftValue - rightValue) < tolerance
+					leftValue > rightValue || Math.abs (leftValue - rightValue) < tolerance
 				);
 			}
-		}
-		catch (java.lang.Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

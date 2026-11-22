@@ -178,9 +178,9 @@ public class ExplicitBootMuniCurve
 	}
 
 	/**
-	 * Retrieve the Manifest Measure Jacobian of the Forward Rate to the given date
+	 * Retrieve the Manifest Measure Jacobian of the Forward Yield to the given date
 	 * 
-	 * @return The Manifest Measure Jacobian of the Forward Rate to the given date
+	 * @return The Manifest Measure Jacobian of the Forward Yield to the given date
 	 */
 
 	public WengertJacobian jackDForwardDManifestMeasure()
@@ -197,25 +197,25 @@ public class ExplicitBootMuniCurve
 			return null;
 		}
 
-		TreeMap<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
-			_kalotayWilliamsFabozzi.timeToZeroVolatilityPeriodStateMap();
+		TreeMap<Double, CalibrationSegmentElastic> pillarTimeToCalibrationSegmentElasticMap =
+			_kalotayWilliamsFabozzi.pillarTimeToCalibrationSegmentElasticMap();
 
-		for (double endTime : _kalotayWilliamsFabozzi.timeKeySet()) {
-			if (1. == endTime) {
+		for (double pillarTime : _kalotayWilliamsFabozzi.timeKeySet()) {
+			if (1. == pillarTime) {
 				wengertJacobian.accumulatePartialFirstDerivative (0, 0, 1.);
 			} else {
-				int wengertIndex = (int) endTime - 1;
+				int wengertIndex = (int) pillarTime - 1;
 
 				double currentToPreviousDirtyParFloaterRatio = (
-					1. + timeToZeroVolatilityPeriodStateMap.get (endTime).cumulativeMarketYield()
+					1. + pillarTimeToCalibrationSegmentElasticMap.get (pillarTime).marketYield()
 				) / (
-					1. + timeToZeroVolatilityPeriodStateMap.get (endTime - 1.).cumulativeMarketYield()
+					1. + pillarTimeToCalibrationSegmentElasticMap.get (pillarTime - 1.).marketYield()
 				);
 
 				if (!wengertJacobian.accumulatePartialFirstDerivative (
 					wengertIndex,
 					wengertIndex,
-					endTime * Math.pow (currentToPreviousDirtyParFloaterRatio, endTime - 1.)
+					pillarTime * Math.pow (currentToPreviousDirtyParFloaterRatio, pillarTime - 1.)
 				))
 				{
 					return null;
@@ -224,7 +224,7 @@ public class ExplicitBootMuniCurve
 				if (0 != wengertIndex && !wengertJacobian.accumulatePartialFirstDerivative (
 					wengertIndex,
 					wengertIndex - 1,
-					-1. * (endTime - 1.) * Math.pow (currentToPreviousDirtyParFloaterRatio, endTime)
+					-1. * (pillarTime - 1.) * Math.pow (currentToPreviousDirtyParFloaterRatio, pillarTime)
 				))
 				{
 					return null;
@@ -260,35 +260,37 @@ public class ExplicitBootMuniCurve
 		final int date)
 		throws Exception
 	{
-		double t = ((double) (date - epoch().julian())) / 365.25;
+		double time = ((double) (date - epoch().julian())) / 365.25;
 
-		TreeMap<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
-			_kalotayWilliamsFabozzi.timeToZeroVolatilityPeriodStateMap();
+		TreeMap<Double, CalibrationSegmentElastic> pillarTimeToCalibrationSegmentElasticMap =
+			_kalotayWilliamsFabozzi.pillarTimeToCalibrationSegmentElasticMap();
 
-		ZeroVolatilityPeriodState leftSegmentState =
-			timeToZeroVolatilityPeriodStateMap.firstEntry().getValue();
+		CalibrationSegmentElastic leftCalibrationSegmentElastic =
+			pillarTimeToCalibrationSegmentElasticMap.firstEntry().getValue();
 
-		if (t <= leftSegmentState.period().endTime()) {
-			return leftSegmentState.forwardYield();
+		if (time <= leftCalibrationSegmentElastic.inelastic().endTime()) {
+			return leftCalibrationSegmentElastic.forwardYield();
 		}
 
-		ZeroVolatilityPeriodState rightSegmentState =
-			timeToZeroVolatilityPeriodStateMap.lastEntry().getValue();
+		CalibrationSegmentElastic rightCalibrationSegmentElastic =
+			pillarTimeToCalibrationSegmentElasticMap.lastEntry().getValue();
 
-		if (t >= rightSegmentState.period().endTime()) {
-			return rightSegmentState.cumulativeMarketYield();
+		if (time >= rightCalibrationSegmentElastic.inelastic().endTime()) {
+			return rightCalibrationSegmentElastic.marketYield();
 		}
 
-		for (ZeroVolatilityPeriodState zeroVolatilityPeriodState :
-			timeToZeroVolatilityPeriodStateMap.values())
+		for (CalibrationSegmentElastic calibrationSegmentElastic :
+			pillarTimeToCalibrationSegmentElasticMap.values())
 		{
-			KalotayWilliamsFabozziPeriod period = zeroVolatilityPeriodState.period();
+			SegmentInelastic segmentInelastic = calibrationSegmentElastic.inelastic();
 
-			if (zeroVolatilityPeriodState.period().in11 (t)) {
-				double terminalDiscountFactor = zeroVolatilityPeriodState.cumulativeBeginDiscountFactor() *
-					Math.pow (1. + zeroVolatilityPeriodState.forwardYield(), period.startTime() - t);
-
-				return Math.pow (terminalDiscountFactor, -1. / t) - 1.;
+			if (segmentInelastic.in11 (time)) {
+				return Math.pow (
+					calibrationSegmentElastic.beginDiscountFactor() / (
+						1. + calibrationSegmentElastic.forwardYield() * (segmentInelastic.startTime() - time)
+					),
+					-1. / time
+				) - 1.;
 			}
 		}
 
@@ -308,7 +310,7 @@ public class ExplicitBootMuniCurve
 		final int index,
 		final double value)
 	{
-		return _kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (index, value);
+		return _kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (index, value);
 	}
 
 	/**
@@ -324,7 +326,7 @@ public class ExplicitBootMuniCurve
 		final int index,
 		final double value)
 	{
-		return _kalotayWilliamsFabozzi.bumpZeroVolatilityPeriodState (index, value);
+		return _kalotayWilliamsFabozzi.bumpMarketYield (index, value);
 	}
 
 	/**
@@ -340,7 +342,7 @@ public class ExplicitBootMuniCurve
 	{
 		return (
 			_kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi()
-		).augmentTimeToZeroVolatilityPeriodStateMap (
+		).updateCalibrationSegmentElasticMap (
 			1.,
 			value
 		);
@@ -363,14 +365,14 @@ public class ExplicitBootMuniCurve
 
 		WengertJacobian jackDForwardDManifestMeasure = jackDForwardDManifestMeasure();
 
-		TreeMap<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
-			_kalotayWilliamsFabozzi.timeToZeroVolatilityPeriodStateMap();
+		TreeMap<Double, CalibrationSegmentElastic> pillarTimeToCalibrationSegmentElasticMap =
+			_kalotayWilliamsFabozzi.pillarTimeToCalibrationSegmentElasticMap();
 
-		for (double endTime : _kalotayWilliamsFabozzi.timeKeySet()) {
+		for (double pillarTime : _kalotayWilliamsFabozzi.timeKeySet()) {
 			try {
 				int segmentCount = _kalotayWilliamsFabozzi.segmentCount();
 
-				if (timeToZeroVolatilityPeriodStateMap.get (endTime).period().in11 (t)) {
+				if (pillarTimeToCalibrationSegmentElasticMap.get (pillarTime).inelastic().in11 (t)) {
 					WengertJacobian datedJackDForwardDManifestMeasure = new WengertJacobian (
 						1,
 						segmentCount
@@ -380,7 +382,10 @@ public class ExplicitBootMuniCurve
 						if (!datedJackDForwardDManifestMeasure.accumulatePartialFirstDerivative (
 							0,
 							parameterIndex,
-							jackDForwardDManifestMeasure.firstDerivative ((int) endTime - 1, parameterIndex)
+							jackDForwardDManifestMeasure.firstDerivative (
+								(int) pillarTime - 1,
+								parameterIndex
+							)
 						))
 						{
 							return null;
@@ -395,5 +400,31 @@ public class ExplicitBootMuniCurve
 		}
 
 		return null;
+	}
+
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @param prefix Prefix
+	 * 
+	 * @return String Version of the State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + "(Code => " + _code +
+			"; Kalotay Williams Fabozzi => " + _kalotayWilliamsFabozzi + ")";
+	}
+
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @return String Version of the State
+	 */
+
+	@Override public String toString()
+	{
+		return toString ("");
 	}
 }

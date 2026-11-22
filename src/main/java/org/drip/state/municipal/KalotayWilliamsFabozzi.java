@@ -128,46 +128,46 @@ public class KalotayWilliamsFabozzi
 {
 
 	/**
-	 * Base Forward Node Off of Cumulative Calibration Yield
+	 * Segment Yield Unadjusted by Evolution Mean
 	 */
 
-	public static final int BASE_FORWARD_NODE_UNADJUSTED_CUMULATIVE_YIELD = 0;
+	public static final int EVOLUTION_MEAN_UNADJUSTED_SEGMENT_YIELD = 0;
 
 	/**
-	 * Base Forward Node Off of Mean-evolved Calibration Yield
+	 * Segment Yield Adjusted by Evolution Mean
 	 */
 
-	public static final int BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD = 1;
+	public static final int EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD = 1;
 
-	private TreeMap<Double, Double> _timeToCalibrationYieldMap = null;
-	private TreeMap<Double, List<Double>> _timeToProjectedPeriodYieldScalingMap = null;
-	private TreeMap<Double, ZeroVolatilityPeriodState> _timeToZeroVolatilityPeriodStateMap = null;
-	private TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> _timeToProjectedPeriodStateMap = null;
+	private TreeMap<Double, Double> _pillarTimeToCalibrationYieldMap = null;
+	private TreeMap<Double, List<Double>> _pillarTimeToYieldScalingListMap = null;
+	private TreeMap<Double, List<SegmentElastic>> _pillarTimeToSegmentElasticListMap = null;
+	private TreeMap<Double, CalibrationSegmentElastic> _pillarTimeToCalibrationSegmentElasticMap = null;
 
-	private boolean buildTimeToZeroVolatilityPeriodStateMap (
+	private boolean setupCalibrationSegmentElasticMap (
 		final double yieldBasis)
 	{
-		double startTime = 0.;
-		double startDiscountFactor = 1.;
+		double startingTime = 0.;
+		double startingDiscountFactor = 1.;
 
-		_timeToZeroVolatilityPeriodStateMap = new TreeMap<Double, ZeroVolatilityPeriodState>();
+		_pillarTimeToCalibrationSegmentElasticMap = new TreeMap<Double, CalibrationSegmentElastic>();
 
-		for (double endTime : _timeToCalibrationYieldMap.keySet()) {
-			double cumulativeMarketYield = _timeToCalibrationYieldMap.get (endTime) + yieldBasis;
+		for (double pillarTime : _pillarTimeToCalibrationYieldMap.keySet()) {
+			double pillarYield = _pillarTimeToCalibrationYieldMap.get (pillarTime) + yieldBasis;
 
-			double cumulativeDiscountFactor = Math.pow (1. + cumulativeMarketYield, -1. * endTime);
+			double pillarDiscountFactor = Math.pow (1. + pillarYield, -1. * pillarTime);
 
-			double forwardDiscountFactor = cumulativeDiscountFactor / startDiscountFactor;
+			double segmentDiscountFactor = pillarDiscountFactor / startingDiscountFactor;
 
 			try {
-				_timeToZeroVolatilityPeriodStateMap.put (
-					endTime,
-					new ZeroVolatilityPeriodState (
-						new KalotayWilliamsFabozziPeriod (startTime, endTime),
-						((1. / forwardDiscountFactor) - 1.) / (endTime - startTime),
-						forwardDiscountFactor,
-						cumulativeDiscountFactor,
-						cumulativeMarketYield
+				_pillarTimeToCalibrationSegmentElasticMap.put (
+					pillarTime,
+					new CalibrationSegmentElastic (
+						new SegmentInelastic (startingTime, pillarTime),
+						((1. / segmentDiscountFactor) - 1.) / (pillarTime - startingTime),
+						segmentDiscountFactor,
+						pillarDiscountFactor,
+						pillarYield
 					)
 				);
 			} catch (Exception e) {
@@ -176,8 +176,8 @@ public class KalotayWilliamsFabozzi
 				return false;
 			}
 
-			startDiscountFactor = cumulativeDiscountFactor;
-			startTime = endTime;
+			startingDiscountFactor = pillarDiscountFactor;
+			startingTime = pillarTime;
 		}
 
 		return true;
@@ -189,105 +189,120 @@ public class KalotayWilliamsFabozzi
 
 	public KalotayWilliamsFabozzi()
 	{
-		_timeToCalibrationYieldMap = new TreeMap<Double, Double>();
+		_pillarTimeToCalibrationYieldMap = new TreeMap<Double, Double>();
 
-		_timeToZeroVolatilityPeriodStateMap = new TreeMap<Double, ZeroVolatilityPeriodState>();
+		_pillarTimeToCalibrationSegmentElasticMap = new TreeMap<Double, CalibrationSegmentElastic>();
 	}
 
 	/**
-	 * Retrieve the Time Map of <i>ZeroVolatilityPeriodState</i> Instances
+	 * Retrieve the Pillar Time Map of Calibration Yields
 	 * 
-	 * @return Time Map of <i>ZeroVolatilityPeriodState</i> Instances
+	 * @return Pillar Time Map of Calibration Yields
 	 */
 
-	public TreeMap<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap()
+	public TreeMap<Double, Double> pillarTimeToCalibrationYieldMap()
 	{
-		return _timeToZeroVolatilityPeriodStateMap;
+		return _pillarTimeToCalibrationYieldMap;
 	}
 
 	/**
-	 * Retrieve the Time Map of Projected Period Yield Scaling
+	 * Retrieve the Map of Pillar Time to <i>CalibrationSegmentElastic</i> Instances
 	 * 
-	 * @return Time Map of Projected Period Yield Scaling
+	 * @return Map of Pillar Time to <i>CalibrationSegmentElastic</i> Instances
 	 */
 
-	public TreeMap<Double, List<Double>> timeToProjectedPeriodYieldScalingMap()
+	public TreeMap<Double, CalibrationSegmentElastic> pillarTimeToCalibrationSegmentElasticMap()
 	{
-		return _timeToProjectedPeriodYieldScalingMap;
+		return _pillarTimeToCalibrationSegmentElasticMap;
 	}
 
 	/**
-	 * Retrieve the Time Map of the Projected Period State List
+	 * Retrieve the Map of Pillar Time to Yield Scaling List
 	 * 
-	 * @return Time Map of the Projected Period State List
+	 * @return Map of Pillar Time to Yield Scaling List
 	 */
 
-	public TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap()
+	public TreeMap<Double, List<Double>> pillarTimeToYieldScalingListMap()
 	{
-		return _timeToProjectedPeriodStateMap;
+		return _pillarTimeToYieldScalingListMap;
 	}
 
 	/**
-	 * Retrieve the Count of Segments
+	 * Retrieve the Map of Pillar Time to Segment Elastic List
 	 * 
-	 * @return Count of Segments
+	 * @return Map of Pillar Time to Segment Elastic List
+	 */
+
+	public TreeMap<Double, List<SegmentElastic>> pillarTimeToSegmentElasticListMap()
+	{
+		return _pillarTimeToSegmentElasticListMap;
+	}
+
+	/**
+	 * Retrieve the Count of Calibration Segments
+	 * 
+	 * @return Count of Calibration Segments
 	 */
 
 	public int segmentCount()
 	{
-		return _timeToCalibrationYieldMap.size();
+		return _pillarTimeToCalibrationYieldMap.size();
 	}
 
 	/**
-	 * Retrieve the Set of Time Pillars
+	 * Retrieve the Set of Calibration Time Pillars
 	 * 
-	 * @return Set of Time Pillars
+	 * @return Set of Calibration Time Pillars
 	 */
 
 	public Set<Double> timeKeySet()
 	{
-		return _timeToCalibrationYieldMap.keySet();
+		return _pillarTimeToCalibrationYieldMap.keySet();
 	}
 
 	/**
-	 * Augment the <i>ZeroVolatilityPeriodState</i> Map with the Timed Market Yield
+	 * Update the <i>CalibrationSegmentElastic</i> Map with a Market Yield
 	 * 
-	 * @param endTime End Time Pillar
-	 * @param cumulativeMarketYield Cumulative Market Yield
+	 * @param pillarTime Pillar Time
+	 * @param marketYield Market Yield
 	 * 
-	 * @return TRUE - <i>ZeroVolatilityPeriodState</i> Map augmented successfully with the Timed Market Yield
+	 * @return TRUE - <i>CalibrationSegmentElastic</i> Map successfully updated
 	 */
 
-	public boolean augmentTimeToZeroVolatilityPeriodStateMap (
-		final double endTime,
-		final double cumulativeMarketYield)
+	public boolean updateCalibrationSegmentElasticMap (
+		final double pillarTime,
+		final double marketYield)
 	{
-		_timeToCalibrationYieldMap.put (endTime, cumulativeMarketYield);
+		if (!NumberUtil.IsValid (pillarTime) || 0. >= pillarTime || !NumberUtil.IsValid (marketYield)) {
+			return false;
+		}
 
-		double forwardDiscountFactor = 1. / (1. + cumulativeMarketYield);
-		double cumulativeEndDiscountFactor = forwardDiscountFactor;
+		_pillarTimeToCalibrationYieldMap.put (pillarTime, marketYield);
+
+		double segmentDiscountFactor = 1. / (1. + marketYield);
+		double pillarDiscountFactor = segmentDiscountFactor;
 		double startTime = 0.;
 
-		if (!_timeToZeroVolatilityPeriodStateMap.isEmpty()) {
-			ZeroVolatilityPeriodState zeroVolatilityPeriodState =
-				_timeToZeroVolatilityPeriodStateMap.lastEntry().getValue();
+		if (!_pillarTimeToCalibrationSegmentElasticMap.isEmpty()) {
+			CalibrationSegmentElastic calibrationSegmentElastic =
+				_pillarTimeToCalibrationSegmentElasticMap.lastEntry().getValue();
 
-			forwardDiscountFactor = (
-				cumulativeEndDiscountFactor = Math.pow (1. + cumulativeMarketYield, -1. * endTime)
-			) / zeroVolatilityPeriodState.cumulativeEndDiscountFactor();
+			segmentDiscountFactor = (
+				pillarDiscountFactor = Math.pow (1. + marketYield, -1. * pillarTime)
+			) / calibrationSegmentElastic.endDiscountFactor();
 
-			startTime = zeroVolatilityPeriodState.period().endTime();
+			startTime = calibrationSegmentElastic.inelastic().endTime();
 		}
 
 		try {
-			_timeToZeroVolatilityPeriodStateMap.put (
-				endTime,
-				new ZeroVolatilityPeriodState (
-					new KalotayWilliamsFabozziPeriod (startTime, endTime),
-					((1. / forwardDiscountFactor) - 1.) / (endTime - startTime),
-					forwardDiscountFactor,
-					cumulativeEndDiscountFactor,
-					cumulativeMarketYield
+			_pillarTimeToCalibrationSegmentElasticMap.put (
+				pillarTime,
+				new CalibrationSegmentElastic (
+					new SegmentInelastic (startTime, pillarTime),
+					((1. / segmentDiscountFactor) - 1.) / (pillarTime - startTime),
+					segmentDiscountFactor,
+					pillarDiscountFactor,
+					marketYield
 				)
 			);
 		} catch (Exception e) {
@@ -300,46 +315,48 @@ public class KalotayWilliamsFabozzi
 	}
 
 	/**
-	 * Bump the Cumulative Market Yield at the Specified Segment End Time Node
+	 * Bump the Market Yield for the Pillar Time
 	 * 
-	 * @param time Segment End Time Node
+	 * @param candidatePillarTime Candidate Pillar Time
 	 * @param yieldBump Yield Bump
 	 * 
-	 * @return TRUE - The Cumulative Market Yield successfully set at the Specified Segment End Time Node
+	 * @return TRUE - The Market Yield successfully set for the Pillar Time
 	 */
 
-	public boolean bumpZeroVolatilityPeriodState (
-		final double time,
+	public boolean bumpMarketYield (
+		final double candidatePillarTime,
 		final double yieldBump)
 	{
-		if (!NumberUtil.IsValid (yieldBump)) {
+		if (!NumberUtil.IsValid (candidatePillarTime) || 0. >= candidatePillarTime ||
+			!NumberUtil.IsValid (yieldBump))
+		{
 			return false;
 		}
 
 		double startTime = 0.;
 		double startDiscountFactor = 1.;
 
-		for (double endTime : _timeToCalibrationYieldMap.keySet()) {
-			if (time < endTime) {
+		for (double pillarTime : _pillarTimeToCalibrationYieldMap.keySet()) {
+			if (candidatePillarTime < pillarTime) {
 				continue;
 			}
 
-			double cumulativeMarketYield = _timeToCalibrationYieldMap.get (endTime) +
-				(time == endTime ? yieldBump : 0.);
+			double marketYield = _pillarTimeToCalibrationYieldMap.get (pillarTime) +
+				(candidatePillarTime == pillarTime ? yieldBump : 0.);
 
-			double cumulativeDiscountFactor = Math.pow (1. + cumulativeMarketYield, -1. * endTime);
+			double pillarDiscountFactor = Math.pow (1. + marketYield, -1. * pillarTime);
 
-			double forwardDiscountFactor = cumulativeDiscountFactor / startDiscountFactor;
+			double segmentDiscountFactor = pillarDiscountFactor / startDiscountFactor;
 
 			try {
-				_timeToZeroVolatilityPeriodStateMap.put (
-					endTime,
-					new ZeroVolatilityPeriodState (
-						new KalotayWilliamsFabozziPeriod (startTime, endTime),
-						((1. / forwardDiscountFactor) - 1.) / (endTime - startTime),
-						forwardDiscountFactor,
-						cumulativeDiscountFactor,
-						cumulativeMarketYield
+				_pillarTimeToCalibrationSegmentElasticMap.put (
+					pillarTime,
+					new CalibrationSegmentElastic (
+						new SegmentInelastic (startTime, pillarTime),
+						((1. / segmentDiscountFactor) - 1.) / (pillarTime - startTime),
+						segmentDiscountFactor,
+						pillarDiscountFactor,
+						marketYield
 					)
 				);
 			} catch (Exception e) {
@@ -348,8 +365,8 @@ public class KalotayWilliamsFabozzi
 				return false;
 			}
 
-			startDiscountFactor = cumulativeDiscountFactor;
-			startTime = endTime;
+			startDiscountFactor = pillarDiscountFactor;
+			startTime = pillarTime;
 		}
 
 		return true;
@@ -366,7 +383,7 @@ public class KalotayWilliamsFabozzi
 	public boolean applyBasisYield (
 		final double basisYield)
 	{
-		return NumberUtil.IsValid (basisYield) && buildTimeToZeroVolatilityPeriodStateMap (basisYield);
+		return NumberUtil.IsValid (basisYield) && setupCalibrationSegmentElasticMap (basisYield);
 	}
 
 	/**
@@ -377,43 +394,42 @@ public class KalotayWilliamsFabozzi
 
 	public boolean removeBasisYield()
 	{
-		return buildTimeToZeroVolatilityPeriodStateMap (0.);
+		return setupCalibrationSegmentElasticMap (0.);
 	}
 
 	/**
-	 * Apply Annualized Forward Yield Volatility
+	 * Apply Segment Yield Volatility
 	 * 
-	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
+	 * @param segmentYieldVolatility Segment Yield Volatility
 	 * 
-	 * @return TRUE - The Annualized Forward Yield Volatility successfully applied
+	 * @return TRUE - The Segment Yield Volatility successfully applied
 	 */
 
-	public boolean applyAnnualizedForwardYieldVolatility (
-		final double annualizedForwardYieldVolatility)
+	public boolean applySegmentYieldVolatility (
+		final double segmentYieldVolatility)
 	{
-		if (!NumberUtil.IsValid (annualizedForwardYieldVolatility) || 0. > annualizedForwardYieldVolatility)
-		{
+		if (!NumberUtil.IsValid (segmentYieldVolatility) || 0. > segmentYieldVolatility) {
 			return false;
 		}
 
 		int segmentIndex = 0;
 
-		_timeToProjectedPeriodYieldScalingMap = new TreeMap<Double, List<Double>>();
+		_pillarTimeToYieldScalingListMap = new TreeMap<Double, List<Double>>();
 
-		double periodYieldScalingFactor = Math.exp (2. * annualizedForwardYieldVolatility);
+		double pillarYieldScalingFactor = Math.exp (2. * segmentYieldVolatility);
 
-		for (double endTime : _timeToZeroVolatilityPeriodStateMap.keySet()) {
-			double periodYieldScaling = 1.;
+		for (double pillarTime : _pillarTimeToCalibrationSegmentElasticMap.keySet()) {
+			double pillarYieldScaling = 1.;
 
-			List<Double> projectedPeriodYieldScalingList = new ArrayList<Double>();
+			List<Double> pillarYieldScalingList = new ArrayList<Double>();
 
 			for (int projectionIndex = 0; projectionIndex <= segmentIndex; ++projectionIndex) {
-				projectedPeriodYieldScalingList.add (periodYieldScaling);
+				pillarYieldScalingList.add (pillarYieldScaling);
 
-				periodYieldScaling *= periodYieldScalingFactor;
+				pillarYieldScaling *= pillarYieldScalingFactor;
 			}
 
-			_timeToProjectedPeriodYieldScalingMap.put (endTime, projectedPeriodYieldScalingList);
+			_pillarTimeToYieldScalingListMap.put (pillarTime, pillarYieldScalingList);
 
 			++segmentIndex;
 		}
@@ -422,64 +438,61 @@ public class KalotayWilliamsFabozzi
 	}
 
 	/**
-	 * Apply the Time Map of Projected Base Forward Yield
+	 * Apply the Map of Pillar Time to Base Segment Yield #1
 	 * 
-	 * @param projectedBaseForwardYieldMap Map of Projected Base Forward Yield
+	 * @param pillarTimeToSegmentBaseYieldMap Map of Pillar Time to Segment Base Yield
 	 * 
-	 * @return TRUE - The Time Map of Projected Base Forward Yield successfully applied
+	 * @return TRUE - Map of Pillar Time to Segment Base Yield successfully applied
 	 */
 
-	public boolean applyProjectedBaseForwardYield (
-		final TreeMap<Double, Double> projectedBaseForwardYieldMap)
+	public boolean applySegmentBaseYield (
+		final TreeMap<Double, Double> pillarTimeToSegmentBaseYieldMap)
 	{
-		if (null == projectedBaseForwardYieldMap || 0 == projectedBaseForwardYieldMap.size()) {
+		if (null == pillarTimeToSegmentBaseYieldMap || 0 == pillarTimeToSegmentBaseYieldMap.size()) {
 			return false;
 		}
 
 		double startTime = 0.;
-		List<KalotayWilliamsFabozziPeriodState> previousKalotayWilliamsFabozziPeriodStateList = null;
+		List<SegmentElastic> previousSegmentElasticList = null;
 
-		_timeToProjectedPeriodStateMap = new TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>>();
+		_pillarTimeToSegmentElasticListMap = new TreeMap<Double, List<SegmentElastic>>();
 
-		for (double endTime : _timeToZeroVolatilityPeriodStateMap.keySet()) {
-			List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
-				new ArrayList<KalotayWilliamsFabozziPeriodState>();
+		for (double pillarTime : _pillarTimeToCalibrationSegmentElasticMap.keySet()) {
+			double segmentBaseYield = pillarTimeToSegmentBaseYieldMap.containsKey (pillarTime) ?
+				pillarTimeToSegmentBaseYieldMap.get (pillarTime) :
+				_pillarTimeToCalibrationSegmentElasticMap.get (pillarTime).forwardYield();
 
-			double baseForwardYield = projectedBaseForwardYieldMap.containsKey (endTime) ?
-				projectedBaseForwardYieldMap.get (endTime) :
-				_timeToZeroVolatilityPeriodStateMap.get (endTime).forwardYield();
+			int previousSegmentVertexCount = null == previousSegmentElasticList ?
+				0 : previousSegmentElasticList.size();
 
-			double timeGap = endTime - startTime;
-			int segmentProjectionListIndex = 0;
+			List<SegmentElastic> segmentElasticList = new ArrayList<SegmentElastic>();
 
-			for (double periodYieldScaling : _timeToProjectedPeriodYieldScalingMap.get (endTime)) {
-				double forwardYield = baseForwardYield * periodYieldScaling;
+			double segmentTime = pillarTime - startTime;
+			int segmentVertexCount = 0;
 
-				double forwardDiscountFactor = Math.pow (1. + forwardYield, -1. * timeGap);
+			for (double pillarYieldScaling : _pillarTimeToYieldScalingListMap.get (pillarTime)) {
+				double segmentYield = segmentBaseYield * pillarYieldScaling;
 
-				int previousSegmentProjectionCount = null == previousKalotayWilliamsFabozziPeriodStateList ?
-					0 : previousKalotayWilliamsFabozziPeriodStateList.size();
+				double segmentDiscountFactor = Math.pow (1. + segmentYield, -1. * segmentTime);
 
-				double endDiscountFactor = forwardDiscountFactor;
+				double segmentEndDiscountFactor = segmentDiscountFactor;
 
-				if (segmentProjectionListIndex < previousSegmentProjectionCount) {
-					endDiscountFactor *= previousKalotayWilliamsFabozziPeriodStateList.get (
-						segmentProjectionListIndex
-					).cumulativeEndDiscountFactor();
-				} else if (0 != previousSegmentProjectionCount) {
-					endDiscountFactor *= previousKalotayWilliamsFabozziPeriodStateList.get (
-						previousSegmentProjectionCount - 1
-					).cumulativeEndDiscountFactor();
+				if (segmentVertexCount < previousSegmentVertexCount) {
+					segmentEndDiscountFactor *=
+						previousSegmentElasticList.get (segmentVertexCount).endDiscountFactor();
+				} else if (0 != previousSegmentVertexCount) {
+					segmentEndDiscountFactor *= previousSegmentElasticList.get (
+						previousSegmentVertexCount - 1
+					).endDiscountFactor();
 				}
 
 				try {
-					kalotayWilliamsFabozziPeriodStateList.add (
-						new ZeroVolatilityPeriodState (
-							new KalotayWilliamsFabozziPeriod (startTime, endTime),
-							forwardYield,
-							forwardDiscountFactor,
-							endDiscountFactor,
-							Math.pow (endDiscountFactor, -1. * (1 / endTime)) - 1.
+					segmentElasticList.add (
+						new SegmentElastic (
+							new SegmentInelastic (startTime, pillarTime),
+							segmentYield,
+							segmentDiscountFactor,
+							segmentEndDiscountFactor
 						)
 					);
 				} catch (Exception e) {
@@ -488,92 +501,91 @@ public class KalotayWilliamsFabozzi
 					return false;
 				}
 
-				++segmentProjectionListIndex;
+				++segmentVertexCount;
 			}
 
-			_timeToProjectedPeriodStateMap.put (endTime, kalotayWilliamsFabozziPeriodStateList);
+			_pillarTimeToSegmentElasticListMap.put (pillarTime, segmentElasticList);
 
-			previousKalotayWilliamsFabozziPeriodStateList = kalotayWilliamsFabozziPeriodStateList;
-			startTime = endTime;
+			previousSegmentElasticList = segmentElasticList;
+			startTime = pillarTime;
 		}
 
 		return true;
 	}
 
 	/**
-	 * Apply the Time Map of Projected Base Forward Yield
+	 * Apply the Map of Pillar Time to Segment Base Yield #2
 	 * 
-	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
-	 * @param timeToProjectedBaseForwardYieldMap Map of Projected Base Forward Yield
+	 * @param segmentYieldVolatility Segment Yield Volatility
+	 * @param yieldScalingScheme Yield Scaling Scheme
 	 * 
-	 * @return TRUE - The Time Map of Projected Base Forward Yield successfully applied
+	 * @return TRUE - The Map of Pillar Time to Segment Base Yield successfully applied
 	 */
 
-	public boolean applyProjectedBaseForwardYield (
-		final double annualizedForwardYieldVolatility,
-		final TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap)
+	public boolean applySegmentBaseYield (
+		final double segmentYieldVolatility,
+		final int yieldScalingScheme)
 	{
-		return applyAnnualizedForwardYieldVolatility (annualizedForwardYieldVolatility) &&
-			applyProjectedBaseForwardYield (timeToProjectedBaseForwardYieldMap);
-	}
-
-	/**
-	 * Apply the Time Map of Projected Base Forward Yield
-	 * 
-	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
-	 * @param forwardNodeProjectionScheme Forward Node Projection Scheme
-	 * 
-	 * @return TRUE - The Time Map of Projected Base Forward Yield successfully applied
-	 */
-
-	public boolean applyProjectedBaseForwardYield (
-		final double annualizedForwardYieldVolatility,
-		final int forwardNodeProjectionScheme)
-	{
-		if (!applyAnnualizedForwardYieldVolatility (annualizedForwardYieldVolatility)) {
+		if (!applySegmentYieldVolatility (segmentYieldVolatility)) {
 			return false;
 		}
 
-		TreeMap<Double, Double> timeToProjectedBaseForwardYieldMap = new TreeMap<Double, Double>();
+		TreeMap<Double, Double> pillarTimeToSegmentYieldMap = new TreeMap<Double, Double>();
 
-		for (Double endTime : _timeToZeroVolatilityPeriodStateMap.keySet()) {
+		for (Double pillarTime : _pillarTimeToCalibrationSegmentElasticMap.keySet()) {
 			double scaleDownFactor = 1.;
 
-			if (BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD == forwardNodeProjectionScheme) {
+			if (EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD == yieldScalingScheme) {
 				scaleDownFactor = 0.;
 
-				List<Double> projectedPeriodYieldScalingList =
-					_timeToProjectedPeriodYieldScalingMap.get (endTime);
+				List<Double> segmentYieldScalingList = _pillarTimeToYieldScalingListMap.get (pillarTime);
 
-				for (Double scalingFactor : projectedPeriodYieldScalingList) {
-					scaleDownFactor += scalingFactor;
+				for (Double segmentYieldScaling : segmentYieldScalingList) {
+					scaleDownFactor += segmentYieldScaling;
 				}
 
-				scaleDownFactor /= projectedPeriodYieldScalingList.size();
+				scaleDownFactor /= segmentYieldScalingList.size();
 			}
 
-			timeToProjectedBaseForwardYieldMap.put (
-				endTime,
-				_timeToZeroVolatilityPeriodStateMap.get (endTime).forwardYield() / scaleDownFactor
+			pillarTimeToSegmentYieldMap.put (
+				pillarTime,
+				_pillarTimeToCalibrationSegmentElasticMap.get (pillarTime).forwardYield() / scaleDownFactor
 			);
 		}
 
-		return applyProjectedBaseForwardYield (timeToProjectedBaseForwardYieldMap);
+		return applySegmentBaseYield (pillarTimeToSegmentYieldMap);
 	}
 
 	/**
-	 * Retrieve the List of <i>KalotayWilliamsFabozziPeriodState</i> Instances at the Specified Time Node
+	 * Apply the Pillar Time Map of Segment Base Yield
 	 * 
-	 * @param bespokeTime Bespoke Time Node
+	 * @param segmentYieldVolatility Annualized Segment Yield Volatility
+	 * @param pillarTimeToSegmentBaseYieldMap Map of Segment Base Yield
 	 * 
-	 * @return List of <i>KalotayWilliamsFabozziPeriodState</i> Instances
+	 * @return TRUE - The Pillar Time Map of Segment Base Yield successfully applied
 	 */
 
-	public List<KalotayWilliamsFabozziPeriodState> bespokePeriodStateList (
+	public boolean applyBaseForwardYield (
+		final double segmentYieldVolatility,
+		final TreeMap<Double, Double> pillarTimeToSegmentBaseYieldMap)
+	{
+		return applySegmentYieldVolatility (segmentYieldVolatility) &&
+			applySegmentBaseYield (pillarTimeToSegmentBaseYieldMap);
+	}
+
+	/**
+	 * Retrieve the List of <i>SegmentElastic</i> Instances at the Bespoke Time
+	 * 
+	 * @param bespokeTime Bespoke Time
+	 * 
+	 * @return List of <i>SegmentElastic</i> Instances
+	 */
+
+	public List<SegmentElastic> bespokeSegmentElasticList (
 		final double bespokeTime)
 	{
 		if (!NumberUtil.IsValid (bespokeTime) || 0. >= bespokeTime ||
-			_timeToProjectedPeriodStateMap.isEmpty())
+			_pillarTimeToSegmentElasticListMap.isEmpty())
 		{
 			return null;
 		}
@@ -581,17 +593,46 @@ public class KalotayWilliamsFabozzi
 		double segmentStartTime = 0.;
 		double segmentEndTime = Double.NaN;
 
-		for (double endTime : _timeToProjectedPeriodStateMap.keySet()) {
-			if (endTime > bespokeTime) {
-				segmentEndTime = endTime;
+		double lastPillarTime = _pillarTimeToSegmentElasticListMap.lastKey();
+
+		if (bespokeTime > lastPillarTime) {
+			List<SegmentElastic> segmentElasticList = new ArrayList<SegmentElastic>();
+
+			for (SegmentElastic segmentElastic : _pillarTimeToSegmentElasticListMap.get (lastPillarTime)) {
+				double segmentYield = segmentElastic.forwardYield();
+
+				double segmentDiscountFactor = 1. / (1. + segmentYield * (bespokeTime - lastPillarTime));
+
+				try {
+					segmentElasticList.add (
+						new SegmentElastic (
+							new SegmentInelastic (lastPillarTime, bespokeTime),
+							segmentYield,
+							segmentDiscountFactor,
+							segmentElastic.endDiscountFactor() * segmentDiscountFactor
+						)
+					);
+				} catch (Exception e) {
+					e.printStackTrace();
+
+					return null;
+				}
+			}
+
+			return segmentElasticList;
+		}
+
+		for (double pillarTime : _pillarTimeToSegmentElasticListMap.keySet()) {
+			if (pillarTime > bespokeTime) {
+				segmentEndTime = pillarTime;
 				break;
 			}
 
-			if (endTime == bespokeTime) {
-				return _timeToProjectedPeriodStateMap.get (endTime);
+			if (pillarTime == bespokeTime) {
+				return _pillarTimeToSegmentElasticListMap.get (pillarTime);
 			}
 
-			segmentStartTime = endTime;
+			segmentStartTime = pillarTime;
 		}
 
 		if (Double.isNaN (segmentEndTime)) {
@@ -601,30 +642,26 @@ public class KalotayWilliamsFabozzi
 		double timeShift = segmentEndTime - bespokeTime;
 
 		double frontalDiscountFactorAdjustment =
-			1. + _timeToZeroVolatilityPeriodStateMap.firstEntry().getValue().cumulativeMarketYield() *
+			1. + _pillarTimeToCalibrationSegmentElasticMap.firstEntry().getValue().marketYield() *
 				(bespokeTime - segmentStartTime);
 
-		List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
-			new ArrayList<KalotayWilliamsFabozziPeriodState>();
+		List<SegmentElastic> segmentElasticList = new ArrayList<SegmentElastic>();
 
-		for (KalotayWilliamsFabozziPeriodState kalotayWilliamsFabozziPeriodState :
-			_timeToProjectedPeriodStateMap.get (segmentEndTime))
-		{
-			KalotayWilliamsFabozziPeriod period = kalotayWilliamsFabozziPeriodState.period();
+		for (SegmentElastic segmentElastic : _pillarTimeToSegmentElasticListMap.get (segmentEndTime)) {
+			SegmentInelastic inelastic = segmentElastic.inelastic();
 
-			double startTime = period.startTime() - timeShift;
+			double startTime = inelastic.startTime() - timeShift;
 
 			try {
-				kalotayWilliamsFabozziPeriodStateList.add (
-					new KalotayWilliamsFabozziPeriodState (
-						new KalotayWilliamsFabozziPeriod (
+				segmentElasticList.add (
+					new SegmentElastic (
+						new SegmentInelastic (
 							0. > startTime ? 0. : startTime,
-							period.endTime() - timeShift
+							inelastic.endTime() - timeShift
 						),
-						kalotayWilliamsFabozziPeriodState.forwardYield(),
-						kalotayWilliamsFabozziPeriodState.forwardDiscountFactor(),
-						kalotayWilliamsFabozziPeriodState.cumulativeEndDiscountFactor() *
-							frontalDiscountFactorAdjustment
+						segmentElastic.forwardYield(),
+						segmentElastic.forwardDiscountFactor(),
+						segmentElastic.endDiscountFactor() * frontalDiscountFactorAdjustment
 					)
 				);
 			} catch (Exception e) {
@@ -634,6 +671,35 @@ public class KalotayWilliamsFabozzi
 			}
 		}
 
-		return kalotayWilliamsFabozziPeriodStateList;
+		return segmentElasticList;
+	}
+
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @param prefix Prefix
+	 * 
+	 * @return String Version of the State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + "Pillar Time To Calibration Yield Map => " + _pillarTimeToCalibrationYieldMap +
+			"; Pillar Time To Yield Scaling List Map => " + _pillarTimeToYieldScalingListMap +
+			"; Pillar Time To Calibration Segment Elastic Map => " +
+				_pillarTimeToCalibrationSegmentElasticMap +
+			"; Pillar Time To Segment Elastic List Map => " + _pillarTimeToSegmentElasticListMap;
+	}
+
+	/**
+	 * Generate a String Version of the State
+	 * 
+	 * @return String Version of the State
+	 */
+
+	@Override public String toString()
+	{
+		return toString ("");
 	}
 }

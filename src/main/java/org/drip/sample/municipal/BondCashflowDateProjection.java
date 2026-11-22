@@ -13,7 +13,7 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.ExplicitBootMuniCurve;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -207,8 +207,8 @@ public class BondCashflowDateProjection
 		final int bespokeDateJulian)
 		throws Exception
 	{
-		List<KalotayWilliamsFabozziPeriodState> bespokePeriodStateList =
-			kalotayWilliamsFabozzi.bespokePeriodStateList (
+		List<SegmentElastic> bespokePeriodStateList =
+			kalotayWilliamsFabozzi.bespokeSegmentElasticList (
 				((double) (bespokeDateJulian - spotDateJulian)) / 365.25
 			);
 
@@ -222,15 +222,13 @@ public class BondCashflowDateProjection
 			"\t||-------------------------------------------------------------------------------------||"
 		);
 
-		for (KalotayWilliamsFabozziPeriodState bespokePeriodState : bespokePeriodStateList) {
+		for (SegmentElastic bespokePeriodState : bespokePeriodStateList) {
 			System.out.println (
-				"\t|| [" + bespokePeriodState.period() + "] =>" +
+				"\t|| [" + bespokePeriodState.inelastic() + "] =>" +
 					FormatUtil.FormatDouble (bespokePeriodState.forwardYield(), 2, 2, 100.) + "% | " +
 					FormatUtil.FormatDouble (bespokePeriodState.forwardDiscountFactor(), 1, 4, 1.) + " | " +
-					FormatUtil.FormatDouble (bespokePeriodState.cumulativeBeginDiscountFactor(), 1, 4, 1.) +
-						" | " +
-					FormatUtil.FormatDouble (bespokePeriodState.cumulativeEndDiscountFactor(), 1, 4, 1.) +
-						" ||"
+					FormatUtil.FormatDouble (bespokePeriodState.beginDiscountFactor(), 1, 4, 1.) + " | " +
+					FormatUtil.FormatDouble (bespokePeriodState.endDiscountFactor(), 1, 4, 1.) +" ||"
 			);
 		}
 
@@ -330,9 +328,9 @@ public class BondCashflowDateProjection
 
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = explicitBootMuniCurve.kalotayWilliamsFabozzi();
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
 		System.out.println (

@@ -10,7 +10,7 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.eostree.ProxyBondEvaluator;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.KalotayWilliamsFabozziPeriodState;
+import org.drip.state.municipal.SegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -280,19 +280,16 @@ public class FigureH
 		TreeMap<Double, Double> timeToCalibrationYieldMap = TimeToCalibrationYieldMap();
 
 		for (double time : timeToCalibrationYieldMap.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMap.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMap.get (time));
 		}
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applyBaseForwardYield (
 			annualizedForwardVolatility,
 			timeToProjectedBaseForwardYieldMapInput
 		);
 
-		TreeMap<Double, List<KalotayWilliamsFabozziPeriodState>> timeToProjectedPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToProjectedPeriodStateMap();
+		TreeMap<Double, List<SegmentElastic>> timeToProjectedPeriodStateMap =
+			kalotayWilliamsFabozzi.pillarTimeToSegmentElasticListMap();
 
 		ProxyBondEvaluator proxyBulletBond = ProxyBondEvaluator.Bullet (bondMaturityTime, bondCoupon);
 
@@ -314,7 +311,7 @@ public class FigureH
 			if (timeToProjectedForwardYieldListMapReconciler.containsKey (time)) {
 				String dump = "\t|" + FormatUtil.FormatDouble (time, 1, 0, 1.) + " => ";
 
-				List<KalotayWilliamsFabozziPeriodState> kalotayWilliamsFabozziPeriodStateList =
+				List<SegmentElastic> kalotayWilliamsFabozziPeriodStateList =
 					timeToProjectedPeriodStateMap.get (time);
 
 				List<Double> projectedForwardYieldListReconciliation =
@@ -346,7 +343,7 @@ public class FigureH
 			TimeToProjectedBulletBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedBulletBondValueListMap =
-			proxyBulletBond.valueTree (null, kalotayWilliamsFabozzi);
+			proxyBulletBond.valueGrid (null, kalotayWilliamsFabozzi).timetoPVListMap();
 
 		System.out.println ("\t|------------------------------------------------------||");
 
@@ -391,13 +388,14 @@ public class FigureH
 
 		System.out.println ("\t|------------------------------------------------------||\n");
 
-		ProxyBondEvaluator proxyPuttableBond = ProxyBondEvaluator.Puttable (bondMaturityTime, bondCoupon, putPriceSchedule);
+		ProxyBondEvaluator proxyPuttableBond =
+			ProxyBondEvaluator.Puttable (bondMaturityTime, bondCoupon, putPriceSchedule);
 
 		Map<Double, List<Double>> timeToProjectedPuttableBondValueListMapReconciler =
 			TimeToProjectedPuttableBondValueListMapReconciler();
 
 		TreeMap<Double, List<Double>> projectedPuttableBondValueListMap =
-			proxyPuttableBond.valueTree (null, kalotayWilliamsFabozzi);
+			proxyPuttableBond.valueGrid (null, kalotayWilliamsFabozzi).timetoPVListMap();
 
 		System.out.println ("\t|------------------------------------------------------||");
 

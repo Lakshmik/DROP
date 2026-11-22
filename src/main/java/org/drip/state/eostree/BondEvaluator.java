@@ -1,12 +1,9 @@
 
 package org.drip.state.eostree;
 
-import java.util.List;
-import java.util.TreeMap;
-
 import org.drip.analytics.date.JulianDate;
 import org.drip.numerical.common.NumberUtil;
-import org.drip.state.municipal.BondSensitivity;
+import org.drip.state.municipal.YieldSensitivity;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 
 /*
@@ -132,36 +129,36 @@ public abstract class BondEvaluator
 	protected double priceFromYieldBasis (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
-		final double annualizedForwardYieldVolatility,
+		final double segmentYieldVolatility,
 		final double yieldBasis)
 		throws Exception
 	{
 		kalotayWilliamsFabozzi.applyBasisYield (yieldBasis);
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
-			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
+			segmentYieldVolatility,
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
-		TreeMap<Double, List<Double>> bumpUpValueTree = valueTree (spotDate, kalotayWilliamsFabozzi);
+		ValueGrid valueGrid = valueGrid (spotDate, kalotayWilliamsFabozzi);
 
-		if (null == bumpUpValueTree) {
+		if (null == valueGrid) {
 			throw new Exception ("BondEvaluator::priceFromYieldBasis => Cannot calculate Price");
 		}
 
-		return bumpUpValueTree.firstEntry().getValue().get (0);
+		return valueGrid.pv();
 	}
 
 	/**
-	 * Construct the Bond Value Tree using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
+	 * Construct the Bond Value Grid using the Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @param spotDate Calibrated <i>KalotayWilliamsFabozzi</i> Instance
+	 * @param spotDate Spot Date
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
 	 * 
-	 * @return Bond Value Tree
+	 * @return Bond Value Grid
 	 */
 
-	public abstract TreeMap<Double, List<Double>> valueTree (
+	public abstract ValueGrid valueGrid (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi
 	);
@@ -185,47 +182,46 @@ public abstract class BondEvaluator
 	 * 
 	 * @param spotDate Spot Date
 	 * @param kalotayWilliamsFabozzi Calibrated <i>KalotayWilliamsFabozzi</i> Instance
-	 * @param annualizedForwardYieldVolatility Annualized Forward Yield Volatility
+	 * @param segmentYieldVolatility Segment Yield Volatility
 	 * @param yieldBasis Yield Basis
 	 * 
 	 * @return Secular Bond Sensitivity Measures from the Yield Basis
 	 */
 
-	public BondSensitivity secularMeasuresFromYieldBasis (
+	public YieldSensitivity secularMeasuresFromYieldBasis (
 		final JulianDate spotDate,
 		final KalotayWilliamsFabozzi kalotayWilliamsFabozzi,
-		final double annualizedForwardYieldVolatility,
+		final double segmentYieldVolatility,
 		final double yieldBasis)
 	{
-		if (!NumberUtil.IsValid (annualizedForwardYieldVolatility) ||
-				0. > annualizedForwardYieldVolatility ||
+		if (!NumberUtil.IsValid (segmentYieldVolatility) || 0. > segmentYieldVolatility ||
 			!NumberUtil.IsValid (yieldBasis))
 		{
 			return null;
 		}
 
-		TreeMap<Double, List<Double>> theoreticalValueTree = valueTree (spotDate, kalotayWilliamsFabozzi);
+		ValueGrid valueGrid = valueGrid (spotDate, kalotayWilliamsFabozzi);
 
 		try {
-			return null == theoreticalValueTree ? null : BondSensitivity.FromBaseUpDown (
-				theoreticalValueTree.firstEntry().getValue().get (0),
+			return null == valueGrid ? null : YieldSensitivity.FromBaseUpDown (
+				valueGrid.pv(),
 				priceFromYieldBasis (
 					spotDate,
 					kalotayWilliamsFabozzi,
-					annualizedForwardYieldVolatility,
+					segmentYieldVolatility,
 					yieldBasis
 				),
 				yieldBasis,
 				priceFromYieldBasis (
 					spotDate,
 					kalotayWilliamsFabozzi,
-					annualizedForwardYieldVolatility,
+					segmentYieldVolatility,
 					yieldBasis + SENSITIVITY_BUMP
 				),
 				priceFromYieldBasis (
 					spotDate,
 					kalotayWilliamsFabozzi,
-					annualizedForwardYieldVolatility,
+					segmentYieldVolatility,
 					yieldBasis - SENSITIVITY_BUMP
 				),
 				SENSITIVITY_BUMP

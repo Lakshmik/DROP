@@ -81,10 +81,10 @@ import org.drip.service.common.FormatUtil;
  */
 
 /**
- * <i>KalotayWilliamsFabozzi</i> implements a Period in the Kalotay, Williams, and Fabozzi (1993) Tree-based
- * 	Model for valuing bonds with Embedded Options. The References are:
+ * <i>CalibrationSegmentElastic</i> augments the Period's Inferred Path Metrics with the Market Yield. The
+ *  References are:
  *  
- * 	<br>
+ * 	<br><br>
  *  <ul>
  * 		<li>
  * 			Black, F., E. Derman, and W. Toy (1990): A One-Factor Model of Interest Rates and Its Application
@@ -120,137 +120,47 @@ import org.drip.service.common.FormatUtil;
  * @author Lakshmi Krishnamurthy
  */
 
-public class KalotayWilliamsFabozziPeriod
+public class CalibrationSegmentElastic
+	extends SegmentElastic
 {
-	private double _endTime = Double.NaN;
-	private double _startTime = Double.NaN;
+	private double _marketYield = Double.NaN;
 
 	/**
-	 * <i>KalotayWilliamsFabozziPeriod</i> Constructor
+	 * <i>CalibrationSegmentElastic</i> Constructor
 	 * 
-	 * @param startTime Start Time of the Period
-	 * @param endTime End Time of the Period
+	 * @param inelastic <i>SegmentInelastic</i> Instance
+	 * @param forwardYield Forward Yield
+	 * @param forwardDiscountFactor Forward Discount Factor
+	 * @param endDiscountFactor Segment End Discount Factor
+	 * @param marketYield Market Yield
 	 * 
 	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
-	public KalotayWilliamsFabozziPeriod (
-		final double startTime,
-		final double endTime)
+	public CalibrationSegmentElastic (
+		final SegmentInelastic inelastic,
+		final double forwardYield,
+		final double forwardDiscountFactor,
+		final double endDiscountFactor,
+		final double marketYield)
 		throws Exception
 	{
-		if (!NumberUtil.IsValid (_startTime = startTime) ||
-			!NumberUtil.IsValid (_endTime = endTime) ||
-			_endTime <= _startTime)
-		{
-			throw new Exception ("KalotayWilliamsFabozziPeriod Constructor => Invalid Inputs");
+		super (inelastic, forwardYield, forwardDiscountFactor, endDiscountFactor);
+
+		if (!NumberUtil.IsValid (_marketYield = marketYield)) {
+			throw new Exception ("CalibrationSegmentElastic Constructor => Invalid Inputs");
 		}
 	}
 
 	/**
-	 * Retrieve the Start Time of the Period
+	 * Retrieve the Market Yield
 	 * 
-	 * @return Start Time of the Period
+	 * @return Market Yield
 	 */
 
-	public double startTime()
+	public double marketYield()
 	{
-		return _startTime;
-	}
-
-	/**
-	 * Retrieve the End Time of the Period
-	 * 
-	 * @return End Time of the Period
-	 */
-
-	public double endTime()
-	{
-		return _endTime;
-	}
-
-	/**
-	 * Indicate if the Time is inside the period (exclusive, exclusive)
-	 * 
-	 * @param time Time
-	 * 
-	 * @return TRUE - Time is inside the period (exclusive, exclusive)
-	 * 
-	 * @throws Exception Thrown if the Input is invalid
-	 */
-
-	public boolean in00 (
-		final double time)
-		throws Exception
-	{
-		if (!NumberUtil.IsValid (time)) {
-			throw new Exception ("KalotayWilliamsFabozziPeriod::in00 => Invalid Inputs");
-		}
-
-		return time > _startTime && time < _endTime;
-	}
-
-	/**
-	 * Indicate if the Time is inside the period (inclusive, exclusive)
-	 * 
-	 * @param time Time
-	 * 
-	 * @return TRUE - Time is inside the period (inclusive, exclusive)
-	 * 
-	 * @throws Exception Thrown if the Input is invalid
-	 */
-
-	public boolean in10 (
-		final double time)
-		throws Exception
-	{
-		if (!NumberUtil.IsValid (time)) {
-			throw new Exception ("KalotayWilliamsFabozziPeriod::in10 => Invalid Inputs");
-		}
-
-		return time >= _startTime && time < _endTime;
-	}
-
-	/**
-	 * Indicate if the Time is inside the period (exclusive, inclusive)
-	 * 
-	 * @param time Time
-	 * 
-	 * @return TRUE - Time is inside the period (exclusive, inclusive)
-	 * 
-	 * @throws Exception Thrown if the Input is invalid
-	 */
-
-	public boolean in01 (
-		final double time)
-		throws Exception
-	{
-		if (!NumberUtil.IsValid (time)) {
-			throw new Exception ("KalotayWilliamsFabozziPeriod::in01 => Invalid Inputs");
-		}
-
-		return time > _startTime && time <= _endTime;
-	}
-
-	/**
-	 * Indicate if the Time is inside the period (inclusive, inclusive)
-	 * 
-	 * @param time Time
-	 * 
-	 * @return TRUE - Time is inside the period (inclusive, inclusive)
-	 * 
-	 * @throws Exception Thrown if the Input is invalid
-	 */
-
-	public boolean in11 (
-		final double time)
-		throws Exception
-	{
-		if (!NumberUtil.IsValid (time)) {
-			throw new Exception ("KalotayWilliamsFabozziPeriod::in11 => Invalid Inputs");
-		}
-
-		return time >= _startTime && time <= _endTime;
+		return _marketYield;
 	}
 
 	/**
@@ -259,10 +169,16 @@ public class KalotayWilliamsFabozziPeriod
 	 * @return The Cloned Instance
 	 */
 
-	@Override public KalotayWilliamsFabozziPeriod clone()
+	@Override public CalibrationSegmentElastic clone()
 	{
 		try {
-			return new KalotayWilliamsFabozziPeriod (_startTime, _endTime);
+			return new CalibrationSegmentElastic (
+				inelastic().clone(),
+				forwardYield(),
+				forwardDiscountFactor(),
+				beginDiscountFactor(),
+				_marketYield
+			);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -281,8 +197,11 @@ public class KalotayWilliamsFabozziPeriod
 	public String toString (
 		final String prefix)
 	{
-		return prefix + " {Start Time => " + FormatUtil.FormatDouble (_startTime, 2, 2, 1., false) +
-			"; End Time => " + FormatUtil.FormatDouble (_endTime, 2, 2, 1., false) + "}";
+		return prefix + "Segment Inelastic => " + inelastic() +
+			"; Forward Yield => " + FormatUtil.FormatDouble (forwardYield(), 1, 6, 1.) +
+			"; Forward Discount Factor => " + FormatUtil.FormatDouble (forwardDiscountFactor(), 1, 6, 1.) +
+			"; Segment End Discount Factor => " + FormatUtil.FormatDouble (endDiscountFactor(), 1, 6, 1.) +
+			"; Market Yield => " + FormatUtil.FormatDouble (_marketYield, 1, 6, 1.);
 	}
 
 	/**

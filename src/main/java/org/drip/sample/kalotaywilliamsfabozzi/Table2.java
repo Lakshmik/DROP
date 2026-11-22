@@ -7,7 +7,7 @@ import java.util.TreeMap;
 import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
-import org.drip.state.municipal.ZeroVolatilityPeriodState;
+import org.drip.state.municipal.CalibrationSegmentElastic;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -161,14 +161,11 @@ public class Table2
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
 
 		for (double time : timeToCalibrationYieldMap.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMap.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMap.get (time));
 		}
 
-		Map<Double, ZeroVolatilityPeriodState> timeToZeroVolatilityPeriodStateMap =
-			kalotayWilliamsFabozzi.timeToZeroVolatilityPeriodStateMap();
+		Map<Double, CalibrationSegmentElastic> timeToZeroVolatilityPeriodStateMap =
+			kalotayWilliamsFabozzi.pillarTimeToCalibrationSegmentElasticMap();
 
 		System.out.println ("\t|-----------------------------------------------||");
 
@@ -189,13 +186,13 @@ public class Table2
 		System.out.println ("\t|-----------------------------------------------||");
 
 		for (double time : timeToZeroVolatilityPeriodStateMap.keySet()) {
-			ZeroVolatilityPeriodState zeroVolatilityPeriodState =
+			CalibrationSegmentElastic zeroVolatilityPeriodState =
 				timeToZeroVolatilityPeriodStateMap.get (time);
 
 			System.out.println (
-				"\t|" + zeroVolatilityPeriodState.period() + " =>" +
+				"\t|" + zeroVolatilityPeriodState.inelastic() + " =>" +
 					FormatUtil.FormatDouble (
-						zeroVolatilityPeriodState.cumulativeEndDiscountFactor(),
+						zeroVolatilityPeriodState.endDiscountFactor(),
 						1,
 						6,
 						1.
@@ -205,7 +202,7 @@ public class Table2
 						3,
 						100.
 					) + "% |" + FormatUtil.FormatDouble (
-						forwardRateMapReconciliation.get (zeroVolatilityPeriodState.period().endTime()),
+						forwardRateMapReconciliation.get (zeroVolatilityPeriodState.inelastic().endTime()),
 						1,
 						3,
 						100.

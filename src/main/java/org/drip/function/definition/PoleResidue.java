@@ -1,11 +1,21 @@
 
 package org.drip.function.definition;
 
+import org.drip.numerical.common.NumberUtil;
+
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  */
 
 /*!
+ * Copyright (C) 2030 Lakshmi Krishnamurthy
+ * Copyright (C) 2029 Lakshmi Krishnamurthy
+ * Copyright (C) 2028 Lakshmi Krishnamurthy
+ * Copyright (C) 2027 Lakshmi Krishnamurthy
+ * Copyright (C) 2026 Lakshmi Krishnamurthy
+ * Copyright (C) 2025 Lakshmi Krishnamurthy
+ * Copyright (C) 2024 Lakshmi Krishnamurthy
+ * Copyright (C) 2023 Lakshmi Krishnamurthy
  * Copyright (C) 2022 Lakshmi Krishnamurthy
  * Copyright (C) 2021 Lakshmi Krishnamurthy
  * Copyright (C) 2020 Lakshmi Krishnamurthy
@@ -77,44 +87,49 @@ package org.drip.function.definition;
  */
 
 /**
- * <i>PoleResidue</i> holds the Residue for  given variate, if it is a Pole.
+ * <i>PoleResidue</i> holds the Residue for  given variate, if it is a Pole. It provides the following
+ * 	Functions:
  *
- *	<br><br>
  *  <ul>
- *		<li><b>Module </b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></li>
- *		<li><b>Library</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></li>
- *		<li><b>Project</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></li>
- *		<li><b>Package</b> = <a href = "https://github.com/lakshmiDRIP/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></li>
+ * 		<li>Construct a "Not-A-Pole" Version of <i>PoleResidue</i></li>
+ * 		<li><i>PoleResidue</i> Constructor</li>
+ * 		<li>Retrieve the Variate</li>
+ * 		<li>Retrieve the Residue</li>
+ * 		<li>Indicate if the Variate is a Pole</li>
+ * 		<li>Indicate if the Variate is a Simple Pole</li>
  *  </ul>
+ * 
+ *	<br>
+ *  <table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+ *		<tr><td><b>Module </b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/ComputationalCore.md">Computational Core Module</a></td></tr>
+ *		<tr><td><b>Library</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/NumericalAnalysisLibrary.md">Numerical Analysis Library</a></td></tr>
+ *		<tr><td><b>Project</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/README.md">R<sup>d</sup> To R<sup>d</sup> Function Analysis</a></td></tr>
+ *		<tr><td><b>Package</b></td> <td><a href = "https://github.com/lakshmik/DROP/tree/master/src/main/java/org/drip/function/definition/README.md">Function Implementation Ancillary Support Objects</a></td></tr>
+ *  </table>
+ *	<br>
  *
  * @author Lakshmi Krishnamurthy
  */
 
 public class PoleResidue
 {
-	private double _variate = java.lang.Double.NaN;
-	private double _residue = java.lang.Double.NaN;
+	private double _variate = Double.NaN;
+	private double _residue = Double.NaN;
 
 	/**
-	 * Construct a "Not-A-Pole" Version of PoleResidue
+	 * Construct a "Not-A-Pole" Version of <i>PoleResidue</i>
 	 * 
 	 * @param variate The Variate
 	 * 
-	 * @return "Not-A-Pole" Version of PoleResidue
+	 * @return "Not-A-Pole" Version of <i>PoleResidue</i>
 	 */
 
 	public static final PoleResidue NotAPole (
 		final double variate)
 	{
-		try
-		{
-			return new PoleResidue (
-				variate,
-				java.lang.Double.NaN
-			);
-		}
-		catch (java.lang.Exception e)
-		{
+		try {
+			return new PoleResidue (variate, Double.NaN);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -122,22 +137,21 @@ public class PoleResidue
 	}
 
 	/**
-	 * PoleResidue Constructor
+	 * <i>PoleResidue</i> Constructor
 	 * 
 	 * @param variate The Variate
 	 * @param residue The Residue
 	 * 
-	 * @throws java.lang.Exception Thrown if the Inputs are Invalid
+	 * @throws Exception Thrown if the Inputs are Invalid
 	 */
 
 	public PoleResidue (
 		final double variate,
 		final double residue)
-		throws java.lang.Exception
+		throws Exception
 	{
-		if (!org.drip.numerical.common.NumberUtil.IsValid (_variate = variate))
-		{
-			throw new java.lang.Exception ("PoleResidue Constructor => Invalid Inputs");
+		if (!NumberUtil.IsValid (_variate = variate)) {
+			throw new Exception ("PoleResidue Constructor => Invalid Inputs");
 		}
 
 		_residue = residue;
@@ -173,7 +187,7 @@ public class PoleResidue
 
 	public boolean isPole()
 	{
-		return !java.lang.Double.isNaN (_residue);
+		return !Double.isNaN (_residue);
 	}
 
 	/**
@@ -184,6 +198,6 @@ public class PoleResidue
 
 	public boolean isPoleSimple()
 	{
-		return java.lang.Double.isFinite (_residue);
+		return Double.isFinite (_residue);
 	}
 }

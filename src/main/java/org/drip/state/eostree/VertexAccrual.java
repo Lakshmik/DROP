@@ -2,6 +2,7 @@
 package org.drip.state.eostree;
 
 import org.drip.numerical.common.NumberUtil;
+import org.drip.service.common.FormatUtil;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -80,9 +81,9 @@ import org.drip.numerical.common.NumberUtil;
  */
 
 /**
- * <i>VertexAccrual</i> holds the Path-independent Vertex Accrual Properties of a Single Event Pillar Segment
- *  built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds with
- *  Embedded Options. The References are:
+ * <i>VertexAccrual</i> holds the Path-independent Vertex Accrual Properties of a Single Vertex with Pillar
+ * 	Segments built according to the Kalotay, Williams, and Fabozzi (1993) Tree-based Model for valuing bonds
+ * 	with Embedded Options. The References are:
  *  
  * 	<br>
  *  <ul>
@@ -209,5 +210,32 @@ public class VertexAccrual
 	public double amount()
 	{
 		return _yearFraction * _couponRate * _couponNotional;
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @param prefix The JSON Prefix
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public String toString (
+		final String prefix)
+	{
+		return prefix + " {Accrual Year Fraction: " + FormatUtil.FormatDouble (_yearFraction, 1, 4, 1.) +
+			"; Accrual Coupon Rate: " + FormatUtil.FormatDouble (_couponRate, 1, 4, 1.) +
+			"; Accrual Coupon Notional: " + FormatUtil.FormatDouble (_couponNotional, 1, 4, 1.) + "}";
+	}
+
+	/**
+	 * 'JSON-ize' the State
+	 * 
+	 * @return The 'JSON-ize'd State
+	 */
+
+	public @Override String toString()
+	{
+		return toString ("");
 	}
 }

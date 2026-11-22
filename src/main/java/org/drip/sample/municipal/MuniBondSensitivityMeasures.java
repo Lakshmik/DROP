@@ -7,7 +7,7 @@ import org.drip.service.common.FormatUtil;
 import org.drip.service.env.EnvManager;
 import org.drip.state.municipal.KalotayWilliamsFabozzi;
 import org.drip.state.eostree.ProxyBondEvaluator;
-import org.drip.state.municipal.BondSensitivity;
+import org.drip.state.municipal.YieldSensitivity;
 
 /*
  * -*- mode: java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
@@ -288,15 +288,12 @@ public class MuniBondSensitivityMeasures
 		KalotayWilliamsFabozzi kalotayWilliamsFabozzi = new KalotayWilliamsFabozzi();
 
 		for (double time : timeToCalibrationYieldMapInput.keySet()) {
-			kalotayWilliamsFabozzi.augmentTimeToZeroVolatilityPeriodStateMap (
-				time,
-				timeToCalibrationYieldMapInput.get (time)
-			);
+			kalotayWilliamsFabozzi.updateCalibrationSegmentElasticMap (time, timeToCalibrationYieldMapInput.get (time));
 		}
 
-		kalotayWilliamsFabozzi.applyProjectedBaseForwardYield (
+		kalotayWilliamsFabozzi.applySegmentBaseYield (
 			annualizedForwardYieldVolatility,
-			KalotayWilliamsFabozzi.BASE_FORWARD_NODE_ADJUSTED_CUMULATIVE_YIELD
+			KalotayWilliamsFabozzi.EVOLUTION_MEAN_ADJUSTED_SEGMENT_YIELD
 		);
 
 		TreeMap<Double, Double> timeToYieldBasisMap = TimeToYieldBasisMap();
@@ -328,7 +325,7 @@ public class MuniBondSensitivityMeasures
 				callPriceSchedule
 			);
 
-			BondSensitivity proxyBondSensitivity = proxyBond.secularMeasuresFromYieldBasis (
+			YieldSensitivity proxyBondSensitivity = proxyBond.secularMeasuresFromYieldBasis (
 				null,
 				kalotayWilliamsFabozzi,
 				annualizedForwardYieldVolatility,
@@ -362,7 +359,7 @@ public class MuniBondSensitivityMeasures
 					1,
 					1.
 				) + " |" + FormatUtil.FormatDouble (
-					proxyBondSensitivity.yieldBasis(),
+					proxyBondSensitivity.basis(),
 					3,
 					1,
 					10000.
